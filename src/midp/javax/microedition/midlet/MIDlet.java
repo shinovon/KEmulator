@@ -4,7 +4,6 @@ import emulator.Emulator;
 import emulator.Permission;
 import emulator.Settings;
 import emulator.Utils;
-import emulator.custom.CustomMethod;
 
 import javax.microedition.io.ConnectionNotFoundException;
 import java.io.File;
@@ -39,8 +38,7 @@ public abstract class MIDlet {
 		}
 		Emulator.notifyDestroyed();
 		Emulator.getEmulator().getLogStream().println("Exiting Emulator");
-		CustomMethod.close();
-		System.exit(0);
+		Emulator.exitToFavorites();
 	}
 
 	public void notifyPaused() {

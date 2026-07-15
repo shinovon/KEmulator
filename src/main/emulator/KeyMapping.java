@@ -169,9 +169,6 @@ public final class KeyMapping {
 			n = 13;
 		}
 
-		if (Settings.canvasKeyboard && (n >= '0' && n <= '9')) {
-			return String.valueOf(n);
-		}
 		final Object value;
 		if ((value = KeyMapping.deviceKeyToStr.get(String.valueOf(n))) != null) {
 			return (String) KeyMapping.strToPCKey.get(value);
@@ -245,6 +242,6 @@ public final class KeyMapping {
 		KeyMapping.keysTable.put("9", "Insert");
 		KeyMapping.keysTable.put("13", "Enter");
 		KeyMapping.keysTable.put("80", "Enter");
-		KeyMapping.deviceKeycodes = new String[]{"48", "55", "56", "57", "52", "53", "54", "49", "50", "51", "42", "47", "1", "2", "3", "4", "13", "10", "11"};
+		KeyMapping.deviceKeycodes = new String[]{"48", "55", "56", "57", "52", "53", "54", "49", "50", "51", "42", "47", "1", "2", "3", "4", "12", "10", "11"};
 	}
 }

@@ -33,11 +33,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 public class Emulator implements Runnable {
-	public static boolean debugBuild = true;
+	public static boolean debugBuild = false;
 	public static String version = "2.21.4";
 	public static String revision = "";
 	public static final int numericVersion = 38;
@@ -48,6 +49,7 @@ public class Emulator implements Runnable {
 	private static Screen currentScreen;
 	private static EventQueue eventQueue;
 	private static KeyRecords record;
+	
 	public static Vector jarLibrarys;
 	public static Vector<String> jarClasses;
 	public static String midletJarPath;
@@ -67,6 +69,8 @@ public class Emulator implements Runnable {
 	private static boolean updated;
 	private static boolean bridge;
 	public static boolean doja;
+	static boolean showFavoritesOnStart;
+	static boolean startFullscreen;
 
 	static int startWidth, startHeight;
 
@@ -131,6 +135,95 @@ public class Emulator implements Runnable {
 			}
 		} catch (Throwable ignored) {}
 		MMFPlayer.close();
+		killJ2MEGamepad();
+	}
+
+	private static String j2meGamepadFoundPath;
+
+	public static String getJ2MEGamepadPath() {
+		if (Settings.j2meGamepadPath != null) return Settings.j2meGamepadPath;
+		refreshJ2MEGamepadPath();
+		return Settings.j2meGamepadPath;
+	}
+
+	public static boolean isJ2MEGamepadAvailable() {
+		if (Settings.j2meGamepadPath != null) {
+			if (new File(Settings.j2meGamepadPath).isFile()) return true;
+			Settings.j2meGamepadPath = null;
+			if (emulatorimpl != null) {
+				try { emulatorimpl.getProperty().saveProperties(); } catch (Exception ignored) {}
+			}
+		}
+		return isJ2MEGamepadRunning();
+	}
+
+	public static void launchJ2MEGamepad() {
+		if (isJ2MEGamepadRunning()) return;
+		String path = getJ2MEGamepadPath();
+		if (path == null) return;
+		try {
+			Runtime.getRuntime().exec("cmd /c start \"\" \"" + path + "\"");
+		} catch (IOException e) {
+			System.err.println("[Gamepad] launch error: " + e.getMessage());
+		}
+	}
+
+	private static boolean isJ2MEGamepadRunning() {
+		try {
+			Process p = Runtime.getRuntime().exec(new String[]{"tasklist", "/FI", "IMAGENAME eq J2MEGamepad.exe"});
+			BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
+			boolean found = false;
+			String line;
+			while ((line = r.readLine()) != null) {
+				if (line.toLowerCase().contains("j2megamepad.exe")) { found = true; break; }
+			}
+			r.close();
+			p.waitFor();
+			if (found && Settings.j2meGamepadPath == null) refreshJ2MEGamepadPath();
+			return found;
+		} catch (Exception ignored) {}
+		return false;
+	}
+
+	private static void refreshJ2MEGamepadPath() {
+		try {
+			Process p = Runtime.getRuntime().exec(new String[]{
+				"wmic", "process", "where", "name='J2MEGamepad.exe'",
+				"get", "ExecutablePath", "/format:value"
+			});
+			BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
+			String line;
+			while ((line = r.readLine()) != null) {
+				line = line.trim();
+				if (line.startsWith("ExecutablePath=")) {
+					String path = line.substring("ExecutablePath=".length()).trim();
+					if (path.length() > 0 && new File(path).isFile()) {
+						Settings.j2meGamepadPath = path;
+						if (emulatorimpl != null) {
+							try { emulatorimpl.getProperty().saveProperties(); } catch (Exception ignored) {}
+						}
+					}
+				}
+			}
+			r.close();
+			p.waitFor();
+		} catch (Exception ignored) {}
+	}
+
+	public static void killJ2MEGamepad() {
+		if (!Settings.j2meGamepadEnabled) return;
+		// Fire WM_CLOSE (graceful) then immediately /F — no waits.
+		// If the gamepad processes WM_CLOSE fast enough it cleans up;
+		// otherwise /F terminates it and UnstickModifierKeys on next
+		// launch releases any leftover stuck keys.
+		try { new ProcessBuilder("taskkill", "/IM", "J2MEGamepad.exe").start(); } catch (Exception ignored) {}
+		try { new ProcessBuilder("taskkill", "/F", "/IM", "J2MEGamepad.exe").start(); } catch (IOException e) {
+			System.err.println("[Gamepad] kill error: " + e.getMessage());
+		}
+	}
+
+	public static void killJ2MEGamepadForced() {
+		killJ2MEGamepad();
 	}
 
 	public static void notifyDestroyed() {
@@ -243,7 +336,7 @@ public class Emulator implements Runnable {
 	public static String getTitle(String s) {
 		if (AppSettings.customTitle != null) return AppSettings.customTitle;
 		StringBuilder sb = new StringBuilder();
-		sb.append(platform.getTitleName()).append(' ').append(version);
+		sb.append(platform.getTitleName()).append(' ').append(version).append(" KEADDON");
 		if (s != null) {
 			sb.append(" - ").append(s);
 		} else if (midletJarPath != null && Emulator.emulatorimpl.getAppProperties() != null) {
@@ -262,7 +355,7 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getAboutString() {
-		return "KEmulator nnmod\n" + version;
+		return platform.getTitleName() + " " + version + " KEADDON\n" + version;
 	}
 
 	public static void getLibraries() {
@@ -380,10 +473,9 @@ public class Emulator implements Runnable {
 
 						int n = emulatorimpl.getScreen().showMidletChoice(midletKeys);
 						if (n == -1) {
-							CustomMethod.close();
-							System.exit(0);
-							return false;
-						}
+CustomMethod.close();
+		System.exit(0);
+	}
 						String c = props.getProperty(midletKeys.get(n));
 						Emulator.midletClassName = c.substring(c.lastIndexOf(",") + 1).trim();
 						return true;
@@ -508,6 +600,16 @@ public class Emulator implements Runnable {
 		array[n] = midletJar;
 	}
 
+	public static void syncPresetIndex(int w, int h) {
+		Settings.currentPresetIdx = -1;
+		for (int i = 0; i < Settings.resolutionPresets.length; i++) {
+			if (Settings.resolutionPresets[i][0] == w && Settings.resolutionPresets[i][1] == h) {
+				Settings.currentPresetIdx = i;
+				break;
+			}
+		}
+	}
+
 	private static void setProperties() {
 		System.setProperty("microedition.configuration", "CLDC-1.1");
 		System.setProperty("microedition.profiles", "MIDP-2.0");
@@ -629,6 +731,14 @@ public class Emulator implements Runnable {
 			else
 				Emulator.emulatorimpl = new SWTFrontend();
 			parseLaunchArgs(args);
+
+			// Save JAR directory for Favorites Browser cache
+			if (Emulator.midletJarPath != null) {
+				try {
+					Settings.lastJarDir = new File(Emulator.midletJarPath).getParentFile().getAbsolutePath();
+				} catch (Exception ignored) {}
+			}
+
 			// Force m3g engine to LWJGL in x64 build
 			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
 
@@ -640,6 +750,8 @@ public class Emulator implements Runnable {
 					+ System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
 			Devices.load(Settings.deviceFile);
 			AppSettings.init();
+			if (Settings.j2meGamepadAutoLaunch) launchJ2MEGamepad();
+			Runtime.getRuntime().addShutdownHook(new Thread(Emulator::shutdownHook));
 
 			setupMRUList();
 			RichPresence.initRichPresence();
@@ -651,29 +763,32 @@ public class Emulator implements Runnable {
 
 			if (Emulator.midletClassName == null && Emulator.midletJarPath == null) {
 				Emulator.emulatorimpl.getScreen().initScreen(AppSettings.screenWidth, AppSettings.screenHeight);
+				if (showFavoritesOnStart) {
+					EmulatorScreen escr = (EmulatorScreen) Emulator.emulatorimpl.getScreen();
+					EmulatorScreen.fullscreen = startFullscreen;
+					escr.openFavoritesBrowser();
+				}
 				Emulator.emulatorimpl.getScreen().runEmpty();
 				emulatorimpl.dispose();
-				System.exit(0);
+				killJ2MEGamepad();
+				Runtime.getRuntime().halt(0);
 				return;
 			}
 			Emulator.record = new KeyRecords();
 			getLibraries();
-			Runtime.getRuntime().addShutdownHook(new Thread(Emulator::shutdownHook));
 			try {
 				if (!getJarClasses()) {
-					Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."));
-					System.exit(1);
+					restartClean();
 					return;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_CLASSES_ERROR", "Get Classes Failed!! Plz check the input jar or classpath."), CustomMethod.getStackTrace(e));
-				System.exit(1);
+				restartClean();
 				return;
 			}
 			if (Emulator.midletClassName == null) {
-				Emulator.emulatorimpl.getScreen().showMessage(UILocale.get("LOAD_MIDLET_ERROR", "Can not find MIDlet class. Plz check jad or use -midlet param."));
-				System.exit(1);
+				restartClean();
 				return;
 			}
 			InputStream inputStream = null;
@@ -701,7 +816,7 @@ public class Emulator implements Runnable {
 				AppSettings.softbankApi = Emulator.emulatorimpl.getAppProperty("MIDxlet-API") != null;
 			} catch (Exception ignored) {}
 
-			if (AppSettings.load(false) == 0) {
+			if (AppSettings.load(false) == 0 && Settings.showAppSettingsOnStart) {
 				Emulator.emulatorimpl.openAppSettings(true);
 			}
 			tryToSetDevice();
@@ -742,7 +857,8 @@ public class Emulator implements Runnable {
 			emulatorimpl.dispose();
 		} catch (Throwable ignored) {
 		}
-		System.exit(0);
+		killJ2MEGamepad();
+		Runtime.getRuntime().halt(0);
 	}
 
 	private static void tryToSetDevice() {
@@ -822,6 +938,10 @@ public class Emulator implements Runnable {
 				AppSettings.uei = true;
 			} else if (key.equalsIgnoreCase("s")) {
 				forked = true;
+			} else if (key.equalsIgnoreCase("fav")) {
+				showFavoritesOnStart = true;
+			} else if (key.equalsIgnoreCase("fullscreen")) {
+				startFullscreen = true;
 			} else if (key.equalsIgnoreCase("updated")) {
 				updated = true;
 			} else if (key.equals("bridge")) {
@@ -1006,6 +1126,64 @@ public class Emulator implements Runnable {
 		return getAbsolutePath();
 	}
 
+	/** Restart the emulator without loading any JAR, stripping JAR path args from the command line. */
+	public static void restartClean() {
+		// Filter out -jar/-jad/-midlet and their values, and bare .jar/.jad/.jam paths
+		java.util.ArrayList<String> filtered = new java.util.ArrayList<>();
+		boolean skipNext = false;
+		for (int i = 0; i < commandLineArguments.length; i++) {
+			String a = commandLineArguments[i];
+			if (skipNext) { skipNext = false; continue; }
+			String low = a.toLowerCase();
+			if (low.equals("-jar") || low.equals("-jad") || low.equals("-midlet")) {
+				skipNext = true;
+				continue;
+			}
+			if (low.endsWith(".jar") || low.endsWith(".jad") || low.endsWith(".jam")) {
+				continue;
+			}
+			filtered.add(a);
+		}
+		commandLineArguments = filtered.toArray(new String[0]);
+		loadGame(null, false);
+	}
+
+	/** Restart the emulator and show the Favorites Browser instead of loading a JAR. */
+	public static void exitToFavorites() {
+		boolean wasFullscreen = EmulatorScreen.fullscreen;
+		ArrayList<String> cmd = new ArrayList<String>();
+		String javahome = System.getProperty("java.home");
+		cmd.add(javahome == null || javahome.length() < 1 ? "java" : (javahome + (!Utils.win ? "/bin/java" : "/bin/java.exe")));
+		cmd.add("-cp");
+		cmd.add(System.getProperty("java.class.path"));
+		if (Settings.jdwpDebug) {
+			cmd.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + Settings.debugPort);
+		}
+		cmd.add("-Djava.library.path=" + getAbsolutePath());
+		cmd.add("-Dfile.encoding=UTF-8");
+		if (debugBuild) {
+			cmd.add("-javaagent:" + getAbsoluteFile());
+		} else {
+			cmd.add("-javaagent:" + getAbsoluteFile());
+		}
+		cmd.add("emulator.Emulator");
+		cmd.add("-fav");
+		if (wasFullscreen) {
+			cmd.add("-fullscreen");
+		}
+		try {
+			ProcessBuilder pb = new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO();
+			pb.environment().remove("GDK_BACKEND");
+			pb.environment().remove("WAYLAND_DISPLAY");
+			pb.start();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		killJ2MEGamepad();
+		CustomMethod.close();
+		Runtime.getRuntime().halt(0);
+	}
+
 	public static void loadGame(String s, boolean b) {
 		loadGame(s, Settings.g2d, Settings.g3d, Settings.micro3d, b);
 	}
@@ -1120,7 +1298,12 @@ public class Emulator implements Runnable {
 		try {
 			getEmulator().disposeSubWindows();
 			notifyDestroyed();
-		} catch (NullPointerException ignored) {}
+		} catch (Exception ignored) {}
+		if (emulatorimpl != null) {
+			// Kill gamepad BEFORE spawning the new process so isJ2MEGamepadRunning()
+			// returns false when the new instance checks it and launches a fresh one.
+			killJ2MEGamepad();
+		}
 		try {
 			ProcessBuilder newKem = new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO();
 			newKem.environment().remove("GDK_BACKEND");
@@ -1133,8 +1316,10 @@ public class Emulator implements Runnable {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		CustomMethod.close();
-		System.exit(0);
+		if (emulatorimpl != null) {
+			CustomMethod.close();
+		}
+		Runtime.getRuntime().halt(0);
 	}
 
 	static String getMidletJarUrl(String jadPath) {

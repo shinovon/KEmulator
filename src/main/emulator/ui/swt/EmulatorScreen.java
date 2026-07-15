@@ -1,5 +1,10 @@
 package emulator.ui.swt;
 
+import com.sun.jna.Function;
+import com.sun.jna.NativeLibrary;
+import com.sun.jna.platform.win32.Kernel32;
+import com.sun.jna.platform.win32.WinNT;
+import com.sun.jna.ptr.IntByReference;
 import emulator.*;
 import emulator.custom.ResourceManager;
 import emulator.custom.CustomMethod;
@@ -13,7 +18,9 @@ import emulator.ui.CommandsMenuPosition;
 import emulator.ui.ICaret;
 import emulator.ui.IScreen;
 import emulator.ui.TargetedCommand;
+import emulator.ui.VibraPipe;
 import emulator.ui.swt.devutils.idea.IdeaUtils;
+import emulator.ui.swt.HotkeyManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StackLayout;
@@ -33,14 +40,29 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Screen;
 import javax.swing.*;
+import javax.sound.sampled.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Vector;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 public final class EmulatorScreen implements
 		IScreen, Runnable, PaintListener, DisposeListener,
@@ -54,6 +76,43 @@ public final class EmulatorScreen implements
 
 	private Shell shell;
 	private Canvas canvas;
+	private Rectangle browseFavBounds;
+	private Rectangle luckyJarBounds;
+	/* Debug button removed
+	private Rectangle debugFavBounds;
+	/**/
+	private float browseBtnR = 120, browseBtnG = 60, browseBtnB = 180; // Performance Scene — random color with fade
+	private float browseBtnTargetR = 120, browseBtnTargetG = 60, browseBtnTargetB = 180;
+	private int browseBtnCycleTimer;
+
+	private float luckyBtnR = 60, luckyBtnG = 120, luckyBtnB = 180;
+	private float luckyBtnTargetR = 60, luckyBtnTargetG = 120, luckyBtnTargetB = 180;
+	private int luckyBtnCycleTimer;
+
+	/* Debug button removed
+	private float debugBtnR = 180, debugBtnG = 60, debugBtnB = 120;
+	private float debugBtnTargetR = 180, debugBtnTargetG = 60, debugBtnTargetB = 120;
+	/**/
+	private boolean browseAnimScheduled;
+	private int browseFavOpenCount; // Performance Scene — pause bg when FavoritesBrowser is open
+	private boolean browseFavHeld;
+	private boolean browseFavPressed;
+	private boolean browseFavHovered;
+	private boolean luckyFavHeld;
+	private boolean luckyFavPressed;
+	private boolean luckyFavHovered;
+	/* Debug button removed
+	private boolean debugFavHeld;
+	private boolean debugFavPressed;
+	private boolean debugFavHovered;
+	/**/
+	private int browseSelectedIdx = -1;
+	private Clip browseSoundClip;
+	private Object browseSoundPlayer;
+	private Thread browseSoundThread;
+	private String[] browseSoundFiles;
+	private boolean browseSoundPlaying;
+	private Random browseSoundRand = new Random();
 	private CLabel leftSoftLabel;
 	private CLabel rightSoftLabel;
 	private CLabel statusLabel;
@@ -119,12 +178,14 @@ public final class EmulatorScreen implements
 	MenuItem helpMenuItem;
 	MenuItem updateMenuItem;
 	MenuItem optionsMenuItem;
+	MenuItem themeMenuItem;
 	MenuItem xrayViewMenuItem;
 	MenuItem infosMenuItem;
 	MenuItem alwaysOnTopMenuItem;
 	MenuItem rotateScreenMenuItem;
 	MenuItem forcePaintMenuItem;
 	MenuItem keypadMenuItem;
+	MenuItem openLuckyJarMenuItem;
 	MenuItem logMenuItem;
 	MenuItem watchesMenuItem;
 	MenuItem profilerMenuItem;
@@ -135,7 +196,18 @@ public final class EmulatorScreen implements
 	MenuItem sensorMenuItem;
 	MenuItem devUtilsMenuItem;
 	MenuItem networkKillswitchMenuItem;
+	MenuItem j2meGamepadTerminateMenuItem;
+	MenuItem j2meGamepadLaunchMenuItem;
+	MenuItem autoSkipAppSettingsMenuItem;
 	MenuItem appSettingsMenuItem;
+	MenuItem deleteJarMenuItem;
+	MenuItem prevJarMenuItem;
+	MenuItem nextJarMenuItem;
+	MenuItem prevResMenuItem;
+	MenuItem nextResMenuItem;
+	MenuItem resolutionRestartMenuItem;
+	MenuItem disableTouchDblClickMenuItem;
+	private Shell toastShell;
 	private MenuItem canvasKeyboardMenuItem;
 	private MenuItem changeResMenuItem;
 	private Menu menuResize;
@@ -198,10 +270,125 @@ public final class EmulatorScreen implements
 	private Win32KeyboardPoller poller;
 
 	private boolean crashed;
+	private Image splashImage;
+	private Rectangle splashBounds;
+	private boolean splashHeld;
+	private String splashHeldSentence;
+	private float pulsePhase; // Performance Scene — pulsing background hue
+	private static final String[] BG_SENTENCES = {
+		"",
+		"Fun is infinite!",
+		"For free?!",
+		"Don't litter cities, please",
+		"You're going to have a great time!",
+		"Tech is fun!",
+		"Even the smallest details\ncan greatly enhance\nyour personal experience."
+	};
+	private String currentBgSentence = BG_SENTENCES[browseSoundRand.nextInt(BG_SENTENCES.length)];
+	private boolean pulseAnimScheduled;
+
+	// ── Infinite-scroll background icon animation for splash screen ─
+	private static final int BG_ICON_SIZE = 64; // Performance Scene
+	private final List<BgIconSlot> bgIconSlots = new ArrayList<>();
+	private final java.util.List<File> bgJarFiles = new ArrayList<>();
+	private boolean bgIconsLoaded;
+	private static final java.util.Set<File> bgLoadingSet = new java.util.HashSet<>(); // Performance Scene — dedup bg icon loads
+	private static final java.util.Set<String> bgNoIconJars = new java.util.HashSet<>(); // Performance Scene — jars known to have no icon
+	private int bgGridCols = 1;
+	private int bgGridRows = 1;
+	private int bgMaxActiveIcons = 1; // Performance Scene — limit visible icons to unique jar count for sparse look
+	private int bgSteadyCap = 1; // lower cap applied after first wrap transition
+	private int bgActiveIconCount;
+	private int bgWrapCount;
+	private int bgGridPad;
+	private float bgScrollY;
+	private Runnable bgAnimRunnable;
+	private long bgAnimLastNanos;
+	private static final int BG_LEADING_PAD = 4; // extra grid rows so leading edge is off-screen before wrap
+	private static final int BG_ANIM_INTERVAL_MS = 50; // Performance Scene — 20 FPS ceiling
+	private static final float BG_SCROLL_SPEED_SEC = 24.0f; // Performance Scene — px/s scroll
+	private static final float PULSE_SPEED_SEC = 0.1f; // Performance Scene — cycles/s
+	private static final float ALPHA_FADE_SEC = 0.7f; // Performance Scene — fade duration
+	private static final float BTN_FADE_SPEED = 0.08f; // Performance Scene — lerp factor per tick toward target
+	private Color pulseBgColor; // Performance Scene — cached pulsing color
+	private int pulseBgColorR = -1, pulseBgColorG = -1, pulseBgColorB = -1;
+	private Color splashDarkBg;
+	private Color splashDarkFg;
+	private Color statusBarDarkBg;
+	private boolean shellBgStored;
+	private Color shellBgLight;
+
+
+	private boolean bgDirty;
+	// Performance Scene — O(1) shuffled jar-index pool (culling to BG_POOL_SIZE entries)
+	private int[] bgJarOrder;
+	private int bgJarOrderCursor;
+	private static final int BG_POOL_SIZE = 3000;
+	private String bgCustomDirPath; // Performance Scene — temp override for swapped dir
+	private static final int DIR_UP = 0, DIR_DOWN = 1, DIR_RIGHT = 2, DIR_LEFT = 3;
+	private static final int DIR_UP_RIGHT = 4, DIR_UP_LEFT = 5, DIR_DOWN_RIGHT = 6, DIR_DOWN_LEFT = 7;
+	private int bgScrollDir = browseSoundRand.nextInt(8); // Performance Scene — random direction at startup
+	private int bgAnimMode = 8; // 0-7=directions, 8=random; default matches legacy random
+	private float bgScrollX;
+
+	private static class BgIconSlot {
+		Image icon;
+		float x, y;
+		float alpha;
+		int phase;
+		int phaseTimer;
+		int drawAlpha;
+		int drawX, drawY;
+		int row;
+		int col;
+	}
 
 	public EmulatorScreen() {
 		this.pauseStateStrings = new String[]{UILocale.get("MAIN_INFO_BAR_UNLOADED", "UNLOADED"), UILocale.get("MAIN_INFO_BAR_RUNNING", "RUNNING"), UILocale.get("MAIN_INFO_BAR_PAUSED", "PAUSED")};
 		display = SWTFrontend.getDisplay();
+		display.addFilter(SWT.KeyDown, new Listener() {
+			public void handleEvent(Event event) {
+				if (Character.toLowerCase(event.keyCode) == 'w' && (event.stateMask & SWT.CTRL) != 0) {
+					if (!fullscreen) return;
+					event.doit = false;
+					event.type = SWT.None;
+					doDeleteJar();
+				}
+				if (pauseState == 0) {
+					Shell[] shells = shell == null ? null : shell.getShells();
+					if (shells != null) {
+						for (Shell s : shells) {
+							if (s.isVisible()) return;
+						}
+					}
+					int kc = event.keyCode;
+					if (kc == SWT.ARROW_UP || kc == SWT.KEYPAD_8 || kc == SWT.ARROW_DOWN || kc == SWT.KEYPAD_2 || kc == SWT.F3 || kc == SWT.KEYPAD_5) {
+						handleBtnKeyDown(kc);
+						event.doit = false;
+					}
+				}
+			}
+		});
+		display.addFilter(SWT.KeyUp, new Listener() {
+			public void handleEvent(Event event) {
+				if (pauseState != 0) return;
+				Shell[] shells = shell == null ? null : shell.getShells();
+				if (shells != null) {
+					for (Shell s : shells) {
+						if (s.isVisible()) return;
+					}
+				}
+				int kc = event.keyCode;
+				if (kc == SWT.F3 || kc == SWT.KEYPAD_5) {
+					if (browseSelectedIdx == 0 && browseFavHeld) handleBrowseRelease();
+					else if (browseSelectedIdx == 1 && luckyFavHeld) handleLuckyRelease();
+					/* Debug button removed
+					else if (browseSelectedIdx == 2 && debugFavHeld) handleDebugRelease();
+					/**/
+					event.doit = false;
+				}
+			}
+		});
 		this.initShell();
 	}
 
@@ -214,6 +401,7 @@ public final class EmulatorScreen implements
 			this.initScreenBuffer(w = 240, h = 320);
 		}
 		startWidth = w; startHeight = h;
+		Emulator.syncPresetIndex(w, h);
 		this.updatePauseState();
 	}
 
@@ -280,35 +468,78 @@ public final class EmulatorScreen implements
 		} catch (Throwable ignored) {
 		}
 
-		Shell shell = new Shell(parentShell, SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL);
-		shell.setSize(450, 300);
-		shell.setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
-		shell.setLayout(new GridLayout(1, false));
+		Shell dialog = new Shell(parentShell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+		dialog.setSize(450, 300);
+		dialog.setText(UILocale.get("MESSAGE_BOX_TITLE", "KEmulator Alert"));
+		dialog.setLayout(new GridLayout(1, false));
 
-		Composite composite = new Composite(shell, SWT.NONE);
+		Composite composite = new Composite(dialog, SWT.NONE);
 		composite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		Label label = new Label(composite, SWT.NONE);
 		label.setText(title);
 
-		Composite composite_1 = new Composite(shell, SWT.NONE);
+		Composite composite_1 = new Composite(dialog, SWT.NONE);
 		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		composite_1.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		Text text = new Text(composite_1, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
 		text.setText(detail);
 
-//		shell.pack();
-		Rectangle clientArea = shell.getMonitor().getClientArea();
-		Point size = shell.getSize();
-		shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
-		shell.open();
-		while (!shell.isDisposed()) {
+		Composite buttonBar = new Composite(dialog, SWT.NONE);
+		buttonBar.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
+		GridLayout buttonLayout = new GridLayout(2, true);
+		buttonLayout.marginWidth = 8;
+		buttonLayout.marginHeight = 4;
+		buttonBar.setLayout(buttonLayout);
+
+		Label hintLabel = new Label(buttonBar, SWT.NONE);
+		hintLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
+		hintLabel.setText("Press F2 to close");
+
+		Button okBtn = new Button(buttonBar, SWT.PUSH);
+		okBtn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		okBtn.setText("OK");
+		if (Settings.favoritesDarkMode) {
+			applyThemeToShell(dialog, true);
+		}
+		okBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				dialog.close();
+			}
+		});
+
+		Rectangle clientArea = dialog.getMonitor().getClientArea();
+		Point size = dialog.getSize();
+		dialog.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
+
+		org.eclipse.swt.widgets.Listener dialogFilter = event -> {
+			if (dialog == null || dialog.isDisposed() || !dialog.isVisible()) return;
+			org.eclipse.swt.widgets.Control focus = display.getFocusControl();
+			if (focus == null || focus.getShell() != dialog) return;
+			KeyEvent ke = new KeyEvent(event);
+			if (FavoritesBrowser.isConfirmKey(ke)) {
+				if (focus instanceof Button) {
+					((org.eclipse.swt.widgets.Button) focus).notifyListeners(SWT.Selection, new Event());
+				}
+				event.doit = false;
+			} else if (FavoritesBrowser.matchNavKey(ke, HotkeyManager.UI_CANCEL)) {
+				dialog.close();
+				event.doit = false;
+			}
+		};
+		display.addFilter(SWT.KeyUp, dialogFilter);
+
+		okBtn.setFocus();
+
+		dialog.open();
+		while (!dialog.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
 		}
+		display.removeFilter(SWT.KeyUp, dialogFilter);
 	}
 
 	public void showMessageThreadSafe(final String title, final String detail) {
@@ -365,7 +596,6 @@ public final class EmulatorScreen implements
 		}
 		this.shell.setLocation(EmulatorScreen.locX, EmulatorScreen.locY);
 //		EmulatorImpl.asyncExec(new WindowOpen(this, 0));
-		display.asyncExec(new WindowOpen(this, 1));
 		display.asyncExec(new WindowOpen(this, 2));
 
 		if (midletLoaded) {
@@ -373,7 +603,11 @@ public final class EmulatorScreen implements
 			midletSupportsMultitouch = s != null && s.contains("EnableMultiPointTouchEvents");
 		}
 
-		shell.open();
+		if (!shell.isVisible()) {
+			shell.open();
+		}
+
+		scheduleBrowseBtnAnim();
 
 		if (Utils.win) {
 			Rectangle screenArea = display.getClientArea();
@@ -435,19 +669,27 @@ public final class EmulatorScreen implements
 			}
 		} catch (Throwable e) {
 			crashed = true;
-			e.printStackTrace();
-			CustomMethod.close();
+			String trace;
 			try {
-				if (shell != null && !shell.isDisposed()) {
-					shell.removeDisposeListener(this);
-					shell.removeControlListener(this);
-					shell.dispose();
-				}
-				showMessage("KEmulator has crashed, please report this error message.", CustomMethod.getStackTrace(e));
-			} catch (Throwable t) {
-				JOptionPane.showMessageDialog(new JPanel(), "KEmulator has crashed, please report this error message.\n\n" + CustomMethod.getStackTrace(e));
+				java.io.StringWriter sw = new java.io.StringWriter();
+				java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+				e.printStackTrace(pw);
+				pw.close();
+				trace = sw.toString();
+			} catch (Throwable ignored) {
+				trace = e.getMessage();
 			}
-			System.exit(1);
+			System.err.println("KEmulator has crashed:");
+			System.err.println(trace);
+			try {
+				java.io.PrintWriter fw = new java.io.PrintWriter(new java.io.FileWriter(System.getProperty("java.io.tmpdir", ".") + "/kemulator_crash.log"));
+				fw.println("KEmulator crash log");
+				fw.println(trace);
+				fw.close();
+				System.err.println("Crash log at: %TEMP%\\kemulator_crash.log");
+			} catch (Throwable ignored) {
+			}
+			Runtime.getRuntime().halt(1); // Performance Scene — kill JVM, skip SWT shutdown hooks
 		}
 		this.pauseState = 0;
 	}
@@ -460,9 +702,14 @@ public final class EmulatorScreen implements
 				Settings.resizeMode = ResizeMethod.Fit;
 				syncScalingModeSelection();
 			}
-			initScreenBuffer(x, y); // it's set automatically only in follow mode
+			initScreenBuffer(x, y);
 			updateCanvasRect(true, false, true);
 			Emulator.getEventQueue().sizeChanged(x, y);
+			if (AppSettings.screenWidth != x || AppSettings.screenHeight != y) {
+				AppSettings.screenWidth = x;
+				AppSettings.screenHeight = y;
+				AppSettings.save();
+			}
 		}
 	}
 
@@ -841,9 +1088,12 @@ public final class EmulatorScreen implements
 		layout.makeColumnsEqualWidth = false;
 		(this.shell = new Shell(fullscreen ? SWT.NONE : SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN))
 				.setText(Emulator.getTitle(null));
+		markThemeable(shell);
 		shell.addListener(SWT.Close, event -> CustomMethod.close());
 		shell.setMinimumSize(120, 50); // windows uses 120px as hard limit for width
 		shell.setLayout(layout);
+		shellBgLight = shell.getBackground();
+		shellBgLight = new Color(display, shellBgLight.getRed(), shellBgLight.getGreen(), shellBgLight.getBlue());
 		try {
 			if (f == null) {
 				FontData fd = shell.getFont().getFontData()[0];
@@ -852,6 +1102,10 @@ public final class EmulatorScreen implements
 			}
 			shell.setFont(f);
 		} catch (Error ignored) {
+		}
+		try {
+			splashImage = new Image(display, getClass().getResourceAsStream("/res/keaddon.png"));
+		} catch (Exception ignored) {
 		}
 		initCanvas();
 		(this.leftSoftLabel = new CLabel(this.shell, 0)).setText("\t");
@@ -873,6 +1127,10 @@ public final class EmulatorScreen implements
 				new Thread(() -> Emulator.getCurrentDisplay().getCurrent().handleSoftKeyAction(KeyMapping.soft2(), true)).start();
 			}
 		});
+		if (Settings.favoritesDarkMode) {
+			applyStatusBarTheme(true);
+			applyThemeToShell(shell, true);
+		}
 		initMenu();
 		setFullscreen(fullscreen);
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
@@ -929,7 +1187,7 @@ public final class EmulatorScreen implements
 		shell.setMenuBar(fullscreen ? null : menu);
 	}
 
-	private void changeFullscreen() {
+	public void changeFullscreen() {
 //		shell.setMenuBar(null);
 		if (infosEnabled) {
 			infosEnabled = false;
@@ -945,6 +1203,9 @@ public final class EmulatorScreen implements
 		initShell();
 		start(pauseState != 0);
 		tempShell.dispose();
+		if (EmulatorScreen.fullscreen) {
+			reloadBgIcons(); // Performance Scene — fresh bg after entering fullscreen
+		}
 	}
 
 	private void initMenu() {
@@ -967,7 +1228,7 @@ public final class EmulatorScreen implements
 		(this.infosMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_INFO", "Infos") + "\tCtrl+I");
 		this.infosMenuItem.addSelectionListener(this);
 
-		(this.xrayViewMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_XRAY", "X-Ray View") + "\tAlt+X");
+		(this.xrayViewMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_XRAY", "X-Ray View") + "\tCtrl+X");
 		this.xrayViewMenuItem.addSelectionListener(this);
 
 		if (!Emulator.isX64()) {
@@ -980,10 +1241,10 @@ public final class EmulatorScreen implements
 		this.rotateScreenMenuItem.addSelectionListener(this);
 
 		this.rotate90MenuItem = new MenuItem(this.menuView, 8);
-		this.rotate90MenuItem.setText(UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees") + "\tAlt+Y");
+		this.rotate90MenuItem.setText(UILocale.get("MENU_VIEW_ROTATE_90", "Rotate 90 Degrees") + "\tCtrl+Shift+Y");
 		this.rotate90MenuItem.addSelectionListener(this);
 
-		(this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tCtrl+F");
+		(this.forcePaintMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_FORCE_PAINT", "Force Paint") + "\tF5");
 		this.forcePaintMenuItem.addSelectionListener(this);
 		try {
 			setWindowOnTop(ReflectUtil.getHandle(shell), Settings.alwaysOnTop);
@@ -1031,6 +1292,9 @@ public final class EmulatorScreen implements
 
 		(this.optionsMenuItem = new MenuItem(this.menuView, 8)).setText("Global Settings...");
 		this.optionsMenuItem.addSelectionListener(this);
+
+		(this.themeMenuItem = new MenuItem(this.menuView, 8)).setText(Settings.favoritesDarkMode ? "Light Theme" : "Dark Theme");
+		this.themeMenuItem.addSelectionListener(this);
 
 		new MenuItem(this.menuView, 2);
 
@@ -1133,6 +1397,19 @@ public final class EmulatorScreen implements
 		fullscreenMenuItem.addSelectionListener(this);
 		fullscreenMenuItem.setSelection(fullscreen);
 
+		new MenuItem(menuResize, 2);
+		(this.prevResMenuItem = new MenuItem(menuResize, 8)).setText("Previous resolution preset\tAlt+Left");
+		this.prevResMenuItem.setAccelerator(SWT.ALT | SWT.ARROW_LEFT);
+		this.prevResMenuItem.addSelectionListener(this);
+		(this.nextResMenuItem = new MenuItem(menuResize, 8)).setText("Next resolution preset\tAlt+Right");
+		this.nextResMenuItem.setAccelerator(SWT.ALT | SWT.ARROW_RIGHT);
+		this.nextResMenuItem.addSelectionListener(this);
+
+		new MenuItem(menuResize, 2);
+		(this.resolutionRestartMenuItem = new MenuItem(menuResize, 32)).setText("Restart MIDlet on resolution change");
+		this.resolutionRestartMenuItem.setSelection(Settings.resolutionRestartMidlet);
+		this.resolutionRestartMenuItem.addSelectionListener(this);
+
 		resizeMenuItem.setMenu(menuResize);
 
 		syncScalingModeSelection();
@@ -1177,6 +1454,15 @@ public final class EmulatorScreen implements
 		networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable);
 		networkKillswitchMenuItem.addSelectionListener(this);
 
+		new MenuItem(this.menuTool, 2);
+		(this.autoSkipAppSettingsMenuItem = new MenuItem(this.menuTool, 32)).setText("Auto-skip Application Settings");
+		this.autoSkipAppSettingsMenuItem.setSelection(!Settings.showAppSettingsOnStart);
+		this.autoSkipAppSettingsMenuItem.addSelectionListener(this);
+
+		(this.disableTouchDblClickMenuItem = new MenuItem(this.menuTool, 32)).setText("Disable touchscreen double-click");
+		this.disableTouchDblClickMenuItem.setSelection(Settings.disableTouchDoubleClick);
+		this.disableTouchDblClickMenuItem.addSelectionListener(this);
+
 		menuItemTool.setMenu(this.menuTool);
 
 		this.menuMidlet = new Menu(menuItemMidlet);
@@ -1203,12 +1489,62 @@ public final class EmulatorScreen implements
 			});
 		}
 		menuItem5.setMenu(aMenu1018);
+
+		new MenuItem(this.menuMidlet, 2);
+		(this.prevJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText("Previous JAR in folder\tCtrl+[");
+		this.prevJarMenuItem.setAccelerator(SWT.CONTROL | '[');
+		this.prevJarMenuItem.addSelectionListener(this);
+		(this.nextJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText("Next JAR in folder\tCtrl+]");
+		this.nextJarMenuItem.setAccelerator(SWT.CONTROL | ']');
+		this.nextJarMenuItem.addSelectionListener(this);
+
+		new MenuItem(this.menuMidlet, 2);
+		(this.deleteJarMenuItem = new MenuItem(this.menuMidlet, 8)).setText("Delete current JAR\tCtrl+W");
+		this.deleteJarMenuItem.setAccelerator(SWT.CONTROL | 'W');
+		this.deleteJarMenuItem.addSelectionListener(this);
+
+		new MenuItem(this.menuMidlet, 2);
+		MenuItem addToFavItem = new MenuItem(this.menuMidlet, 8);
+		addToFavItem.setText("Add to Favorites\t" + HotkeyManager.ADD_TO_FAVORITES.formatKey());
+		addToFavItem.setAccelerator(HotkeyManager.ADD_TO_FAVORITES.stateMask | HotkeyManager.ADD_TO_FAVORITES.keyCode);
+		addToFavItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				addCurrentToFavorites();
+			}
+		});
+
+		MenuItem openFavItem = new MenuItem(this.menuMidlet, 8);
+		openFavItem.setText("Open Favorites...\t" + HotkeyManager.OPEN_FAVORITES.formatKey());
+		openFavItem.setAccelerator(HotkeyManager.OPEN_FAVORITES.stateMask | HotkeyManager.OPEN_FAVORITES.keyCode);
+		openFavItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				openFavoritesBrowser();
+			}
+		});
+
+		new MenuItem(this.menuMidlet, 2);
+		MenuItem setupLuckyItem = new MenuItem(this.menuMidlet, 8);
+		setupLuckyItem.setText("Setup Lucky Folder...");
+		setupLuckyItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				new LuckyFolderSetupDlg().open(display);
+			}
+		});
+		openLuckyJarMenuItem = new MenuItem(this.menuMidlet, 8);
+		openLuckyJarMenuItem.setText("Open Lucky Jar");
+		openLuckyJarMenuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				loadLuckyJar();
+			}
+		});
+
 		new MenuItem(this.menuMidlet, 2);
 		(this.openJadMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_JAD", "Open JAD with Notepad") + "\tCtrl+D");
 		this.openJadMenuItem.addSelectionListener(this);
 
 		this.appSettingsMenuItem = new MenuItem(this.menuMidlet, 8);
-		this.appSettingsMenuItem.setText("Application Settings...");
+		this.appSettingsMenuItem.setText("Application Settings...\tCtrl+A");
+		this.appSettingsMenuItem.setAccelerator(SWT.CONTROL | 'A');
 		this.appSettingsMenuItem.addSelectionListener(this);
 
 		new MenuItem(this.menuMidlet, 2);
@@ -1263,8 +1599,20 @@ public final class EmulatorScreen implements
 		(this.playResumeMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_PLAY_RESUME", "Play/Resume") + "\tCtrl+R");
 		this.playResumeMenuItem.addSelectionListener(this);
 		new MenuItem(this.menuMidlet, 2);
-		(this.restartMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_RESTART", "Restart") + "\tAlt+R");
-		this.restartMenuItem.setAccelerator(65618);
+		this.j2meGamepadTerminateMenuItem = new MenuItem(this.menuMidlet, 32);
+		j2meGamepadTerminateMenuItem.setText("Terminating J2ME Gamepad after exit/crash");
+		j2meGamepadTerminateMenuItem.setSelection(Settings.j2meGamepadEnabled);
+		j2meGamepadTerminateMenuItem.setEnabled(Emulator.isJ2MEGamepadAvailable());
+		j2meGamepadTerminateMenuItem.addSelectionListener(this);
+		this.j2meGamepadLaunchMenuItem = new MenuItem(this.menuMidlet, 32);
+		j2meGamepadLaunchMenuItem.setText("Launch J2ME Gamepad on startup");
+		j2meGamepadLaunchMenuItem.setSelection(Settings.j2meGamepadAutoLaunch);
+		j2meGamepadLaunchMenuItem.setEnabled(Emulator.isJ2MEGamepadAvailable());
+		j2meGamepadLaunchMenuItem.addSelectionListener(this);
+		refreshGamepadMenuState();
+		new MenuItem(this.menuMidlet, 2);
+		(this.restartMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_RESTART", "Restart") + "\tCtrl+Shift+R");
+		this.restartMenuItem.setAccelerator(SWT.CONTROL | SWT.SHIFT | 'R');
 		this.restartMenuItem.addSelectionListener(this);
 		(this.exitMenuItem = new MenuItem(this.menuMidlet, 8)).setText(UILocale.get("MENU_MIDLET_EXIT", "Exit")/* + "\tESC"*/);
 		//this.exitMenuItem.setAccelerator(SWT.CONTROL | 27);
@@ -1272,10 +1620,10 @@ public final class EmulatorScreen implements
 		menuItemMidlet.setMenu(this.menuMidlet);
 
 		this.infosMenuItem.setAccelerator(SWT.CONTROL | 73);
-		this.xrayViewMenuItem.setAccelerator(SWT.ALT | 88);
+		this.xrayViewMenuItem.setAccelerator(SWT.CONTROL | 88);
 		this.rotateScreenMenuItem.setAccelerator(SWT.CONTROL | 89);
-		this.rotate90MenuItem.setAccelerator(SWT.ALT | 89);
-		this.forcePaintMenuItem.setAccelerator(SWT.CONTROL | 70);
+		this.rotate90MenuItem.setAccelerator(SWT.CONTROL | SWT.SHIFT | 89);
+		this.forcePaintMenuItem.setAccelerator(SWT.F5);
 		this.speedUpMenuItem.setAccelerator(!Settings.altLessSpeedShortcuts ? SWT.ALT | 46 : 46);
 		this.slowDownMenuItem.setAccelerator(!Settings.altLessSpeedShortcuts ? SWT.ALT | 44 : 44);
 		this.resetSpeedMenuItem.setAccelerator(!Settings.altLessSpeedShortcuts ? SWT.ALT | '/' : '/');
@@ -1345,11 +1693,20 @@ public final class EmulatorScreen implements
 					return;
 				}
 
-				if (menuItem == networkKillswitchMenuItem) {
-					networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable = !Settings.networkNotAvailable);
-					return;
-				}
-				if (menuItem == this.showTrackInfoMenuItem) {
+			if (menuItem == networkKillswitchMenuItem) {
+				networkKillswitchMenuItem.setSelection(Settings.networkNotAvailable = !Settings.networkNotAvailable);
+				return;
+			}
+			if (menuItem == this.autoSkipAppSettingsMenuItem) {
+				this.autoSkipAppSettingsMenuItem.setSelection(Settings.showAppSettingsOnStart = !Settings.showAppSettingsOnStart);
+				return;
+			}
+			if (menuItem == this.disableTouchDblClickMenuItem) {
+				this.disableTouchDblClickMenuItem.setSelection(Settings.disableTouchDoubleClick = !Settings.disableTouchDoubleClick);
+				return;
+			}
+
+			if (menuItem == this.showTrackInfoMenuItem) {
 					this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack = !Settings.threadMethodTrack);
 					return;
 				}
@@ -1396,6 +1753,22 @@ public final class EmulatorScreen implements
 			}
 		} else if (parent == this.menuMidlet) {
 			boolean equals = false;
+			if (menuItem == this.j2meGamepadTerminateMenuItem) {
+				refreshGamepadMenuState();
+				if (!j2meGamepadTerminateMenuItem.isEnabled()) return;
+				Settings.j2meGamepadEnabled = !Settings.j2meGamepadEnabled;
+				this.j2meGamepadTerminateMenuItem.setSelection(Settings.j2meGamepadEnabled);
+				((Property) Emulator.getEmulator().getProperty()).saveProperties();
+				return;
+			}
+			if (menuItem == this.j2meGamepadLaunchMenuItem) {
+				refreshGamepadMenuState();
+				if (!j2meGamepadLaunchMenuItem.isEnabled()) return;
+				Settings.j2meGamepadAutoLaunch = !Settings.j2meGamepadAutoLaunch;
+				this.j2meGamepadLaunchMenuItem.setSelection(Settings.j2meGamepadAutoLaunch);
+				((Property) Emulator.getEmulator().getProperty()).saveProperties();
+				return;
+			}
 			if (menuItem == this.exitMenuItem) {
 				shell.close();
 				Thread.yield();
@@ -1500,6 +1873,18 @@ public final class EmulatorScreen implements
 				this.updatePauseState();
 				return;
 			}
+			if (menuItem == this.deleteJarMenuItem) {
+				doDeleteJar();
+				return;
+			}
+			if (menuItem == this.prevJarMenuItem) {
+				browseJarInFolder(-1);
+				return;
+			}
+			if (menuItem == this.nextJarMenuItem) {
+				browseJarInFolder(1);
+				return;
+			}
 			if (menuItem == this.appSettingsMenuItem) {
 				Emulator.getEmulator().openAppSettings(false);
 				return;
@@ -1596,6 +1981,13 @@ public final class EmulatorScreen implements
 			}
 			if (menuItem == this.optionsMenuItem) {
 				((Property) Emulator.getEmulator().getProperty()).open(this.shell);
+				return;
+			}
+			if (menuItem == this.themeMenuItem) {
+				Settings.favoritesDarkMode = !Settings.favoritesDarkMode;
+				themeMenuItem.setText(Settings.favoritesDarkMode ? "Light Theme" : "Dark Theme");
+				applyStatusBarTheme(Settings.favoritesDarkMode);
+				notifyThemeChanged();
 				return;
 			}
 			if (menuItem == this.alwaysOnTopMenuItem) {
@@ -1772,6 +2164,14 @@ public final class EmulatorScreen implements
 			} else if (menuItem == fullscreenMenuItem) {
 				fullscreen = fullscreenMenuItem.getSelection();
 				changeFullscreen();
+			} else if (menuItem == this.prevResMenuItem) {
+				cycleResolutionPreset(-1);
+			} else if (menuItem == this.nextResMenuItem) {
+				cycleResolutionPreset(1);
+			} else if (menuItem == this.resolutionRestartMenuItem) {
+				this.resolutionRestartMenuItem.setSelection(Settings.resolutionRestartMidlet = !Settings.resolutionRestartMidlet);
+				((Property) Emulator.getEmulator().getProperty()).saveProperties();
+				return;
 			}
 		}
 	}
@@ -1809,6 +2209,11 @@ public final class EmulatorScreen implements
 		this.pausestepMenuItem.setEnabled(this.pauseState != 0);
 		this.playResumeMenuItem.setEnabled(AppSettings.steps >= 0 && this.pauseState != 0);
 		this.openJadMenuItem.setEnabled(this.pauseState != 0);
+		this.deleteJarMenuItem.setEnabled(pauseState != 0 && Emulator.midletJarPath != null);
+		this.prevJarMenuItem.setEnabled(pauseState != 0 && Emulator.midletJarPath != null);
+		this.nextJarMenuItem.setEnabled(pauseState != 0 && Emulator.midletJarPath != null);
+		this.prevResMenuItem.setEnabled(pauseState != 0);
+		this.nextResMenuItem.setEnabled(pauseState != 0);
 		appSettingsMenuItem.setEnabled(pauseState != 0);
 		this.watchesMenuItem.setEnabled(this.pauseState != 0);
 		this.profilerMenuItem.setEnabled(this.pauseState != 0);
@@ -1818,6 +2223,273 @@ public final class EmulatorScreen implements
 //		fullscreenMenuItem.setEnabled(pauseState != 0);
 		mediaViewMenuItem.setEnabled(pauseState != 0);
 		this.updateStatus();
+	}
+
+	private void browseJarInFolder(int direction) {
+		if (Emulator.midletJarPath == null) {
+			showMessage("No JAR loaded");
+			return;
+		}
+		File currentFile = new File(Emulator.midletJarPath);
+		File parentDir = currentFile.getParentFile();
+		if (parentDir == null || !parentDir.isDirectory()) {
+			showMessage("Cannot determine JAR directory");
+			return;
+		}
+		File[] jars = parentDir.listFiles(new java.io.FileFilter() {
+			public boolean accept(File f) {
+				return f.isFile() && f.getName().toLowerCase().endsWith(".jar");
+			}
+		});
+		if (jars == null || jars.length < 2) {
+			showMessage("No other JARs in this folder");
+			return;
+		}
+		java.util.Arrays.sort(jars, new java.util.Comparator<File>() {
+			public int compare(File a, File b) {
+				return a.getName().compareToIgnoreCase(b.getName());
+			}
+		});
+		int currentIdx = -1;
+		String currentName = currentFile.getName();
+		for (int i = 0; i < jars.length; i++) {
+			if (jars[i].getName().equals(currentName)) {
+				currentIdx = i;
+				break;
+			}
+		}
+		if (currentIdx == -1) {
+			showMessage("Current JAR not found in file listing");
+			return;
+		}
+		int targetIdx = (currentIdx + direction + jars.length) % jars.length;
+		final String targetPath = jars[targetIdx].getAbsolutePath();
+		showToast(jars[targetIdx].getName(), 1500);
+		new Thread("JAR-Switch") {
+			public void run() {
+				try { Thread.sleep(800); } catch (InterruptedException ignored) {}
+				Settings.recordedKeysFile = null;
+				Emulator.loadGame(targetPath, false);
+			}
+		}.start();
+	}
+
+	private void showToast(final String text, final int durationMs) {
+		if (toastShell != null && !toastShell.isDisposed()) toastShell.dispose();
+		Display display = this.display;
+		if (display == null || display.isDisposed()) return;
+
+		toastShell = new Shell(shell, SWT.NO_TRIM | SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
+		Color bg = Settings.favoritesDarkMode ? getThemeDarkBg() : display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+		Color fg = Settings.favoritesDarkMode ? getThemeDarkFg() : display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND);
+		toastShell.setBackground(bg);
+		GridLayout gl = new GridLayout();
+		gl.marginWidth = 15;
+		gl.marginHeight = 8;
+		toastShell.setLayout(gl);
+		Label toastLabel = new Label(toastShell, SWT.NONE);
+		toastLabel.setText(text);
+		toastLabel.setBackground(bg);
+		toastLabel.setForeground(fg);
+		toastShell.pack();
+
+		Point shellLoc = shell.getLocation();
+		Point shellSize = shell.getSize();
+		Point toastSize = toastShell.getSize();
+		toastShell.setLocation(shellLoc.x + (shellSize.x - toastSize.x) / 2,
+							   shellLoc.y + shellSize.y - toastSize.y - 50);
+		toastShell.setAlpha(220);
+		toastShell.open();
+		shell.setFocus();
+
+		display.timerExec(durationMs, new Runnable() {
+			public void run() {
+				if (toastShell != null && !toastShell.isDisposed()) {
+					toastShell.dispose();
+					toastShell = null;
+				}
+			}
+		});
+	}
+
+	private void cycleResolutionPreset(int direction) {
+		int w = getWidth(), h = getHeight();
+		int idx = -1;
+		for (int i = 0; i < Settings.resolutionPresets.length; i++) {
+			if (Settings.resolutionPresets[i][0] == w && Settings.resolutionPresets[i][1] == h) {
+				idx = i;
+				break;
+			}
+		}
+		if (idx == -1) {
+			idx = Settings.currentPresetIdx;
+		}
+		int newIdx = (idx + direction + Settings.resolutionPresets.length) % Settings.resolutionPresets.length;
+		int newW = Settings.resolutionPresets[newIdx][0];
+		int newH = Settings.resolutionPresets[newIdx][1];
+		Settings.currentPresetIdx = newIdx;
+		showResolutionToast(Settings.resolutionPresetNames[newIdx]);
+		final String resName = Settings.resolutionPresetNames[newIdx];
+		display.timerExec(30, () -> showToast("Res: " + resName, 800));
+
+		if (Settings.resolutionRestartMidlet && Emulator.midletJarPath != null) {
+			// Persist resolution so new process picks it up, then restart
+			AppSettings.screenWidth = newW;
+			AppSettings.screenHeight = newH;
+			AppSettings.save();
+			Emulator.loadGame(Emulator.midletJarPath, false);
+		} else {
+			// No restart — resize display buffer and canvas, persist for next launch
+			AppSettings.screenWidth = newW;
+			AppSettings.screenHeight = newH;
+			AppSettings.save();
+			initScreenBuffer(newW, newH);
+			updateCanvasRect(true, true, false);
+		}
+	}
+
+	private void showResolutionToast(final String text) {
+		final String orig = statusLabel.getText();
+		statusLabel.setText(text);
+		display.timerExec(1500, new Runnable() {
+			public void run() {
+				if (statusLabel != null && !statusLabel.isDisposed()) {
+					statusLabel.setText(orig);
+				}
+			}
+		});
+	}
+
+	private void addCurrentToFavorites() {
+		if (Emulator.midletJarPath == null) {
+			showMessage("No JAR is currently loaded.");
+			return;
+		}
+
+		String favoritesDir = Settings.favoritesPath;
+		if (favoritesDir == null || favoritesDir.isEmpty()) {
+			favoritesDir = Emulator.getUserPath() + File.separator + "favorites";
+			Settings.favoritesPath = favoritesDir;
+		}
+
+		new File(favoritesDir).mkdirs();
+
+		File srcJar = new File(Emulator.midletJarPath);
+		if (!srcJar.exists()) {
+			showMessage("JAR file not found: " + Emulator.midletJarPath);
+			return;
+		}
+
+		File destJar = new File(favoritesDir, srcJar.getName());
+		if (destJar.getAbsolutePath().equalsIgnoreCase(srcJar.getAbsolutePath())) {
+			showToast("Already in favorites folder", 2000);
+			return;
+		}
+
+		// Store pending move — executed on next launch when file is not locked
+		String entry = srcJar.getAbsolutePath() + "||" + destJar.getAbsolutePath();
+		if (Settings.pendingFavoriteMoves == null || Settings.pendingFavoriteMoves.isEmpty()) {
+			Settings.pendingFavoriteMoves = entry;
+		} else {
+			Settings.pendingFavoriteMoves = Settings.pendingFavoriteMoves + ";;" + entry;
+		}
+		((Property) Emulator.getEmulator().getProperty()).saveProperties();
+
+		// Navigate to next JAR in source folder
+		File parentDir = srcJar.getParentFile();
+		if (parentDir != null && parentDir.isDirectory()) {
+			File[] allJars = parentDir.listFiles(new java.io.FileFilter() {
+				public boolean accept(File f) {
+					return f.isFile() && f.getName().toLowerCase().endsWith(".jar");
+				}
+			});
+			if (allJars != null && allJars.length > 1) {
+				java.util.Arrays.sort(allJars, new java.util.Comparator<File>() {
+					public int compare(File a, File b) {
+						return a.getName().compareToIgnoreCase(b.getName());
+					}
+				});
+				int currentIdx = 0;
+				for (int i = 0; i < allJars.length; i++) {
+					if (allJars[i].getAbsolutePath().equalsIgnoreCase(srcJar.getAbsolutePath())) {
+						currentIdx = i;
+						break;
+					}
+				}
+				int nextIdx = (currentIdx + 1) % allJars.length;
+				final String loadPath = allJars[nextIdx].getAbsolutePath();
+				showToast("Scheduled: " + srcJar.getName() + " → favorites (on restart)", 2000);
+				display.timerExec(100, new Runnable() {
+					public void run() {
+						Emulator.loadGame(loadPath, false);
+					}
+				});
+				return;
+			}
+		}
+
+		showToast("Scheduled: " + srcJar.getName() + " → favorites (on restart)", 2000);
+	}
+
+	private void doDeleteJar() {
+		if (Emulator.midletJarPath == null) return;
+		try {
+			setWindowOnTop(ReflectUtil.getHandle(shell), true);
+		} catch (Throwable ignored) {}
+		MessageBox mb = new MessageBox(shell, SWT.ICON_WARNING | SWT.YES | SWT.NO);
+		mb.setText("Delete JAR");
+		mb.setMessage("Permanently delete this JAR file?\n\n" + Emulator.midletJarPath);
+		if (mb.open() != SWT.YES) return;
+		try {
+			synchronized (Emulator.jarFileLock) {
+				if (Emulator.midletJar != null) {
+					try { Emulator.midletJar.close(); } catch (IOException ignored) {}
+					Emulator.midletJar = null;
+				}
+			}
+			File f = new File(Emulator.midletJarPath);
+			if (f.exists() && f.delete()) {
+				for (int i = 0; i < 5; i++) {
+					if (Emulator.midletJarPath.equalsIgnoreCase(Settings.recentJars[i])) {
+						Settings.recentJars[i] = "";
+						break;
+					}
+				}
+				((Property) Emulator.getEmulator().getProperty()).saveProperties();
+				File parentDir = f.getParentFile();
+				if (parentDir != null && parentDir.isDirectory()) {
+					File[] allJars = parentDir.listFiles(new java.io.FileFilter() {
+						public boolean accept(File x) {
+							return x.isFile() && x.getName().toLowerCase().endsWith(".jar");
+						}
+					});
+					if (allJars != null && allJars.length > 0) {
+						java.util.Arrays.sort(allJars, new java.util.Comparator<File>() {
+							public int compare(File a, File b) {
+								return a.getName().compareToIgnoreCase(b.getName());
+							}
+						});
+						Emulator.loadGame(allJars[0].getAbsolutePath(), false);
+						return;
+					}
+				}
+			}
+			Emulator.loadGame(null, false);
+		} catch (Exception ex) {
+			showMessage("Error: " + ex.getMessage());
+		}
+	}
+
+	public void openFavoritesBrowser() {
+		browseFavOpenCount++; // Performance Scene — pause bg animation
+		new FavoritesBrowser(display, () -> {
+			stopBrowseSound();
+			browseFavOpenCount--;
+			if (browseFavOpenCount <= 0) { // Performance Scene — resume on close
+				browseFavOpenCount = 0;
+				scheduleBrowseBtnAnim();
+			}
+		}).open(shell);
 	}
 
 	public void widgetDefaultSelected(final SelectionEvent selectionEvent) {
@@ -1982,6 +2654,474 @@ public final class EmulatorScreen implements
 		});
 	}
 
+	private Color splashBg() {
+		if (Settings.favoritesDarkMode) {
+			if (splashDarkBg == null || splashDarkBg.isDisposed()) {
+				splashDarkBg = new Color(display, 45, 45, 45);
+			}
+			return splashDarkBg;
+		}
+		return display.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+	}
+
+	private Color splashFg() {
+		if (Settings.favoritesDarkMode) {
+			if (splashDarkFg == null || splashDarkFg.isDisposed()) {
+				splashDarkFg = new Color(display, 224, 224, 224);
+			}
+			return splashDarkFg;
+		}
+		return display.getSystemColor(SWT.COLOR_LIST_FOREGROUND);
+	}
+
+	private static void setShellDarkMode(long handle, boolean dark) {
+		try {
+			NativeLibrary dwmapi = NativeLibrary.getInstance("dwmapi");
+			Function func = dwmapi.getFunction("DwmSetWindowAttribute");
+			IntByReference attr = new IntByReference(dark ? 1 : 0);
+			try {
+				func.invoke(int.class, new Object[]{handle, 20, attr, 4});
+			} catch (Throwable t) {
+				func.invoke(int.class, new Object[]{handle, 19, attr, 4});
+			}
+		} catch (Throwable ignored) {}
+	}
+
+	private void applyStatusBarTheme(boolean dark) {
+		if (dark) {
+			if (statusBarDarkBg == null || statusBarDarkBg.isDisposed()) {
+				statusBarDarkBg = new Color(display, 18, 18, 18);
+			}
+			if (splashDarkFg == null || splashDarkFg.isDisposed()) {
+				splashDarkFg = new Color(display, 224, 224, 224);
+			}
+			if (shell != null && !shell.isDisposed()) {
+				shell.setBackground(statusBarDarkBg);
+				setShellDarkMode(ReflectUtil.getHandle(shell), true);
+			}
+			if (leftSoftLabel != null && !leftSoftLabel.isDisposed()) {
+				((Canvas) leftSoftLabel).setBackground(statusBarDarkBg);
+				((Canvas) leftSoftLabel).setForeground(splashDarkFg);
+			}
+			if (statusLabel != null && !statusLabel.isDisposed()) {
+				((Canvas) statusLabel).setBackground(statusBarDarkBg);
+				((Canvas) statusLabel).setForeground(splashDarkFg);
+			}
+			if (rightSoftLabel != null && !rightSoftLabel.isDisposed()) {
+				((Canvas) rightSoftLabel).setBackground(statusBarDarkBg);
+				((Canvas) rightSoftLabel).setForeground(splashDarkFg);
+			}
+		} else {
+			if (shell != null && !shell.isDisposed()) {
+				if (shellBgLight != null && !shellBgLight.isDisposed()) {
+					shell.setBackground(shellBgLight);
+				} else {
+					shell.setBackground(null);
+				}
+				setShellDarkMode(ReflectUtil.getHandle(shell), false);
+			}
+			if (leftSoftLabel != null && !leftSoftLabel.isDisposed()) {
+				((Canvas) leftSoftLabel).setBackground(null);
+				((Canvas) leftSoftLabel).setForeground(null);
+			}
+			if (statusLabel != null && !statusLabel.isDisposed()) {
+				((Canvas) statusLabel).setBackground(null);
+				((Canvas) statusLabel).setForeground(null);
+			}
+			if (rightSoftLabel != null && !rightSoftLabel.isDisposed()) {
+				((Canvas) rightSoftLabel).setBackground(null);
+				((Canvas) rightSoftLabel).setForeground(null);
+			}
+			if (statusBarDarkBg != null && !statusBarDarkBg.isDisposed()) {
+				statusBarDarkBg.dispose();
+				statusBarDarkBg = null;
+			}
+			if (splashDarkFg != null && !splashDarkFg.isDisposed()) {
+				splashDarkFg.dispose();
+				splashDarkFg = null;
+			}
+		}
+	}
+
+	public void updateSplashTheme() {
+		if (display == null || display.isDisposed()) return;
+		display.asyncExec(() -> {
+			if (shell == null || shell.isDisposed()) return;
+			applyStatusBarTheme(Settings.favoritesDarkMode);
+			if (canvas != null && !canvas.isDisposed()) {
+				canvas.redraw();
+			}
+		});
+	}
+	public static void notifyThemeChanged() {
+		if (Emulator.getEmulator() instanceof SWTFrontend) {
+			IScreen screen = Emulator.getEmulator().getScreen();
+			if (screen instanceof EmulatorScreen) {
+				((EmulatorScreen) screen).updateSplashTheme();
+			}
+		}
+		for (Shell s : Display.getCurrent().getShells()) {
+			if (s != null && !s.isDisposed() && s.getData("themeable") != null) {
+				applyThemeToShell(s, Settings.favoritesDarkMode);
+			}
+		}
+	}
+
+	private static Color themeDarkBg;
+	private static Color themeDarkFg;
+	private static Color themeDarkBtnBg;
+	private static Color themeDarkTextBg;
+	private static Color themeLightBg;
+	private static Color themeLightFg;
+
+	public static Color getThemeDarkBg() {
+		if (themeDarkBg == null || themeDarkBg.isDisposed()) themeDarkBg = new Color(Display.getCurrent(), 45, 45, 45);
+		return themeDarkBg;
+	}
+
+	public static Color getThemeDarkFg() {
+		if (themeDarkFg == null || themeDarkFg.isDisposed()) themeDarkFg = new Color(Display.getCurrent(), 224, 224, 224);
+		return themeDarkFg;
+	}
+
+	public static Color getThemeDarkBtnBg() {
+		if (themeDarkBtnBg == null || themeDarkBtnBg.isDisposed()) themeDarkBtnBg = new Color(Display.getCurrent(), 60, 60, 60);
+		return themeDarkBtnBg;
+	}
+
+	public static Color getThemeDarkTextBg() {
+		if (themeDarkTextBg == null || themeDarkTextBg.isDisposed()) themeDarkTextBg = new Color(Display.getCurrent(), 30, 30, 30);
+		return themeDarkTextBg;
+	}
+
+	public static Color getThemeLightBg() {
+		if (themeLightBg == null || themeLightBg.isDisposed()) themeLightBg = new Color(Display.getCurrent(), 240, 240, 240);
+		return themeLightBg;
+	}
+
+	public static Color getThemeLightFg() {
+		if (themeLightFg == null || themeLightFg.isDisposed()) themeLightFg = new Color(Display.getCurrent(), 0, 0, 0);
+		return themeLightFg;
+	}
+
+	public static void disposeThemeColors() {
+		if (themeDarkBg != null && !themeDarkBg.isDisposed()) themeDarkBg.dispose();
+		if (themeDarkFg != null && !themeDarkFg.isDisposed()) themeDarkFg.dispose();
+		if (themeDarkBtnBg != null && !themeDarkBtnBg.isDisposed()) themeDarkBtnBg.dispose();
+		if (themeDarkTextBg != null && !themeDarkTextBg.isDisposed()) themeDarkTextBg.dispose();
+		if (themeLightBg != null && !themeLightBg.isDisposed()) themeLightBg.dispose();
+		if (themeLightFg != null && !themeLightFg.isDisposed()) themeLightFg.dispose();
+	}
+
+	public static void applyThemeToShell(Shell shell, boolean dark) {
+		if (shell == null || shell.isDisposed()) return;
+		applyThemeToControl(shell, dark);
+	}
+
+	private static void applyThemeToControl(org.eclipse.swt.widgets.Control c, boolean dark) {
+		if (c == null || c.isDisposed()) return;
+		if (c instanceof Shell) {
+			Shell s = (Shell) c;
+			if (dark) {
+				s.setBackground(getThemeDarkBg());
+				try { setShellDarkMode(ReflectUtil.getHandle(s), true); } catch (Throwable ignored) {}
+			} else {
+				s.setBackground(null);
+				try { setShellDarkMode(ReflectUtil.getHandle(s), false); } catch (Throwable ignored) {}
+			}
+		}
+		if (dark) {
+			if (c instanceof Table || c instanceof Tree) {
+				c.setBackground(getThemeDarkTextBg());
+				c.setForeground(getThemeDarkFg());
+			} else if (c instanceof Text || c instanceof org.eclipse.swt.custom.StyledText) {
+				c.setBackground(getThemeDarkTextBg());
+				c.setForeground(getThemeDarkFg());
+				setControlWinTheme(c, true);
+			} else if (c instanceof Combo || c instanceof Spinner) {
+				c.setBackground(getThemeDarkTextBg());
+				c.setForeground(getThemeDarkFg());
+			} else if (c instanceof Button) {
+				Button btn = (Button) c;
+				if ((btn.getStyle() & SWT.CHECK) != 0 || (btn.getStyle() & SWT.RADIO) != 0) {
+					c.setBackground(getThemeDarkBg());
+					c.setForeground(getThemeDarkFg());
+				} else {
+					c.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+					c.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+				}
+				setControlWinTheme(c, true);
+			} else if (c instanceof Label || c instanceof CLabel || c instanceof Group) {
+				c.setBackground(getThemeDarkBg());
+				c.setForeground(getThemeDarkFg());
+				setControlWinTheme(c, true);
+			} else if (c instanceof org.eclipse.swt.widgets.TabFolder) {
+				c.setBackground(getThemeDarkBg());
+				setControlWinTheme(c, true);
+			} else if (c instanceof org.eclipse.swt.custom.CTabFolder) {
+				c.setBackground(getThemeDarkBg());
+				c.setForeground(getThemeDarkFg());
+			} else if (c instanceof Composite || c instanceof Canvas) {
+				c.setBackground(getThemeDarkBg());
+			} else if (c instanceof ProgressBar || c instanceof Scale) {
+				c.setBackground(getThemeDarkBg());
+				c.setForeground(getThemeDarkFg());
+			} else if (c instanceof org.eclipse.swt.custom.SashForm) {
+				c.setBackground(getThemeDarkBg());
+			} else if (c instanceof Link) {
+				c.setBackground(getThemeDarkBg());
+				c.setForeground(getThemeDarkFg());
+			} else {
+				try { c.setBackground(getThemeDarkBg()); c.setForeground(getThemeDarkFg()); } catch (Exception ignored) {}
+			}
+		} else {
+			if (c instanceof Table) {
+				c.setBackground(null);
+				c.setForeground(null);
+			} else if (c instanceof Tree) {
+				c.setBackground(null);
+				c.setForeground(null);
+			} else if (c instanceof Text || c instanceof org.eclipse.swt.custom.StyledText) {
+				c.setBackground(null);
+				c.setForeground(null);
+				setControlWinTheme(c, false);
+			} else if (c instanceof Combo || c instanceof Spinner) {
+				c.setBackground(null);
+				c.setForeground(null);
+			} else if (c instanceof Button) {
+				c.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+				c.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+				setControlWinTheme(c, false);
+			} else if (c instanceof Label || c instanceof CLabel || c instanceof Group) {
+				c.setBackground(null);
+				c.setForeground(null);
+				setControlWinTheme(c, false);
+			} else if (c instanceof org.eclipse.swt.widgets.TabFolder) {
+				c.setBackground(null);
+				setControlWinTheme(c, false);
+			} else if (c instanceof org.eclipse.swt.custom.CTabFolder) {
+				c.setBackground(null);
+				c.setForeground(null);
+			} else if (c instanceof Composite || c instanceof Canvas) {
+				c.setBackground(null);
+			} else if (c instanceof ProgressBar || c instanceof Scale || c instanceof org.eclipse.swt.custom.SashForm || c instanceof Link) {
+				c.setBackground(null);
+				c.setForeground(null);
+			} else {
+				try { c.setBackground(null); c.setForeground(null); } catch (Exception ignored) {}
+			}
+		}
+		if (c instanceof Composite) {
+			for (org.eclipse.swt.widgets.Control child : ((Composite) c).getChildren()) {
+				applyThemeToControl(child, dark);
+			}
+		}
+	}
+
+	public static void markThemeable(Shell shell) {
+		if (shell != null && !shell.isDisposed()) {
+			shell.setData("themeable", Boolean.TRUE);
+		}
+	}
+
+	private static void setControlWinTheme(org.eclipse.swt.widgets.Control c, boolean dark) {
+		try {
+			NativeLibrary uxtheme = NativeLibrary.getInstance("uxtheme");
+			Function func = uxtheme.getFunction("SetWindowTheme");
+			func.invoke(int.class, new Object[]{c.handle, dark ? "" : null, dark ? "" : null});
+		} catch (Throwable ignored) {}
+	}
+
+	private void paintPauseScreen(GC gc, Rectangle size) {
+		gc.setAlpha(255);
+		boolean fullscreenSplash = EmulatorScreen.fullscreen || (shell != null && !shell.isDisposed() && shell.getFullScreen()); // Performance Scene
+		if (fullscreenSplash) {
+			if (splashHeld) { splashHeld = false; splashHeldSentence = null; }
+			float t = (float)(1d - Math.cos(pulsePhase * Math.PI * 2d)) * 0.5f;
+			int rr = lerp(0x1a, 0x84, t);
+			int rg = lerp(0x00, 0x12, t);
+			int rb = lerp(0x6d, 0x92, t);
+			if (pulseBgColor == null || pulseBgColor.isDisposed() || rr != pulseBgColorR || rg != pulseBgColorG || rb != pulseBgColorB) {
+				if (pulseBgColor != null && !pulseBgColor.isDisposed()) pulseBgColor.dispose();
+				pulseBgColor = new Color(display, rr, rg, rb); // Performance Scene — cached pulse
+				pulseBgColorR = rr; pulseBgColorG = rg; pulseBgColorB = rb;
+			}
+		gc.setBackground(pulseBgColor);
+		gc.fillRectangle(0, 0, size.width, size.height);
+		if (!bgIconSlots.isEmpty()) { // Performance Scene — paint icons on offscreen buffer
+			paintBgIcons(gc, rr, rg, rb);
+			gc.setAdvanced(false);
+			gc.setTextAntialias(SWT.DEFAULT);
+			gc.setAntialias(SWT.DEFAULT);
+		}
+	} else {
+		gc.setBackground(splashBg());
+		gc.fillRectangle(0, 0, size.width, size.height);
+			if (splashImage != null && !splashImage.isDisposed()) {
+				Rectangle ib = splashImage.getBounds();
+				double phase = pulsePhase * Math.PI * 2d;
+				float bobY = (float)(Math.sin(phase) * 5d);
+				float scalePulse = (float)(Math.sin(phase + Math.PI) * 1.5d);
+				float baseSw = ib.width * 3f / 8f;
+				float baseSh = ib.height * 3f / 8f;
+				int sw = Math.round(baseSw + scalePulse);
+				int sh = Math.round(baseSh + scalePulse);
+				int sx = (size.width >> 1) - (sw >> 1);
+				int sy = Math.max(8, (size.height - sh - 100) >> 1) + Math.round(bobY);
+				splashBounds = new Rectangle(sx, sy, sw, sh);
+				if (splashHeld) {
+					gc.setForeground(splashFg());
+					gc.setFont(f);
+					if (splashHeldSentence == null) {
+						splashHeldSentence = BG_SENTENCES[browseSoundRand.nextInt(BG_SENTENCES.length)];
+						currentBgSentence = splashHeldSentence;
+					}
+					String[] lines = splashHeldSentence.split("\n", -1);
+					int lh = gc.getFontMetrics().getHeight();
+					int totalH = lines.length * lh;
+					int textY = sy + ((sh - totalH) >> 1);
+					for (int i = 0; i < lines.length; i++) {
+						Point lext = gc.stringExtent(lines[i]);
+						int lx = sx + ((sw - lext.x) >> 1);
+						gc.drawText(lines[i], Math.max(sx, lx), textY + i * lh, true);
+					}
+				} else {
+					gc.drawImage(splashImage, 0, 0, ib.width, ib.height, sx, sy, sw, sh);
+				}
+			}
+		}
+
+		int centerX = size.width >> 1;
+		if (fullscreenSplash && splashImage != null && !splashImage.isDisposed()) {
+			Rectangle ib = splashImage.getBounds();
+			int sx = centerX - (ib.width >> 1);
+			int sy = Math.max(8, (size.height - ib.height - 100) >> 1);
+			gc.drawImage(splashImage, sx, sy);
+		}
+
+		if (fullscreenSplash) {
+			gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		} else {
+			gc.setForeground(splashFg());
+		}
+		gc.setFont(f);
+		int textY, y2;
+		if (fullscreenSplash) {
+			String msg = currentBgSentence;
+			if (msg != null && !msg.isEmpty()) {
+				String[] lines = msg.split("\n", -1);
+				int lh = gc.getFontMetrics().getHeight();
+				int totalH = lines.length * lh;
+				textY = splashImage != null && !splashImage.isDisposed()
+					? (size.height + 60) >> 1
+					: (size.height - totalH) >> 1;
+				for (int i = 0; i < lines.length; i++) {
+					Point lext = gc.stringExtent(lines[i]);
+					int lx = Math.max(4, centerX - (lext.x >> 1));
+					drawTextWithShadow(gc, lines[i], lx, textY + i * lh, true);
+				}
+				y2 = textY + totalH + 4;
+			} else {
+				y2 = (size.height + 60) >> 1;
+			}
+		} else {
+			String s = Emulator.getInfoString();
+			textY = (size.height - gc.stringExtent(s).y * 2) >> 1;
+			drawTextWithShadow(gc, s, Math.max(4, centerX - (gc.stringExtent(s).x >> 1)), textY, false);
+			s = "Drop a J2ME application here";
+			y2 = textY + gc.getFontMetrics().getHeight() + 4;
+			drawTextWithShadow(gc, s, Math.max(4, centerX - (gc.stringExtent(s).x >> 1)), y2, false);
+		}
+		int btnY = y2 + gc.getFontMetrics().getHeight() + 12;
+		paintBrowseButton(gc, size.width, btnY);
+		paintLuckyJarButton(gc, size.width, browseFavBounds.y + browseFavBounds.height + 8);
+		/* Debug button removed
+		paintDebugButton(gc, size.width, luckyJarBounds.y + luckyJarBounds.height + 8);
+		/**/
+	}
+
+	private void drawTextWithShadow(GC gc, String text, int x, int y, boolean fullscreen) {
+		if (fullscreen) {
+			gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+			gc.drawText(text, x + 1, y + 1, true);
+			gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		}
+		gc.drawText(text, x, y, true);
+	}
+
+	private void paintBrowseButton(GC gc, int winW, int y) { // Performance Scene — random color with fade
+		String s = "Browse favorites";
+		gc.setFont(f);
+		Point ext = gc.stringExtent(s);
+		int btnW = ext.x + 20;
+		int btnH = ext.y + 10;
+		int bx = (winW - btnW) >> 1;
+		float mult = browseFavPressed ? 0.75f : (browseFavHovered || browseSelectedIdx == 0 ? 1.15f : 1.0f);
+		Color btnBg = new Color(display,
+			Math.min(255, Math.round(browseBtnR * mult)),
+			Math.min(255, Math.round(browseBtnG * mult)),
+			Math.min(255, Math.round(browseBtnB * mult)));
+		gc.setBackground(btnBg);
+		int tx = browseFavPressed ? bx + 11 : bx + 10;
+		int ty = browseFavPressed ? y + 6 : y + 5;
+		gc.fillRoundRectangle(bx, y, btnW, btnH, 6, 6);
+		btnBg.dispose();
+		gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+		gc.drawText(s, tx + 1, ty + 1, true);
+		gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		gc.drawText(s, tx, ty, true);
+		browseFavBounds = new Rectangle(bx, y, btnW, btnH);
+	}
+
+	private void paintLuckyJarButton(GC gc, int winW, int y) {
+		String s = "Lucky Jar";
+		gc.setFont(f);
+		Point ext = gc.stringExtent(s);
+		int btnW = ext.x + 20;
+		int btnH = ext.y + 10;
+		int bx = (winW - btnW) >> 1;
+		float mult = luckyFavPressed ? 0.75f : (luckyFavHovered || browseSelectedIdx == 1 ? 1.15f : 1.0f);
+		Color btnBg = new Color(display,
+			Math.min(255, Math.round(luckyBtnR * mult)),
+			Math.min(255, Math.round(luckyBtnG * mult)),
+			Math.min(255, Math.round(luckyBtnB * mult)));
+		gc.setBackground(btnBg);
+		int tx = luckyFavPressed ? bx + 11 : bx + 10;
+		int ty = luckyFavPressed ? y + 6 : y + 5;
+		gc.fillRoundRectangle(bx, y, btnW, btnH, 6, 6);
+		btnBg.dispose();
+		gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+		gc.drawText(s, tx + 1, ty + 1, true);
+		gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		gc.drawText(s, tx, ty, true);
+		luckyJarBounds = new Rectangle(bx, y, btnW, btnH);
+	}
+
+	/* Debug button removed
+	private void paintDebugButton(GC gc, int winW, int y) {
+		String s = "Debug";
+		Point ext = gc.stringExtent(s);
+		int btnW = ext.x + 20;
+		int btnH = ext.y + 10;
+		int bx = (winW - btnW) >> 1;
+		float mult = debugFavPressed ? 0.75f : (debugFavHovered || browseSelectedIdx == 2 ? 1.15f : 1.0f);
+		Color btnBg = new Color(display,
+			Math.min(255, Math.round(debugBtnR * mult)),
+			Math.min(255, Math.round(debugBtnG * mult)),
+			Math.min(255, Math.round(debugBtnB * mult)));
+		gc.setBackground(btnBg);
+		int tx = debugFavPressed ? bx + 11 : bx + 10;
+		int ty = debugFavPressed ? y + 6 : y + 5;
+		gc.fillRoundRectangle(bx, y, btnW, btnH, 6, 6);
+		btnBg.dispose();
+		gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+		gc.drawText(s, tx + 1, ty + 1, true);
+		gc.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		gc.drawText(s, tx, ty, true);
+		debugFavBounds = new Rectangle(bx, y, btnW, btnH);
+	}
+	/**/
+
 	public void forceCloseCommandsList() {
 		display.syncExec(() -> commandsMenu.setVisible(false));
 	}
@@ -1991,18 +3131,11 @@ public final class EmulatorScreen implements
 		Rectangle size = canvas.getClientArea();
 
 		if (this.pauseState == 0) {
-			// Game not running, show info label
-			gc.setBackground(display.getSystemColor(22));
-			gc.fillRectangle(0, 0, size.width, size.height);
-			gc.setForeground(display.getSystemColor(21));
-			gc.setFont(f);
-			String s = Emulator.getInfoString();
-			gc.drawText(s, Math.max(4, (size.width - gc.stringExtent(s).x) >> 1), (size.height - gc.stringExtent(s).y * 2) >> 1, true);
-
-			s = "Drop a J2ME application here";
-			gc.drawText(s, Math.max(4, (size.width - gc.stringExtent(s).x) >> 1), (size.height + gc.stringExtent(s).y) >> 1, true);
+			paintPauseScreen(gc, size);
 			return;
 		}
+
+		browseAnimScheduled = false;
 
 		gc.setInterpolation(Settings.interpolation);
 		int origWidth = getWidth();
@@ -2037,6 +3170,965 @@ public final class EmulatorScreen implements
 		if (wasResized) {
 			caret.setWindowZoom((float) screenHeight / (float) origHeight);
 			wasResized = false;
+		}
+	}
+
+	private void handleBtnKeyDown(int kc) {
+		if (kc == SWT.ARROW_UP || kc == SWT.KEYPAD_8) {
+			if (browseSelectedIdx > 0) {
+				resetBrowseBtn();
+				resetLuckyBtn();
+				browseSelectedIdx--;
+			}
+			return;
+		}
+		if (kc == SWT.ARROW_DOWN || kc == SWT.KEYPAD_2) {
+			if (browseSelectedIdx < 1) {
+				resetBrowseBtn();
+				resetLuckyBtn();
+				browseSelectedIdx++;
+			}
+			return;
+		}
+		if (kc == SWT.F3 || kc == SWT.KEYPAD_5) {
+			if (browseSelectedIdx == 0) handleBrowsePress();
+			else if (browseSelectedIdx == 1) handleLuckyPress();
+			/* Debug button removed
+			else if (browseSelectedIdx == 2) handleDebugPress();
+			/**/
+		}
+	}
+
+	private void handleBrowsePress() {
+		if (!browseFavHeld) {
+			browseFavHeld = true;
+			browseFavPressed = true;
+			display.timerExec(150, new Runnable() {
+				public void run() {
+					if (!browseFavHeld) return;
+					startBrowseSound();
+				}
+			});
+		}
+	}
+
+	/* Debug button removed
+	private void handleDebugPress() {
+		if (!debugFavHeld) {
+			debugFavHeld = true;
+			debugFavPressed = true;
+		}
+	}
+	/**/
+
+	private void handleBrowseRelease() {
+		browseFavHeld = false;
+		browseFavPressed = false;
+		stopBrowseSound();
+		openFavoritesBrowser();
+	}
+
+	/* Debug button removed
+	private void handleDebugRelease() {
+		debugFavHeld = false;
+		debugFavPressed = false;
+		((Log) Emulator.getEmulator().getLogStream()).createWindow(this.shell);
+	}
+	/**/
+
+	private void handleLuckyPress() {
+		if (!luckyFavHeld) {
+			luckyFavHeld = true;
+			luckyFavPressed = true;
+		}
+	}
+
+	private void handleLuckyRelease() {
+		luckyFavHeld = false;
+		luckyFavPressed = false;
+		loadLuckyJar();
+	}
+
+	private void loadLuckyJar() {
+		java.io.File jar = LuckyFolderManager.pickRandomJar();
+		if (jar != null) {
+			String name = jar.getName().replace(".jar", "");
+			showToast("Loading: " + name, 800);
+			final String path = jar.getAbsolutePath();
+			new Thread("LuckyJar") {
+				public void run() {
+					emulator.Emulator.loadGame(path, false);
+				}
+			}.start();
+		}
+	}
+
+	private void resetBrowseBtn() {
+		browseFavHeld = false;
+		browseFavPressed = false;
+		stopBrowseSound();
+	}
+
+	/* Debug button removed
+	private void resetDebugBtn() {
+		debugFavHeld = false;
+		debugFavPressed = false;
+	}
+	/**/
+
+	private void resetLuckyBtn() {
+		luckyFavHeld = false;
+		luckyFavPressed = false;
+	}
+
+	private boolean handleBrowseMouseDown(MouseEvent e) {
+		if (browseFavBounds != null && browseFavBounds.contains(e.x, e.y) && e.button == 1) {
+			browseFavHeld = true;
+			browseFavPressed = true;
+			display.timerExec(150, new Runnable() {
+				public void run() {
+					if (!browseFavHeld) return;
+					startBrowseSound();
+				}
+			});
+			return true;
+		}
+		return false;
+	}
+
+	/* Debug button removed
+	private boolean handleDebugMouseDown(MouseEvent e) {
+		if (debugFavBounds != null && debugFavBounds.contains(e.x, e.y) && e.button == 1) {
+			debugFavHeld = true;
+			debugFavPressed = true;
+			return true;
+		}
+		return false;
+	}
+	/**/
+
+	private boolean handleBrowseMouseUp(MouseEvent e) {
+		if (browseFavHeld && browseFavBounds != null && browseFavBounds.contains(e.x, e.y)) {
+			openFavoritesBrowser();
+			browseFavHeld = false;
+			browseFavPressed = false;
+			return true;
+		}
+		return false;
+	}
+
+	/* Debug button removed
+	private boolean handleDebugMouseUp(MouseEvent e) {
+		if (debugFavHeld && debugFavBounds != null && debugFavBounds.contains(e.x, e.y)) {
+			((Log) Emulator.getEmulator().getLogStream()).createWindow(this.shell);
+			debugFavHeld = false;
+			debugFavPressed = false;
+			resetBrowseBtn();
+			resetDebugBtn();
+			return true;
+		}
+		return false;
+	}
+	/**/
+
+	private void handleBrowseMouseMove(MouseEvent e) {
+		boolean hoverInside = browseFavBounds != null && browseFavBounds.contains(e.x, e.y);
+		if (hoverInside != browseFavHovered) {
+			browseFavHovered = hoverInside;
+		}
+		if (browseFavHeld) {
+			if (hoverInside != browseFavPressed) {
+				browseFavPressed = hoverInside;
+				if (!hoverInside) {
+					browseFavHeld = false;
+					stopBrowseSound();
+				}
+			}
+		}
+	}
+
+	/* Debug button removed
+	private void handleDebugMouseMove(MouseEvent e) {
+		boolean hoverInside = debugFavBounds != null && debugFavBounds.contains(e.x, e.y);
+		if (hoverInside != debugFavHovered) {
+			debugFavHovered = hoverInside;
+		}
+		if (debugFavHeld && hoverInside != debugFavPressed) {
+			debugFavPressed = hoverInside;
+		}
+	}
+	/**/
+
+	private void clearBrowseHover() {
+		if (browseFavHeld) {
+			browseFavHeld = false;
+			browseFavPressed = false;
+			stopBrowseSound();
+		}
+		browseFavHovered = false;
+	}
+
+	/* Debug button removed
+	private void clearDebugHover() {
+		debugFavHovered = false;
+	}
+	/**/
+
+	private boolean handleLuckyMouseDown(MouseEvent e) {
+		if (luckyJarBounds != null && luckyJarBounds.contains(e.x, e.y) && e.button == 1) {
+			luckyFavHeld = true;
+			luckyFavPressed = true;
+			return true;
+		}
+		return false;
+	}
+
+	private boolean handleLuckyMouseUp(MouseEvent e) {
+		if (luckyFavHeld && luckyJarBounds != null && luckyJarBounds.contains(e.x, e.y)) {
+			loadLuckyJar();
+			luckyFavHeld = false;
+			luckyFavPressed = false;
+			resetBrowseBtn();
+			resetLuckyBtn();
+			return true;
+		}
+		return false;
+	}
+
+	private void handleLuckyMouseMove(MouseEvent e) {
+		boolean hoverInside = luckyJarBounds != null && luckyJarBounds.contains(e.x, e.y);
+		if (hoverInside != luckyFavHovered) {
+			luckyFavHovered = hoverInside;
+		}
+		if (luckyFavHeld && hoverInside != luckyFavPressed) {
+			luckyFavPressed = hoverInside;
+		}
+	}
+
+	private void clearLuckyHover() {
+		luckyFavHovered = false;
+	}
+
+	private void advanceBtnHues(float dt) {
+		advanceSingleBtnState(true);
+		advanceSingleLuckyBtnState();
+		/* Debug button removed
+		advanceSingleBtnState(false);
+		/**/
+	}
+
+	private void advanceSingleBtnState(boolean isBrowse) {
+		float speed = BTN_FADE_SPEED;
+		boolean pressed = isBrowse && browseFavPressed;
+		if (pressed) speed = BTN_FADE_SPEED * 2.5f;
+
+		float r = browseBtnR;
+		float g = browseBtnG;
+		float b = browseBtnB;
+		float tr = browseBtnTargetR;
+		float tg = browseBtnTargetG;
+		float tb = browseBtnTargetB;
+
+		r += (tr - r) * speed;
+		g += (tg - g) * speed;
+		b += (tb - b) * speed;
+
+		boolean nearTarget = Math.abs(r - tr) < 0.5f && Math.abs(g - tg) < 0.5f && Math.abs(b - tb) < 0.5f;
+
+		if (pressed) {
+			browseBtnCycleTimer++;
+			if (browseBtnCycleTimer >= 12 || nearTarget) {
+				browseBtnCycleTimer = 0;
+				r = tr; g = tg; b = tb;
+				tr = 60 + browseSoundRand.nextInt(156);
+				tg = 60 + browseSoundRand.nextInt(156);
+				tb = 60 + browseSoundRand.nextInt(156);
+			}
+		} else if (nearTarget) {
+			r = tr; g = tg; b = tb;
+			do {
+				tr = 60 + browseSoundRand.nextInt(156);
+				tg = 60 + browseSoundRand.nextInt(156);
+				tb = 60 + browseSoundRand.nextInt(156);
+			} while (Math.abs(tr - r) < 20 && Math.abs(tg - g) < 20 && Math.abs(tb - b) < 20);
+		}
+
+		browseBtnR = r; browseBtnG = g; browseBtnB = b;
+		browseBtnTargetR = tr; browseBtnTargetG = tg; browseBtnTargetB = tb;
+	}
+
+	private void advanceSingleLuckyBtnState() {
+		float speed = BTN_FADE_SPEED;
+
+		float r = luckyBtnR;
+		float g = luckyBtnG;
+		float b = luckyBtnB;
+		float tr = luckyBtnTargetR;
+		float tg = luckyBtnTargetG;
+		float tb = luckyBtnTargetB;
+
+		r += (tr - r) * speed;
+		g += (tg - g) * speed;
+		b += (tb - b) * speed;
+
+		boolean nearTarget = Math.abs(r - tr) < 0.5f && Math.abs(g - tg) < 0.5f && Math.abs(b - tb) < 0.5f;
+
+		if (nearTarget) {
+			r = tr; g = tg; b = tb;
+			do {
+				tr = 60 + browseSoundRand.nextInt(156);
+				tg = 60 + browseSoundRand.nextInt(156);
+				tb = 60 + browseSoundRand.nextInt(156);
+			} while (Math.abs(tr - r) < 20 && Math.abs(tg - g) < 20 && Math.abs(tb - b) < 20);
+		}
+
+		luckyBtnR = r; luckyBtnG = g; luckyBtnB = b;
+		luckyBtnTargetR = tr; luckyBtnTargetG = tg; luckyBtnTargetB = tb;
+	}
+
+	private static int lerp(int a, int b, float t) {
+		return Math.round(a + (b - a) * t);
+	}
+
+	// ── Background icon animation ────────────────────────────────
+
+	private void loadBgIcons() {
+		if (bgIconsLoaded) return;
+		bgIconsLoaded = true;
+		String dirPath = bgCustomDirPath != null ? bgCustomDirPath : Settings.favoritesPath;
+		bgCustomDirPath = null;
+		if (dirPath == null || dirPath.isEmpty()) {
+			dirPath = Emulator.getUserPath() + File.separator + "favorites";
+		}
+		File dir = new File(dirPath);
+		if (!dir.exists() || !dir.isDirectory()) {
+			System.err.println("[BgIcons] favorites dir not found: " + dirPath);
+			return;
+		}
+
+		File[] jars = dir.listFiles((d, name) -> name.toLowerCase().endsWith(".jar"));
+		if (jars == null) {
+			System.err.println("[BgIcons] failed to list jars in: " + dirPath);
+			return;
+		}
+
+		for (File jar : jars) {
+			bgJarFiles.add(jar);
+		}
+		bgJarOrder = null;
+		bgJarOrderCursor = 0;
+		System.err.println("[BgIcons] found " + bgJarFiles.size() + " jar(s) in " + dirPath);
+	}
+
+	private void loadBgIconFromJar(final File jar) {
+		if (bgIconTempFile(jar).exists() || bgNoIconMarker(jar).exists()) return;
+		synchronized (bgLoadingSet) {
+			if (bgLoadingSet.contains(jar)) return;
+			if (bgLoadingSet.size() >= 8) return; // Performance Scene — cap concurrent extractions
+			bgLoadingSet.add(jar);
+		}
+		final String jarName = jar.getName();
+		System.err.println("[BgIcons] loading: " + jarName);
+		new Thread("BgIconLoader-" + jarName) {
+			public void run() {
+				try {
+					final byte[] iconBytes = readIconBytesFromJar(jar);
+					if (iconBytes == null) {
+						System.err.println("[BgIcons] no icon in: " + jarName);
+						try { bgNoIconMarker(jar).createNewFile(); } catch (Exception e2) {}
+						synchronized (bgLoadingSet) { bgLoadingSet.remove(jar); }
+						return;
+					}
+					try {
+						java.nio.file.Files.write(bgIconTempFile(jar).toPath(), iconBytes);
+						System.err.println("[BgIcons] extracted: " + jarName);
+					} catch (Exception e) {
+						System.err.println("[BgIcons] failed to write temp file for: " + jarName + " — " + e);
+					} finally {
+						synchronized (bgLoadingSet) { bgLoadingSet.remove(jar); }
+					}
+				} catch (Exception e) {
+					System.err.println("[BgIcons] error loading: " + jarName + " — " + e);
+					synchronized (bgLoadingSet) { bgLoadingSet.remove(jar); }
+				}
+			}
+		}.start();
+	}
+
+	private byte[] readIconBytesFromJar(File jar) { // Performance Scene — background thread
+		try (JarFile jf = new JarFile(jar, false)) {
+			Manifest mf = jf.getManifest();
+			if (mf == null) return null;
+			Attributes a = mf.getMainAttributes();
+			String iconPath = a.getValue("MIDlet-Icon");
+			if (iconPath == null) {
+				String midlet1 = a.getValue("MIDlet-1");
+				if (midlet1 != null) {
+					String[] parts = midlet1.split(",");
+					if (parts.length > 1) {
+						iconPath = parts[1].trim();
+					}
+				}
+			}
+			if (iconPath == null || iconPath.isEmpty()) return null;
+			while (iconPath.startsWith("/")) iconPath = iconPath.substring(1);
+			JarEntry entry = jf.getJarEntry(iconPath);
+			if (entry == null) {
+				java.util.Enumeration<JarEntry> e = jf.entries();
+				while (e.hasMoreElements()) {
+					JarEntry je = e.nextElement();
+					if (je.getName().equalsIgnoreCase(iconPath)) {
+						entry = je;
+						break;
+					}
+				}
+			}
+			if (entry == null) return null;
+			try (InputStream is = jf.getInputStream(entry)) {
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				byte[] buf = new byte[4096];
+				int len;
+				while ((len = is.read(buf)) > 0) bos.write(buf, 0, len);
+				return bos.toByteArray();
+			}
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private void disposeBgSlotIcons() {
+		for (BgIconSlot slot : bgIconSlots) {
+			if (slot.icon != null && !slot.icon.isDisposed()) slot.icon.dispose();
+			slot.icon = null;
+		}
+	}
+
+	private void rebuildBgGrid() {
+		if (shell == null || shell.isDisposed()) return;
+		Rectangle ca = canvas.getClientArea();
+		int w = ca.width, h = ca.height;
+		if (w <= 0 || h <= 0) return;
+		boolean hasY = bgScrollDir == DIR_UP || bgScrollDir == DIR_DOWN || bgScrollDir >= 4;
+		boolean hasX = bgScrollDir == DIR_LEFT || bgScrollDir == DIR_RIGHT || bgScrollDir >= 4;
+		int baseCols = Math.max(1, w / (BG_ICON_SIZE + 4)) + (hasX ? 3 : 2);
+		int baseRows = Math.max(3, h / BG_ICON_SIZE + 5) + (hasY ? 3 : 2);
+		int newCols = baseCols + (hasX ? BG_LEADING_PAD : 0);
+		int newRows = baseRows + (hasY ? BG_LEADING_PAD : 0);
+		if (newCols == bgGridCols && newRows == bgGridRows && !bgIconSlots.isEmpty()) {
+			bgGridPad = Math.max(0, (w - baseCols * BG_ICON_SIZE) / (baseCols + 1));
+			return;
+		}
+		disposeBgSlotIcons();
+		bgGridCols = newCols;
+		bgGridRows = newRows;
+		int totalSlots = bgGridCols * bgGridRows;
+		int jarCount = bgJarFiles.size();
+		int cap = jarCount > 0 ? Math.min(jarCount, Math.max(10, totalSlots * 30 / 100)) : 1;
+		bgSteadyCap = cap;
+		bgMaxActiveIcons = cap;
+		bgActiveIconCount = 0;
+		bgGridPad = Math.max(0, (w - baseCols * BG_ICON_SIZE) / (baseCols + 1));
+		bgScrollX = 0;
+		bgScrollY = 0;
+		bgIconSlots.clear();
+		int step0 = BG_ICON_SIZE + bgGridPad;
+		for (int i = 0; i < totalSlots; i++) {
+			BgIconSlot slot = new BgIconSlot();
+			int col = i % bgGridCols;
+			int r = i / bgGridCols;
+			slot.col = col + bgPosDc();
+			slot.row = r + bgPosDr();
+			slot.phase = 0;
+			slot.phaseTimer = 10 + browseSoundRand.nextInt(60);
+			slot.x = bgGridPad + slot.col * step0;
+			slot.drawX = Math.round(slot.x);
+			slot.y = bgGridPad + slot.row * step0;
+			slot.drawY = Math.round(slot.y);
+			bgIconSlots.add(slot);
+		}
+	}
+
+	private int bgPosDr() {
+		if (bgScrollDir == DIR_DOWN || bgScrollDir == DIR_DOWN_LEFT || bgScrollDir == DIR_DOWN_RIGHT) return -BG_LEADING_PAD;
+		return 0;
+	}
+
+	private int bgPosDc() {
+		if (bgScrollDir == DIR_RIGHT || bgScrollDir == DIR_UP_RIGHT || bgScrollDir == DIR_DOWN_RIGHT) return -BG_LEADING_PAD;
+		return 0;
+	}
+
+	private static File bgIconTempDir() {
+		File dir = new File(System.getProperty("java.io.tmpdir"), "keaddon-bg-icons");
+		if (!dir.isDirectory()) dir.mkdirs();
+		return dir;
+	}
+	private static String bgIconHash(File jar) {
+		return Integer.toHexString(jar.getAbsolutePath().hashCode());
+	}
+	private static File bgIconTempFile(File jar) {
+		return new File(bgIconTempDir(), bgIconHash(jar) + ".png");
+	}
+	private static File bgNoIconMarker(File jar) {
+		return new File(bgIconTempDir(), bgIconHash(jar) + ".noicon");
+	}
+	private Image loadBgIconImage(File jar) {
+		File f = bgIconTempFile(jar);
+		if (!f.exists() || f.length() == 0) return null;
+		try {
+			ImageData data = new ImageData(f.getAbsolutePath());
+			data = data.scaledTo(BG_ICON_SIZE, BG_ICON_SIZE);
+			return new Image(display, data);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	private void disposeBgIconSlot(BgIconSlot slot) {
+		if (slot.icon != null && !slot.icon.isDisposed()) slot.icon.dispose();
+		slot.icon = null;
+		if (slot.phase >= 1 && slot.phase <= 3) bgActiveIconCount--;
+		slot.alpha = 0f; slot.drawAlpha = 0;
+		slot.phase = 0;
+		slot.phaseTimer = browseSoundRand.nextInt(16);
+	}
+
+	// Performance Scene — O(1) random pick from active pool via swap-with-last
+	private int nextBgJarIndex() {
+		if (bgJarOrder == null || bgJarOrderCursor >= bgJarOrder.length) {
+			int total = bgJarFiles.size();
+			if (total == 0) return -1;
+			int poolSize = Math.min(BG_POOL_SIZE, total);
+			bgJarOrder = new int[poolSize];
+			if (total <= BG_POOL_SIZE) {
+				for (int i = 0; i < poolSize; i++) bgJarOrder[i] = i;
+			} else {
+				java.util.BitSet used = new java.util.BitSet(total);
+				for (int i = 0; i < poolSize; i++) {
+					int idx;
+					do { idx = browseSoundRand.nextInt(total); } while (used.get(idx));
+					used.set(idx);
+					bgJarOrder[i] = idx;
+				}
+			}
+			bgJarOrderCursor = 0;
+		}
+		int pick = bgJarOrderCursor + browseSoundRand.nextInt(bgJarOrder.length - bgJarOrderCursor);
+		int jarIdx = bgJarOrder[pick];
+		bgJarOrder[pick] = bgJarOrder[bgJarOrderCursor];
+		bgJarOrder[bgJarOrderCursor] = jarIdx;
+		bgJarOrderCursor++;
+		return jarIdx;
+	}
+
+	private void advanceBgIconAnim(float dt) { // Performance Scene — tick icons
+		if (shell == null || shell.isDisposed()) return;
+		rebuildBgGrid();
+		if (bgIconSlots.isEmpty()) return;
+		Rectangle ca = canvas.getClientArea();
+		int w = ca.width, h = ca.height;
+		int step = BG_ICON_SIZE + bgGridPad;
+		if (step <= 0) return;
+		float scrollAmount = BG_SCROLL_SPEED_SEC * dt;
+		if (scrollAmount < 0.001f) scrollAmount = 0.001f;
+		// Scroll offset per direction (both axes for diagonal)
+		switch (bgScrollDir) {
+		case DIR_UP:          bgScrollY += scrollAmount; break;
+		case DIR_DOWN:        bgScrollY -= scrollAmount; break;
+		case DIR_RIGHT:       bgScrollX -= scrollAmount; break;
+		case DIR_LEFT:        bgScrollX += scrollAmount; break;
+		case DIR_UP_RIGHT:    bgScrollY += scrollAmount; bgScrollX -= scrollAmount; break;
+		case DIR_UP_LEFT:     bgScrollY += scrollAmount; bgScrollX += scrollAmount; break;
+		case DIR_DOWN_RIGHT:  bgScrollY -= scrollAmount; bgScrollX -= scrollAmount; break;
+		case DIR_DOWN_LEFT:   bgScrollY -= scrollAmount; bgScrollX += scrollAmount; break;
+		}
+		// Wrap check (primary axis depends on direction)
+		boolean wrap = false;
+		switch (bgScrollDir) {
+		case DIR_UP: case DIR_UP_RIGHT: case DIR_UP_LEFT: wrap = bgScrollY >= step * BG_LEADING_PAD; break;
+		case DIR_DOWN: case DIR_DOWN_RIGHT: case DIR_DOWN_LEFT: wrap = bgScrollY <= -(step * BG_LEADING_PAD); break;
+		case DIR_RIGHT: wrap = bgScrollX <= -(step * BG_LEADING_PAD); break;
+		case DIR_LEFT: wrap = bgScrollX >= step * BG_LEADING_PAD; break;
+		}
+		if (wrap) {
+			// Snap back both axes based on direction
+			int snapStep = step * BG_LEADING_PAD;
+			switch (bgScrollDir) {
+			case DIR_UP:          bgScrollY -= snapStep; break;
+			case DIR_DOWN:        bgScrollY += snapStep; break;
+			case DIR_RIGHT:       bgScrollX += snapStep; break;
+			case DIR_LEFT:        bgScrollX -= snapStep; break;
+			case DIR_UP_RIGHT:    bgScrollY -= snapStep; bgScrollX += snapStep; break;
+			case DIR_UP_LEFT:     bgScrollY -= snapStep; bgScrollX -= snapStep; break;
+			case DIR_DOWN_RIGHT:  bgScrollY += snapStep; bgScrollX += snapStep; break;
+			case DIR_DOWN_LEFT:   bgScrollY += snapStep; bgScrollX -= snapStep; break;
+			}
+			if (bgMaxActiveIcons > bgSteadyCap) bgMaxActiveIcons = bgSteadyCap;
+			bgWrapCount++;
+			int cols = bgGridCols;
+			int rows = bgGridRows;
+			// Source offset (dr, dc) and iteration order per direction
+			int dr, dc, rStart, rEnd, rInc, cStart, cEnd, cInc;
+			switch (bgScrollDir) {
+			case DIR_UP:          dr=BG_LEADING_PAD;  dc=0;               rStart=0;    rEnd=rows; rInc=1;  cStart=0;    cEnd=cols; cInc=1;  break;
+			case DIR_DOWN:        dr=-BG_LEADING_PAD; dc=0;               rStart=rows-1;rEnd=-1;   rInc=-1; cStart=0;    cEnd=cols; cInc=1;  break;
+			case DIR_RIGHT:       dr=0;                dc=-BG_LEADING_PAD; rStart=0;    rEnd=rows; rInc=1;  cStart=cols-1;cEnd=-1;   cInc=-1; break;
+			case DIR_LEFT:        dr=0;                dc=BG_LEADING_PAD;  rStart=0;    rEnd=rows; rInc=1;  cStart=0;    cEnd=cols; cInc=1;  break;
+			case DIR_UP_RIGHT:    dr=BG_LEADING_PAD;  dc=-BG_LEADING_PAD; rStart=0;    rEnd=rows; rInc=1;  cStart=cols-1;cEnd=-1;   cInc=-1; break;
+			case DIR_UP_LEFT:     dr=BG_LEADING_PAD;  dc=BG_LEADING_PAD;  rStart=0;    rEnd=rows; rInc=1;  cStart=0;    cEnd=cols; cInc=1;  break;
+			case DIR_DOWN_RIGHT:  dr=-BG_LEADING_PAD; dc=-BG_LEADING_PAD; rStart=rows-1;rEnd=-1;   rInc=-1; cStart=cols-1;cEnd=-1;   cInc=-1; break;
+			default: /*DIR_DOWN_LEFT*/ dr=-BG_LEADING_PAD; dc=BG_LEADING_PAD;  rStart=rows-1;rEnd=-1;   rInc=-1; cStart=0;    cEnd=cols; cInc=1;  break;
+			}
+			for (int r = rStart; r != rEnd; r += rInc) {
+				for (int c = cStart; c != cEnd; c += cInc) {
+					int srcR = r + dr;
+					int srcC = c + dc;
+					if (srcR >= 0 && srcR < rows && srcC >= 0 && srcC < cols) {
+						// Shift data from diagonal/axial neighbor
+						BgIconSlot s = bgIconSlots.get(r * cols + c);
+						BgIconSlot src = bgIconSlots.get(srcR * cols + srcC);
+						// Dispose s's old icon and remove its count if it still has one
+						boolean sHadIcon = s.icon != null;
+						if (sHadIcon && !s.icon.isDisposed()) s.icon.dispose();
+						if (sHadIcon && s.phase >= 1 && s.phase <= 3) bgActiveIconCount--;
+						boolean srcHadIcon = src.icon != null && src.phase >= 1 && src.phase <= 3;
+						s.icon = src.icon; src.icon = null; s.x = src.x; s.drawX = src.drawX;
+						s.y = src.y; s.drawY = src.drawY;
+						s.alpha = src.alpha; s.drawAlpha = src.drawAlpha;
+						s.phase = src.phase; s.phaseTimer = src.phaseTimer;
+						src.phase = 0; src.phaseTimer = browseSoundRand.nextInt(16);
+						s.row = r + bgPosDr(); s.col = c + bgPosDc();
+						// Fix counts: src loses its contribution, s gains one
+						if (srcHadIcon) bgActiveIconCount--;
+						if (s.phase >= 1 && s.phase <= 3 && s.icon != null) bgActiveIconCount++;
+					} else {
+						// Spawn edge — reset with direct cache assign
+						BgIconSlot slot = bgIconSlots.get(r * cols + c);
+						disposeBgIconSlot(slot);
+						slot.row = r + bgPosDr(); slot.col = c + bgPosDc();
+						if (!bgJarFiles.isEmpty() && bgActiveIconCount < bgMaxActiveIcons && browseSoundRand.nextFloat() < 0.33f) {
+							int jarIdx = nextBgJarIndex();
+							if (jarIdx < 0) continue;
+							File f = bgJarFiles.get(jarIdx);
+							Image img = loadBgIconImage(f);
+							if (img != null) {
+								slot.icon = img; slot.alpha = 0f; slot.drawAlpha = 0;
+								slot.phase = 1; slot.phaseTimer = 30; bgActiveIconCount++;
+							} else {
+								if (!bgIconTempFile(f).exists() && !bgNoIconMarker(f).exists()) loadBgIconFromJar(f);
+							}
+						}
+					}
+				}
+			}
+		}
+		int step2 = step;
+		for (int i = 0; i < bgIconSlots.size(); i++) {
+			BgIconSlot slot = bgIconSlots.get(i);
+			float ny = bgGridPad + slot.row * step2 - bgScrollY;
+			if (slot.y != ny) { slot.y = ny; slot.drawY = Math.round(ny); }
+			float nx = bgGridPad + slot.col * step2 - bgScrollX;
+			if (slot.x != nx) { slot.x = nx; slot.drawX = Math.round(nx); }
+			float fadeStep = ALPHA_FADE_SEC * dt;
+			switch (slot.phase) {
+			case 0:
+				if (slot.icon != null) { if (!slot.icon.isDisposed()) slot.icon.dispose(); slot.icon = null; }
+				if (--slot.phaseTimer <= 0) {
+					if (bgJarFiles.isEmpty()) { slot.phaseTimer = 60; break; }
+					if (bgActiveIconCount >= bgMaxActiveIcons) { slot.phaseTimer = 10 + browseSoundRand.nextInt(20); break; }
+					if (browseSoundRand.nextFloat() > 0.33f) { slot.phaseTimer = 10 + browseSoundRand.nextInt(10); break; }
+					int jarIdx = nextBgJarIndex();
+					if (jarIdx < 0) { slot.phaseTimer = 60; break; }
+					File f = bgJarFiles.get(jarIdx);
+					if (!bgIconTempFile(f).exists() && !bgNoIconMarker(f).exists()) { loadBgIconFromJar(f); slot.phaseTimer = 60; break; }
+					Image img = loadBgIconImage(f);
+					if (img == null) { slot.phaseTimer = 2 + browseSoundRand.nextInt(4); break; }
+					slot.icon = img; slot.alpha = 0f; slot.drawAlpha = 0;
+					slot.phase = 1; slot.phaseTimer = 30; bgActiveIconCount++;
+				}
+				break;
+			case 1:
+				slot.alpha = Math.min(0.2f, slot.alpha + fadeStep);
+				slot.drawAlpha = Math.round(slot.alpha * 255);
+				if (--slot.phaseTimer <= 0) { slot.phase = 2; slot.phaseTimer = 20 + browseSoundRand.nextInt(20); }
+				break;
+			case 2:
+				if (--slot.phaseTimer <= 0) {
+					slot.phase = 3;
+					int fadeTicks = Math.max(1, Math.round(ALPHA_FADE_SEC / (BG_ANIM_INTERVAL_MS / 1000f)));
+					slot.phaseTimer = fadeTicks;
+				}
+				break;
+			case 3:
+				slot.alpha = Math.max(0f, slot.alpha - fadeStep);
+				slot.drawAlpha = Math.round(slot.alpha * 255);
+				if (--slot.phaseTimer <= 0 || slot.alpha <= 0f) {
+					if (slot.icon != null && !slot.icon.isDisposed()) slot.icon.dispose();
+					if (slot.icon != null) bgActiveIconCount--;
+					slot.icon = null; slot.phase = 0;
+					slot.alpha = 0f; slot.drawAlpha = 0;
+					slot.phaseTimer = browseSoundRand.nextInt(16);
+				}
+				break;
+			}
+			// Immediate recycle when fully off-screen at trailing edge
+			if (slot.phase >= 1 && slot.icon != null) {
+				boolean gone = false;
+				switch (bgScrollDir) {
+				case DIR_UP:          gone = slot.drawY + BG_ICON_SIZE <= 0; break;
+				case DIR_DOWN:        gone = slot.drawY >= h; break;
+				case DIR_LEFT:        gone = slot.drawX + BG_ICON_SIZE <= 0; break;
+				case DIR_RIGHT:       gone = slot.drawX >= w; break;
+				case DIR_UP_RIGHT:    gone = slot.drawY + BG_ICON_SIZE <= 0 || slot.drawX >= w; break;
+				case DIR_UP_LEFT:     gone = slot.drawY + BG_ICON_SIZE <= 0 || slot.drawX + BG_ICON_SIZE <= 0; break;
+				case DIR_DOWN_RIGHT:  gone = slot.drawY >= h || slot.drawX >= w; break;
+				case DIR_DOWN_LEFT:   gone = slot.drawY >= h || slot.drawX + BG_ICON_SIZE <= 0; break;
+				}
+				if (gone) {
+					disposeBgIconSlot(slot);
+				}
+			}
+		}
+		bgDirty = true;
+	}
+
+	private void paintBgIcons(GC gc, int bgR, int bgG, int bgB) {
+		if (bgIconSlots.isEmpty()) return;
+		Rectangle ca = canvas.getClientArea();
+		int w = ca.width, h = ca.height;
+		if (w <= 0 || h <= 0) return;
+		int lastA = -1;
+		for (BgIconSlot slot : bgIconSlots) {
+			if (slot.drawAlpha <= 0 || slot.icon == null || slot.icon.isDisposed()) continue;
+			if (slot.drawY + BG_ICON_SIZE <= 0 || slot.drawY >= h || slot.drawX + BG_ICON_SIZE <= 0 || slot.drawX >= w) continue;
+			if (slot.drawAlpha != lastA) {
+				gc.setAlpha(slot.drawAlpha);
+				lastA = slot.drawAlpha;
+			}
+			gc.drawImage(slot.icon, slot.drawX, slot.drawY);
+		}
+		gc.setAlpha(255);
+	}
+
+	private void scheduleBrowseBtnAnim() {
+		if (browseAnimScheduled) return;
+		browseAnimScheduled = true;
+		loadBgIcons();
+		canvas.redraw();
+		if (bgAnimRunnable == null) {
+			bgAnimRunnable = new Runnable() {
+				public void run() {
+					try {
+						if (shell == null || shell.isDisposed()) return;
+						// Performance Scene — pause bg animation only in fullscreen when browser open
+						if (fullscreen && (pauseState != 0 || browseFavOpenCount > 0)) {
+							browseAnimScheduled = false;
+							return;
+						}
+						long now = System.nanoTime();
+						if (bgAnimLastNanos == 0) bgAnimLastNanos = now;
+						float dt = (now - bgAnimLastNanos) / 1e9f;
+						if (dt > 0.05f) dt = 0.05f;
+						bgAnimLastNanos = now;
+						advanceBtnHues(dt);
+						pulsePhase += PULSE_SPEED_SEC * dt;
+						if (pulsePhase > 1f) pulsePhase -= 1f;
+						if (fullscreen && shell != null && !shell.isDisposed()) {
+							advanceBgIconAnim(dt);
+						}
+						canvas.redraw();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					display.timerExec(BG_ANIM_INTERVAL_MS, this);
+				}
+			};
+		} else {
+			bgAnimLastNanos = 0;
+		}
+		display.timerExec(0, bgAnimRunnable);
+	}
+
+	private void setBgScrollDirFromMode() {
+		if (bgAnimMode >= 0 && bgAnimMode <= 7) {
+			bgScrollDir = bgAnimMode;
+		} else {
+			bgScrollDir = browseSoundRand.nextInt(8);
+		}
+	}
+
+	private void cycleBgAnimMode() {
+		bgAnimMode = (bgAnimMode + 1) % 9;
+		if (bgAnimRunnable != null) {
+			display.timerExec(-1, bgAnimRunnable);
+		}
+		browseAnimScheduled = false;
+		disposeBgSlotIcons();
+		bgIconSlots.clear();
+		bgGridCols = 1; bgGridRows = 1;
+		bgScrollX = 0;
+		bgScrollY = 0;
+		bgAnimLastNanos = 0;
+		bgDirty = false;
+		bgActiveIconCount = 0;
+		setBgScrollDirFromMode();
+		scheduleBrowseBtnAnim();
+	}
+
+	public void reloadBgIcons() {
+		reloadBgIcons(null);
+	}
+
+	public void reloadBgIcons(String customPath) {
+		currentBgSentence = BG_SENTENCES[browseSoundRand.nextInt(BG_SENTENCES.length)];
+		bgCustomDirPath = customPath;
+		// Performance Scene — full reset of bg icon state
+		if (bgAnimRunnable != null) {
+			display.timerExec(-1, bgAnimRunnable);
+		}
+		browseAnimScheduled = false;
+		synchronized (bgLoadingSet) {
+			bgLoadingSet.clear();
+		}
+		// Dispose any active slot icons
+		for (BgIconSlot slot : bgIconSlots) {
+			if (slot.icon != null && !slot.icon.isDisposed()) slot.icon.dispose();
+		}
+		bgJarFiles.clear();
+		bgIconsLoaded = false;
+		bgJarOrder = null;
+		bgJarOrderCursor = 0;
+		bgIconSlots.clear();
+		bgGridCols = 1; bgGridRows = 1;
+		bgScrollX = 0;
+		bgScrollY = 0;
+		setBgScrollDirFromMode();
+		bgDirty = false;
+		bgAnimLastNanos = 0;
+		bgNoIconJars.clear();
+		loadBgIcons();
+		scheduleBrowseBtnAnim();
+	}
+
+	private void startBrowseSound() {
+		try {
+			final File folder = new File(Emulator.getUserPath(), "just_to_feel_something");
+			if (!folder.isDirectory()) return;
+			browseSoundFiles = folder.list((dir, name) -> new File(folder, name).isFile());
+			if (browseSoundFiles == null || browseSoundFiles.length == 0) return;
+			Arrays.sort(browseSoundFiles);
+			stopBrowseSound();
+			File f = new File(folder, browseSoundFiles[browseSoundRand.nextInt(browseSoundFiles.length)]);
+			if (!playWithJavaSound(f)) {
+				if (!playWithJavaFX(f)) {
+					playWithJLayer(folder);
+				}
+			}
+			browseSoundPlaying = browseSoundClip != null || browseSoundPlayer != null || browseSoundThread != null;
+		} catch (Exception ignored) {}
+	}
+
+	private boolean playWithJavaFX(File f) {
+		try {
+			Class<?> mediaClass = Class.forName("javafx.scene.media.Media");
+			Constructor<?> mediaCtor = mediaClass.getConstructor(String.class);
+			Object media = mediaCtor.newInstance(f.toURI().toString());
+			Class<?> playerClass = Class.forName("javafx.scene.media.MediaPlayer");
+			Constructor<?> playerCtor = playerClass.getConstructor(mediaClass);
+			browseSoundPlayer = playerCtor.newInstance(media);
+			Method setCycleCount = playerClass.getMethod("setCycleCount", int.class);
+			Object val = null;
+			for (Class<?> c : playerClass.getDeclaredClasses()) {
+				if (c.getSimpleName().equals("Indefinite")) {
+					val = c.getDeclaredFields()[0].get(null);
+					break;
+				}
+			}
+			setCycleCount.invoke(browseSoundPlayer, val != null ? val : Integer.MAX_VALUE);
+			playerClass.getMethod("setVolume", double.class).invoke(browseSoundPlayer, 0.0);
+			playerClass.getMethod("play").invoke(browseSoundPlayer);
+			return true;
+		} catch (Exception e) {
+			browseSoundPlayer = null;
+			return false;
+		}
+	}
+
+	private boolean playWithJLayer(final File folder) {
+		try {
+			final Class<?> playerClass = Class.forName("javazoom.jl.player.Player");
+			final Constructor<?> playerCtor = playerClass.getConstructor(InputStream.class);
+			final Method playMtd = playerClass.getMethod("play");
+			final Method closeMtd = playerClass.getMethod("close");
+			browseSoundThread = new Thread("BrowseSound-JLayer") {
+				public void run() {
+					try {
+						while (browseSoundThread == Thread.currentThread() && !isInterrupted()) {
+							File pick = new File(folder, browseSoundFiles[browseSoundRand.nextInt(browseSoundFiles.length)]);
+							InputStream fis = new BufferedInputStream(new FileInputStream(pick));
+							Object player = playerCtor.newInstance(fis);
+							browseSoundPlayer = player;
+							playMtd.invoke(player);
+							closeMtd.invoke(player);
+							if (browseSoundThread != Thread.currentThread() || isInterrupted()) break;
+						}
+					} catch (Exception ignored) {}
+					browseSoundPlayer = null;
+				}
+			};
+			browseSoundThread.setDaemon(true);
+			browseSoundThread.start();
+			return true;
+		} catch (Exception e) {
+			browseSoundPlayer = null;
+			return false;
+		}
+	}
+
+	private boolean playWithJavaSound(File f) {
+		try {
+			AudioInputStream ais = AudioSystem.getAudioInputStream(f);
+			browseSoundClip = AudioSystem.getClip();
+			browseSoundClip.open(ais);
+			if (browseSoundClip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+				FloatControl gain = (FloatControl) browseSoundClip.getControl(FloatControl.Type.MASTER_GAIN);
+				float min = gain.getMinimum();
+				float range = gain.getMaximum() - min;
+				gain.setValue(min + range * 0.0f);
+			}
+			browseSoundClip.loop(Clip.LOOP_CONTINUOUSLY);
+			browseSoundClip.start();
+			return true;
+		} catch (Exception e) {
+			browseSoundClip = null;
+			return false;
+		}
+	}
+
+	private void stopBrowseSound() {
+		browseSoundPlaying = false;
+		Thread t = browseSoundThread;
+		Object player = browseSoundPlayer;
+		Clip clip = browseSoundClip;
+		browseSoundThread = null;
+		browseSoundPlayer = null;
+		browseSoundClip = null;
+		if (t != null) {
+			try {
+				if (player != null) {
+					player.getClass().getMethod("close").invoke(player);
+				}
+				t.interrupt();
+			} catch (Exception ignored) {}
+		}
+		if (player != null) {
+			try {
+				player.getClass().getMethod("stop").invoke(player);
+				player.getClass().getMethod("dispose").invoke(player);
+			} catch (Exception ignored) {}
+		}
+		if (clip != null) {
+			try { clip.stop(); } catch (Exception ignored) {}
+			try { clip.close(); } catch (Exception ignored) {}
 		}
 	}
 
@@ -2175,6 +4267,12 @@ public final class EmulatorScreen implements
 		}
 	}
 
+	private static boolean matchHotkey(KeyEvent e, HotkeyManager.HotkeyAction a) {
+		int mods = e.stateMask & (SWT.CTRL | SWT.SHIFT | SWT.ALT);
+		if (mods != a.stateMask) return false;
+		return e.keyCode == a.keyCode || Character.toLowerCase(e.keyCode) == Character.toLowerCase(a.keyCode);
+	}
+
 	public void keyPressed(final KeyEvent keyEvent) {
 		if (keyEvent.keyCode == 16777261/*&& (keyEvent.stateMask & SWT.CONTROL) != 0*/) {
 			this.zoomOut();
@@ -2185,13 +4283,236 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (fullscreen && keyEvent.keyCode == SWT.ESC) {
-			fullscreenMenuItem.setSelection(fullscreen = false);
+			fullscreen = false;
 			changeFullscreen();
 			return;
 		}
-		if (keyEvent.keyCode == SWT.F11) {
-			fullscreenMenuItem.setSelection(fullscreen = !fullscreen);
+		if (matchHotkey(keyEvent, HotkeyManager.CYCLE_BG_ANIM)) {
+			cycleBgAnimMode();
+			return;
+		}
+		if (this.pauseState == 0) {
+			int kc = keyEvent.keyCode;
+			if (kc == SWT.ARROW_UP || kc == SWT.KEYPAD_8 || kc == SWT.ARROW_DOWN || kc == SWT.KEYPAD_2 || kc == SWT.F3 || kc == SWT.KEYPAD_5) {
+				handleBtnKeyDown(kc);
+				return;
+			}
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.CYCLE_RES_PREV) && this.pauseState == 1) {
+			cycleResolutionPreset(-1);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.CYCLE_RES_NEXT) && this.pauseState == 1) {
+			cycleResolutionPreset(1);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.TOGGLE_FULLSCREEN)) {
+			fullscreen = !fullscreen;
 			changeFullscreen();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.DELETE_JAR)) {
+			doDeleteJar();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.OPEN_APP_SETTINGS) && this.pauseState == 1) {
+			Emulator.getEmulator().openAppSettings(false);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.PREV_JAR) && this.pauseState == 1 && Emulator.midletJarPath != null) {
+			browseJarInFolder(-1);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.NEXT_JAR) && this.pauseState == 1 && Emulator.midletJarPath != null) {
+			browseJarInFolder(1);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.SPEED_UP)) {
+			if (AppSettings.speedModifier == -1) {
+				AppSettings.speedModifier = 1;
+				this.updateStatus();
+				return;
+			}
+			if (AppSettings.speedModifier < 100) {
+				++AppSettings.speedModifier;
+				this.updateStatus();
+			}
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.SLOW_DOWN)) {
+			if (AppSettings.speedModifier == 1) {
+				AppSettings.speedModifier = -1;
+				this.updateStatus();
+				return;
+			}
+			if (AppSettings.speedModifier > -100) {
+				--AppSettings.speedModifier;
+				this.updateStatus();
+			}
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.RESET_SPEED)) {
+			AppSettings.speedModifier = 1;
+			this.updateStatus();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.RESTART_MIDLET) && this.pauseState == 1) {
+			Emulator.loadGame(null, false);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.SUSPEND) && this.pauseState == 1) {
+			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+				this.pauseState = 2;
+				Emulator.getEventQueue().queue(EventQueue.EVENT_PAUSE);
+				this.pauseScreen();
+				this.canvas.redraw();
+				this.updatePauseState();
+			}
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.RESUME) && this.pauseState == 2) {
+			if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+				this.pauseState = 1;
+				Emulator.getEventQueue().queue(EventQueue.EVENT_RESUME);
+				this.screenImg.dispose();
+				if (AppSettings.steps == 0) {
+					this.pauseScreen();
+					this.canvas.redraw();
+				} else {
+					try {
+						Emulator.getCanvas().repaint();
+					} catch (Exception ignored) {
+					}
+				}
+				this.updatePauseState();
+			}
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.PAUSE_STEP) && this.pauseState == 1) {
+			pauseStep();
+			this.updatePauseState();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.PLAY_RESUME) && this.pauseState == 1) {
+			this.resumeStep();
+			this.updatePauseState();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.XRAY_VIEW)) {
+			AppSettings.xrayView = this.xrayViewMenuItem.getSelection();
+			this.xrayViewMenuItem.setSelection(!AppSettings.xrayView);
+			AppSettings.xrayView = !AppSettings.xrayView;
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.ROTATE_SCREEN) && this.pauseState == 1) {
+			this.setSize(this.getHeight(), this.getWidth());
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.ROTATE_90)) {
+			rotate90degrees();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.FORCE_PAINT) && this.pauseState == 1) {
+			if (Settings.g2d == 0) {
+				if (AppSettings.xrayView) {
+					this.xrayScreenImageSwt.cloneImage(this.screenCopySwt);
+				} else {
+					this.backBufferImageSwt.cloneImage(this.screenCopySwt);
+				}
+			} else if (Settings.g2d == 1) {
+				(AppSettings.xrayView ? this.xrayScreenImageAwt : this.backBufferImageAwt).cloneImage(this.screenCopyAwt);
+			}
+			this.canvas.redraw();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.ADD_TO_FAVORITES) && this.pauseState == 1) {
+			addCurrentToFavorites();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.OPEN_FAVORITES)) {
+			openFavoritesBrowser();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.ZOOM_IN)) {
+			this.zoomIn();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.ZOOM_OUT)) {
+			this.zoomOut();
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.TOGGLE_RESOLUTION_RESTART)) {
+			this.resolutionRestartMenuItem.setSelection(Settings.resolutionRestartMidlet = !Settings.resolutionRestartMidlet);
+			((Property) Emulator.getEmulator().getProperty()).saveProperties();
+			showToast(Settings.resolutionRestartMidlet ? "Restart on resolution: ON" : "Restart on resolution: OFF", 800);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.RESET_WINDOW_SIZE) && this.pauseState == 1) {
+			if (getWidth() != startWidth || getHeight() != startHeight) {
+				initScreenBuffer(startWidth, startHeight);
+				Emulator.getEventQueue().sizeChanged(startWidth, startHeight);
+			}
+			Settings.canvasScale = 1f;
+			updateCanvasRect(true, true, false);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.CYCLE_SCALE_MODE) && this.pauseState == 1) {
+			switch (Settings.resizeMode) {
+				case Manual:
+					Settings.resizeMode = ResizeMethod.Fit;
+					break;
+				case Fit:
+					Settings.resizeMode = ResizeMethod.FitInteger;
+					break;
+				case FitInteger:
+					Settings.resizeMode = ResizeMethod.FollowWindowSize;
+					break;
+				case FollowWindowSize:
+					Settings.resizeMode = ResizeMethod.Manual;
+					break;
+			}
+			syncScalingModeSelection();
+			if (Settings.resizeMode == ResizeMethod.Manual) {
+				Settings.canvasScale = (float) (Math.floor(realZoom * 2) / 2d);
+			}
+			updateCanvasRect(true, false, false);
+			String[] names = {"No adaptive", "Fit", "Fit integer", "Sync"};
+			showToast("Scale: " + names[Settings.resizeMode.ordinal()], 800);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.CYCLE_INTERP_MODE) && this.pauseState == 1) {
+			if (Settings.interpolation == SWT.NONE) {
+				Settings.interpolation = SWT.LOW;
+			} else if (Settings.interpolation == SWT.LOW) {
+				Settings.interpolation = SWT.HIGH;
+			} else {
+				Settings.interpolation = SWT.NONE;
+			}
+			interposeNearestMenuItem.setSelection(Settings.interpolation == SWT.NONE);
+			interposeLowMenuItem.setSelection(Settings.interpolation == SWT.LOW);
+			interposeHighMenuItem.setSelection(Settings.interpolation == SWT.HIGH);
+			repaint();
+			String[] names = {"Nearest", "Low", "High"};
+			showToast("Interp: " + names[Settings.interpolation], 800);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.AUTO_SKIP_APP_SETTINGS)) {
+			this.autoSkipAppSettingsMenuItem.setSelection(Settings.showAppSettingsOnStart = !Settings.showAppSettingsOnStart);
+			showToast(Settings.showAppSettingsOnStart ? "Auto-skip Application Settings: ON" : "Auto-skip Application Settings: OFF", 800);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.DISABLE_TOUCH_DBLCLICK)) {
+			this.disableTouchDblClickMenuItem.setSelection(Settings.disableTouchDoubleClick = !Settings.disableTouchDoubleClick);
+			showToast(Settings.disableTouchDoubleClick ? "Disable dbl-click: ON" : "Disable dbl-click: OFF", 800);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.SETUP_LUCKY_FOLDER)) {
+			new LuckyFolderSetupDlg().open(display);
+			return;
+		}
+		if (matchHotkey(keyEvent, HotkeyManager.OPEN_LUCKY_JAR)) {
+			loadLuckyJar();
 			return;
 		}
 		int n = keyEvent.keyCode & 0xFEFFFFFF;
@@ -2202,6 +4523,17 @@ public final class EmulatorScreen implements
 	}
 
 	public void keyReleased(final KeyEvent keyEvent) {
+		if (this.pauseState == 0) {
+			int kc = keyEvent.keyCode;
+			if (kc == SWT.F3 || kc == SWT.KEYPAD_5) {
+				if (browseSelectedIdx == 0 && browseFavHeld) handleBrowseRelease();
+				else if (browseSelectedIdx == 1 && luckyFavHeld) handleLuckyRelease();
+				/* Debug button removed
+				else if (browseSelectedIdx == 2 && debugFavHeld) handleDebugRelease();
+				/**/
+				return;
+			}
+		}
 		if (!Settings.canvasKeyboard && poller != null) {
 			return;
 		}
@@ -2315,10 +4647,21 @@ public final class EmulatorScreen implements
 		if (Settings.playingRecordedKeys) {
 			return;
 		}
-		if (this.pauseState == 0 || Emulator.getCurrentDisplay().getCurrent() == null) {
+		if (Settings.disableTouchDoubleClick) {
 			return;
 		}
-		if (mouseEvent.button != 1 || Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+		if (Emulator.getCurrentDisplay() != null && Emulator.getCurrentDisplay().getCurrent() != null
+				&& Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
+			fullscreen = !fullscreen;
+			changeFullscreen();
+			return;
+		}
+		if (this.pauseState == 0) {
+			fullscreen = !fullscreen;
+			changeFullscreen();
+			return;
+		}
+		if (mouseEvent.button != 1) {
 			return;
 		}
 		try {
@@ -2406,7 +4749,33 @@ public final class EmulatorScreen implements
 			this.mouseYRelease = mouseEvent.y;
 			this.mouseDownInfos = true;
 		}
-		if (this.pauseState == 0 || Settings.playingRecordedKeys
+		if (this.pauseState == 0) {
+			if (splashBounds != null && splashBounds.contains(mouseEvent.x, mouseEvent.y)
+					&& splashImage != null && !splashImage.isDisposed()
+					&& !EmulatorScreen.fullscreen && (shell == null || shell.isDisposed() || !shell.getFullScreen())) {
+				splashHeld = true;
+				splashHeldSentence = null;
+				canvas.redraw();
+				return;
+			}
+			if (handleBrowseMouseDown(mouseEvent)) return;
+			if (handleLuckyMouseDown(mouseEvent)) return;
+		/* Debug button removed
+		if (handleDebugMouseDown(mouseEvent)) return;
+		/**/
+			splashHeld = false;
+			splashHeldSentence = null;
+			browseFavHeld = false;
+			browseFavPressed = false;
+			luckyFavHeld = false;
+			luckyFavPressed = false;
+			/* Debug button removed
+			debugFavHeld = false;
+			debugFavPressed = false;
+			/**/
+			return;
+		}
+		if (Settings.playingRecordedKeys
 				|| Emulator.getCurrentDisplay().getCurrent() == null) {
 			return;
 		}
@@ -2423,7 +4792,29 @@ public final class EmulatorScreen implements
 
 	public void mouseUp(final MouseEvent mouseEvent) {
 		this.mouseDownInfos = false;
-		if (this.pauseState == 0 || Settings.playingRecordedKeys
+		if (this.pauseState == 0) {
+			if (splashHeld) {
+				splashHeld = false;
+				splashHeldSentence = null;
+				canvas.redraw();
+				return;
+			}
+			if (handleBrowseMouseUp(mouseEvent)) return;
+			if (handleLuckyMouseUp(mouseEvent)) return;
+		/* Debug button removed
+		if (handleDebugMouseUp(mouseEvent)) return;
+		/**/
+			browseFavHeld = false;
+			browseFavPressed = false;
+			luckyFavHeld = false;
+			luckyFavPressed = false;
+			/* Debug button removed
+			debugFavHeld = false;
+			debugFavPressed = false;
+			/**/
+			return;
+		}
+		if (Settings.playingRecordedKeys
 				|| Emulator.getCurrentDisplay().getCurrent() == null) {
 			return;
 		}
@@ -2436,6 +4827,11 @@ public final class EmulatorScreen implements
 	}
 
 	public void mouseMove(final MouseEvent mouseEvent) {
+		handleBrowseMouseMove(mouseEvent);
+		handleLuckyMouseMove(mouseEvent);
+		/* Debug button removed
+		handleDebugMouseMove(mouseEvent);
+		/**/
 		if (this.infosEnabled) {
 			if (this.mouseDownInfos) {
 				this.mouseXRelease = mouseEvent.x;
@@ -2499,6 +4895,11 @@ public final class EmulatorScreen implements
 	}
 
 	public void mouseExit(MouseEvent e) {
+		clearBrowseHover();
+		clearLuckyHover();
+		/* Debug button removed
+		clearDebugHover();
+		/**/
 	}
 
 	public void mouseHover(MouseEvent arg0) {
@@ -2511,7 +4912,21 @@ public final class EmulatorScreen implements
 		if (this.pauseState != 0) {
 			Emulator.getEventQueue().queue(EventQueue.EVENT_EXIT);
 		}
-	}
+		if (splashImage != null && !splashImage.isDisposed()) {
+			splashImage.dispose();
+			splashImage = null;
+		}
+		// Performance Scene — dispose slot icons and clean up temp files
+		for (BgIconSlot slot : bgIconSlots) {
+			if (slot.icon != null && !slot.icon.isDisposed()) slot.icon.dispose();
+		}
+		bgIconSlots.clear();
+		bgJarFiles.clear();
+		if (pulseBgColor != null && !pulseBgColor.isDisposed()) { pulseBgColor.dispose(); pulseBgColor = null; }
+		if (splashDarkBg != null && !splashDarkBg.isDisposed()) { splashDarkBg.dispose(); splashDarkBg = null; }
+		if (splashDarkFg != null && !splashDarkFg.isDisposed()) { splashDarkFg.dispose(); splashDarkFg = null; }
+		if (statusBarDarkBg != null && !statusBarDarkBg.isDisposed()) { statusBarDarkBg.dispose(); statusBarDarkBg = null; }
+		}
 
 	public void controlMoved(final ControlEvent controlEvent) {
 		if (controlEvent.widget != shell)
@@ -2574,13 +4989,18 @@ public final class EmulatorScreen implements
 	}
 
 	public void startVibra(final long aLong1013) {
+		startVibra(100, aLong1013);
+	}
+
+	public void startVibra(final int intensity, final long duration) {
 		if (!Settings.enableVibration) {
 			return;
 		}
+		sendVibraToGamepad((int) duration, intensity);
 		if (maximized) {
 			return;
 		}
-		this.vibra = aLong1013;
+		this.vibra = duration;
 		if (this.vibra == 0L) {
 			this.stopVibra();
 			return;
@@ -2595,9 +5015,14 @@ public final class EmulatorScreen implements
 	}
 
 	public void stopVibra() {
+		sendVibraToGamepad(0, 0);
 		if (this.vibraThread != null) {
 			this.vibraThread.stop = true;
 		}
+	}
+
+	private static void sendVibraToGamepad(int durationMs, int intensity) {
+		VibraPipe.send(durationMs, intensity);
 	}
 
 	private void method589() {
@@ -2719,6 +5144,9 @@ public final class EmulatorScreen implements
 			} catch (Exception ignored) {}
 		}
 
+		if (Settings.favoritesDarkMode) {
+			applyThemeToShell(shell, true);
+		}
 		Rectangle clientArea = this.shell.getMonitor().getClientArea();
 		Point size = shell.getSize();
 		shell.setLocation(clientArea.x + (clientArea.width - size.x) / 2, clientArea.y + (clientArea.height - size.y) / 2);
@@ -2879,14 +5307,6 @@ public final class EmulatorScreen implements
 					}
 					break;
 				}
-				case 1: {
-					if (Settings.showLogFrame) {
-						this.screen.logMenuItem.setSelection(true);
-						((Log) Emulator.getEmulator().getLogStream()).createWindow(EmulatorScreen.method561(this.screen));
-						return;
-					}
-					break;
-				}
 				case 2: {
 					if (Settings.showInfoFrame) {
 						infosEnabled = true;
@@ -2938,6 +5358,18 @@ public final class EmulatorScreen implements
 				}
 			} catch (Exception ignored) {
 			}
+		}
+	}
+
+	private void refreshGamepadMenuState() {
+		boolean avail = Emulator.isJ2MEGamepadAvailable();
+		j2meGamepadTerminateMenuItem.setEnabled(avail);
+		j2meGamepadLaunchMenuItem.setEnabled(avail);
+		if (!avail) {
+			j2meGamepadTerminateMenuItem.setSelection(false);
+			j2meGamepadLaunchMenuItem.setSelection(false);
+			Settings.j2meGamepadEnabled = false;
+			Settings.j2meGamepadAutoLaunch = false;
 		}
 	}
 }

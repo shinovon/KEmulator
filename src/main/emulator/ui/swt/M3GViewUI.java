@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.UILocale;
 import emulator.Utils;
 import emulator.debug.Memory;
@@ -331,6 +332,10 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		this.method545();
 		this.shell.setLayout(layout);
 		this.shell.setSize(new Point(600, 400));
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 		this.menu = new Menu(this.shell, 2);
 		final MenuItem menuItem = new MenuItem(this.menu, 64);
 		final MenuItem menuItem2;

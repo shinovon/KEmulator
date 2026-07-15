@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Settings;
 import emulator.UILocale;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -86,5 +87,9 @@ public class InputDialog extends Dialog {
 		});
 
 		shell.setDefaultButton(ok);
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 	}
 }

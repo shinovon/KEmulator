@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Settings;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -70,5 +71,9 @@ public final class InfosBox {
 		label.setText("Pos(0,0)\nColr(0)\nRect(0,0,0,0)");
 		label.setLayoutData(layoutData);
 		label.setBackground(display.getSystemColor(13));
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 	}
 }

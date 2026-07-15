@@ -19,6 +19,7 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -205,6 +206,7 @@ public final class Property implements IProperty, SelectionListener {
 
 	private Composite keyMapControllerComp;
 	private Composite keyMapTabComp;
+	private Composite hotkeyComp;
 
 	private Button vmsCheck;
 	private Button globalMidiCheck;
@@ -246,7 +248,7 @@ public final class Property implements IProperty, SelectionListener {
 		display = parent.getDisplay();
 		this.method372(parent);
 		this.setsShell.pack();
-		this.setsShell.setSize(420, this.setsShell.getSize().y);
+		this.setsShell.setSize(460, 410);
 		systemScrollComp.setMinHeight(systemComp.computeSize(-1, -1).y);
 		
 		systemScrollComp.setExpandVertical(true);
@@ -371,9 +373,17 @@ public final class Property implements IProperty, SelectionListener {
 				KeyMapping.mapDeviceKey(16, KeyMapping.method601(properties.getProperty("MAP_KEY_MIDDLE")));
 				KeyMapping.mapDeviceKey(17, KeyMapping.method601(properties.getProperty("MAP_KEY_LSOFT")));
 				KeyMapping.mapDeviceKey(18, KeyMapping.method601(properties.getProperty("MAP_KEY_RSOFT")));
+				// Migrate old Pad_Middle default from Enter (13) to F3 (12)
+				if ("13".equals(KeyMapping.get(16))) {
+					KeyMapping.mapDeviceKey(16, "12");
+				}
 			}
 			Settings.enableKeyCache = Boolean.parseBoolean(properties.getProperty("EnableKeyCache", "false"));
 			Settings.canvasKeyboard = Boolean.parseBoolean(properties.getProperty("CanvasKeyboardMode", "true"));
+			Settings.j2meGamepadEnabled = Boolean.parseBoolean(properties.getProperty("J2MEGamepadEnabled", "false"));
+			Settings.j2meGamepadAutoLaunch = Boolean.parseBoolean(properties.getProperty("J2MEGamepadAutoLaunch", "false"));
+			String p = properties.getProperty("J2MEGamepadPath", "");
+			if (p.length() > 0 && new java.io.File(p).isFile()) Settings.j2meGamepadPath = p;
 			Settings.recordKeys = Boolean.parseBoolean(properties.getProperty("RecordKeys", "false"));
 
 			// controller mappings
@@ -427,6 +437,8 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.altLessSpeedShortcuts = Boolean.parseBoolean(properties.getProperty("AltLessSpeedShortcuts", "false"));
 			Settings.showAppSettingsOnStart = Boolean.parseBoolean(properties.getProperty("ShowAppSettingsOnStart", "true"));
 			Settings.globalSettings = Boolean.parseBoolean(properties.getProperty("GlobalSettings", "false"));
+			Settings.resolutionRestartMidlet = Boolean.parseBoolean(properties.getProperty("ResolutionRestartMidlet", "false"));
+			Settings.disableTouchDoubleClick = Boolean.parseBoolean(properties.getProperty("DisableTouchDoubleClick", "false"));
 			Settings.storeCreatedImages = Boolean.parseBoolean(properties.getProperty("StoreCreatedImages", "false"));
 
 			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
@@ -438,6 +450,8 @@ public final class Property implements IProperty, SelectionListener {
 			for (int i = 0; i < 5; ++i) {
 				Settings.recentJars[i] = properties.getProperty("MRUList" + i, "");
 			}
+
+			HotkeyManager.loadFromProperties(properties);
 
 			// proxy
 			Settings.proxyType = Integer.parseInt(properties.getProperty("ProxyType", "0"));
@@ -451,7 +465,6 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.proxyDomain = properties.getProperty("ProxyDomain", "");
 
 			// view
-			Settings.showLogFrame = Boolean.parseBoolean(properties.getProperty("ShowLogFrame", "false"));
 			Settings.showInfoFrame = Boolean.parseBoolean(properties.getProperty("ShowInfoFrame", "false"));
 			Settings.showMemViewFrame = Boolean.parseBoolean(properties.getProperty("ShowMemViewFrame", "false"));
 			Settings.fpsCounter = Boolean.parseBoolean(properties.getProperty("FPSCounter", "true"));
@@ -504,6 +517,52 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.lastIdeaRepoPath = properties.getProperty("LastIdeaProjectsRepo", "");
 
 			Settings.deviceFile = properties.getProperty("PresetsPath", Settings.deviceFile);
+
+			Settings.favoritesPath = properties.getProperty("FavoritesPath", "");
+			Settings.favoritesViewMode = properties.getProperty("FavoritesViewMode", "detailed");
+			Settings.favoritesShowDetails = "true".equalsIgnoreCase(properties.getProperty("FavoritesShowDetails", "true"));
+			// Per-mode favorites settings
+			Settings.favoritesUISize_icons = Integer.parseInt(properties.getProperty("FavoritesUISize_icons", "12"));
+			Settings.favoritesTextSize_icons = Integer.parseInt(properties.getProperty("FavoritesTextSize_icons", "12"));
+			Settings.favoritesPadding_icons = Integer.parseInt(properties.getProperty("FavoritesPadding_icons", "5"));
+			Settings.favoritesMask_icons = Integer.parseInt(properties.getProperty("FavoritesMask_icons", "31"));
+			Settings.favoritesNames_icons = "true".equalsIgnoreCase(properties.getProperty("FavoritesNames_icons", "true"));
+			Settings.favoritesIconSize_icons = Integer.parseInt(properties.getProperty("FavoritesIconSize_icons", "64"));
+			Settings.favoritesUISize_compact = Integer.parseInt(properties.getProperty("FavoritesUISize_compact", "12"));
+			Settings.favoritesTextSize_compact = Integer.parseInt(properties.getProperty("FavoritesTextSize_compact", "12"));
+			Settings.favoritesPadding_compact = Integer.parseInt(properties.getProperty("FavoritesPadding_compact", "5"));
+			Settings.favoritesMask_compact = Integer.parseInt(properties.getProperty("FavoritesMask_compact", "15"));
+			Settings.favoritesUISize_detailed = Integer.parseInt(properties.getProperty("FavoritesUISize_detailed", "12"));
+			Settings.favoritesTextSize_detailed = Integer.parseInt(properties.getProperty("FavoritesTextSize_detailed", "12"));
+			Settings.favoritesPadding_detailed = Integer.parseInt(properties.getProperty("FavoritesPadding_detailed", "5"));
+			// Runtime copies (swapped from per-mode on browser open)
+			Settings.favoritesCompactMask = Settings.favoritesMask_compact;
+			Settings.favoritesIconsMask = Settings.favoritesMask_icons;
+			Settings.favoritesIconsShowNames = Settings.favoritesNames_icons;
+			Settings.favoritesDarkMode = "true".equalsIgnoreCase(properties.getProperty("FavoritesDarkMode", "false"));
+			Settings.pendingFavoriteMoves = properties.getProperty("PendingFavoriteMoves", "");
+			Settings.lastJarDir = properties.getProperty("LastJarDir", "");
+			Settings.lastJarIndex = Integer.parseInt(properties.getProperty("LastJarIndex", "-1"));
+			Settings.luckyFolderBrowserIndex = Integer.parseInt(properties.getProperty("LuckyFolderBrowserIndex", "0"));
+
+			// lucky folders
+			String luckyPathsStr = properties.getProperty("LuckyFolderPaths", "");
+			String luckyModesStr = properties.getProperty("LuckyFolderModes", "");
+			if (luckyPathsStr != null && !luckyPathsStr.isEmpty()) {
+				String[] pathArr = luckyPathsStr.split("\\|");
+				String[] modeArr = (luckyModesStr != null && !luckyModesStr.isEmpty()) ? luckyModesStr.split("\\|") : new String[0];
+				boolean[] modeBools = new boolean[pathArr.length];
+				for (int i = 0; i < pathArr.length; i++) {
+					modeBools[i] = i < modeArr.length && "true".equals(modeArr[i]);
+				}
+				LuckyFolderManager.setFolders(pathArr, modeBools);
+			}
+
+			// Execute any pending favorite moves on startup
+			FavoritesBrowser.executePendingMoves();
+			if (Settings.pendingFavoriteMoves == null || Settings.pendingFavoriteMoves.isEmpty()) {
+				Settings.pendingFavoriteMoves = null;
+			}
 		} catch (Exception ex) {
 			if (!(ex instanceof FileNotFoundException)) {
 				System.out.println("properties load failed");
@@ -529,7 +588,6 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.proxyUser = "";
 			Settings.proxyPass = "";
 			Settings.proxyDomain = "";
-			Settings.showLogFrame = false;
 			Settings.showInfoFrame = false;
 			Settings.showMemViewFrame = false;
 			Settings.canvasScale = 1f;
@@ -633,6 +691,9 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("MAP_KEY_RSOFT", KeyMapping.get(18));
 			properties.setProperty("EnableKeyCache", String.valueOf(Settings.enableKeyCache));
 			properties.setProperty("CanvasKeyboardMode", String.valueOf(Settings.canvasKeyboard));
+			properties.setProperty("J2MEGamepadEnabled", String.valueOf(Settings.j2meGamepadEnabled));
+			properties.setProperty("J2MEGamepadAutoLaunch", String.valueOf(Settings.j2meGamepadAutoLaunch));
+			if (Settings.j2meGamepadPath != null) properties.setProperty("J2MEGamepadPath", Settings.j2meGamepadPath);
 			properties.setProperty("RecordKeys", String.valueOf(Settings.recordKeys));
 
 			// controller mappings
@@ -683,6 +744,8 @@ public final class Property implements IProperty, SelectionListener {
 				properties.setProperty("AltLessSpeedShortcuts",String.valueOf(Settings.altLessSpeedShortcuts));
 			properties.setProperty("ShowAppSettingsOnStart", String.valueOf(Settings.showAppSettingsOnStart));
 			properties.setProperty("GlobalSettings", String.valueOf(Settings.globalSettings));
+			properties.setProperty("ResolutionRestartMidlet", String.valueOf(Settings.resolutionRestartMidlet));
+			properties.setProperty("DisableTouchDoubleClick", String.valueOf(Settings.disableTouchDoubleClick));
 			properties.setProperty("StoreCreatedImages", String.valueOf(Settings.storeCreatedImages));
 
 			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
@@ -695,6 +758,8 @@ public final class Property implements IProperty, SelectionListener {
 				properties.setProperty("MRUList" + i, Settings.recentJars[i]);
 			}
 
+			HotkeyManager.saveToProperties(properties);
+
 			// proxy
 			properties.setProperty("ProxyType", String.valueOf(Settings.proxyType));
 			properties.setProperty("ProxyHost", Settings.proxyHost);
@@ -704,7 +769,6 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("ProxyDomain", Settings.proxyDomain);
 
 			// view
-			properties.setProperty("ShowLogFrame", String.valueOf(Settings.showLogFrame));
 			properties.setProperty("ShowInfoFrame", String.valueOf(Settings.showInfoFrame));
 			properties.setProperty("ShowMemViewFrame", String.valueOf(Settings.showMemViewFrame));
 			properties.setProperty("FPSCounter", String.valueOf(Settings.fpsCounter));
@@ -757,6 +821,45 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("LastIdeaProjectsRepo", Settings.lastIdeaRepoPath);
 
 			properties.setProperty("PresetsPath", Settings.deviceFile);
+
+			properties.setProperty("FavoritesPath", Settings.favoritesPath == null ? "" : Settings.favoritesPath);
+			properties.setProperty("FavoritesViewMode", Settings.favoritesViewMode);
+			properties.setProperty("FavoritesShowDetails", String.valueOf(Settings.favoritesShowDetails));
+			properties.setProperty("FavoritesUISize_icons", String.valueOf(Settings.favoritesUISize_icons));
+			properties.setProperty("FavoritesTextSize_icons", String.valueOf(Settings.favoritesTextSize_icons));
+			properties.setProperty("FavoritesPadding_icons", String.valueOf(Settings.favoritesPadding_icons));
+			properties.setProperty("FavoritesMask_icons", String.valueOf(Settings.favoritesMask_icons));
+			properties.setProperty("FavoritesNames_icons", String.valueOf(Settings.favoritesNames_icons));
+			properties.setProperty("FavoritesIconSize_icons", String.valueOf(Settings.favoritesIconSize_icons));
+			properties.setProperty("FavoritesUISize_compact", String.valueOf(Settings.favoritesUISize_compact));
+			properties.setProperty("FavoritesTextSize_compact", String.valueOf(Settings.favoritesTextSize_compact));
+			properties.setProperty("FavoritesPadding_compact", String.valueOf(Settings.favoritesPadding_compact));
+			properties.setProperty("FavoritesMask_compact", String.valueOf(Settings.favoritesMask_compact));
+			properties.setProperty("FavoritesUISize_detailed", String.valueOf(Settings.favoritesUISize_detailed));
+			properties.setProperty("FavoritesTextSize_detailed", String.valueOf(Settings.favoritesTextSize_detailed));
+			properties.setProperty("FavoritesPadding_detailed", String.valueOf(Settings.favoritesPadding_detailed));
+			properties.setProperty("FavoritesDarkMode", String.valueOf(Settings.favoritesDarkMode));
+			if (Settings.pendingFavoriteMoves != null && !Settings.pendingFavoriteMoves.isEmpty()) {
+				properties.setProperty("PendingFavoriteMoves", Settings.pendingFavoriteMoves);
+			}
+			properties.setProperty("LastJarDir", Settings.lastJarDir == null ? "" : Settings.lastJarDir);
+			properties.setProperty("LastJarIndex", String.valueOf(Settings.lastJarIndex));
+			properties.setProperty("LuckyFolderBrowserIndex", String.valueOf(Settings.luckyFolderBrowserIndex));
+
+			// lucky folders
+			{
+				String[] paths = LuckyFolderManager.getPaths();
+				boolean[] modes = LuckyFolderManager.getModes();
+				StringBuilder sbp = new StringBuilder();
+				StringBuilder sbm = new StringBuilder();
+				for (int i = 0; i < paths.length; i++) {
+					if (i > 0) { sbp.append("|"); sbm.append("|"); }
+					sbp.append(paths[i]);
+					sbm.append(i < modes.length && modes[i]);
+				}
+				properties.setProperty("LuckyFolderPaths", sbp.toString());
+				properties.setProperty("LuckyFolderModes", sbm.toString());
+			}
 
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();
@@ -887,6 +990,10 @@ public final class Property implements IProperty, SelectionListener {
 		this.setsShell.setLayout(layout);
 		this.method393();
 		this.method390();
+		EmulatorScreen.markThemeable(setsShell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(setsShell, true);
+		}
 	}
 
 	private void genLanguageList() {
@@ -975,6 +1082,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.tabFolder.setUnselectedImageVisible(false);
 		this.tabFolder.setLayoutData(layoutData);
 		this.setupKeyMapComp();
+		this.setupHotkeyComp();
 		this.setupSystemComp();
 		setupDisableApiComp();
 		setupPropsComp();
@@ -986,6 +1094,9 @@ public final class Property implements IProperty, SelectionListener {
 		final CTabItem keymapTab = new CTabItem(this.tabFolder, 0);
 		keymapTab.setText(UILocale.get("OPTION_TAB_KEYMAP", "KeyMap"));
 		keymapTab.setControl(this.keyMapTabComp);
+		final CTabItem hotkeyTab = new CTabItem(this.tabFolder, 0);
+		hotkeyTab.setText(UILocale.get("OPTION_TAB_HOTKEYS", "Hotkeys"));
+		hotkeyTab.setControl(this.hotkeyComp);
 		final CTabItem sysFontTab = new CTabItem(this.tabFolder, 0);
 		sysFontTab.setText(UILocale.get("OPTION_TAB_FONT", "Font"));
 		sysFontTab.setControl(this.fontScrollComp);
@@ -1386,6 +1497,236 @@ public final class Property implements IProperty, SelectionListener {
 		this.method404();
 	}
 
+	private void setupHotkeyComp() {
+		this.hotkeyComp = new Composite(this.tabFolder, 0);
+		hotkeyComp.setLayout(new GridLayout(3, false));
+
+		Label lblHotkeyInfo = new Label(hotkeyComp, SWT.NONE);
+		lblHotkeyInfo.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 3, 1));
+		lblHotkeyInfo.setText("Configure emulator keyboard shortcuts:");
+
+		final java.util.List<HotkeyManager.HotkeyAction> actions = new java.util.ArrayList<>(HotkeyManager.getAll());
+		final org.eclipse.swt.widgets.Table hotkeyTable = new org.eclipse.swt.widgets.Table(hotkeyComp, SWT.BORDER | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		GridData tableGd = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
+		tableGd.heightHint = 160;
+		hotkeyTable.setLayoutData(tableGd);
+		hotkeyTable.setHeaderVisible(true);
+		hotkeyTable.setLinesVisible(true);
+
+		hotkeyTable.addListener(SWT.EraseItem, e -> {
+			e.detail &= ~SWT.FOCUSED;
+		});
+
+		org.eclipse.swt.widgets.TableColumn colAction = new org.eclipse.swt.widgets.TableColumn(hotkeyTable, SWT.LEFT);
+		colAction.setText("Action");
+		{
+			GC gc = new GC(hotkeyTable);
+			gc.setFont(hotkeyTable.getFont());
+			int maxW = gc.textExtent("Action").x + 12;
+			for (HotkeyManager.HotkeyAction a : actions) {
+				int w = gc.textExtent(a.displayName).x + 12;
+				if (w > maxW) maxW = w;
+			}
+			gc.dispose();
+			colAction.setWidth(maxW);
+		}
+
+		org.eclipse.swt.widgets.TableColumn colKey = new org.eclipse.swt.widgets.TableColumn(hotkeyTable, SWT.LEFT);
+		colKey.setText("Shortcut");
+		{
+			GC gc = new GC(hotkeyTable);
+			gc.setFont(hotkeyTable.getFont());
+			int maxW = gc.textExtent("Shortcut").x + 12;
+			for (HotkeyManager.HotkeyAction a : actions) {
+				int w = gc.textExtent(a.formatKey()).x + 12;
+				if (w > maxW) maxW = w;
+			}
+			gc.dispose();
+			colKey.setWidth(maxW);
+		}
+
+		for (HotkeyManager.HotkeyAction a : actions) {
+			org.eclipse.swt.widgets.TableItem item = new org.eclipse.swt.widgets.TableItem(hotkeyTable, SWT.NONE);
+			item.setText(0, a.displayName);
+			item.setText(1, a.formatKey());
+			item.setData(a);
+		}
+
+		Button changeBtn = new Button(hotkeyComp, SWT.PUSH);
+		changeBtn.setText("Change...");
+		changeBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		changeBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				int selIdx = hotkeyTable.getSelectionIndex();
+				if (selIdx < 0) return;
+				HotkeyManager.HotkeyAction action = (HotkeyManager.HotkeyAction) hotkeyTable.getItem(selIdx).getData();
+				showHotkeyCaptureDialog(action);
+				hotkeyTable.getItem(selIdx).setText(1, action.formatKey());
+			}
+		});
+
+		Button resetBtn = new Button(hotkeyComp, SWT.PUSH);
+		resetBtn.setText("Reset to Default");
+		resetBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		resetBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				int selIdx = hotkeyTable.getSelectionIndex();
+				if (selIdx < 0) return;
+				HotkeyManager.HotkeyAction action = (HotkeyManager.HotkeyAction) hotkeyTable.getItem(selIdx).getData();
+				action.keyCode = action.defaultKeyCode;
+				action.stateMask = action.defaultStateMask;
+				hotkeyTable.getItem(selIdx).setText(1, action.formatKey());
+			}
+		});
+	}
+
+	private void showHotkeyCaptureDialog(HotkeyManager.HotkeyAction action) {
+		final Shell dialog = new Shell(this.setsShell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+		dialog.setText("Change Hotkey: " + action.displayName);
+		dialog.setLayout(new GridLayout(1, false));
+		dialog.setSize(400, 210);
+
+		Label lbl = new Label(dialog, SWT.CENTER | SWT.WRAP);
+		lbl.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		lbl.setText("Press a key for:\n\"" + action.displayName + "\"\nCurrent: " + action.formatKey());
+
+		// Modifier checkboxes
+		Composite modComp = new Composite(dialog, SWT.NONE);
+		modComp.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, false));
+		modComp.setLayout(new GridLayout(3, false));
+
+		final Button ctrlCheck = new Button(modComp, SWT.CHECK);
+		ctrlCheck.setText("Ctrl");
+		ctrlCheck.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
+
+		final Button shiftCheck = new Button(modComp, SWT.CHECK);
+		shiftCheck.setText("Shift");
+		shiftCheck.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
+
+		final Button altCheck = new Button(modComp, SWT.CHECK);
+		altCheck.setText("Alt");
+		altCheck.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
+
+		final Label capturedLabel = new Label(dialog, SWT.CENTER | SWT.BORDER);
+		capturedLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		capturedLabel.setText("(press a key...)");
+		capturedLabel.setFont(new org.eclipse.swt.graphics.Font(dialog.getDisplay(), "Segoe UI", 14, SWT.NORMAL));
+
+		final Label conflictLabel = new Label(dialog, SWT.CENTER | SWT.WRAP);
+		conflictLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		conflictLabel.setForeground(dialog.getDisplay().getSystemColor(SWT.COLOR_RED));
+
+		final int[] newKeyCode = {0};
+
+		Runnable updateCapturedLabel = new Runnable() {
+			public void run() {
+				int mod = 0;
+				if (ctrlCheck.getSelection()) mod |= SWT.CTRL;
+				if (shiftCheck.getSelection()) mod |= SWT.SHIFT;
+				if (altCheck.getSelection()) mod |= SWT.ALT;
+				if (newKeyCode[0] != 0) {
+					capturedLabel.setText(formatCapturedKey(mod, newKeyCode[0]));
+					String conflict = HotkeyManager.checkConflict(action, mod, newKeyCode[0]);
+					conflictLabel.setText(conflict != null ? "Warning: \"" + conflict + "\" already uses this shortcut" : "");
+				}
+			}
+		};
+
+		ctrlCheck.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) { updateCapturedLabel.run(); }
+		});
+		shiftCheck.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) { updateCapturedLabel.run(); }
+		});
+		altCheck.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) { updateCapturedLabel.run(); }
+		});
+
+		// Use display.addFilter to capture ALL key events globally
+		final org.eclipse.swt.widgets.Listener captureListener = event -> {
+			if (event.type == SWT.KeyDown) {
+				int key = event.keyCode;
+				// Ignore bare modifier key presses
+				if (key == SWT.CTRL || key == SWT.SHIFT || key == SWT.ALT) return;
+				// Ignore tab, escape — let them pass through
+				if (key == SWT.TAB || key == SWT.ESC) return;
+				newKeyCode[0] = key;
+				updateCapturedLabel.run();
+				event.doit = false;
+			}
+		};
+		dialog.getDisplay().addFilter(SWT.KeyDown, captureListener);
+
+		Composite btnComp = new Composite(dialog, SWT.NONE);
+		btnComp.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
+		btnComp.setLayout(new GridLayout(3, true));
+
+		Button okBtn = new Button(btnComp, SWT.PUSH);
+		okBtn.setText("OK");
+		okBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		okBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (newKeyCode[0] != 0) {
+					int mod = 0;
+					if (ctrlCheck.getSelection()) mod |= SWT.CTRL;
+					if (shiftCheck.getSelection()) mod |= SWT.SHIFT;
+					if (altCheck.getSelection()) mod |= SWT.ALT;
+					action.keyCode = newKeyCode[0];
+					action.stateMask = mod;
+				}
+				dialog.getDisplay().removeFilter(SWT.KeyDown, captureListener);
+				dialog.close();
+			}
+		});
+
+		Button clearBtn = new Button(btnComp, SWT.PUSH);
+		clearBtn.setText("Clear");
+		clearBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		clearBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				action.keyCode = 0;
+				action.stateMask = 0;
+				dialog.getDisplay().removeFilter(SWT.KeyDown, captureListener);
+				dialog.close();
+			}
+		});
+
+		Button cancelBtn = new Button(btnComp, SWT.PUSH);
+		cancelBtn.setText("Cancel");
+		cancelBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		cancelBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				dialog.getDisplay().removeFilter(SWT.KeyDown, captureListener);
+				dialog.close();
+			}
+		});
+
+		dialog.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				dialog.getDisplay().removeFilter(SWT.KeyDown, captureListener);
+			}
+		});
+
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(dialog, true);
+		}
+		dialog.open();
+		while (!dialog.isDisposed()) {
+			if (!dialog.getDisplay().readAndDispatch()) {
+				dialog.getDisplay().sleep();
+			}
+		}
+	}
+
+	private static String formatCapturedKey(int stateMask, int keyCode) {
+		StringBuilder sb = new StringBuilder();
+		if ((stateMask & SWT.CTRL) != 0) sb.append("Ctrl+");
+		if ((stateMask & SWT.SHIFT) != 0) sb.append("Shift+");
+		if ((stateMask & SWT.ALT) != 0) sb.append("Alt+");
+		sb.append(HotkeyManager.HotkeyAction.keyCodeToString(keyCode));
+		return sb.toString();
+	}
+
 	private void method400() {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalSpan = 2;
@@ -1478,7 +1819,7 @@ public final class Property implements IProperty, SelectionListener {
 					KeyMapping.mapDeviceKey(13, "2");
 					KeyMapping.mapDeviceKey(14, "3");
 					KeyMapping.mapDeviceKey(15, "4");
-					KeyMapping.mapDeviceKey(16, "13");
+					KeyMapping.mapDeviceKey(16, "12");
 					KeyMapping.mapDeviceKey(17, "10");
 					KeyMapping.mapDeviceKey(18, "11");
 					for (int i = 0; i < Property.aStringArray661.length; i++) {

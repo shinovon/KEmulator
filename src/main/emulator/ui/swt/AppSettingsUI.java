@@ -706,6 +706,10 @@ public class AppSettingsUI {
 
 		scrolledComposite_1.setMinHeight(composite_8.computeSize(-1, -1).y);
 		scrolledComposite_2.setMinHeight(composite_9.computeSize(-1, -1).y);
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 	}
 
 	private void applyPreset(String s) {
