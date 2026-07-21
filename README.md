@@ -1,6 +1,7 @@
 # KEADDON
 
 KEmulator fork
+**You won't see any ready-to-download packages until I come up with the next plan. The current code can be compiled manually if you have JDK 21 or later—if you really need the additional KEADDON functionality.**
 
 <img width="1920" height="1080" alt="were3232423423" src="https://github.com/user-attachments/assets/6b102bef-8763-4fdf-9477-82f6c784545e" />
 
