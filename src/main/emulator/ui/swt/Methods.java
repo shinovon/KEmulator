@@ -228,6 +228,10 @@ public final class Methods implements Runnable, DisposeListener {
 		this.shell.setSize(new Point(752, 483));
 		this.shell.setLayout(new GridLayout());
 		this.method450();
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 	}
 
 	private void method450() {

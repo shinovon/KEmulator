@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.Settings;
 import emulator.UILocale;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -49,6 +50,10 @@ public final class M3GViewCameraSetDialog extends Dialog {
 		final Shell shell;
 		(shell = new Shell(this.getParent(), this.getStyle())).setText(this.getText());
 		this.method341(shell);
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 		shell.setLocation(this.getParent().getBounds().x + (this.getParent().getBounds().width - shell.getSize().x) / 2, this.getParent().getBounds().y + (this.getParent().getBounds().height - shell.getSize().y) / 2);
 		shell.open();
 		final Display display = this.getParent().getDisplay();

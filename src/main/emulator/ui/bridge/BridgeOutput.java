@@ -11,6 +11,7 @@ import emulator.ui.CommandsMenuPosition;
 import emulator.ui.ICaret;
 import emulator.ui.IScreen;
 import emulator.ui.TargetedCommand;
+import emulator.ui.VibraPipe;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
@@ -153,14 +154,25 @@ final class BridgeOutput implements IScreen {
 
 	@Override
 	public void startVibra(long p0) {
-		ByteBuffer bb = ByteBuffer.allocate(8);
-		bb.putLong(p0);
+		startVibra(100, p0);
+	}
+
+	@Override
+	public void startVibra(int intensity, long duration) {
+		ByteBuffer bb = ByteBuffer.allocate(12);
+		bb.putInt(intensity);
+		bb.putLong(duration);
 		bridge.sendToState('V', bb.array());
+		VibraPipe.send((int) duration, intensity);
 	}
 
 	@Override
 	public void stopVibra() {
-		bridge.sendToState('V', new byte[8]);
+		ByteBuffer bb = ByteBuffer.allocate(12);
+		bb.putInt(0);
+		bb.putLong(0);
+		bridge.sendToState('V', bb.array());
+		VibraPipe.send(0, 0);
 	}
 
 	@Override

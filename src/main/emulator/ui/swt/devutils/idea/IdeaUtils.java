@@ -5,6 +5,7 @@ package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.ui.swt.EmulatorScreen;
 import emulator.Utils;
 import emulator.ui.swt.devutils.JavaTypeValidator;
 import org.eclipse.swt.SWT;
@@ -124,6 +125,10 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 		restartSetup.addSelectionListener(this);
 
 		shell.layout(true, true);
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 	}
 
 	public static void open(Shell p) {
