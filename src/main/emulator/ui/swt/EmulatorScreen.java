@@ -1684,11 +1684,11 @@ public final class EmulatorScreen implements
 			}
 			if (menuItem == m3gViewMenuItem) {
 				try {
-					if (((SWTFrontend) Emulator.getEmulator()).getM3GView().method494()) {
+					if (((SWTFrontend) Emulator.getEmulator()).getM3GView().isShellOpen()) {
 						((SWTFrontend) Emulator.getEmulator()).getM3GView().close();
 						return;
 					}
-					((SWTFrontend) Emulator.getEmulator()).getM3GView().method226();
+					((SWTFrontend) Emulator.getEmulator()).getM3GView().openWindow();
 				} catch (Throwable e) {
 					e.printStackTrace();
 				}
