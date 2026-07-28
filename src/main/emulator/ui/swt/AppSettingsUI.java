@@ -215,7 +215,7 @@ public class AppSettingsUI {
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		CTabItem tbtmGeneral = new CTabItem(tabFolder, SWT.NONE);
-		tbtmGeneral.setText("General");
+		tbtmGeneral.setText(UILocale.get("OPTION_TAB_GENERAL", "General"));
 
 		Composite composite_5 = new Composite(tabFolder, SWT.NONE);
 		tbtmGeneral.setControl(composite_5);
@@ -226,7 +226,7 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_3 = new Label(grpDevice, SWT.NONE);
 		lblNewLabel_3.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_3.setText("Device preset:");
+		lblNewLabel_3.setText(UILocale.get("OPTION_CUSTOM_DEVICE_PRESET", "Device preset:"));
 
 		deviceCombo = new Combo(grpDevice, SWT.NONE);
 		deviceCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
@@ -259,7 +259,7 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_7 = new Label(grpDevice, SWT.NONE);
 		lblNewLabel_7.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_7.setText("Platform:");
+		lblNewLabel_7.setText(UILocale.get("LOCALE_CUSTOM_PLATFORM", "Platform:"));
 
 		platformText = new Text(grpDevice, SWT.BORDER);
 		platformText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
@@ -267,7 +267,7 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_8 = new Label(grpDevice, SWT.NONE);
 		lblNewLabel_8.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_8.setText("Encoding:");
+		lblNewLabel_8.setText(UILocale.get("LOCALE_CUSTOM_ENCODING", "Encoding:"));
 
 		encodingCombo = new Combo(grpDevice, SWT.NONE);
 		encodingCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -295,7 +295,7 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_9 = new Label(grpDevice, SWT.NONE);
 		lblNewLabel_9.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_9.setText("Locale:");
+		lblNewLabel_9.setText(UILocale.get("OPTION_CUSTOM_LOCALE", "Locale:"));
 
 		localeText = new Text(grpDevice, SWT.BORDER);
 		localeText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -303,7 +303,7 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_4 = new Label(grpDevice, SWT.NONE);
 		lblNewLabel_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_4.setText("Screen size:");
+		lblNewLabel_4.setText(UILocale.get("OPTION_CUSTOM_SCREEN_SIZE", "Screen size:"));
 
 		Composite composite_4 = new Composite(grpDevice, SWT.NONE);
 		composite_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
@@ -331,7 +331,7 @@ public class AppSettingsUI {
 				screenHeightText.setText(tmp);
 			}
 		});
-		btnNewButton_2.setText("Swap");
+		btnNewButton_2.setText(UILocale.get("OPTION_CUSTOM_SWAP_SCREEN"));
 
 		fpsLabel = new Label(grpDevice, SWT.NONE);
 		fpsLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -361,7 +361,7 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_10 = new Label(grpKeyMapping, SWT.NONE);
 		lblNewLabel_10.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		lblNewLabel_10.setText("Left soft key:");
+		lblNewLabel_10.setText(UILocale.get("OPTION_CUSTOM_KEY_LSK", "Left soft key:"));
 
 		leftSoftText = new Text(grpKeyMapping, SWT.BORDER);
 		leftSoftText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -369,14 +369,14 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_11 = new Label(grpKeyMapping, SWT.NONE);
 		lblNewLabel_11.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		lblNewLabel_11.setText("Right soft key:");
+		lblNewLabel_11.setText(UILocale.get("OPTION_CUSTOM_KEY_RSK", "Right soft key:"));
 
 		rightSoftText = new Text(grpKeyMapping, SWT.BORDER);
 		rightSoftText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		rightSoftText.setText(Integer.toString(AppSettings.rightSoftKey));
 
 		Label lblNewLabel_12 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_12.setText("Fire/Middle:");
+		lblNewLabel_12.setText(UILocale.get("OPTION_CUSTOM_KEY_MIDDLE", "Fire/Middle:"));
 
 		fireText = new Text(grpKeyMapping, SWT.BORDER);
 		fireText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -392,10 +392,10 @@ public class AppSettingsUI {
 			}
 		});
 		btnNewButton_3.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
-		btnNewButton_3.setText("Swap softkeys");
+		btnNewButton_3.setText(UILocale.get("OPTION_CUSTOM_SWAP_SOFTKEYS"));
 		
 		Label lblNewLabel_13 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_13.setText("Up:");
+		lblNewLabel_13.setText(UILocale.get("OPTION_CUSTOM_KEY_UP", "Up:"));
 
 		upText = new Text(grpKeyMapping, SWT.BORDER);
 		upText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -403,28 +403,28 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_15 = new Label(grpKeyMapping, SWT.NONE);
 		lblNewLabel_15.setAlignment(SWT.RIGHT);
-		lblNewLabel_15.setText("Down:");
+		lblNewLabel_15.setText(UILocale.get("OPTION_CUSTOM_KEY_DOWN", "Down:"));
 
 		downText = new Text(grpKeyMapping, SWT.BORDER);
 		downText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		downText.setText(Integer.toString(AppSettings.downKey));
 		
 		Label lblNewLabel_14 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_14.setText("Left:");
+		lblNewLabel_14.setText(UILocale.get("OPTION_CUSTOM_KEY_LEFT", "Left:"));
 
 		leftText = new Text(grpKeyMapping, SWT.BORDER);
 		leftText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		leftText.setText(Integer.toString(AppSettings.leftKey));
 
 		Label lblNewLabel_16 = new Label(grpKeyMapping, SWT.NONE);
-		lblNewLabel_16.setText("Right:");
+		lblNewLabel_16.setText(UILocale.get("OPTION_CUSTOM_KEY_RIGHT", "Right:"));
 
 		rightText = new Text(grpKeyMapping, SWT.BORDER);
 		rightText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		rightText.setText(Integer.toString(AppSettings.rightKey));
 
 		CTabItem tbtmFont = new CTabItem(tabFolder, SWT.NONE);
-		tbtmFont.setText("Font");
+		tbtmFont.setText(UILocale.get("OPTION_TAB_FONT", "Font"));
 
 		Composite grpFont = new Composite(tabFolder, SWT.NONE);
 		tbtmFont.setControl(grpFont);
@@ -432,27 +432,27 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_5 = new Label(grpFont, SWT.NONE);
 		lblNewLabel_5.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_5.setText("Large size:");
+		lblNewLabel_5.setText(UILocale.get("OPTION_FONT_LARGE_SIZE", "Large size:"));
 
 		largeSizeSpinner = new Spinner(grpFont, SWT.BORDER);
 		largeSizeSpinner.setSelection(AppSettings.fontLargeSize);
 
 		Label lblNewLabel_5_1 = new Label(grpFont, SWT.NONE);
 		lblNewLabel_5_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_5_1.setText("Medium size:");
+		lblNewLabel_5_1.setText(UILocale.get("OPTION_FONT_MIDDLE_SIZE", "Medium size:"));
 
 		mediumSizeSpinner = new Spinner(grpFont, SWT.BORDER);
 		mediumSizeSpinner.setSelection(AppSettings.fontMediumSize);
 
 		Label lblNewLabel_5_1_1 = new Label(grpFont, SWT.NONE);
 		lblNewLabel_5_1_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_5_1_1.setText("Small size:");
+		lblNewLabel_5_1_1.setText(UILocale.get("OPTION_FONT_SMALL_SIZE", "Small size:"));
 
 		smallSizeSpinner = new Spinner(grpFont, SWT.BORDER);
 		smallSizeSpinner.setSelection(AppSettings.fontSmallSize);
 
 		CTabItem tbtmTweaks = new CTabItem(tabFolder, SWT.NONE);
-		tbtmTweaks.setText("Tweaks");
+		tbtmTweaks.setText(UILocale.get("OPTION_TAB_TWEAKS", "Tweaks"));
 
 		Composite composite_6 = new Composite(tabFolder, SWT.NONE);
 		tbtmTweaks.setControl(composite_6);
@@ -481,7 +481,7 @@ public class AppSettingsUI {
 		pointerEventsCheck.setSelection(AppSettings.hasPointerEvents);
 
 		Group grpTweaks = new Group(composite_9, SWT.NONE);
-		grpTweaks.setText("Tweaks");
+		grpTweaks.setText(UILocale.get("OPTION_TAB_TWEAKS", "Tweaks"));
 		grpTweaks.setLayout(new GridLayout(1, false));
 		grpTweaks.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
@@ -531,7 +531,7 @@ public class AppSettingsUI {
 		scrolledComposite_2.setMinSize(composite_9.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		CTabItem tbtmd = new CTabItem(tabFolder, SWT.NONE);
-		tbtmd.setText("3D");
+		tbtmd.setText(UILocale.get("OPTION_TAB_3D", "3D"));
 
 		Composite composite_7 = new Composite(tabFolder, SWT.NONE);
 		tbtmd.setControl(composite_7);
@@ -551,34 +551,34 @@ public class AppSettingsUI {
 
 		m3gIgnoreOverwriteCheck = new Button(grpMgLwjgl, SWT.CHECK);
 		m3gIgnoreOverwriteCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
-		m3gIgnoreOverwriteCheck.setText("Ignore OVERWRITE hint");
+		m3gIgnoreOverwriteCheck.setText(UILocale.get("OPTION_M3G_IGNORE_OVERWRITE", "Ignore OVERWRITE hint"));
 		m3gIgnoreOverwriteCheck.setSelection(AppSettings.m3gIgnoreOverwrite);
 
 		m3gForcePersCorrectCheck = new Button(grpMgLwjgl, SWT.CHECK);
 		m3gForcePersCorrectCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
-		m3gForcePersCorrectCheck.setText("Force perspective correction");
+		m3gForcePersCorrectCheck.setText(UILocale.get("OPTION_M3G_FORCE_PERSPECTIVE_CORRECTION", "Force perspective correction"));
 		m3gForcePersCorrectCheck.setSelection(AppSettings.m3gForcePerspectiveCorrection);
 
 		m3gDisableLightClampCheck = new Button(grpMgLwjgl, SWT.CHECK);
 		m3gDisableLightClampCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
-		m3gDisableLightClampCheck.setText("Disable light clamping");
+		m3gDisableLightClampCheck.setText(UILocale.get("OPTION_M3G_DISABLE_LIGHT_CLAMPING", "Disable light clamping"));
 		m3gDisableLightClampCheck.setSelection(AppSettings.m3gDisableLightClamp);
 
 		m3gFlushImmediately = new Button(grpMgLwjgl, SWT.CHECK);
 		m3gFlushImmediately.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
-		m3gFlushImmediately.setText("Flush contents immediately (slow!)");
+		m3gFlushImmediately.setText(UILocale.get("OPTION_M3G_FLUSH_IMMEDIATELY", "Flush contents immediately (slow!)"));
 		m3gFlushImmediately.setToolTipText("Fixes background in Angry Birds Seasons");
 		m3gFlushImmediately.setSelection(AppSettings.m3gFlushImmediately);
 
 		m3gThreadCheck = new Button(grpMgLwjgl, SWT.CHECK);
 		m3gThreadCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
-		m3gThreadCheck.setText("Single threaded M3G");
+		m3gThreadCheck.setText(UILocale.get("OPTION_M3G_THREAD", "Single threaded M3G"));
 		m3gThreadCheck.setToolTipText("Fixes some games, but less performance. Restart after changing this property.");
 		m3gThreadCheck.setSelection(AppSettings.m3gThread);
 
 		Label lblNewLabel_17 = new Label(grpMgLwjgl, SWT.NONE);
 		lblNewLabel_17.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_17.setText("Anti-aliasing:");
+		lblNewLabel_17.setText(UILocale.get("OPTION_M3G_AA", "Anti-aliasing:"));
 
 		m3gAACombo = new Combo(grpMgLwjgl, SWT.NONE);
 		m3gAACombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -589,7 +589,7 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_18 = new Label(grpMgLwjgl, SWT.NONE);
 		lblNewLabel_18.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_18.setText("Texture filter:");
+		lblNewLabel_18.setText(UILocale.get("OPTION_M3G_TEXTURE_FILTER", "Texture filter:"));
 
 		m3gTexFilterCombo = new Combo(grpMgLwjgl, SWT.NONE);
 		m3gTexFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -600,7 +600,7 @@ public class AppSettingsUI {
 
 		Label lblNewLabel_19 = new Label(grpMgLwjgl, SWT.NONE);
 		lblNewLabel_19.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_19.setText("Mipmapping:");
+		lblNewLabel_19.setText(UILocale.get("OPTION_M3G_MIPMAPPING", "Mipmapping:"));
 
 		m3gMipmapCombo = new Combo(grpMgLwjgl, SWT.NONE);
 		m3gMipmapCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -621,22 +621,22 @@ public class AppSettingsUI {
 
 		mascotNo2DMixingCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
 		mascotNo2DMixingCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		mascotNo2DMixingCheck.setText("No 2D mixing");
+		mascotNo2DMixingCheck.setText(UILocale.get("OPTION_MASCOT_NO_2D_MIXING", "No 2D mixing"));
 		mascotNo2DMixingCheck.setSelection(AppSettings.mascotNo2DMixing);
 
 		mascotIgnoreBgCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
 		mascotIgnoreBgCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		mascotIgnoreBgCheck.setText("Ignore background");
+		mascotIgnoreBgCheck.setText(UILocale.get("OPTION_MASCOT_IGNORE_BACKGROUND", "Ignore background"));
 		mascotIgnoreBgCheck.setSelection(AppSettings.mascotIgnoreBackground);
 
 		mascotTextureFilterCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
 		mascotTextureFilterCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		mascotTextureFilterCheck.setText("Texture filter");
+		mascotTextureFilterCheck.setText(UILocale.get("OPTION_MASCOT_TEXTURE_FILTER", "Texture filter"));
 		mascotTextureFilterCheck.setSelection(AppSettings.mascotTextureFilter);
 
 		mascotBackgroundFilterCheck = new Button(grpMascotcapsuleLwjgl, SWT.CHECK);
 		mascotBackgroundFilterCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		mascotBackgroundFilterCheck.setText("Background filter");
+		mascotBackgroundFilterCheck.setText(UILocale.get("OPTION_MASCOT_BACKGROUND_FILTER", "Background filter"));
 		mascotBackgroundFilterCheck.setSelection(AppSettings.mascotBackgroundFilter);
 
 		composite_8.setSize(composite_8.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -644,7 +644,7 @@ public class AppSettingsUI {
 		scrolledComposite_1.setMinSize(composite_8.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		CTabItem tbtmProperties = new CTabItem(tabFolder, SWT.NONE);
-		tbtmProperties.setText("Properties");
+		tbtmProperties.setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
 
 		systemPropertiesText = new Text(tabFolder, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 		StringBuilder s = new StringBuilder();
