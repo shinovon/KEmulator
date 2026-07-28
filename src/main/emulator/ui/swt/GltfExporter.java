@@ -1,5 +1,6 @@
 package emulator.ui.swt;
 
+import emulator.graphics3D.m3g.BoneTransform;
 import javax.imageio.ImageIO;
 import javax.microedition.m3g.*;
 import java.awt.image.BufferedImage;
@@ -12,20 +13,39 @@ import java.util.*;
  * Minimal glTF 2.0 (.glb) scene exporter for the M3G scene viewer.
  * No external glTF libraries used - JSON and binary buffer are built by hand.
  *
+ * Supported:
+ *  - Full scene graph (Group/Mesh/Sprite3D/Light/Camera)
+ *  - Materials (baseColor incl. alpha, emissive, alphaMode, doubleSided, texture + tiling)
+ *  - Lights via KHR_lights_punctual (directional/point/spot; ambient is skipped, no glTF analog)
+ *  - Camera (perspective/orthographic; GENERIC projection type is skipped, no analog)
+ *  - MorphingMesh -> glTF morph targets (delta-encoded, see derivation below)
+ *  - SkinnedMesh -> glTF skin/joints (bind-pose only, no animation - see caveats below)
+ *
  * Limitations (by design):
- *  - No skinning / bones (SkinnedMesh is exported as a static bind-pose Mesh)
- *  - No animations (KeyframeSequence / AnimationController are ignored)
+ *  - No animations (KeyframeSequence / AnimationController / AnimationTrack are ignored) -
+ *    exported skins/morphs only reproduce the CURRENT bind-pose/weights, not playback
  *  - Sprite3D is exported as a flat quad using its current node transform
  *    (billboard behaviour is NOT preserved, since glTF has no runtime billboarding)
  *  - Ambient lights are NOT exported (KHR_lights_punctual has no ambient light type)
  *  - Light attenuation coefficients (constant/linear/quadratic) are NOT mapped;
  *    exported lights use glTF's default infinite-range inverse-square falloff
+ *  - Fog is NOT exported (no equivalent concept in core glTF 2.0)
+ *  - Vertex colors (COLOR_0) are always multiplicative with baseColorFactor per glTF spec,
+ *    which only approximates M3G's GL_COLOR_MATERIAL vertex-color-tracking behaviour
+ *  - Color bytes are copied as-is without sRGB/linear conversion (visually close, not exact)
  */
 public final class GltfExporter {
 
     public static void export(Node root, File outFile) throws IOException {
         new GltfExporter().doExport(root, outFile);
     }
+
+    private static final float[] IDENTITY_MATRIX = {
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+    };
 
     // ---------- export state ----------
     private final ByteArrayOutputStream bin = new ByteArrayOutputStream();
@@ -36,13 +56,17 @@ public final class GltfExporter {
     private final List<Object> gMaterials = new ArrayList<>();
     private final List<Object> gTextures = new ArrayList<>();
     private final List<Object> gImages = new ArrayList<>();
-    private final List<Object> gSamplers = new ArrayList<>(); // NEW: texture wrap modes
-    private final List<Object> gLights = new ArrayList<>();   // NEW: KHR_lights_punctual lights
+    private final List<Object> gSamplers = new ArrayList<>();
+    private final List<Object> gLights = new ArrayList<>();
+    private final List<Object> gCameras = new ArrayList<>();  // NEW
+    private final List<Object> gSkins = new ArrayList<>();    // NEW
 
     private final IdentityHashMap<Appearance, Integer> materialCache = new IdentityHashMap<>();
     private final IdentityHashMap<Image2D, Integer> imageCache = new IdentityHashMap<>();
-    private final Map<Long, Integer> samplerCache = new HashMap<>();     // NEW: (wrapS,wrapT) -> sampler index
-    private final IdentityHashMap<Light, Integer> lightCache = new IdentityHashMap<>(); // NEW
+    private final Map<Long, Integer> samplerCache = new HashMap<>();
+    private final IdentityHashMap<Light, Integer> lightCache = new IdentityHashMap<>();
+    private final IdentityHashMap<Camera, Integer> cameraCache = new IdentityHashMap<>(); // NEW
+    private final IdentityHashMap<Node, Integer> nodeIndexMap = new IdentityHashMap<>();  // NEW: M3G Node -> gltf node index
 
     // ---------- entry point ----------
     private void doExport(Node root, File outFile) throws IOException {
@@ -63,14 +87,37 @@ public final class GltfExporter {
         gnode.put("matrix", floatList(m3gToGltfMatrix(t)));
         gnode.put("name", node.getClass().getSimpleName() + "_" + node.getUserID());
 
-        if (node instanceof Mesh) {
+        // CHANGED: SkinnedMesh must be checked before the generic Mesh branch (inheritance)
+        if (node instanceof SkinnedMesh) {
+            SkinnedMesh sm = (SkinnedMesh) node;
+            gnode.put("mesh", exportMesh(sm));
+
+            // NEW: export skeleton subtree as children of this node. SkinnedMesh sets
+            // skeleton.parent = this internally, so computing bone transforms relative
+            // to this node (via getTransformTo) is consistent with that convention.
+            //
+            // IMPORTANT: per glTF convention, a node with "skin" should have an identity
+            // local transform, since most runtimes apply the node's own TRS on top of the
+            // skin result, which would double-transform the mesh otherwise. The skeleton's
+            // own bind-pose transforms (computed relative to this now-identity node) fully
+            // reproduce the correct static appearance.
+            gnode.put("matrix", floatList(IDENTITY_MATRIX));
+
+            List<Integer> children = new ArrayList<>();
+            children.add(exportNode(sm.getSkeleton(), sm));
+            gnode.put("children", children);
+
+            // NEW: skin/joints are best-effort. If a referenced bone wasn't found in the
+            // exported skeleton subtree, exportSkin() returns -1 and we simply keep the
+            // static (bind-pose) geometry, which is always correct regardless.
+            int skinIdx = exportSkin(sm);
+            if (skinIdx >= 0) gnode.put("skin", skinIdx);
+
+        } else if (node instanceof Mesh) {
             gnode.put("mesh", exportMesh((Mesh) node));
         } else if (node instanceof Sprite3D) {
             gnode.put("mesh", exportSpriteAsQuad((Sprite3D) node));
         } else if (node instanceof Light) {
-            // NEW: export light source via KHR_lights_punctual, attached to this node.
-            // The node itself (with its transform) is still added to the scene graph
-            // so the light's position/orientation is preserved.
             int lightIdx = exportLight((Light) node);
             if (lightIdx >= 0) {
                 Map<String, Object> ext = new LinkedHashMap<>();
@@ -79,6 +126,9 @@ public final class GltfExporter {
                 ext.put("KHR_lights_punctual", khr);
                 gnode.put("extensions", ext);
             }
+        } else if (node instanceof Camera) { // NEW
+            int camIdx = exportCamera((Camera) node);
+            if (camIdx >= 0) gnode.put("camera", camIdx);
         }
 
         if (node instanceof Group) {
@@ -88,17 +138,63 @@ public final class GltfExporter {
             for (int i = 0; i < cc; i++) {
                 Node child = g.getChild(i);
                 if (child == null) continue;
-                if (child instanceof Camera) continue; // CHANGED: only cameras are skipped now, lights are exported
+                // CHANGED: cameras and lights are no longer skipped - they're now exported
                 children.add(exportNode(child, node));
             }
-            if (!children.isEmpty()) gnode.put("children", children);
+            if (!children.isEmpty()) {
+                // NOTE: SkinnedMesh above already may have set "children" (the skeleton) -
+                // Group and SkinnedMesh are mutually exclusive in M3G, so no conflict here.
+                gnode.put("children", children);
+            }
         }
 
         gNodes.add(gnode);
-        return gNodes.size() - 1;
+        int idx = gNodes.size() - 1;
+        nodeIndexMap.put(node, idx); // NEW: needed for skin joints lookup
+        return idx;
     }
 
-    // ---------- light export (NEW) ----------
+    // ---------- camera export (NEW) ----------
+    private int exportCamera(Camera cam) {
+        Integer cached = cameraCache.get(cam);
+        if (cached != null) return cached;
+
+        float[] proj = new float[4];
+        int type = cam.getProjection(proj);
+        if (type == Camera.GENERIC) {
+            // Arbitrary projection matrix - has no equivalent in glTF's
+            // perspective/orthographic camera model. Skipped.
+            return -1;
+        }
+
+        Map<String, Object> gcam = new LinkedHashMap<>();
+        if (type == Camera.PERSPECTIVE) {
+            Map<String, Object> persp = new LinkedHashMap<>();
+            persp.put("yfov", Math.toRadians(proj[0]));
+            persp.put("aspectRatio", (double) proj[1]);
+            persp.put("znear", (double) proj[2]);
+            persp.put("zfar", (double) proj[3]);
+            gcam.put("type", "perspective");
+            gcam.put("perspective", persp);
+        } else { // PARALLEL
+            float height = proj[0];
+            float aspect = proj[1];
+            Map<String, Object> ortho = new LinkedHashMap<>();
+            ortho.put("xmag", (double) (aspect * height / 2f));
+            ortho.put("ymag", (double) (height / 2f));
+            ortho.put("znear", (double) proj[2]);
+            ortho.put("zfar", (double) proj[3]);
+            gcam.put("type", "orthographic");
+            gcam.put("orthographic", ortho);
+        }
+
+        gCameras.add(gcam);
+        int idx = gCameras.size() - 1;
+        cameraCache.put(cam, idx);
+        return idx;
+    }
+
+    // ---------- light export ----------
     private int exportLight(Light light) {
         Integer cached = lightCache.get(light);
         if (cached != null) return cached;
@@ -110,12 +206,11 @@ public final class GltfExporter {
             case Light.SPOT:        type = "spot"; break;
             case Light.AMBIENT:
             default:
-                // KHR_lights_punctual has no ambient light type - skip.
-                return -1;
+                return -1; // no ambient equivalent in KHR_lights_punctual
         }
 
         float[] col = new float[3];
-        int c = light.getColor(); // packed 0x00RRGGBB, no alpha channel used
+        int c = light.getColor();
         col[0] = ((c >> 16) & 0xFF) / 255f;
         col[1] = ((c >> 8) & 0xFF) / 255f;
         col[2] = (c & 0xFF) / 255f;
@@ -123,17 +218,11 @@ public final class GltfExporter {
         Map<String, Object> gl = new LinkedHashMap<>();
         gl.put("type", type);
         gl.put("color", floatList(col));
-        // NOTE: M3G intensity is a unitless multiplier; glTF expects candela (point/spot)
-        // or lux (directional). Passed through as best-effort approximation - re-tune
-        // in your DCC tool if lights look too dim/bright after import.
         gl.put("intensity", (double) light.getIntensity());
 
         if (light.getMode() == Light.SPOT) {
             Map<String, Object> spot = new LinkedHashMap<>();
             float outer = (float) Math.toRadians(light.getSpotAngle());
-            // M3G has no separate inner cone angle, only a single cutoff angle plus
-            // an exponent controlling falloff sharpness. Approximate inner cone from
-            // spotExponent: higher exponent => tighter hotspot => inner closer to outer.
             float innerFactor = 1.0f - Math.min(light.getSpotExponent() / 128f, 0.9f);
             spot.put("innerConeAngle", outer * innerFactor);
             spot.put("outerConeAngle", outer);
@@ -164,19 +253,16 @@ public final class GltfExporter {
         float[] posSB = new float[4];
         VertexArray posArr = vb.getPositions(posSB);
         int vertexCount = posArr.getVertexCount();
-        float[] positions = readVecN(posArr, posSB, vertexCount, 3);
+        float[] basePositions = readVecN(posArr, posSB, vertexCount, 3);
 
-        float[] normals = null;
+        float[] baseNormals = null;
         VertexArray normArr = vb.getNormals();
         if (normArr != null) {
             float[] noSB = {1f, 0f, 0f, 0f};
-            normals = readVecN(normArr, noSB, vertexCount, 3);
-            normalize3(normals);
+            baseNormals = readVecN(normArr, noSB, vertexCount, 3);
+            normalize3(baseNormals);
         }
 
-        // CHANGED: keep raw UVs (without texture's own transform) - the per-texture
-        // transform is now applied per-submesh, since different submeshes of the
-        // same mesh may use different Texture2D transforms (tiling scale etc).
         float[] baseUvs = null;
         float[] uvSB = new float[4];
         VertexArray uvArr = vb.getTexCoords(0, uvSB);
@@ -186,10 +272,58 @@ public final class GltfExporter {
         VertexArray colArr = vb.getColors();
         if (colArr != null) colors = readColorsRGBA(colArr, vertexCount);
 
-        int posAcc = writeAccessor(positions, 3, true);
-        int normAcc = normals != null ? writeAccessor(normals, 3, false) : -1;
+        int posAcc = writeAccessor(basePositions, 3, true);
+        int normAcc = baseNormals != null ? writeAccessor(baseNormals, 3, false) : -1;
         int colAcc = colors != null ? writeAccessor(colors, 4, false) : -1;
-        int identityUvAcc = -1; // lazily created accessor for submeshes without a texture
+
+        // NEW: skinning accessors, computed once for the whole mesh (shared across submeshes)
+        int jointsAcc = -1, weightsAcc = -1;
+        if (mesh instanceof SkinnedMesh) {
+            int[] skinAcc = writeSkinningAccessors((SkinnedMesh) mesh, vertexCount);
+            jointsAcc = skinAcc[0];
+            weightsAcc = skinAcc[1];
+        }
+
+        // NEW: morph targets, delta-encoded.
+        // M3G's MorphingMesh formula: final = baseWeight*base + sum(weight_i * target_i),
+        // where baseWeight = 1 - sum(weight_i). This is algebraically identical to glTF's
+        // final = base + sum(weight_i * (target_i - base)), so we simply export per-target
+        // position/normal DELTAS and pass through the current weights unchanged.
+        List<Object> morphTargets = null;
+        List<Float> currentWeights = null;
+        if (mesh instanceof MorphingMesh) {
+            MorphingMesh mm = (MorphingMesh) mesh;
+            int targetCount = mm.getMorphTargetCount();
+            morphTargets = new ArrayList<>();
+            float[] weightsArr = new float[targetCount];
+            mm.getWeights(weightsArr);
+            currentWeights = new ArrayList<>();
+            for (float w : weightsArr) currentWeights.add(w);
+
+            for (int ti = 0; ti < targetCount; ti++) {
+                VertexBuffer targetVb = mm.getMorphTarget(ti);
+
+                float[] tPosSB = new float[4];
+                VertexArray tPosArr = targetVb.getPositions(tPosSB);
+                float[] targetPositions = readVecN(tPosArr, tPosSB, vertexCount, 3);
+                float[] posDelta = new float[targetPositions.length];
+                for (int i = 0; i < posDelta.length; i++) posDelta[i] = targetPositions[i] - basePositions[i];
+
+                Map<String, Object> target = new LinkedHashMap<>();
+                target.put("POSITION", writeAccessor(posDelta, 3, false));
+
+                VertexArray tNormArr = targetVb.getNormals();
+                if (tNormArr != null && baseNormals != null) {
+                    float[] tNoSB = {1f, 0f, 0f, 0f};
+                    float[] targetNormals = readVecN(tNormArr, tNoSB, vertexCount, 3);
+                    normalize3(targetNormals);
+                    float[] normDelta = new float[targetNormals.length];
+                    for (int i = 0; i < normDelta.length; i++) normDelta[i] = targetNormals[i] - baseNormals[i];
+                    target.put("NORMAL", writeAccessor(normDelta, 3, false));
+                }
+                morphTargets.add(target);
+            }
+        }
 
         List<Object> primitives = new ArrayList<>();
         int submeshCount = mesh.getSubmeshCount();
@@ -200,13 +334,21 @@ public final class GltfExporter {
 
             int[] triIndices = toTriangleList(ib);
 
+            // NEW: fix triangle winding order to match glTF's CCW front-face convention
+            PolygonMode pm = ap != null ? ap.getPolygonMode() : null;
+            if (pm != null && pm.getWinding() == PolygonMode.WINDING_CW) {
+                for (int k = 0; k + 2 < triIndices.length; k += 3) {
+                    int tmp = triIndices[k + 1];
+                    triIndices[k + 1] = triIndices[k + 2];
+                    triIndices[k + 2] = tmp;
+                }
+            }
+
             Map<String, Object> attrs = new LinkedHashMap<>();
             attrs.put("POSITION", posAcc);
             if (normAcc >= 0) attrs.put("NORMAL", normAcc);
             if (colAcc >= 0) attrs.put("COLOR_0", colAcc);
 
-            // CHANGED: bake this submesh's Texture2D transform (tiling scale/offset/
-            // rotation) into a dedicated UV accessor, instead of reusing raw UVs.
             if (baseUvs != null) {
                 Texture2D tex0 = ap != null ? ap.getTexture(0) : null;
                 if (tex0 != null) {
@@ -214,9 +356,13 @@ public final class GltfExporter {
                     applyTextureTransform(transformedUvs, tex0);
                     attrs.put("TEXCOORD_0", writeAccessor(transformedUvs, 2, false));
                 } else {
-                    if (identityUvAcc < 0) identityUvAcc = writeAccessor(baseUvs, 2, false);
-                    attrs.put("TEXCOORD_0", identityUvAcc);
+                    attrs.put("TEXCOORD_0", writeAccessor(baseUvs, 2, false));
                 }
+            }
+
+            if (jointsAcc >= 0) {
+                attrs.put("JOINTS_0", jointsAcc);
+                attrs.put("WEIGHTS_0", weightsAcc);
             }
 
             Map<String, Object> prim = new LinkedHashMap<>();
@@ -225,29 +371,101 @@ public final class GltfExporter {
             prim.put("mode", 4); // TRIANGLES
             int matIdx = exportMaterial(ap);
             if (matIdx >= 0) prim.put("material", matIdx);
+            if (morphTargets != null) prim.put("targets", morphTargets);
             primitives.add(prim);
         }
 
         Map<String, Object> gmesh = new LinkedHashMap<>();
         gmesh.put("primitives", primitives);
+        if (currentWeights != null) gmesh.put("weights", currentWeights);
         gMeshes.add(gmesh);
         return gMeshes.size() - 1;
     }
 
-    // ---------- texture transform baking (NEW) ----------
-    // Mirrors Emulator3D.draw()'s GL_TEXTURE matrix setup:
-    //   glLoadMatrixf(texture2D.getCompositeTransform())
-    //   glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3])
-    //   glScalef(scaleBias[0], scaleBias[0], scaleBias[0])
-    // The scale/translate part (VertexArray fixed-point decode) is already applied
-    // by readVecN() above; here we apply the remaining compositeTransform on top,
-    // which is where M3G authors typically encode texture tiling (Texture2D extends
-    // Transformable and can have its own scale/rotate/translate).
+    // ---------- skinning (NEW) ----------
+    private int[] writeSkinningAccessors(SkinnedMesh mesh, int vertexCount) {
+        int[] vtxBones = mesh.getVerticesBones();
+        int[] vtxWeights = mesh.getVerticesWeights();
+        final int slots = 4; // Emulator3D.MaxTransformsPerVertex
+
+        int[] joints = new int[vertexCount * slots];
+        float[] weights = new float[vertexCount * slots];
+
+        for (int v = 0; v < vertexCount; v++) {
+            int sum = 0;
+            for (int s = 0; s < slots; s++) sum += vtxWeights[v * slots + s];
+            for (int s = 0; s < slots; s++) {
+                int boneId = vtxBones[v * slots + s]; // 0 = no bone, else boneTransList index + 1
+                int w = vtxWeights[v * slots + s];
+                joints[v * slots + s] = boneId > 0 ? boneId - 1 : 0;
+                weights[v * slots + s] = (boneId > 0 && sum > 0) ? (float) w / sum : 0f;
+            }
+        }
+
+        ByteBuffer jb = ByteBuffer.allocate(joints.length * 2).order(ByteOrder.LITTLE_ENDIAN);
+        for (int j : joints) jb.putShort((short) j);
+        int jointsBv = addBufferView(jb.array(), 34962); // ARRAY_BUFFER
+
+        Map<String, Object> jointsAccObj = new LinkedHashMap<>();
+        jointsAccObj.put("bufferView", jointsBv);
+        jointsAccObj.put("componentType", 5123); // UNSIGNED_SHORT
+        jointsAccObj.put("count", vertexCount);
+        jointsAccObj.put("type", "VEC4");
+        gAccessors.add(jointsAccObj);
+        int jointsAccIdx = gAccessors.size() - 1;
+
+        int weightsAccIdx = writeAccessor(weights, 4, false);
+
+        return new int[]{jointsAccIdx, weightsAccIdx};
+    }
+
+    private int exportSkin(SkinnedMesh mesh) {
+        Vector boneTransList = mesh.getTransforms();
+        if (boneTransList.isEmpty()) return -1;
+
+        List<Integer> joints = new ArrayList<>();
+        List<Float> ibmFlat = new ArrayList<>();
+
+        for (int i = 0; i < boneTransList.size(); i++) {
+            BoneTransform bt = (BoneTransform) boneTransList.elementAt(i);
+            Integer boneNodeIdx = nodeIndexMap.get(bt.bone);
+            if (boneNodeIdx == null) {
+                // Referenced bone wasn't found among exported nodes - abort skin export,
+                // the mesh keeps its correct static bind-pose geometry regardless.
+                return -1;
+            }
+            joints.add(boneNodeIdx);
+
+            float[] m = m3gToGltfMatrix(bt.toBoneTrans);
+            for (float f : m) ibmFlat.add(f);
+        }
+
+        ByteBuffer bb = ByteBuffer.allocate(ibmFlat.size() * 4).order(ByteOrder.LITTLE_ENDIAN);
+        for (float f : ibmFlat) bb.putFloat(f);
+        int bv = addBufferView(bb.array(), 0);
+
+        Map<String, Object> acc = new LinkedHashMap<>();
+        acc.put("bufferView", bv);
+        acc.put("componentType", 5126); // FLOAT
+        acc.put("count", joints.size());
+        acc.put("type", "MAT4");
+        gAccessors.add(acc);
+        int ibmAccIdx = gAccessors.size() - 1;
+
+        Map<String, Object> skin = new LinkedHashMap<>();
+        skin.put("joints", joints);
+        skin.put("inverseBindMatrices", ibmAccIdx);
+
+        gSkins.add(skin);
+        return gSkins.size() - 1;
+    }
+
+    // ---------- texture transform baking ----------
     private void applyTextureTransform(float[] uvs, Texture2D tex) {
         Transform t = new Transform();
         tex.getCompositeTransform(t);
         float[] m = new float[16];
-        t.get(m); // row-major, translation at indices {3,7,11} (same convention as m3gToGltfMatrix)
+        t.get(m);
 
         for (int i = 0; i < uvs.length; i += 2) {
             float u = uvs[i], v = uvs[i + 1];
@@ -260,7 +478,7 @@ public final class GltfExporter {
         }
     }
 
-    // ---------- Sprite3D exported as a flat quad (billboarding is NOT preserved) ----------
+    // ---------- Sprite3D exported as a flat quad ----------
     private int exportSpriteAsQuad(Sprite3D sprite) {
         float[] positions = {
                 -0.5f, -0.5f, 0f,
@@ -373,10 +591,14 @@ public final class GltfExporter {
         Material m = ap.getMaterial();
         if (m != null) {
             int diffuse = m.getColor(Material.DIFFUSE);
+            // CHANGED: the top byte of diffuseColor IS the material's alpha channel
+            // (confirmed by Material's default value 0xFFCCCCCC and by
+            // Material.updateProperty's ALPHA case masking exactly 0xFF000000).
+            // Using >>> since diffuse may be a negative int (top bit set).
             baseColor[0] = ((diffuse >> 16) & 0xFF) / 255f;
             baseColor[1] = ((diffuse >> 8) & 0xFF) / 255f;
             baseColor[2] = (diffuse & 0xFF) / 255f;
-            baseColor[3] = 1f;
+            baseColor[3] = ((diffuse >>> 24) & 0xFF) / 255f;
         }
         pbr.put("baseColorFactor", floatList(baseColor));
         pbr.put("metallicFactor", 0.0);
@@ -386,12 +608,40 @@ public final class GltfExporter {
         if (tex != null) {
             Image2D img = tex.getImage();
             Map<String, Object> texRef = new LinkedHashMap<>();
-            texRef.put("index", exportTexture(img, tex)); // CHANGED: pass tex for sampler wrap modes
+            texRef.put("index", exportTexture(img, tex));
             pbr.put("baseColorTexture", texRef);
         }
 
         mat.put("pbrMetallicRoughness", pbr);
-        mat.put("doubleSided", true);
+
+        // NEW: emissive color
+        if (m != null) {
+            int emissive = m.getColor(Material.EMISSIVE);
+            float er = ((emissive >> 16) & 0xFF) / 255f;
+            float eg = ((emissive >> 8) & 0xFF) / 255f;
+            float eb = (emissive & 0xFF) / 255f;
+            if (er > 0f || eg > 0f || eb > 0f) {
+                mat.put("emissiveFactor", floatList(new float[]{er, eg, eb}));
+            }
+        }
+
+        // NEW: alphaMode from CompositingMode
+        CompositingMode cm = ap.getCompositingMode();
+        if (cm != null) {
+            if (cm.getBlending() != CompositingMode.REPLACE) {
+                mat.put("alphaMode", "BLEND");
+            } else if (cm.getAlphaThreshold() > 0.0f) {
+                mat.put("alphaMode", "MASK");
+                mat.put("alphaCutoff", (double) cm.getAlphaThreshold());
+            }
+        }
+
+        // CHANGED: doubleSided now reflects actual PolygonMode culling
+        // (default PolygonMode culling is CULL_BACK, i.e. single-sided!)
+        PolygonMode pm = ap.getPolygonMode();
+        boolean doubleSided = pm != null && pm.getCulling() == PolygonMode.CULL_NONE;
+        mat.put("doubleSided", doubleSided);
+
         gMaterials.add(mat);
         int idx = gMaterials.size() - 1;
         materialCache.put(ap, idx);
@@ -425,12 +675,11 @@ public final class GltfExporter {
 
         Map<String, Object> texObj = new LinkedHashMap<>();
         texObj.put("source", imageIndex);
-        texObj.put("sampler", getSampler(tex)); // NEW: correct wrap mode (repeat/clamp)
+        texObj.put("sampler", getSampler(tex));
         gTextures.add(texObj);
         return gTextures.size() - 1;
     }
 
-    // ---------- sampler (wrap mode) export (NEW) ----------
     private static final int GLTF_REPEAT = 10497;
     private static final int GLTF_CLAMP_TO_EDGE = 33071;
 
@@ -524,11 +773,11 @@ public final class GltfExporter {
     private int writeAccessor(float[] data, int comps, boolean withBounds) {
         ByteBuffer bb = ByteBuffer.allocate(data.length * 4).order(ByteOrder.LITTLE_ENDIAN);
         for (float f : data) bb.putFloat(f);
-        int bv = addBufferView(bb.array(), 34962); // ARRAY_BUFFER
+        int bv = addBufferView(bb.array(), 34962);
 
         Map<String, Object> acc = new LinkedHashMap<>();
         acc.put("bufferView", bv);
-        acc.put("componentType", 5126); // FLOAT
+        acc.put("componentType", 5126);
         acc.put("count", data.length / comps);
         acc.put("type", comps == 2 ? "VEC2" : comps == 3 ? "VEC3" : "VEC4");
 
@@ -557,13 +806,13 @@ public final class GltfExporter {
         if (useShort) {
             bb = ByteBuffer.allocate(indices.length * 2).order(ByteOrder.LITTLE_ENDIAN);
             for (int i : indices) bb.putShort((short) i);
-            componentType = 5123; // UNSIGNED_SHORT
+            componentType = 5123;
         } else {
             bb = ByteBuffer.allocate(indices.length * 4).order(ByteOrder.LITTLE_ENDIAN);
             for (int i : indices) bb.putInt(i);
-            componentType = 5125; // UNSIGNED_INT
+            componentType = 5125;
         }
-        int bv = addBufferView(bb.array(), 34963); // ELEMENT_ARRAY_BUFFER
+        int bv = addBufferView(bb.array(), 34963);
         Map<String, Object> acc = new LinkedHashMap<>();
         acc.put("bufferView", bv);
         acc.put("componentType", componentType);
@@ -600,12 +849,13 @@ public final class GltfExporter {
         if (!gMaterials.isEmpty()) root.put("materials", gMaterials);
         if (!gTextures.isEmpty()) root.put("textures", gTextures);
         if (!gImages.isEmpty()) root.put("images", gImages);
-        if (!gSamplers.isEmpty()) root.put("samplers", gSamplers); // NEW
+        if (!gSamplers.isEmpty()) root.put("samplers", gSamplers);
+        if (!gCameras.isEmpty()) root.put("cameras", gCameras); // NEW
+        if (!gSkins.isEmpty()) root.put("skins", gSkins);       // NEW
         root.put("accessors", gAccessors);
         root.put("bufferViews", gBufferViews);
         root.put("buffers", Collections.singletonList(buffer));
 
-        // NEW: KHR_lights_punctual extension block
         if (!gLights.isEmpty()) {
             root.put("extensionsUsed", Collections.singletonList("KHR_lights_punctual"));
             Map<String, Object> khrLights = new LinkedHashMap<>();
@@ -626,17 +876,17 @@ public final class GltfExporter {
         int totalLen = 12 + 8 + jsonChunkLen + 8 + binChunkLen;
 
         try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outFile)))) {
-            writeLE(out, 0x46546C67); // "glTF"
+            writeLE(out, 0x46546C67);
             writeLE(out, 2);
             writeLE(out, totalLen);
 
             writeLE(out, jsonChunkLen);
-            writeLE(out, 0x4E4F534A); // "JSON"
+            writeLE(out, 0x4E4F534A);
             out.write(jsonBytes);
             for (int i = 0; i < jsonPad; i++) out.write(0x20);
 
             writeLE(out, binChunkLen);
-            writeLE(out, 0x004E4942); // "BIN\0"
+            writeLE(out, 0x004E4942);
             out.write(binBytes);
             for (int i = 0; i < binPad; i++) out.write(0);
         }
@@ -649,7 +899,7 @@ public final class GltfExporter {
         out.write((value >> 24) & 0xFF);
     }
 
-    // ---------- minimal JSON writer (no external dependency) ----------
+    // ---------- minimal JSON writer ----------
     private static String toJson(Object o) {
         StringBuilder sb = new StringBuilder();
         writeJson(o, sb);
