@@ -56,6 +56,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 	private Node currentNode;
 	private Rectangle canvasClientArea;
 	private MenuItem updateWorldMenuItem;
+    private MenuItem exportGltfItem;
 	private MenuItem orbitCameraItem;
 	private MenuItem panMenuItem;
 	private MenuItem dollyMenuItem;
@@ -320,6 +321,39 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		this.m3gview.setXray(b);
 	}
 
+    private void exportSceneAsGltf() {
+        if (currentNode == null) {
+            MessageBox mb = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+            mb.setMessage(UILocale.get("M3G_VIEW_EXPORT_NO_SCENE", "No scene loaded"));
+            mb.open();
+            return;
+        }
+
+        FileDialog dialog = new FileDialog(shell, SWT.SAVE);
+        dialog.setFilterExtensions(new String[]{"*.glb"});
+        dialog.setFilterNames(new String[]{"glTF Binary (*.glb)"});
+        dialog.setFileName("scene.glb");
+        String path = dialog.open();
+        if (path == null) return;
+
+        if (!path.toLowerCase().endsWith(".glb")) {
+            path = path + ".glb";
+        }
+
+        try {
+            GltfExporter.export(currentNode, new java.io.File(path));
+
+            MessageBox mb = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
+            mb.setMessage(UILocale.get("M3G_VIEW_EXPORT_DONE", "Export finished") + ":\n" + path);
+            mb.open();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            MessageBox mb = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+            mb.setMessage(UILocale.get("M3G_VIEW_EXPORT_ERROR", "Export failed") + ":\n" + ex.getMessage());
+            mb.open();
+        }
+    }
+
 	//TODO: Use anonymous classes
 	private void createShellAndMenus() {
 		final GridLayout layout;
@@ -491,6 +525,22 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 				addM3GObjects();
 			}
 		});
+        this.updateWorldMenuItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                addM3GObjects();
+            }
+        });
+
+        new MenuItem(this.displayMenu, 2); // separator
+        (this.exportGltfItem = new MenuItem(this.displayMenu, 8)).setText(UILocale.get("M3G_VIEW_DISPLAY_EXPORT_GLTF", "Export Scene as glTF...") + "\tE");
+        this.exportGltfItem.setAccelerator('E');
+        this.exportGltfItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent selectionEvent) {
+                exportSceneAsGltf();
+            }
+        });
 		menuItem.setMenu(this.displayMenu);
 		menuItem.setText(UILocale.get("M3G_VIEW_DISPLAY", "Display"));
 		this.shell.setMenuBar(this.menu);
