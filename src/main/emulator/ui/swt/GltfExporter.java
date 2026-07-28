@@ -386,12 +386,36 @@ public final class GltfExporter {
         if (tex != null) {
             Image2D img = tex.getImage();
             Map<String, Object> texRef = new LinkedHashMap<>();
-            texRef.put("index", exportTexture(img, tex)); // CHANGED: pass tex for sampler wrap modes
+            texRef.put("index", exportTexture(img, tex));
             pbr.put("baseColorTexture", texRef);
         }
 
         mat.put("pbrMetallicRoughness", pbr);
-        mat.put("doubleSided", true);
+
+        // NEW: emissive color
+        if (m != null) {
+            int emissive = m.getColor(Material.EMISSIVE);
+            float er = ((emissive >> 16) & 0xFF) / 255f;
+            float eg = ((emissive >> 8) & 0xFF) / 255f;
+            float eb = (emissive & 0xFF) / 255f;
+            if (er > 0f || eg > 0f || eb > 0f) {
+                mat.put("emissiveFactor", floatList(new float[]{er, eg, eb}));
+            }
+        }
+
+        // NEW: alpha mode from CompositingMode
+        CompositingMode cm = ap.getCompositingMode();
+        if (cm != null) {
+            if (cm.getBlending() != CompositingMode.REPLACE) {
+                mat.put("alphaMode", "BLEND");
+            } else if (cm.getAlphaThreshold() > 0.0f) {
+                mat.put("alphaMode", "MASK");
+                mat.put("alphaCutoff", (double) cm.getAlphaThreshold());
+            }
+            // else: default OPAQUE, no need to write explicitly
+        }
+
+        mat.put("doubleSided", true); // TODO: read PolygonMode.getCulling() for accuracy
         gMaterials.add(mat);
         int idx = gMaterials.size() - 1;
         materialCache.put(ap, idx);
