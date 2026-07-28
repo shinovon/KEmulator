@@ -34,7 +34,7 @@ public class Clip {
 		return this.aString207;
 	}
 
-	final Player method112() {
+	final Player createPlayer() {
 		ByteArrayInputStream var1 = null;
 		Player var2 = null;
 

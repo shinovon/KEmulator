@@ -6,7 +6,7 @@ import javax.microedition.media.control.ToneControl;
 
 public class Player {
 	static int clipState = 0;
-	static int toneState = 0;
+	static int currentPriority = 0;
 	static Object current = null;
 	static int foregroundClipLoopCount = -2;
 	static int toneLoopCount = -2;
@@ -14,7 +14,7 @@ public class Player {
 	static javax.microedition.media.Player foregroundClipPlayer = null;
 	static javax.microedition.media.Player backgroundClipPlayer = null;
 	static javax.microedition.media.Player tonePlayer = null;
-	private static ToneControl aToneControl908 = null;
+	private static ToneControl toneControl = null;
 	static Clip foregroundClip = null;
 	static DualTone tone = null;
 	static Clip backgroundClip = null;
@@ -27,14 +27,18 @@ public class Player {
 		new PlayerListenerImpl(playerListener);
 	}
 
-	public static void play(Clip clip, int n) throws IllegalArgumentException {
+	public static synchronized void play(Clip clip, int n) throws IllegalArgumentException {
 		if (n < -1) {
 			throw new IllegalArgumentException("Repeat must be -1 or greater");
 		}
-		if (clip == null || clip.priority < toneState) {
+		if (clip == null || clip.priority < currentPriority) {
 			return;
 		}
 		try {
+			if (foregroundClipPlayer != null) {
+				foregroundClipPlayer.close();
+				foregroundClipPlayer = null;
+			}
 			switch (clipState) {
 				case 0: {
 					break;
@@ -69,16 +73,17 @@ public class Player {
 					return;
 				}
 			}
-			foregroundClipPlayer = clip.method112();
+			javax.microedition.media.Player foregroundClipPlayer = clip.createPlayer();
 			foregroundClipLoopCount = n != -1 ? n + 1 : -1;
 			foregroundClipPlayer.setLoopCount(foregroundClipLoopCount);
 			PlayerListenerImpl class55 = new PlayerListenerImpl(playerListener);
 			class55.addPlayerListener(foregroundClipPlayer);
-			toneState = clip.priority;
+			currentPriority = clip.priority;
 			foregroundClip = clip;
 			clipState = 1;
 			current = clip;
 			Vibrator.vibrate((int) clip.vibration);
+			Player.foregroundClipPlayer = foregroundClipPlayer;
 			foregroundClipPlayer.start();
 			return;
 		} catch (MediaException mediaException) {
@@ -90,23 +95,23 @@ public class Player {
 			clipState = 0;
 			current = null;
 			foregroundClip = null;
-			toneState = 0;
+			currentPriority = 0;
 			return;
 		} catch (Exception exception) {
 			clipState = 0;
 			current = null;
 			foregroundClip = null;
-			toneState = 0;
+			currentPriority = 0;
 			exception.printStackTrace();
 			return;
 		}
 	}
 
-	public static void play(DualTone dualTone, int n) throws IllegalArgumentException {
+	public static synchronized void play(DualTone dualTone, int n) throws IllegalArgumentException {
 		if (n < -1) {
 			throw new IllegalArgumentException("Repeat must be -1 or greater");
 		}
-		if (dualTone.anInt514 < toneState) {
+		if (dualTone.anInt514 < currentPriority) {
 			return;
 		}
 		try {
@@ -148,13 +153,13 @@ public class Player {
 			}
 			tonePlayer = Manager.createPlayer("device://tone");
 			tonePlayer.realize();
-			aToneControl908 = (ToneControl) tonePlayer.getControl("ToneControl");
+			toneControl = (ToneControl) tonePlayer.getControl("ToneControl");
 			toneLoopCount = n != -1 ? n + 1 : -1;
 			tonePlayer.setLoopCount(toneLoopCount);
-			aToneControl908.setSequence(dualTone.aByteArray513);
+			toneControl.setSequence(dualTone.aByteArray513);
 			PlayerListenerImpl class55 = new PlayerListenerImpl(playerListener);
 			class55.addPlayerListener(tonePlayer);
-			toneState = dualTone.anInt514;
+			currentPriority = dualTone.anInt514;
 			current = dualTone;
 			tone = dualTone;
 			clipState = 6;
@@ -173,7 +178,7 @@ public class Player {
 		}
 	}
 
-	public static void playBackground(Clip clip, int n) throws IllegalArgumentException {
+	public static synchronized void playBackground(Clip clip, int n) throws IllegalArgumentException {
 		if (n < -1) {
 			throw new IllegalArgumentException("Repeat must be -1 or greater");
 		}
@@ -196,7 +201,7 @@ public class Player {
 			if (backgroundClipPlayer != null) {
 				backgroundClipPlayer.close();
 			}
-			backgroundClipPlayer = clip.method112();
+			backgroundClipPlayer = clip.createPlayer();
 			backgroundClipLoopCount = n != -1 ? n + 1 : -1;
 			backgroundClipPlayer.setLoopCount(backgroundClipLoopCount);
 			PlayerListenerImpl class55 = new PlayerListenerImpl(playerListener);
@@ -230,7 +235,7 @@ public class Player {
 		}
 	}
 
-	public static void pause() {
+	public static synchronized void pause() {
 		block8:
 		{
 			try {
@@ -267,7 +272,7 @@ public class Player {
 		}
 	}
 
-	public static void resume() {
+	public static synchronized void resume() {
 		try {
 			switch (clipState) {
 				case 2: {
@@ -295,7 +300,7 @@ public class Player {
 		}
 	}
 
-	public static void stop() {
+	public static synchronized void stop() {
 		switch (clipState) {
 			case 1: {
 				if (foregroundClipPlayer == null) break;
@@ -335,7 +340,7 @@ public class Player {
 		try {
 			clipState = 0;
 			current = null;
-			toneState = 0;
+			currentPriority = 0;
 			return;
 		} catch (Exception exception) {
 			if (playerListener != null) {
@@ -343,7 +348,7 @@ public class Player {
 			}
 			clipState = 0;
 			current = null;
-			toneState = 0;
+			currentPriority = 0;
 			exception.printStackTrace();
 			return;
 		}

@@ -73,58 +73,59 @@ final class PlayerListenerImpl
 			if (player == Player.foregroundClipPlayer ? Player.toneLoopCount > 0 || Player.toneLoopCount == -1 : (player == Player.tonePlayer ? Player.toneLoopCount > 0 || Player.toneLoopCount == -1 : player == Player.backgroundClipPlayer)) {
 				return;
 			}
+			player.close();
 			switch (Player.clipState) {
-				case 1: {
-					Player.foregroundClipPlayer.close();
-					Player.foregroundClipPlayer = null;
-					Player.foregroundClip = null;
-					Player.current = null;
-					Player.clipState = 0;
-					Player.toneState = 0;
-					if (Player.backgroundClipPlayer == null) break;
-					Player.toneState = 0;
-					Player.clipState = 4;
-					Player.current = Player.backgroundClip;
-					try {
-						Player.backgroundClipPlayer.start();
-						return;
-					} catch (Exception mediaException) {
-						mediaException.printStackTrace();
-						return;
-					}
-				}
-				case 4: {
+			case 1: {
+//				Player.foregroundClipPlayer.close();
+//				Player.foregroundClipPlayer = null;
+				Player.foregroundClip = null;
+				Player.current = null;
+				Player.clipState = 0;
+				Player.currentPriority = 0;
+				if (Player.backgroundClipPlayer == null) break;
+				Player.currentPriority = 0;
+				Player.clipState = 4;
+				Player.current = Player.backgroundClip;
+				try {
+					Player.backgroundClipPlayer.start();
+					return;
+				} catch (Exception mediaException) {
+					mediaException.printStackTrace();
 					return;
 				}
-				case 6: {
-					Exception exception;
-					try {
-						Player.tonePlayer.close();
-						Player.tonePlayer = null;
-						Player.tone = null;
-						Player.current = null;
-						Player.clipState = 0;
-						Player.toneState = 0;
-						if (Player.backgroundClipPlayer != null) {
-							Player.toneState = 0;
-							Player.clipState = 4;
-							Player.current = Player.backgroundClip;
-							Player.backgroundClipPlayer.start();
-							return;
-						}
+			}
+			case 4: {
+				return;
+			}
+			case 6: {
+				Exception exception;
+				try {
+//					Player.tonePlayer.close();
+//					Player.tonePlayer = null;
+					Player.tone = null;
+					Player.current = null;
+					Player.clipState = 0;
+					Player.currentPriority = 0;
+					if (Player.backgroundClipPlayer != null) {
+						Player.currentPriority = 0;
+						Player.clipState = 4;
+						Player.current = Player.backgroundClip;
+						Player.backgroundClipPlayer.start();
 						return;
-					} catch (MediaException mediaException) {
-						if (Player.playerListener != null) {
-							Player.playerListener.playerUpdate(2, Player.current);
-							System.out.println("play background clip encountered a MediaException: " + mediaException.getMessage());
-						}
-						exception = mediaException;
-					} catch (Exception exception2) {
-						Exception exception3;
-						exception = exception3 = exception2;
 					}
-					exception.printStackTrace();
+					return;
+				} catch (MediaException mediaException) {
+					if (Player.playerListener != null) {
+						Player.playerListener.playerUpdate(2, Player.current);
+						System.out.println("play background clip encountered a MediaException: " + mediaException.getMessage());
+					}
+					exception = mediaException;
+				} catch (Exception exception2) {
+					Exception exception3;
+					exception = exception3 = exception2;
 				}
+				exception.printStackTrace();
+			}
 			}
 		}
 	}

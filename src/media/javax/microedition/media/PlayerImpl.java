@@ -49,7 +49,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 	private final Object playLock = new Object();
 	private Sequencer midiSequencer;
 	private Synthesizer midiSynthesizer;
-	private boolean stopped;
+	private boolean stop;
 	private InputStream inputStream;
 	private boolean realized;
 
@@ -699,7 +699,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 				if (cacheRef != null) {
 					cacheRef.setPlayer(this);
 				}
-				stopped = false;
+				stop = false;
 				(playerThread = new Thread(this, "PlayerImpl-" + (++count))).start();
 			} else {
 				try {
@@ -731,7 +731,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 			}
 			return;
 		}
-		stopped = true;
+		stop = true;
 		synchronized (playLock) {
 			playLock.notifyAll();
 		}
@@ -801,12 +801,16 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					}
 					setLevel(level);
 					midiPlaying = true;
-					if (!stopped)
+					if (!stop)
 						synchronized (playLock) {
 							playLock.wait();
 						}
-					stopped = false;
-					complete = this.complete;
+					if (stop) {
+						complete = false;
+						stop = false;
+					} else {
+						complete = this.complete;
+					}
 					midiPlaying = false;
 					if (globalMidi) {
 						mediaTime = EmulatorMIDI.getMicrosecondPosition();
