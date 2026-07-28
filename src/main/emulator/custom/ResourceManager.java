@@ -92,26 +92,29 @@ public final class ResourceManager {
 		return getBytes(((s.indexOf(58) != -1) ? ((InputConnection) Connector.open(s, Connector.READ)).openInputStream() : getResourceAsStream(s)));
 	}
 
-	public static byte[] getBytes(final InputStream inputStream) throws IOException {
-		if (inputStream == null) {
+	public static byte[] getBytes(InputStream in) throws IOException {
+		if (in == null) {
 			return null;
+		}
+		if (in instanceof ResourceConnectionStream) {
+			in = ((ResourceConnectionStream) in).in;
 		}
 		try {
 			int available;
-			if ((available = inputStream.available()) < 128) {
+			if ((available = in.available()) < 128) {
 				available = 128;
 			}
 			final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(available);
 			final byte[] array = new byte[available];
 			int read;
-			while ((read = inputStream.read(array)) != -1) {
+			while ((read = in.read(array)) != -1) {
 				byteArrayOutputStream.write(array, 0, read);
 			}
 			final byte[] byteArray = byteArrayOutputStream.toByteArray();
 			byteArrayOutputStream.close();
 			return byteArray;
 		} finally {
-			inputStream.close();
+			in.close();
 		}
 	}
 

@@ -2,6 +2,7 @@ package javax.microedition.io;
 
 import emulator.AppSettings;
 import emulator.Emulator;
+import emulator.custom.ResourceConnectionStream;
 import emulator.custom.ResourceManager;
 
 import java.io.ByteArrayInputStream;
@@ -39,21 +40,7 @@ final class ResourceConnectionImpl implements InputConnection {
 			return i;
 		}
 
-		return new InputStream() {
-			public int read() throws IOException {
-				int r = i.read();
-				return r == -1 ? 0 : r;
-			}
-
-			public int read(byte[] b, int off, int len) throws IOException {
-				int r = i.read(b, off, len);
-				return r == -1 ? 0 : r;
-			}
-
-			public void close() throws IOException {
-				i.close();
-			}
-		};
+		return new ResourceConnectionStream(i);
 	}
 
 	public final void close() {
