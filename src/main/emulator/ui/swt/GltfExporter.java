@@ -17,6 +17,9 @@ import java.util.*;
  *  - No animations (KeyframeSequence / AnimationController are ignored)
  *  - Sprite3D is exported as a flat quad using its current node transform
  *    (billboard behaviour is NOT preserved, since glTF has no runtime billboarding)
+ *  - Ambient lights are NOT exported (KHR_lights_punctual has no ambient light type)
+ *  - Light attenuation coefficients (constant/linear/quadratic) are NOT mapped;
+ *    exported lights use glTF's default infinite-range inverse-square falloff
  */
 public final class GltfExporter {
 
@@ -33,9 +36,13 @@ public final class GltfExporter {
     private final List<Object> gMaterials = new ArrayList<>();
     private final List<Object> gTextures = new ArrayList<>();
     private final List<Object> gImages = new ArrayList<>();
+    private final List<Object> gSamplers = new ArrayList<>(); // NEW: texture wrap modes
+    private final List<Object> gLights = new ArrayList<>();   // NEW: KHR_lights_punctual lights
 
     private final IdentityHashMap<Appearance, Integer> materialCache = new IdentityHashMap<>();
     private final IdentityHashMap<Image2D, Integer> imageCache = new IdentityHashMap<>();
+    private final Map<Long, Integer> samplerCache = new HashMap<>();     // NEW: (wrapS,wrapT) -> sampler index
+    private final IdentityHashMap<Light, Integer> lightCache = new IdentityHashMap<>(); // NEW
 
     // ---------- entry point ----------
     private void doExport(Node root, File outFile) throws IOException {
@@ -49,8 +56,6 @@ public final class GltfExporter {
 
         Transform t = new Transform();
         if (parent != null) {
-            // Confirmed real API: Node.getTransformTo(Node target, Transform transform)
-            // (see Emulator3D.render(World): world.getActiveCamera().getTransformTo(world, camTrans))
             node.getTransformTo(parent, t);
         } else {
             t.setIdentity();
@@ -62,6 +67,18 @@ public final class GltfExporter {
             gnode.put("mesh", exportMesh((Mesh) node));
         } else if (node instanceof Sprite3D) {
             gnode.put("mesh", exportSpriteAsQuad((Sprite3D) node));
+        } else if (node instanceof Light) {
+            // NEW: export light source via KHR_lights_punctual, attached to this node.
+            // The node itself (with its transform) is still added to the scene graph
+            // so the light's position/orientation is preserved.
+            int lightIdx = exportLight((Light) node);
+            if (lightIdx >= 0) {
+                Map<String, Object> ext = new LinkedHashMap<>();
+                Map<String, Object> khr = new LinkedHashMap<>();
+                khr.put("light", lightIdx);
+                ext.put("KHR_lights_punctual", khr);
+                gnode.put("extensions", ext);
+            }
         }
 
         if (node instanceof Group) {
@@ -71,7 +88,7 @@ public final class GltfExporter {
             for (int i = 0; i < cc; i++) {
                 Node child = g.getChild(i);
                 if (child == null) continue;
-                if (child instanceof Camera || child instanceof Light) continue; // skip helper nodes
+                if (child instanceof Camera) continue; // CHANGED: only cameras are skipped now, lights are exported
                 children.add(exportNode(child, node));
             }
             if (!children.isEmpty()) gnode.put("children", children);
@@ -81,12 +98,55 @@ public final class GltfExporter {
         return gNodes.size() - 1;
     }
 
+    // ---------- light export (NEW) ----------
+    private int exportLight(Light light) {
+        Integer cached = lightCache.get(light);
+        if (cached != null) return cached;
+
+        String type;
+        switch (light.getMode()) {
+            case Light.DIRECTIONAL: type = "directional"; break;
+            case Light.OMNI:        type = "point"; break;
+            case Light.SPOT:        type = "spot"; break;
+            case Light.AMBIENT:
+            default:
+                // KHR_lights_punctual has no ambient light type - skip.
+                return -1;
+        }
+
+        float[] col = new float[3];
+        int c = light.getColor(); // packed 0x00RRGGBB, no alpha channel used
+        col[0] = ((c >> 16) & 0xFF) / 255f;
+        col[1] = ((c >> 8) & 0xFF) / 255f;
+        col[2] = (c & 0xFF) / 255f;
+
+        Map<String, Object> gl = new LinkedHashMap<>();
+        gl.put("type", type);
+        gl.put("color", floatList(col));
+        // NOTE: M3G intensity is a unitless multiplier; glTF expects candela (point/spot)
+        // or lux (directional). Passed through as best-effort approximation - re-tune
+        // in your DCC tool if lights look too dim/bright after import.
+        gl.put("intensity", (double) light.getIntensity());
+
+        if (light.getMode() == Light.SPOT) {
+            Map<String, Object> spot = new LinkedHashMap<>();
+            float outer = (float) Math.toRadians(light.getSpotAngle());
+            // M3G has no separate inner cone angle, only a single cutoff angle plus
+            // an exponent controlling falloff sharpness. Approximate inner cone from
+            // spotExponent: higher exponent => tighter hotspot => inner closer to outer.
+            float innerFactor = 1.0f - Math.min(light.getSpotExponent() / 128f, 0.9f);
+            spot.put("innerConeAngle", outer * innerFactor);
+            spot.put("outerConeAngle", outer);
+            gl.put("spot", spot);
+        }
+
+        gLights.add(gl);
+        int idx = gLights.size() - 1;
+        lightCache.put(light, idx);
+        return idx;
+    }
+
     // ---------- matrix conversion ----------
-    // M3G Transform.get(float[]) fills a row-major matrix where translation
-    // is located at indices {3,7,11} (confirmed by M3GViewUI.update() usage:
-    // cameraX += -m[2]*forward ... i.e. axes are columns {0,4,8}/{2,6,10}).
-    // glTF requires column-major matrix with translation at {12,13,14},
-    // so we transpose.
     private static float[] m3gToGltfMatrix(Transform t) {
         float[] src = new float[16];
         t.get(src);
@@ -107,17 +167,20 @@ public final class GltfExporter {
         float[] positions = readVecN(posArr, posSB, vertexCount, 3);
 
         float[] normals = null;
-        VertexArray normArr = vb.getNormals(); // no scale/bias for normals in this API
+        VertexArray normArr = vb.getNormals();
         if (normArr != null) {
             float[] noSB = {1f, 0f, 0f, 0f};
             normals = readVecN(normArr, noSB, vertexCount, 3);
             normalize3(normals);
         }
 
-        float[] uvs = null;
+        // CHANGED: keep raw UVs (without texture's own transform) - the per-texture
+        // transform is now applied per-submesh, since different submeshes of the
+        // same mesh may use different Texture2D transforms (tiling scale etc).
+        float[] baseUvs = null;
         float[] uvSB = new float[4];
-        VertexArray uvArr = vb.getTexCoords(0, uvSB); // first texture unit
-        if (uvArr != null) uvs = readVecN(uvArr, uvSB, vertexCount, 2);
+        VertexArray uvArr = vb.getTexCoords(0, uvSB);
+        if (uvArr != null) baseUvs = readVecN(uvArr, uvSB, vertexCount, 2);
 
         float[] colors = null;
         VertexArray colArr = vb.getColors();
@@ -125,8 +188,8 @@ public final class GltfExporter {
 
         int posAcc = writeAccessor(positions, 3, true);
         int normAcc = normals != null ? writeAccessor(normals, 3, false) : -1;
-        int uvAcc = uvs != null ? writeAccessor(uvs, 2, false) : -1;
         int colAcc = colors != null ? writeAccessor(colors, 4, false) : -1;
+        int identityUvAcc = -1; // lazily created accessor for submeshes without a texture
 
         List<Object> primitives = new ArrayList<>();
         int submeshCount = mesh.getSubmeshCount();
@@ -140,8 +203,21 @@ public final class GltfExporter {
             Map<String, Object> attrs = new LinkedHashMap<>();
             attrs.put("POSITION", posAcc);
             if (normAcc >= 0) attrs.put("NORMAL", normAcc);
-            if (uvAcc >= 0) attrs.put("TEXCOORD_0", uvAcc);
             if (colAcc >= 0) attrs.put("COLOR_0", colAcc);
+
+            // CHANGED: bake this submesh's Texture2D transform (tiling scale/offset/
+            // rotation) into a dedicated UV accessor, instead of reusing raw UVs.
+            if (baseUvs != null) {
+                Texture2D tex0 = ap != null ? ap.getTexture(0) : null;
+                if (tex0 != null) {
+                    float[] transformedUvs = baseUvs.clone();
+                    applyTextureTransform(transformedUvs, tex0);
+                    attrs.put("TEXCOORD_0", writeAccessor(transformedUvs, 2, false));
+                } else {
+                    if (identityUvAcc < 0) identityUvAcc = writeAccessor(baseUvs, 2, false);
+                    attrs.put("TEXCOORD_0", identityUvAcc);
+                }
+            }
 
             Map<String, Object> prim = new LinkedHashMap<>();
             prim.put("attributes", attrs);
@@ -156,6 +232,32 @@ public final class GltfExporter {
         gmesh.put("primitives", primitives);
         gMeshes.add(gmesh);
         return gMeshes.size() - 1;
+    }
+
+    // ---------- texture transform baking (NEW) ----------
+    // Mirrors Emulator3D.draw()'s GL_TEXTURE matrix setup:
+    //   glLoadMatrixf(texture2D.getCompositeTransform())
+    //   glTranslatef(scaleBias[1], scaleBias[2], scaleBias[3])
+    //   glScalef(scaleBias[0], scaleBias[0], scaleBias[0])
+    // The scale/translate part (VertexArray fixed-point decode) is already applied
+    // by readVecN() above; here we apply the remaining compositeTransform on top,
+    // which is where M3G authors typically encode texture tiling (Texture2D extends
+    // Transformable and can have its own scale/rotate/translate).
+    private void applyTextureTransform(float[] uvs, Texture2D tex) {
+        Transform t = new Transform();
+        tex.getCompositeTransform(t);
+        float[] m = new float[16];
+        t.get(m); // row-major, translation at indices {3,7,11} (same convention as m3gToGltfMatrix)
+
+        for (int i = 0; i < uvs.length; i += 2) {
+            float u = uvs[i], v = uvs[i + 1];
+            float nu = m[0] * u + m[1] * v + m[3];
+            float nv = m[4] * u + m[5] * v + m[7];
+            float nw = m[12] * u + m[13] * v + m[15];
+            if (nw != 0f && nw != 1f) { nu /= nw; nv /= nw; }
+            uvs[i] = nu;
+            uvs[i + 1] = nv;
+        }
     }
 
     // ---------- Sprite3D exported as a flat quad (billboarding is NOT preserved) ----------
@@ -192,12 +294,6 @@ public final class GltfExporter {
     }
 
     // ---------- VertexArray reading ----------
-    // Real API (confirmed via Emulator3D.draw()):
-    //   arr.getComponentType() == 1  -> BYTE, values via arr.getByteValues()
-    //   otherwise                    -> SHORT, values via arr.getShortValues()
-    //   arr.getComponentCount(), arr.getVertexCount()
-    // Scale/bias convention (confirmed via Emulator3D.draw() GL calls):
-    //   final = raw * scaleBias[0] + scaleBias[1..3]
     private float[] readVecN(VertexArray arr, float[] scaleBias, int vertexCount, int comps) {
         float scale = scaleBias[0] == 0 ? 1f : scaleBias[0];
         float biasX = scaleBias.length > 1 ? scaleBias[1] : 0f;
@@ -240,10 +336,8 @@ public final class GltfExporter {
         }
     }
 
-    // Colors are always stored as bytes in this API (confirmed: Emulator3D.draw()
-    // only handles the componentType==1 branch for colors, no short-color branch exists)
     private float[] readColorsRGBA(VertexArray arr, int vertexCount) {
-        int comps = arr.getComponentCount(); // 3 (RGB) or 4 (RGBA)
+        int comps = arr.getComponentCount();
         byte[] raw = arr.getByteValues();
         float[] out = new float[vertexCount * 4];
         for (int v = 0; v < vertexCount; v++) {
@@ -256,9 +350,6 @@ public final class GltfExporter {
     }
 
     // ---------- triangle strip -> triangle list ----------
-    // TriangleStripArray.getIndices(int[] out) ALREADY produces a flat triangle list
-    // with correct winding-order flip per strip (see (j & 1) == 0 check in its source).
-    // No manual strip-to-triangle conversion is needed.
     private int[] toTriangleList(IndexBuffer ib) {
         if (!(ib instanceof TriangleStripArray)) {
             throw new UnsupportedOperationException("Unsupported IndexBuffer type: " + ib.getClass());
@@ -281,7 +372,7 @@ public final class GltfExporter {
         float[] baseColor = {1f, 1f, 1f, 1f};
         Material m = ap.getMaterial();
         if (m != null) {
-            int diffuse = m.getColor(Material.DIFFUSE); // assumed 0x00RRGGBB, alpha handled via CompositingMode
+            int diffuse = m.getColor(Material.DIFFUSE);
             baseColor[0] = ((diffuse >> 16) & 0xFF) / 255f;
             baseColor[1] = ((diffuse >> 8) & 0xFF) / 255f;
             baseColor[2] = (diffuse & 0xFF) / 255f;
@@ -295,7 +386,7 @@ public final class GltfExporter {
         if (tex != null) {
             Image2D img = tex.getImage();
             Map<String, Object> texRef = new LinkedHashMap<>();
-            texRef.put("index", exportTexture(img));
+            texRef.put("index", exportTexture(img, tex)); // CHANGED: pass tex for sampler wrap modes
             pbr.put("baseColorTexture", texRef);
         }
 
@@ -307,7 +398,7 @@ public final class GltfExporter {
         return idx;
     }
 
-    private int exportTexture(Image2D img) {
+    private int exportTexture(Image2D img, Texture2D tex) {
         Integer cachedImg = imageCache.get(img);
         int imageIndex;
         if (cachedImg != null) {
@@ -331,22 +422,41 @@ public final class GltfExporter {
             imageIndex = gImages.size() - 1;
             imageCache.put(img, imageIndex);
         }
+
         Map<String, Object> texObj = new LinkedHashMap<>();
         texObj.put("source", imageIndex);
+        texObj.put("sampler", getSampler(tex)); // NEW: correct wrap mode (repeat/clamp)
         gTextures.add(texObj);
         return gTextures.size() - 1;
     }
 
-    // Manual pixel decoding using the real Image2D API:
-    //   getImageData() -> raw byte[] in a format-specific packing
-    //   getFormat()    -> ALPHA / LUMINANCE / LUMINANCE_ALPHA / RGB / RGBA
-    // (bytesPerPixel matches Image2D.getBitsPerColor(), despite its misleading name)
+    // ---------- sampler (wrap mode) export (NEW) ----------
+    private static final int GLTF_REPEAT = 10497;
+    private static final int GLTF_CLAMP_TO_EDGE = 33071;
+
+    private int getSampler(Texture2D tex) {
+        boolean clampS = tex.getWrappingS() == Texture2D.WRAP_CLAMP;
+        boolean clampT = tex.getWrappingT() == Texture2D.WRAP_CLAMP;
+        long key = (clampS ? 1 : 0) | ((clampT ? 1 : 0) << 1);
+
+        Integer cached = samplerCache.get(key);
+        if (cached != null) return cached;
+
+        Map<String, Object> sampler = new LinkedHashMap<>();
+        sampler.put("wrapS", clampS ? GLTF_CLAMP_TO_EDGE : GLTF_REPEAT);
+        sampler.put("wrapT", clampT ? GLTF_CLAMP_TO_EDGE : GLTF_REPEAT);
+        gSamplers.add(sampler);
+        int idx = gSamplers.size() - 1;
+        samplerCache.put(key, idx);
+        return idx;
+    }
+
     private BufferedImage toBufferedImage(Image2D img) {
         int w = img.getWidth();
         int h = img.getHeight();
         byte[] data = img.getImageData();
         int format = img.getFormat();
-        int bpp = img.getBitsPerColor(); // actually bytes-per-pixel, see Image2D.bytesPerPixel()
+        int bpp = img.getBitsPerColor();
 
         int[] argb = new int[w * h];
         for (int y = 0; y < h; y++) {
@@ -490,9 +600,20 @@ public final class GltfExporter {
         if (!gMaterials.isEmpty()) root.put("materials", gMaterials);
         if (!gTextures.isEmpty()) root.put("textures", gTextures);
         if (!gImages.isEmpty()) root.put("images", gImages);
+        if (!gSamplers.isEmpty()) root.put("samplers", gSamplers); // NEW
         root.put("accessors", gAccessors);
         root.put("bufferViews", gBufferViews);
         root.put("buffers", Collections.singletonList(buffer));
+
+        // NEW: KHR_lights_punctual extension block
+        if (!gLights.isEmpty()) {
+            root.put("extensionsUsed", Collections.singletonList("KHR_lights_punctual"));
+            Map<String, Object> khrLights = new LinkedHashMap<>();
+            khrLights.put("lights", gLights);
+            Map<String, Object> extensions = new LinkedHashMap<>();
+            extensions.put("KHR_lights_punctual", khrLights);
+            root.put("extensions", extensions);
+        }
 
         byte[] jsonBytes = toJson(root).getBytes("UTF-8");
         int jsonPad = (4 - (jsonBytes.length % 4)) % 4;
