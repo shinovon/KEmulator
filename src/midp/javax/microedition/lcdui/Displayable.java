@@ -127,6 +127,8 @@ public class Displayable {
 		String leftLabel = "", rightLabel = "";
 		if (hasMenuOnLeft()) {
 			leftLabel = UILocale.get("LCDUI_MENU_COMMAND", "Menu");
+		} else if (focusedItem != null && !focusedItem.commands.isEmpty()) {
+			leftLabel = focusedItem.commands.get(0).getLabel();
 		} else if (!menuCommands.isEmpty()) {
 			leftLabel = menuCommands.get(0).getLabel();
 		} else if (leftCommand != null) {
