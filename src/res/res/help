@@ -1,3 +1,9 @@
+$v2.21.5 [2026.xx.xx]
+Fixed crash in debug tools on Java 22+
+Fixed crash when showing empty POPUP ChoiceGroup
+Fixed handling of Graphics translation in M3G
+Fixed Sprint Media API
+
 $v2.21.4 [2026.04.08]
 Improved MIDI playback on default JRE synthesizer
 Implemented VolumeControl in MIDI player
