@@ -61,7 +61,7 @@ public final class EmulatorScreen implements
 	private Menu menuMidlet;
 	private Menu menuTool;
 	private Menu menuView;
-	private Menu menu2dEngine;
+//	private Menu menu2dEngine;
 	private Menu menuM3GEngine;
 	public static int locX = Integer.MIN_VALUE;
 	public static int locY = Integer.MIN_VALUE;
@@ -1212,16 +1212,16 @@ public final class EmulatorScreen implements
 		this.appSettingsMenuItem.addSelectionListener(this);
 
 		new MenuItem(this.menuMidlet, 2);
-		final MenuItem menuItem7;
-		(menuItem7 = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_2D_ENGINE", "2D Engine"));
-		this.menu2dEngine = new Menu(this.shell, 4194308);
-		(this.awt2dMenuItem = new MenuItem(this.menu2dEngine, 16)).setText("AWT");
-		this.awt2dMenuItem.setSelection(Settings.g2d == 1);
-		this.awt2dMenuItem.addSelectionListener(this);
-		(this.swt2dMenuItem = new MenuItem(this.menu2dEngine, 16)).setText("SWT (Deprecated)");
-		this.swt2dMenuItem.setSelection(Settings.g2d == 0);
-		this.swt2dMenuItem.addSelectionListener(this);
-		menuItem7.setMenu(this.menu2dEngine);
+//		final MenuItem menuItem7;
+//		(menuItem7 = new MenuItem(this.menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_2D_ENGINE", "2D Engine"));
+//		this.menu2dEngine = new Menu(this.shell, 4194308);
+//		(this.awt2dMenuItem = new MenuItem(this.menu2dEngine, 16)).setText("AWT");
+//		this.awt2dMenuItem.setSelection(Settings.g2d == 1);
+//		this.awt2dMenuItem.addSelectionListener(this);
+//		(this.swt2dMenuItem = new MenuItem(this.menu2dEngine, 16)).setText("SWT (Deprecated)");
+//		this.swt2dMenuItem.setSelection(Settings.g2d == 0);
+//		this.swt2dMenuItem.addSelectionListener(this);
+//		menuItem7.setMenu(this.menu2dEngine);
 
 		final MenuItem engineM3GGroup;
 		(engineM3GGroup = new MenuItem(menuMidlet, 64)).setText(UILocale.get("MENU_MIDLET_M3G_ENGINE", "M3G Engine"));
@@ -1505,26 +1505,26 @@ public final class EmulatorScreen implements
 				return;
 			}
 		}
-		if (parent == this.menu2dEngine) {
-			if (menuItem == this.awt2dMenuItem) {
-				if (this.pauseState != 0 && Settings.g2d != 1) {
-					Emulator.loadGame(null, 1, Settings.g3d, Settings.micro3d, false);
-					return;
-				}
-				Settings.g2d = 1;
-				this.swt2dMenuItem.setSelection(false);
-				this.awt2dMenuItem.setSelection(true);
-			} else if (menuItem == this.swt2dMenuItem) {
-				if (this.pauseState != 0 && Settings.g2d != 0) {
-					Emulator.loadGame(null, 0, Settings.g3d, Settings.micro3d, false);
-					return;
-				}
-				Settings.g2d = 0;
-				this.awt2dMenuItem.setSelection(false);
-				this.swt2dMenuItem.setSelection(true);
-			}
-			return;
-		}
+//		if (parent == this.menu2dEngine) {
+//			if (menuItem == this.awt2dMenuItem) {
+//				if (this.pauseState != 0 && Settings.g2d != 1) {
+//					Emulator.loadGame(null, 1, Settings.g3d, Settings.micro3d, false);
+//					return;
+//				}
+//				Settings.g2d = 1;
+//				this.swt2dMenuItem.setSelection(false);
+//				this.awt2dMenuItem.setSelection(true);
+//			} else if (menuItem == this.swt2dMenuItem) {
+//				if (this.pauseState != 0 && Settings.g2d != 0) {
+//					Emulator.loadGame(null, 0, Settings.g3d, Settings.micro3d, false);
+//					return;
+//				}
+//				Settings.g2d = 0;
+//				this.awt2dMenuItem.setSelection(false);
+//				this.swt2dMenuItem.setSelection(true);
+//			}
+//			return;
+//		}
 		if (parent == this.menuM3GEngine) {
 			if (menuItem == this.swerve3dMenuItem) {
 				if (this.pauseState != 0 && Settings.g3d != 0) {

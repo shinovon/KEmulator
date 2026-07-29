@@ -804,11 +804,12 @@ public class Emulator implements Runnable {
 				if (!value.startsWith("-")) i++;
 				else value = null;
 			}
-			if (key.equals("awt")) {
-				Settings.g2d = 1;
-			} else if (key.equals("swt")) {
-				Settings.g2d = 0;
-			} else if (key.equals("lwj")) {
+//			if (key.equals("awt")) {
+//				Settings.g2d = 1;
+//			} else if (key.equals("swt")) {
+//				Settings.g2d = 0;
+//			} else
+			if (key.equals("lwj")) {
 				Settings.g3d = 1;
 			} else if (key.equals("swerve")) {
 				Settings.g3d = 0;
