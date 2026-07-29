@@ -231,6 +231,7 @@ public final class Property implements IProperty, SelectionListener {
 	private int lastChangedFont;
 	private Button showAppSettingsBtn;
 	private Button maMidiCheck;
+	private Button passMinimizeBtn;
 
 	public Property() {
 		super();
@@ -395,6 +396,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.ignoreRegionRepaint = Boolean.parseBoolean(properties.getProperty("IgnoreRegionRepaint", "false"));
 			Settings.ignoreServiceRepaints = Boolean.parseBoolean(properties.getProperty("IgnoreServiceRepaints", "false"));
 			Settings.dontRepaintOnSetCurrent = Boolean.parseBoolean(properties.getProperty("DontRepaintOnSetCurrent", "false"));
+			Settings.hideDisplayableOnMinimize = Boolean.parseBoolean(properties.getProperty("HideDisplayableOnMinimize", "false"));
 
 			String[] protectedPackages = properties.getProperty("ProtectedPackages", "").split(";");
 			if (protectedPackages.length > 0) {
@@ -649,6 +651,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("IgnoreRegionRepaint", String.valueOf(Settings.ignoreRegionRepaint));
 			properties.setProperty("IgnoreServiceRepaints", String.valueOf(Settings.ignoreServiceRepaints));
 			properties.setProperty("DontRepaintOnSetCurrent", String.valueOf(Settings.dontRepaintOnSetCurrent));
+			properties.setProperty("HideDisplayableOnMinimize", String.valueOf(Settings.hideDisplayableOnMinimize));
 
 			StringBuilder builder = new StringBuilder();
 			if (!Settings.protectedPackages.isEmpty()) {
@@ -2118,15 +2121,20 @@ public final class Property implements IProperty, SelectionListener {
 		grpMisc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		grpMisc.setLayout(new GridLayout(1, false));
 		
-		this.antiAliasBtn = new Button(grpMisc, 32);
+		antiAliasBtn = new Button(grpMisc, 32);
 		antiAliasBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		antiAliasBtn.setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
-		this.antiAliasBtn.setSelection(Settings.awtAntiAliasing);
+		antiAliasBtn.setSelection(Settings.awtAntiAliasing);
 		
-		this.rpcBtn = new Button(grpMisc, 32);
+		rpcBtn = new Button(grpMisc, 32);
 		rpcBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		rpcBtn.setText(UILocale.get("OPTION_SYSTEM_DISCORD_RICHPRESENCE", "Discord Rich Presence"));
-		this.rpcBtn.setSelection(Settings.rpc);
+		rpcBtn.setSelection(Settings.rpc);
+
+		passMinimizeBtn = new Button(grpMisc, 32);
+		passMinimizeBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		passMinimizeBtn.setText("Pass window minimized state to MIDlet");
+		passMinimizeBtn.setSelection(Settings.hideDisplayableOnMinimize);
 	}
 
 	private void setupSysFontComp() {
