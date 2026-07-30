@@ -427,6 +427,11 @@ falls back to a writable temporary automation root when the bundle directory is
 not writable; `KEMU_AUTOMATION_DIR` can select an explicit root. Worker writes
 go to `--data-dir`, `--rms-dir`, and `--file-root`.
 
+For compatibility with existing bundles, an implicit file root is seeded once
+from the bundle's legacy `file/root` directory when the session file root does
+not yet exist. Later reads and writes use only the session copy. Explicit data,
+RMS, and file roots that overlap the runtime bundle are rejected.
+
 ```bash
 ./kemu.sh --session-id a open app.jar \
   --data-dir /tmp/kemu-a \
@@ -440,7 +445,8 @@ go to `--data-dir`, `--rms-dir`, and `--file-root`.
 
 `rms import`, `rms reset`, `state snapshot`, and `state restore` require the
 session app to be closed so the archive is consistent. Archives validate their
-schema and paths before replacing session data.
+schema and paths before replacing session data. RMS index updates use an atomic
+replace so another MIDlet thread cannot observe a truncated index.
 
 `KEMU_WORKER_JAVA_OPTS` supplies additional worker JVM options. An explicit
 `--worker-xmx` replaces any `-Xmx` in that variable. `status --json` reports

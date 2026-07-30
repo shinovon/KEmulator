@@ -18,6 +18,9 @@
 - Added session IDs, writable data/RMS/file roots, read-only bundle support,
   RMS/state archives, configurable worker JVM options, and actual controller
   and worker PID/status reporting.
+- Preserved legacy `file/root` bundle fixtures by copying them once into an
+  implicit session-local file root, rejected explicit writable roots that
+  overlap the runtime bundle, and made RMS index replacement atomic.
 - Kept repaint traffic out of display revision checks, coalesced frame events
   by rendered state revision, delivered native item-state callbacks before
   control mutations return, and initialized an empty writable `midlets.ini`
