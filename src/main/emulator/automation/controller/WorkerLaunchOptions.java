@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,16 +43,31 @@ final class WorkerLaunchOptions {
 		return Paths.get(request.at(key).asString()).toAbsolutePath().normalize();
 	}
 
-	private static void validateWritableRoot(Path path, Path runtimeRoot, String name) {
+	private static boolean explicitlyConfigured(Json request, String key) {
+		String explicitKey = key + "Explicit";
+		if (request.has(explicitKey)) {
+			return request.at(explicitKey).asBoolean();
+		}
+		return request.has(key) && !request.at(key).isNull();
+	}
+
+	private static void validateWritableRoot(
+		Path path,
+		Path runtimeRoot,
+		String name,
+		boolean explicitlyConfigured) {
 		if (path.getParent() == null) {
 			throw new AutomationException(
 				AutomationErrorCodes.INVALID_REQUEST,
 				name + " must not be a filesystem root: " + path);
 		}
-		if (path.equals(runtimeRoot) || runtimeRoot.startsWith(path)) {
+		if (explicitlyConfigured
+			&& (path.equals(runtimeRoot)
+			|| runtimeRoot.startsWith(path)
+			|| path.startsWith(runtimeRoot))) {
 			throw new AutomationException(
 				AutomationErrorCodes.INVALID_REQUEST,
-				name + " must not contain the KEmulator runtime bundle: " + path);
+				name + " must not overlap the KEmulator runtime bundle: " + path);
 		}
 	}
 
@@ -70,6 +86,39 @@ final class WorkerLaunchOptions {
 					throw error;
 				}
 				Files.delete(dir);
+				return FileVisitResult.CONTINUE;
+			}
+		});
+	}
+
+	private static void copyLegacyFileRoot(Path runtimeRoot, final Path fileRoot)
+		throws IOException {
+		final Path legacyRoot = runtimeRoot.resolve("file").resolve("root").normalize();
+		if (Files.exists(fileRoot) || !Files.isDirectory(legacyRoot)) {
+			return;
+		}
+		Files.walkFileTree(legacyRoot, new SimpleFileVisitor<Path>() {
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+				throws IOException {
+				Path target = fileRoot.resolve(legacyRoot.relativize(dir)).normalize();
+				if (!target.startsWith(fileRoot)) {
+					throw new IOException("Legacy file-root entry escapes the session root: " + dir);
+				}
+				Files.createDirectories(target);
+				return FileVisitResult.CONTINUE;
+			}
+
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+				throws IOException {
+				Path target = fileRoot.resolve(legacyRoot.relativize(file)).normalize();
+				if (!target.startsWith(fileRoot)) {
+					throw new IOException("Legacy file-root entry escapes the session root: " + file);
+				}
+				Files.copy(
+					file,
+					target,
+					StandardCopyOption.COPY_ATTRIBUTES,
+					StandardCopyOption.REPLACE_EXISTING);
 				return FileVisitResult.CONTINUE;
 			}
 		});
@@ -150,9 +199,21 @@ final class WorkerLaunchOptions {
 		Path dataDir = path(request, "dataDir", sessionRoot.resolve("data"));
 		Path rmsDir = path(request, "rmsDir", dataDir.resolve("rms"));
 		Path fileRoot = path(request, "fileRoot", dataDir.resolve("files"));
-		validateWritableRoot(dataDir, runtimeRoot, "dataDir");
-		validateWritableRoot(rmsDir, runtimeRoot, "rmsDir");
-		validateWritableRoot(fileRoot, runtimeRoot, "fileRoot");
+		validateWritableRoot(
+			dataDir,
+			runtimeRoot,
+			"dataDir",
+			explicitlyConfigured(request, "dataDir"));
+		validateWritableRoot(
+			rmsDir,
+			runtimeRoot,
+			"rmsDir",
+			explicitlyConfigured(request, "rmsDir"));
+		validateWritableRoot(
+			fileRoot,
+			runtimeRoot,
+			"fileRoot",
+			explicitlyConfigured(request, "fileRoot"));
 		if (request.at("resetState", false).asBoolean()) {
 			deleteTree(dataDir);
 			if (!rmsDir.startsWith(dataDir)) {
@@ -161,6 +222,9 @@ final class WorkerLaunchOptions {
 			if (!fileRoot.startsWith(dataDir) && !fileRoot.startsWith(rmsDir)) {
 				deleteTree(fileRoot);
 			}
+		}
+		if (!explicitlyConfigured(request, "fileRoot")) {
+			copyLegacyFileRoot(runtimeRoot, fileRoot);
 		}
 		Files.createDirectories(dataDir);
 		Files.createDirectories(rmsDir);

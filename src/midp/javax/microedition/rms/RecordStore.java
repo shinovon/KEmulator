@@ -4,6 +4,9 @@ import emulator.Emulator;
 import emulator.ui.IEmulatorFrontend;
 
 import java.io.*;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Vector;
@@ -199,11 +202,11 @@ public class RecordStore {
 		return new RecordEnumerationImpl(this, sync, recordFilter, recordComparator, keepUpdated);
 	}
 
-	public static RecordStore openRecordStore(String name, boolean createIfNecessary) throws RecordStoreException, RecordStoreFullException, RecordStoreNotFoundException {
+	public static synchronized RecordStore openRecordStore(String name, boolean createIfNecessary) throws RecordStoreException, RecordStoreFullException, RecordStoreNotFoundException {
 		return openRecordStore(name, createIfNecessary, 0, true);
 	}
 
-	public static RecordStore openRecordStore(String name, boolean createIfNecessary, int authmode, boolean writable) throws RecordStoreException, RecordStoreFullException, RecordStoreNotFoundException {
+	public static synchronized RecordStore openRecordStore(String name, boolean createIfNecessary, int authmode, boolean writable) throws RecordStoreException, RecordStoreFullException, RecordStoreNotFoundException {
 		if (name.length() > 32 || name.length() < 1) throw new IllegalArgumentException("Record store name is invalid");
 		logln("openRecordStore " + name);
 		String rootPath = getHomeRootPath() + encodeBase64(name) + File.separatorChar;
@@ -231,7 +234,7 @@ public class RecordStore {
 		throw new RecordStoreNotFoundException(name);
 	}
 
-	public static RecordStore openRecordStore(String name, String vendorName, String suiteName) throws RecordStoreException, RecordStoreFullException, RecordStoreNotFoundException {
+	public static synchronized RecordStore openRecordStore(String name, String vendorName, String suiteName) throws RecordStoreException, RecordStoreFullException, RecordStoreNotFoundException {
 		if (name.length() > 32 || name.length() < 1) throw new IllegalArgumentException("Record store name is invalid");
 		logln("openRecordStore " + name + " " + vendorName + " " + suiteName);
 		String rootPath = getRootPath(name, vendorName, suiteName) + encodeBase64(name) + File.separatorChar;
@@ -248,7 +251,7 @@ public class RecordStore {
 		return new RecordStore(name, rootPath, vendorName.equals(e.getAppProperty("MIDlet-Vendor")) && suiteName.equals(e.getAppProperty("MIDlet-Name")), true);
 	}
 
-	public static void deleteRecordStore(String name) throws RecordStoreException, RecordStoreNotFoundException {
+	public static synchronized void deleteRecordStore(String name) throws RecordStoreException, RecordStoreNotFoundException {
 		if (name.length() > 32 || name.length() < 1) throw new IllegalArgumentException("Record store name is invalid");
 		logln("deleteRecordStore " + name);
 		String rootPath = getHomeRootPath() + encodeBase64(name) + File.separatorChar;
@@ -447,15 +450,19 @@ public class RecordStore {
 	}
 
 	public void closeRecordStore() throws RecordStoreNotOpenException, RecordStoreException {
-		if (closed) throw new RecordStoreNotOpenException();
-		logln("closeRecordStore " + name + (!homeSuite ? " (guest)" : ""));
-		if (--openCount < 1) {
-			closed = true;
-			openRecordStores.removeElement(this);
-			if (!recordListeners.isEmpty()) {
-				recordListeners.removeAllElements();
+		synchronized (RecordStore.class) {
+			synchronized (sync) {
+				if (closed) throw new RecordStoreNotOpenException();
+				logln("closeRecordStore " + name + (!homeSuite ? " (guest)" : ""));
+				if (--openCount < 1) {
+					closed = true;
+					openRecordStores.removeElement(this);
+					if (!recordListeners.isEmpty()) {
+						recordListeners.removeAllElements();
+					}
+					if (homeSuite || writable) writeIndex();
+				}
 			}
-			if (homeSuite || writable) writeIndex();
 		}
 	}
 
@@ -465,14 +472,15 @@ public class RecordStore {
 	}
 
 	private void writeIndex() throws RecordStoreException {
+		File tempFile = null;
 		try {
 			File file = new File(rootPath);
 			if (!file.exists()) {
 				file.mkdir();
 			}
 			file = new File(rootPath + "idx");
-			if (!file.exists()) file.createNewFile();
-			DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file));
+			tempFile = new File(rootPath + "idx.tmp");
+			DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(tempFile));
 			try {
 				dataOutputStream.writeInt(count);
 				dataOutputStream.writeInt(records.size());
@@ -486,8 +494,24 @@ public class RecordStore {
 			} finally {
 				dataOutputStream.close();
 			}
+			try {
+				Files.move(
+					tempFile.toPath(),
+					file.toPath(),
+					StandardCopyOption.ATOMIC_MOVE,
+					StandardCopyOption.REPLACE_EXISTING);
+			} catch (AtomicMoveNotSupportedException ignored) {
+				Files.move(
+					tempFile.toPath(),
+					file.toPath(),
+					StandardCopyOption.REPLACE_EXISTING);
+			}
 		} catch (Exception e) {
 			throw new RecordStoreException(name);
+		} finally {
+			if (tempFile != null && tempFile.exists()) {
+				tempFile.delete();
+			}
 		}
 	}
 

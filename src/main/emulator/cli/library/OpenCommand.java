@@ -39,6 +39,9 @@ public final class OpenCommand implements CliCommand {
 				args.set(
 					"fileRoot",
 					(options.fileRoot == null ? dataDir.resolve("files") : options.fileRoot).toString());
+				args.set("dataDirExplicit", options.dataDir != null);
+				args.set("rmsDirExplicit", options.rmsDir != null);
+				args.set("fileRootExplicit", options.fileRoot != null);
 				args.set("resetState", options.resetState);
 				args.set("waitReady", true);
 				args.set("sessionId", KemuPaths.sessionId());
