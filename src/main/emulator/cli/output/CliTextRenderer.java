@@ -85,19 +85,39 @@ public final class CliTextRenderer {
 			+ "  kemu status [--json]\n"
 			+ "  kemu stop [--force] [--json]\n"
 			+ "  kemu logs <controller|worker> [--lines N] [--json]\n"
+			+ "  kemu logs cursor [--json]\n"
+			+ "  kemu logs read [--since CURSOR] [--jsonl] [--json]\n"
+			+ "  kemu logs wait --regex REGEX [--since CURSOR] [--timeout MS] [--json]\n"
 			+ "  kemu inspect <path> [--json]\n"
-			+ "  kemu open <path> [--midlet N] [--headless|--visible] [--runtime " + runtimeUsage
-			+ "] [--size WxH] [--json]\n"
+			+ "  kemu open <path> [--data-dir DIR] [--rms-dir DIR] [--file-root DIR]"
+			+ " [--reset-state] [--worker-xmx SIZE] [--wait-ready]"
+			+ " [--headless|--visible] [--runtime " + runtimeUsage + "] [--size WxH] [--json]\n"
 			+ "  kemu close [--json]\n"
 			+ "  kemu state [--json]\n"
+			+ "  kemu state <snapshot|restore> FILE [--json]\n"
+			+ "  kemu rms <reset|export|import> [FILE] [--json]\n"
 			+ "  kemu observe [--json]\n"
+			+ "  kemu events read [--since CURSOR] [--jsonl] [--json]\n"
 			+ "  kemu screenshot --out FILE [--json]\n"
 			+ "  kemu wait <ms> [--json]\n"
+			+ "  kemu wait display [--kind KIND] [--title TITLE] [--selected-index N]"
+			+ " [--after-revision REV] [--timeout MS] [--json]\n"
+			+ "  kemu wait <worker-ready|worker-exit|idle> [--timeout MS] [--json]\n"
+			+ "  kemu wait frame --after-revision REV [--timeout MS] [--json]\n"
+			+ "  kemu wait log --regex REGEX [--since CURSOR] [--timeout MS] [--json]\n"
 			+ "  kemu key <key> [--duration MS] [--json]\n"
+			+ "  kemu key press <key> [--wait-dispatched] [--json]\n"
+			+ "  kemu key hold <key> [--duration MS] [--wait-release] [--json]\n"
 			+ "  kemu tap <x> <y> [--json]\n"
+			+ "  kemu pointer tap <x> <y> [--wait-dispatched] [--json]\n"
 			+ "  kemu drag <x1> <y1> <x2> <y2> [<x3> <y3> ...] [--delay MS] [--json]\n"
-			+ "  kemu command run <id> --snapshot <snapshotId> [--json]\n"
-			+ "  kemu permission <allow|deny> <id> [--json]\n"
+			+ "  kemu list <select N|move up|move down> [--expect-revision REV] [--json]\n"
+			+ "  kemu choice set N [--item-index INDEX] [--expect-revision REV] [--json]\n"
+			+ "  kemu gauge set VALUE [--item-index INDEX] [--expect-revision REV] [--json]\n"
+			+ "  kemu text-field set TEXT [--item-index INDEX] [--expect-revision REV] [--json]\n"
+			+ "  kemu command run [ID|--id ID|--label LABEL] [--snapshot ID]"
+			+ " [--expect-revision REV] [--wait-next-display] [--timeout MS] [--json]\n"
+			+ "  kemu permission <allow [--once|--always]|deny> [id] [--json]\n"
 			+ "\n"
 			+ "Notes:\n"
 			+ "  CLI automation contract is currently Linux-only.\n"
@@ -115,35 +135,105 @@ public final class CliTextRenderer {
 		if ("stop".equals(topic))
 			return "kemu stop [--force] [--json]";
 		if ("logs".equals(topic))
-			return "kemu logs <controller|worker> [--lines N] [--json]";
+			return "kemu logs <controller|worker> [--lines N] [--json]\n"
+				+ "       kemu logs cursor [--json]\n"
+				+ "       kemu logs read [--since CURSOR] [--jsonl] [--json]\n"
+				+ "       kemu logs wait --regex REGEX [--since CURSOR] [--timeout MS] [--json]";
+		if ("logs cursor".equals(topic))
+			return "kemu logs cursor [--json]";
+		if ("logs read".equals(topic))
+			return "kemu logs read [--since CURSOR] [--jsonl] [--json]";
+		if ("logs wait".equals(topic))
+			return "kemu logs wait --regex REGEX [--since CURSOR] [--timeout MS] [--json]";
 		if ("inspect".equals(topic))
 			return "kemu inspect <path> [--json]";
 		if ("open".equals(topic))
 			return "kemu open <path> [--midlet N] [--headless|--visible] [--runtime " + runtimeUsageChoices()
-				+ "] [--size WxH] [--json]";
+				+ "] [--size WxH] [--data-dir DIR] [--rms-dir DIR] [--file-root DIR]"
+				+ " [--reset-state] [--worker-xmx SIZE] [--wait-ready] [--json]";
 		if ("close".equals(topic))
 			return "kemu close [--json]";
 		if ("state".equals(topic))
-			return "kemu state [--json]";
+			return "kemu state [--json]\n"
+				+ "       kemu state <snapshot|restore> FILE [--json]";
+		if ("rms".equals(topic))
+			return "kemu rms reset [--json]\n"
+				+ "       kemu rms <export|import> FILE [--json]";
 		if ("observe".equals(topic))
 			return "kemu observe [--json]";
+		if ("events".equals(topic))
+			return "kemu events read [--since CURSOR] [--jsonl] [--json]";
 		if ("screenshot".equals(topic))
 			return "kemu screenshot --out FILE [--json]";
 		if ("wait".equals(topic))
-			return "kemu wait <ms> [--json]";
+			return "kemu wait <ms> [--json]\n"
+				+ "       kemu wait display [--kind KIND] [--title TITLE] [--selected-index N]"
+				+ " [--after-revision REV] [--timeout MS] [--json]\n"
+				+ "       kemu wait <worker-ready|worker-exit|idle> [--timeout MS] [--json]\n"
+				+ "       kemu wait frame --after-revision REV [--timeout MS] [--json]\n"
+				+ "       kemu wait permission [--name NAME] [--timeout MS] [--json]\n"
+				+ "       kemu wait log --regex REGEX [--since CURSOR] [--timeout MS] [--json]";
+		if ("wait display".equals(topic))
+			return "kemu wait display [--kind KIND] [--title TITLE] [--selected-index N]"
+				+ " [--after-revision REV] [--timeout MS] [--json]";
+		if ("wait worker-ready".equals(topic)
+			|| "wait worker-exit".equals(topic)
+			|| "wait idle".equals(topic))
+			return "kemu " + topic + " [--timeout MS] [--json]";
+		if ("wait frame".equals(topic))
+			return "kemu wait frame --after-revision REV [--timeout MS] [--json]";
+		if ("wait log".equals(topic))
+			return "kemu wait log --regex REGEX [--since CURSOR] [--timeout MS] [--json]";
+		if ("wait permission".equals(topic))
+			return "kemu wait permission [--name NAME] [--timeout MS] [--json]";
 		if ("key".equals(topic))
-			return "kemu key <key> [--duration MS] [--json]";
+			return "kemu key <key> [--duration MS] [--json]\n"
+				+ "       kemu key press <key> [--wait-dispatched] [--json]\n"
+				+ "       kemu key hold <key> [--duration MS] [--wait-release] [--json]";
+		if ("key press".equals(topic))
+			return "kemu key press <key> [--wait-dispatched] [--json]";
+		if ("key hold".equals(topic))
+			return "kemu key hold <key> [--duration MS] [--wait-release] [--json]";
 		if ("tap".equals(topic))
 			return "kemu tap <x> <y> [--json]";
+		if ("pointer".equals(topic) || "pointer tap".equals(topic))
+			return "kemu pointer tap <x> <y> [--wait-dispatched] [--json]";
 		if ("drag".equals(topic))
 			return "kemu drag <x1> <y1> <x2> <y2> [<x3> <y3> ...] [--delay MS] [--json]";
+		if ("list".equals(topic))
+			return "kemu list select INDEX [--expect-revision REV] [--json]\n"
+				+ "       kemu list move <up|down> [--count N] [--expect-revision REV] [--json]";
+		if ("list select".equals(topic))
+			return "kemu list select INDEX [--expect-revision REV] [--json]";
+		if ("list move".equals(topic))
+			return "kemu list move <up|down> [--count N] [--expect-revision REV] [--json]";
+		if ("choice".equals(topic) || "choice set".equals(topic))
+			return "kemu choice set INDEX [--item-index INDEX] [--expect-revision REV] [--json]";
+		if ("gauge".equals(topic) || "gauge set".equals(topic))
+			return "kemu gauge set VALUE [--item-index INDEX] [--expect-revision REV] [--json]";
+		if ("text-field".equals(topic) || "text-field set".equals(topic))
+			return "kemu text-field set TEXT [--item-index INDEX] [--expect-revision REV] [--json]";
 		if ("command".equals(topic))
-			return "kemu command run <id> --snapshot <snapshotId> [--json]";
+			return "kemu command run [ID|--id ID|--label LABEL] [--snapshot ID]"
+				+ " [--expect-revision REV] [--wait-next-display] [--timeout MS] [--json]";
 		if ("command run".equals(topic))
-			return "kemu command run <id> --snapshot <snapshotId> [--json]";
+			return "kemu command run [ID|--id ID|--label LABEL] [--snapshot ID]"
+				+ " [--expect-revision REV] [--wait-next-display] [--timeout MS] [--json]";
 		if ("permission".equals(topic))
-			return "kemu permission <allow|deny> <id> [--json]";
+			return "kemu permission <allow [--once|--always]|deny> [id] [--json]";
+		if ("events read".equals(topic))
+			return "kemu events read [--since CURSOR] [--jsonl] [--json]";
+		if ("rms reset".equals(topic))
+			return "kemu rms reset [--json]";
+		if ("rms export".equals(topic) || "rms import".equals(topic))
+			return "kemu " + topic + " FILE [--json]";
+		if ("state snapshot".equals(topic) || "state restore".equals(topic))
+			return "kemu " + topic + " FILE [--json]";
 		return null;
+	}
+
+	public static boolean hasUsageTopic(String topic) {
+		return usageLine(topic) != null;
 	}
 
 	public static String usageText(String topic) {
@@ -160,6 +250,10 @@ public final class CliTextRenderer {
 	}
 
 	public static String renderStatus(ControllerStatus status) {
+		return renderStatus(status, status.toJson());
+	}
+
+	public static String renderStatus(ControllerStatus status, Json payload) {
 		if (!status.exists) {
 			return "No controller state file found.";
 		}
@@ -178,7 +272,12 @@ public final class CliTextRenderer {
 		}
 
 		if (status.pid != null) {
-			out.append("PID: ").append(status.pid).append('\n');
+			out.append("Controller PID: ").append(status.pid).append('\n');
+		}
+
+		Json controllerJvmOptions = payload.at("controllerJvmOptions", Json.array());
+		if (controllerJvmOptions != null && controllerJvmOptions.isArray()) {
+			out.append("Controller JVM options: ").append(controllerJvmOptions).append('\n');
 		}
 
 		if (status.endpoint() != null) {
@@ -199,6 +298,16 @@ public final class CliTextRenderer {
 
 		if (status.logFile != null) {
 			out.append("Log file: ").append(status.logFile).append('\n');
+		}
+
+		if (payload.at("active", false).asBoolean()) {
+			Json worker = payload.at("worker", Json.object());
+			out.append("Worker PID: ").append(worker.at("pid", Json.nil())).append('\n');
+			out.append("Worker JVM options: ").append(worker.at("jvmOptions", Json.array())).append('\n');
+			out.append("MIDlet/emulated heap: ").append(worker.at("emulatedHeap", Json.nil())).append('\n');
+			out.append("Data dir: ").append(worker.at("dataDir", Json.nil())).append('\n');
+			out.append("RMS dir: ").append(worker.at("rmsDir", Json.nil())).append('\n');
+			out.append("File root: ").append(worker.at("fileRoot", Json.nil())).append('\n');
 		}
 
 		if (status.loadError != null) {

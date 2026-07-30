@@ -32,10 +32,18 @@ final class WorkerOperationDispatcher {
 					"press-key duration must be between 10 and " + AutomationLimits.MAX_KEY_DURATION_MS + " ms");
 			}
 
-			WorkerInputActions.pressKey(code, durationMs);
+			Json delivery = WorkerInputActions.pressKey(
+				code,
+				durationMs,
+				request.at("waitDispatched", false).asBoolean(),
+				request.at("waitRelease", false).asBoolean());
 			WorkerCommandSnapshots.invalidate();
 
-			return Json.object().set("ok", true).set("key", key).set("code", code);
+			return Json.object()
+				.set("ok", true)
+				.set("key", key)
+				.set("code", code)
+				.set("delivery", delivery);
 		}
 
 		if ("tap".equals(op)) {
@@ -45,10 +53,13 @@ final class WorkerOperationDispatcher {
 				throw new AutomationException(AutomationErrorCodes.INVALID_REQUEST, "tap requires x and y");
 			}
 
-			WorkerInputActions.tap(x, y);
+			Json delivery = WorkerInputActions.tap(
+				x,
+				y,
+				request.at("waitDispatched", false).asBoolean());
 			WorkerCommandSnapshots.invalidate();
 
-			return Json.object().set("ok", true).set("x", x).set("y", y);
+			return Json.object().set("ok", true).set("x", x).set("y", y).set("delivery", delivery);
 		}
 
 		if ("drag".equals(op)) {
@@ -64,29 +75,62 @@ final class WorkerOperationDispatcher {
 					"drag delay must be between 5 and " + AutomationLimits.MAX_DRAG_DELAY_MS + " ms");
 			}
 
-			WorkerInputActions.drag(points, delayMs);
+			Json delivery = WorkerInputActions.drag(
+				points,
+				delayMs,
+				request.at("waitDispatched", false).asBoolean());
 			WorkerCommandSnapshots.invalidate();
 
 			return Json.object()
 				.set("ok", true)
-				.set("points", points.asJsonList().size());
+				.set("points", points.asJsonList().size())
+				.set("delivery", delivery);
 		}
 
 		if ("select-command".equals(op)) {
 			return WorkerCommandSnapshots.select(request);
 		}
 
+		if ("wait".equals(op)) {
+			return WorkerWaits.waitFor(request);
+		}
+
+		if ("events-read".equals(op)) {
+			return WorkerWaits.readEvents(request);
+		}
+
+		if ("list-select".equals(op)) {
+			return WorkerLcduiActions.listSelect(request);
+		}
+
+		if ("list-move".equals(op)) {
+			return WorkerLcduiActions.listMove(request);
+		}
+
+		if ("choice-set".equals(op)) {
+			return WorkerLcduiActions.choiceSet(request);
+		}
+
+		if ("gauge-set".equals(op)) {
+			return WorkerLcduiActions.gaugeSet(request);
+		}
+
+		if ("text-field-set".equals(op)) {
+			return WorkerLcduiActions.textFieldSet(request);
+		}
+
 		if ("answer-permission".equals(op)) {
 			int id = request.at("id", -1).asInteger();
 			boolean allow = request.at("allow", false).asBoolean();
-			if (id < 0) {
-				throw new AutomationException(AutomationErrorCodes.INVALID_REQUEST, "answer-permission requires id");
-			}
+			String mode = request.at("mode", "once").asString();
 
-			WorkerPermissions.resolve(id, allow);
+			Json result = WorkerPermissions.resolve(id, allow, mode);
 			WorkerCommandSnapshots.invalidate();
+			WorkerEventModel.stateChanged(
+				"permission-resolved",
+				Json.object().set("id", result.at("id")).set("allow", allow).set("mode", mode));
 
-			return Json.object().set("ok", true).set("id", id).set("allow", allow);
+			return result.set("ok", true);
 		}
 
 		if ("shutdown".equals(op)) {

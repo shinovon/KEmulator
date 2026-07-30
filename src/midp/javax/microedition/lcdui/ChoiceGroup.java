@@ -6,6 +6,7 @@ import emulator.lcdui.LCDUIUtils;
 import emulator.lcdui.TextUtils;
 import emulator.ui.CommandsMenuPosition;
 import emulator.ui.TargetedCommand;
+import emulator.automation.worker.AutomationWorkerRuntime;
 
 import java.util.Vector;
 
@@ -63,6 +64,7 @@ public class ChoiceGroup
 		}
 		this.items.add(new ChoiceGroupItem(s, image, null, this));
 		layoutForm();
+		AutomationWorkerRuntime.onDisplayStateChanged("choice-items-changed");
 		return this.items.size() - 1;
 	}
 
@@ -72,11 +74,13 @@ public class ChoiceGroup
 		}
 		this.items.remove(n);
 		layoutForm();
+		AutomationWorkerRuntime.onDisplayStateChanged("choice-items-changed");
 	}
 
 	public synchronized void deleteAll() {
 		this.items.removeAllElements();
 		layoutForm();
+		AutomationWorkerRuntime.onDisplayStateChanged("choice-items-changed");
 	}
 
 	public void setFitPolicy(int anInt30) {
@@ -113,6 +117,7 @@ public class ChoiceGroup
 		}
 		this.items.insertElementAt(new ChoiceGroupItem(s, image, null, this), n);
 		layoutForm();
+		AutomationWorkerRuntime.onDisplayStateChanged("choice-items-changed");
 	}
 
 	public synchronized void set(int n, String s, Image image) {
@@ -121,6 +126,7 @@ public class ChoiceGroup
 		}
 		this.items.set(n, new ChoiceGroupItem(s, image, null, this));
 		layoutForm();
+		AutomationWorkerRuntime.onDisplayStateChanged("choice-items-changed");
 	}
 
 	public synchronized void setSelectedFlags(boolean[] array) {
@@ -145,6 +151,7 @@ public class ChoiceGroup
 			if (n == 0 && this.items.size() > 0) {
 				((ChoiceGroupItem) this.items.get(n)).sel = true;
 			}
+			AutomationWorkerRuntime.onSelectionChanged(getSelectedIndex());
 			return;
 		}
 		int j = 0;
@@ -153,6 +160,7 @@ public class ChoiceGroup
 			++j;
 		}
 		repaintForm();
+		AutomationWorkerRuntime.onSelectionChanged(getSelectedIndex());
 	}
 
 	public int getSelectedFlags(boolean[] array) {
@@ -206,10 +214,12 @@ public class ChoiceGroup
 			}
 			if (choiceType == POPUP) layoutForm();
 			else repaintForm();
+			AutomationWorkerRuntime.onSelectionChanged(getSelectedIndex());
 			return;
 		}
 		((ChoiceGroupItem) this.items.get(n)).sel = flag;
 		repaintForm();
+		AutomationWorkerRuntime.onSelectionChanged(getSelectedIndex());
 	}
 
 	public int size() {

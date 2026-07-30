@@ -28,8 +28,8 @@ final class WorkerSupervisor {
 		return WorkerDiagnostics.readLastLines(worker == null ? null : worker.logPath, maxLines);
 	}
 
-	WorkerProcess launchWorker(AppTarget entry, String midletClassName) throws IOException {
-		return launcher.launch(entry, midletClassName);
+	WorkerProcess launchWorker(AppTarget entry, String midletClassName, Json request) throws IOException {
+		return launcher.launch(entry, midletClassName, request);
 	}
 
 	Json waitUntilReady(WorkerProcess worker, long timeoutMs) throws Exception {

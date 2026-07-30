@@ -42,7 +42,10 @@ public class Connector {
 			return ScratchPadConnection.open(s);
 		}
 		if (s.startsWith("file://") && !Settings.protectedPackages.contains("javax.microedition.io.file")) {
-			Permission.checkPermission("connector.open.file");
+			String automationPermission = n == WRITE
+				? "javax.microedition.io.Connector.file.write"
+				: "javax.microedition.io.Connector.file.read";
+			Permission.checkPermission("connector.open.file", automationPermission);
 			return new FileConnectionImpl(s);
 		}
 		if (s.startsWith("sms://") && !Settings.protectedPackages.contains("javax.wireless.messaging")) {

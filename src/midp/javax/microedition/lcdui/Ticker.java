@@ -1,5 +1,7 @@
 package javax.microedition.lcdui;
 
+import emulator.automation.worker.AutomationWorkerRuntime;
+
 public class Ticker {
 	private String string;
 
@@ -13,6 +15,7 @@ public class Ticker {
 			throw new NullPointerException();
 		}
 		this.string = aString353;
+		AutomationWorkerRuntime.onDisplayStateChanged("ticker-changed");
 	}
 
 	public String getString() {

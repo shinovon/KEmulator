@@ -28,7 +28,12 @@ public class FileConnectionImpl implements FileConnection {
 		url = method216(method216(method216(url.replaceFirst("localhost", "").substring("file://".length()), "c"), "d"), "e");
 		if (url.startsWith("/"))
 			url = url.substring(1);
-		this.systemPath = Emulator.getUserPath() + "/file/" + url;
+		if (url.equals("root")) {
+			url = "";
+		} else if (url.startsWith("root/")) {
+			url = url.substring("root/".length());
+		}
+		this.systemPath = new File(FileConnectionImpl.aString441, url).getPath();
 		//method134(this.aString439 = Emulator.getAbsolutePath() + "/file/" + aString314);
 		this.file = new File(this.systemPath);
 	}
@@ -54,7 +59,7 @@ public class FileConnectionImpl implements FileConnection {
 		String replaceFirst = s;
 		if (s.contains(s2 + ":")) {
 			final File file;
-			if (!(file = new File(Emulator.getUserPath() + "/file/" + s2 + "/")).exists() || file.isFile()) {
+			if (!(file = new File(FileConnectionImpl.aString441, s2)).exists() || file.isFile()) {
 				file.mkdirs();
 			}
 			replaceFirst = s.replaceFirst(s2 + ":", s2);
@@ -334,7 +339,11 @@ public class FileConnectionImpl implements FileConnection {
 	}
 
 	static {
-		FileConnectionImpl.aString441 = Emulator.getUserPath() + "/file/" + "root/";
+		String configuredRoot = System.getProperty("kemu.file.root");
+		FileConnectionImpl.aString441 =
+			configuredRoot != null && configuredRoot.trim().length() > 0
+				? new File(configuredRoot).getAbsolutePath()
+				: Emulator.getUserPath() + "/file/" + "root/";
 	}
 
 	public String getRealPath() {

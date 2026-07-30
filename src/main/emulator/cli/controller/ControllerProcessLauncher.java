@@ -6,7 +6,11 @@ import emulator.cli.support.CliDefaults;
 import emulator.cli.support.KemuPaths;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 final class ControllerProcessLauncher {
 	private ControllerProcessLauncher() {
@@ -45,65 +49,50 @@ final class ControllerProcessLauncher {
 		}
 	}
 
-	private static boolean sameReadyController(ControllerStatus left, ControllerStatus right) {
-		if (left == null || right == null) {
-			return false;
-		}
-
-		if (left.port == null || right.port == null || left.port.intValue() != right.port.intValue()) {
-			return false;
-		}
-
-		if (left.pid == null || right.pid == null || !left.pid.equals(right.pid)) {
-			return false;
-		}
-
-		if (left.stateFile == null || right.stateFile == null) {
-			return false;
-		}
-
-		return left.stateFile.equals(right.stateFile);
-	}
-
 	private static void waitForControllerReady(
 		Process process, int port, Path logFile, String commandName, boolean json) throws Exception {
-		long deadline = System.currentTimeMillis() + CliDefaults.START_TIMEOUT_MS;
-		ControllerStatus stableStatus = null;
-		int stableMatches = 0;
-		while (System.currentTimeMillis() < deadline) {
-			if (!process.isAlive()) {
-				throw new KemuCliException(
-					"START_FAILED",
-					"Controller exited before becoming ready.\n"
-						+ ControllerStatusService.readLastLines(logFile, 40),
-					CliExitCodes.RUNTIME,
-					commandName,
-					json);
-			}
+		long deadline = System.nanoTime()
+			+ TimeUnit.MILLISECONDS.toNanos(CliDefaults.START_TIMEOUT_MS);
+		WatchService watchService = KemuPaths.automationRunDir().getFileSystem().newWatchService();
+		KemuPaths.automationRunDir().register(
+			watchService,
+			StandardWatchEventKinds.ENTRY_CREATE,
+			StandardWatchEventKinds.ENTRY_MODIFY);
+		try {
+			while (true) {
+				if (!process.isAlive()) {
+					throw new KemuCliException(
+						"START_FAILED",
+						"Controller exited before becoming ready.\n"
+							+ ControllerStatusService.readLastLines(logFile, 40),
+						CliExitCodes.RUNTIME,
+						commandName,
+						json);
+				}
 
-			try {
-				ControllerStatus status = ControllerStatusService.readControllerStatus();
-				if (status.running && status.port != null && status.port.intValue() == port) {
-					if (sameReadyController(stableStatus, status)) {
-						stableMatches++;
-					} else {
-						stableStatus = status;
-						stableMatches = 1;
-					}
-
-					if (stableMatches >= 2) {
+				try {
+					ControllerStatus status = ControllerStatusService.readControllerStatus();
+					if (status.running && status.port != null && status.port.intValue() == port) {
 						return;
 					}
-				} else {
-					stableStatus = null;
-					stableMatches = 0;
+				} catch (Exception ignored) {
 				}
-			} catch (Exception ignored) {
-				stableStatus = null;
-				stableMatches = 0;
-			}
 
-			Thread.sleep(250L);
+				long remaining = deadline - System.nanoTime();
+				if (remaining <= 0L) {
+					break;
+				}
+				WatchKey key = watchService.poll(remaining, TimeUnit.NANOSECONDS);
+				if (key == null) {
+					break;
+				}
+				key.pollEvents();
+				if (!key.reset()) {
+					break;
+				}
+			}
+		} finally {
+			watchService.close();
 		}
 
 		throw new KemuCliException(
@@ -140,11 +129,12 @@ final class ControllerProcessLauncher {
 		command.add(ControllerRuntimeResolver.javaBinary());
 		command.add("-Dkemu.root=" + KemuPaths.rootDir().toString());
 		command.add("-Dkemu.runtime.root=" + KemuPaths.runtimeRootDir().toString());
+		command.add("-Dkemu.session.id=" + KemuPaths.sessionId());
 		command.add("-cp");
 		command.add(runtime.classpath);
 		command.add("emulator.automation.controller.AutomationControllerMain");
 		command.add("--runtime-root");
-		command.add(KemuPaths.automationDir().toString());
+		command.add(KemuPaths.automationSessionDir().toString());
 		command.add("--host");
 		command.add(CliDefaults.DEFAULT_HOST);
 		command.add("--port");
@@ -157,6 +147,8 @@ final class ControllerProcessLauncher {
 		command.add(actualMode);
 		command.add("--runtime");
 		command.add(runtime.kind);
+		command.add("--session-id");
+		command.add(KemuPaths.sessionId());
 		command.add("--log-file");
 		command.add(logFile.toString());
 

@@ -3,6 +3,7 @@ package javax.microedition.lcdui;
 import emulator.UILocale;
 import emulator.lcdui.IListImpl;
 import emulator.lcdui.ListSWT;
+import emulator.automation.worker.AutomationWorkerRuntime;
 
 public class List extends Screen implements Choice {
 	public static final Command SELECT_COMMAND = new Command(UILocale.get("LCDUI_LIST_SELECT_COMMAND", "Select"), 1, 0);
@@ -59,7 +60,9 @@ public class List extends Screen implements Choice {
 	 */
 	public int append(String text, Image img)
 	{
-		return impl.append(text, img);
+		int index = impl.append(text, img);
+		AutomationWorkerRuntime.onDisplayStateChanged("list-items-changed");
+		return index;
 	}
 
 	/**
@@ -72,6 +75,7 @@ public class List extends Screen implements Choice {
 	public void insert(int position, String text, Image img)
 	{
 		impl.insert(position, text, img);
+		AutomationWorkerRuntime.onDisplayStateChanged("list-items-changed");
 	}
 
 	/**
@@ -84,6 +88,7 @@ public class List extends Screen implements Choice {
 	public void set(int position, String text, Image img)
 	{
 		impl.set(position, text, img);
+		AutomationWorkerRuntime.onDisplayStateChanged("list-items-changed");
 	}
 
 	/**
@@ -94,6 +99,7 @@ public class List extends Screen implements Choice {
 	public void delete(int position)
 	{
 		impl.delete(position);
+		AutomationWorkerRuntime.onDisplayStateChanged("list-items-changed");
 	}
 
 	/**
@@ -102,6 +108,7 @@ public class List extends Screen implements Choice {
 	public void deleteAll()
 	{
 		impl.deleteAll();
+		AutomationWorkerRuntime.onDisplayStateChanged("list-items-changed");
 	}
 
 	/**
@@ -196,6 +203,7 @@ public class List extends Screen implements Choice {
 	public void setSelectedFlags(boolean[] selectedArray)
 	{
 		impl.setSelectedFlags(selectedArray);
+		AutomationWorkerRuntime.onSelectionChanged(getSelectedIndex());
 	}
 
 	/**
@@ -207,6 +215,7 @@ public class List extends Screen implements Choice {
 	public void setSelectedIndex(int position, boolean select)
 	{
 		impl.setSelectedIndex(position, select);
+		AutomationWorkerRuntime.onSelectionChanged(getSelectedIndex());
 	}
 
 	/**

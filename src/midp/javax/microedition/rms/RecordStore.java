@@ -43,6 +43,23 @@ public class RecordStore {
 
 	private int openCount = 1;
 
+	private static synchronized String getHomeRootPath() throws RecordStoreNotFoundException {
+		if (homeRootPath == null) {
+			IEmulatorFrontend emulator = Emulator.getEmulator();
+			String vendor = emulator == null ? null : emulator.getAppProperty("MIDlet-Vendor");
+			String suite = emulator == null ? null : emulator.getAppProperty("MIDlet-Name");
+			if (vendor == null) {
+				vendor = "";
+			}
+			if (suite == null) {
+				suite = "";
+			}
+			homeRootPath = getRootPath(null, vendor, suite);
+			logln("midlet rms path: " + homeRootPath);
+		}
+		return homeRootPath;
+	}
+
 	RecordStore(String aName, String aRootPath, boolean aHomeSuite, boolean existing) throws RecordStoreException, RecordStoreNotFoundException, RecordStoreFullException {
 		records = new Vector();
 		recordListeners = new Vector(3);
@@ -189,7 +206,7 @@ public class RecordStore {
 	public static RecordStore openRecordStore(String name, boolean createIfNecessary, int authmode, boolean writable) throws RecordStoreException, RecordStoreFullException, RecordStoreNotFoundException {
 		if (name.length() > 32 || name.length() < 1) throw new IllegalArgumentException("Record store name is invalid");
 		logln("openRecordStore " + name);
-		String rootPath = homeRootPath + encodeBase64(name) + File.separatorChar;
+		String rootPath = getHomeRootPath() + encodeBase64(name) + File.separatorChar;
 		RecordStore rs = findRecordStore(rootPath);
 		if (rs != null) {
 			rs.openCount++;
@@ -234,7 +251,7 @@ public class RecordStore {
 	public static void deleteRecordStore(String name) throws RecordStoreException, RecordStoreNotFoundException {
 		if (name.length() > 32 || name.length() < 1) throw new IllegalArgumentException("Record store name is invalid");
 		logln("deleteRecordStore " + name);
-		String rootPath = homeRootPath + encodeBase64(name) + File.separatorChar;
+		String rootPath = getHomeRootPath() + encodeBase64(name) + File.separatorChar;
 		if (findRecordStore(rootPath) != null) {
 			logln("tried to delete active store");
 			throw new RecordStoreException("Cannot delete currently opened record store: " + name);
@@ -258,9 +275,7 @@ public class RecordStore {
 	public static String[] listRecordStores() {
 		String[] list = null;
 		try {
-			if (homeRootPath == null)
-				return null;
-			File file = new File(homeRootPath);
+			File file = new File(getHomeRootPath());
 			list = file.list();
 			ArrayList<String> tmp = new ArrayList<String>();
 			if (list != null) {

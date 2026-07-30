@@ -42,9 +42,12 @@ run that bundle's `./kemu.sh`.
 
 ```bash
 ./kemu.sh inspect ./app.jar --json
-./kemu.sh open ./app.jar --headless --json
+./kemu.sh --session-id test-1 open ./app.jar --headless \
+  --data-dir /tmp/kemu-test-1 --reset-state --worker-xmx 64M \
+  --wait-ready --json
+./kemu.sh --session-id test-1 wait display --kind list --timeout 5000 --json
 ./kemu.sh observe --json
-./kemu.sh key FIRE --json
+./kemu.sh key press FIRE --wait-dispatched --json
 ./kemu.sh screenshot --out ./screen.png --json
 ./kemu.sh close --json
 ./kemu.sh stop --force --json
@@ -68,18 +71,45 @@ controller defaults.
 - `stop [--force]`
 - `logs <controller|worker> [--lines N]`, where `N` must be positive and
   defaults to `100`
+- `logs cursor`
+- `logs read [--since CURSOR] [--jsonl]`
+- `logs wait --regex REGEX [--since CURSOR] [--timeout MS]`
 - `inspect <path>`
-- `open <path> [--midlet N] [--headless|--visible] [--runtime <advertised-runtime>] [--size WxH]`
+- `open <path> [--midlet N] [--headless|--visible] [--runtime <advertised-runtime>] [--size WxH] [--data-dir DIR] [--rms-dir DIR] [--file-root DIR] [--reset-state] [--worker-xmx SIZE] [--wait-ready]`
 - `close`
 - `state`
+- `state snapshot FILE`
+- `state restore FILE`
+- `rms reset`
+- `rms export FILE`
+- `rms import FILE`
 - `observe`
+- `events read [--since CURSOR] [--jsonl]`
 - `screenshot --out FILE`
 - `wait <ms>`
+- `wait display [--kind KIND] [--title TITLE] [--selected-index N] [--after-revision REV] [--timeout MS]`
+- `wait worker-ready [--timeout MS]`
+- `wait worker-exit [--timeout MS]`
+- `wait idle [--timeout MS]`
+- `wait frame --after-revision REV [--timeout MS]`
+- `wait permission [--name NAME] [--timeout MS]`
+- `wait log --regex REGEX [--since CURSOR] [--timeout MS]`
 - `key <key> [--duration MS]`
+- `key press <key> [--wait-dispatched]`
+- `key hold <key> [--duration MS] [--wait-release]`
 - `tap <x> <y>`
+- `pointer tap <x> <y> [--wait-dispatched]`
 - `drag <x1> <y1> <x2> <y2> [<x3> <y3> ...] [--delay MS]`
-- `command run <id> --snapshot <snapshotId>`
-- `permission <allow|deny> <id>`
+- `list select INDEX [--expect-revision REV]`
+- `list move <up|down> [--count N] [--expect-revision REV]`
+- `choice set INDEX [--item-index INDEX] [--expect-revision REV]`
+- `gauge set VALUE [--item-index INDEX] [--expect-revision REV]`
+- `text-field set TEXT [--item-index INDEX] [--expect-revision REV]`
+- `command run [ID|--id ID|--label LABEL] [--snapshot ID] [--expect-revision REV] [--wait-next-display] [--timeout MS]`
+- `permission allow [id] [--once|--always]`
+- `permission deny [id]`
+
+`--session-id ID` is a global option and may be added to every command.
 
 Run command-specific help with:
 
@@ -171,6 +201,9 @@ Common error codes include:
 - `MIDLET_SELECTION_REQUIRED`
 - `UNKNOWN_MIDLET`
 - `STALE_SNAPSHOT`
+- `STALE_REVISION`
+- `TIMEOUT`
+- `LCDUI_CONTROL_UNAVAILABLE`
 - `UNKNOWN_KEY`
 - `UNKNOWN_COMMAND_ID`
 - `UNKNOWN_PERMISSION_ID`
@@ -209,6 +242,8 @@ snapshot. `state` still requires a running controller and can return
 
 `observe` returns the richer current MIDlet screen snapshot:
 
+- `schemaVersion` (currently `2`), monotonic `revision`, `frameRevision`, and
+  `eventCursor`
 - readiness and active app metadata
 - screen size
 - displayable kind
@@ -218,16 +253,46 @@ snapshot. `state` still requires a running controller and can return
 - pending permission request
 - `TextBox` text/caret metadata
 - `List` items and selected index
+- structured `displayable` data for `List`, `Form`, `StringItem`,
+  `ChoiceGroup`, `Gauge`, `TextField`, `Alert`, and `Canvas`
 
 `observe` is the preferred command for agents because it returns the current
 controller/app state in one call.
+
+Schema 2 retains the legacy top-level fields (`displayableKind`, `title`,
+`list`, `commands`, and `commandSnapshotId`) so existing callers keep working.
+New callers should use `schemaVersion`, `revision`, and `displayable`.
 
 After `open`, call `observe --json` before the first input even if the open
 response already contains session-like fields. Check `result.active` before
 reading deeper UI fields. Use `observe`, not `state`, when choosing LCDUI
 commands.
 
-## Command Snapshots
+## Revisions And Atomic Commands
+
+The preferred command flow is atomic and does not require a separate command
+snapshot:
+
+```bash
+state="$(./kemu.sh observe --json)"
+revision="$(printf '%s\n' "$state" | jq -r '.result.revision')"
+./kemu.sh command run --label Exit \
+  --expect-revision "$revision" \
+  --wait-next-display --timeout 5000 --json
+```
+
+If the display state changed after `observe`, the operation returns
+`STALE_REVISION`. A successful result includes `oldRevision`, `newRevision`,
+`elapsedMs`, the resulting state, and (with `--wait-next-display`) transition
+details. Rendering a frame does not advance the display `revision`;
+`frameRevision` records the newest display revision that has actually been
+painted, so repaint traffic cannot invalidate an otherwise current command.
+LCDUI commands and native control mutations run on the LCDUI event
+thread and return only after their model mutation or callback completes.
+`--wait-next-display` also recognizes a structured display transition when an
+application reuses one `Displayable` object but replaces its title or contents.
+
+### Legacy Command Snapshots
 
 LCDUI commands are invoked with snapshot protection:
 
@@ -250,11 +315,15 @@ If `command run` returns `STALE_SNAPSHOT` or `UNKNOWN_COMMAND_ID`, call
 ## Permissions
 
 When `result.permissionRequest` is non-null, the MIDlet may be blocked waiting
-for an answer. Read `result.permissionRequest.id` and answer it with:
+for an answer. The request includes its stable `name` where KEmulator can
+identify one, for example `javax.microedition.io.Connector.file.read`. Read
+`result.permissionRequest.id` and answer it with:
 
 ```bash
 ./kemu.sh permission allow <id> --json
 ./kemu.sh permission deny <id> --json
+./kemu.sh permission allow --once --json
+./kemu.sh permission allow --always --json
 ```
 
 Only the head pending permission can be answered. If the CLI returns
@@ -263,9 +332,11 @@ again and use the current `permissionRequest.id`.
 
 After answering a permission request, call `observe --json` before issuing the
 next UI command because the screen and command snapshot may have changed.
-Do not call `permission allow` or `permission deny` without the current
-`permissionRequest.id`. If a permission request disappears while an agent is
-deciding, call `observe --json` and continue from the new state.
+When the id is omitted, the head pending permission is answered atomically.
+`--always` changes the permission policy for the remaining lifetime of that
+worker; it does not claim device-level or OS-level persistence. If a permission
+request disappears while an agent is deciding, call `observe --json` and
+continue from the new state.
 
 ## Input
 
@@ -284,7 +355,9 @@ Useful key names:
 
 Limits and defaults:
 
-- `wait <ms>` accepts `0..10000`.
+- condition waits accept `0..120000` ms and use condition variables or file
+  events rather than polling sleeps
+- legacy `wait <ms>` remains for compatibility
 - `key --duration MS` accepts `10..5000` and defaults to `80`.
 - `drag --delay MS` accepts `5..1000` and defaults to `20`.
 - `drag` requires at least two points and an even coordinate count.
@@ -342,6 +415,53 @@ If a controller is already running, explicit `--runtime`, mode, or `--size`
 values must match that controller. Conflicts return
 `CONFLICTING_CONTROLLER_DEFAULTS`.
 
+Each `--session-id` owns its controller state, loopback port, worker, logs,
+captures, and default writable data tree. Headless controllers own a private
+`xvfb-run` lifecycle; `stop` is idempotent and shuts down the worker before the
+controller exits.
+
+## Writable Session Storage
+
+The release bundle may be mounted read-only. Controller state automatically
+falls back to a writable temporary automation root when the bundle directory is
+not writable; `KEMU_AUTOMATION_DIR` can select an explicit root. Worker writes
+go to `--data-dir`, `--rms-dir`, and `--file-root`.
+
+```bash
+./kemu.sh --session-id a open app.jar \
+  --data-dir /tmp/kemu-a \
+  --rms-dir /tmp/kemu-a/rms \
+  --file-root /tmp/kemu-a/files \
+  --reset-state --worker-xmx 64M --wait-ready
+
+./kemu.sh --session-id a rms export /tmp/a-rms.zip
+./kemu.sh --session-id a state snapshot /tmp/a-state.zip
+```
+
+`rms import`, `rms reset`, `state snapshot`, and `state restore` require the
+session app to be closed so the archive is consistent. Archives validate their
+schema and paths before replacing session data.
+
+`KEMU_WORKER_JAVA_OPTS` supplies additional worker JVM options. An explicit
+`--worker-xmx` replaces any `-Xmx` in that variable. `status --json` reports
+controller and worker JVM options, both PIDs, data paths, and the configured
+emulated heap when one exists.
+
+## Event And Log Cursors
+
+`events read --jsonl` returns structured JSONL events such as
+`display-changed`, `selection-changed`, `command-finished`,
+`input-dispatched`, and `frame-rendered`. Use `eventCursor` or an event
+`cursor` as the next `--since` value.
+
+Worker log cursors are opaque:
+
+```bash
+cursor="$(./kemu.sh logs cursor --json | jq -r '.result.cursor')"
+./kemu.sh logs wait --since "$cursor" --regex 'STATUS=PASS' --timeout 10000
+./kemu.sh logs read --since "$cursor" --jsonl
+```
+
 ## Troubleshooting
 
 Useful first checks:
@@ -377,10 +497,10 @@ Reset a stuck run with:
 - Always pass `--json`.
 - Start with `inspect <path>` before `open <path>`.
 - Prefer absolute or clearly rooted paths in automation scripts.
-- Use `observe` after every action that might change UI state.
-- Use a bounded loop: action, `wait 100..500`, `observe`, then continue when
-  `result.active` and `result.ready` are true or a permission request is present.
-- Use command snapshots for LCDUI commands.
+- Use condition waits after actions instead of fixed sleeps and repeated
+  observations.
+- Use `revision` guards for LCDUI controls and atomic commands.
+- Keep command snapshots only for compatibility with older callers.
 - Answer pending permissions before normal UI input.
 - Use screenshots with unique output paths for Canvas games and visual
   verification.

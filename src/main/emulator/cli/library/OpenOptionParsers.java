@@ -33,7 +33,13 @@ final class OpenOptionParsers {
 			|| "--headless".equals(token)
 			|| "--visible".equals(token)
 			|| "--runtime".equals(token)
-			|| "--size".equals(token);
+			|| "--size".equals(token)
+			|| "--data-dir".equals(token)
+			|| "--rms-dir".equals(token)
+			|| "--file-root".equals(token)
+			|| "--reset-state".equals(token)
+			|| "--wait-ready".equals(token)
+			|| "--worker-xmx".equals(token);
 	}
 
 	private static int parseInputPathIndex(List<String> tokens, boolean json) {
@@ -57,29 +63,17 @@ final class OpenOptionParsers {
 		return 1;
 	}
 
-	private static List<String> stripMidlet(List<String> tokens, int startIndex, boolean json) {
-		ArrayList<String> result = new ArrayList<String>();
-		for (int i = startIndex; i < tokens.size(); i++) {
-			String token = tokens.get(i);
-			if ("--midlet".equals(token)) {
-				i++;
-				if (i >= tokens.size()) {
-					throw usageError(json);
-				}
-
-				continue;
-			}
-
-			result.add(token);
-		}
-
-		return result;
-	}
-
 	static OpenOptions parse(List<String> tokens, boolean json) {
 		int inputPathIndex = parseInputPathIndex(tokens, json);
 		Path inputPath = CliParsing.resolveUserPath(tokens.get(inputPathIndex));
 		Integer midlet = null;
+		Path dataDir = null;
+		Path rmsDir = null;
+		Path fileRoot = null;
+		String workerXmx = null;
+		boolean resetState = false;
+		boolean waitReady = false;
+		ArrayList<String> startTokens = new ArrayList<String>();
 		for (int i = inputPathIndex + 1; i < tokens.size(); i++) {
 			String token = tokens.get(i);
 			if ("--midlet".equals(token)) {
@@ -89,6 +83,49 @@ final class OpenOptionParsers {
 
 				requireSingleAssignment(midlet, "--midlet", json);
 				midlet = Integer.valueOf(CliParsing.parseIntegerArgument(tokens.get(++i), "--midlet", "open", json));
+			} else if ("--data-dir".equals(token)
+				|| "--rms-dir".equals(token)
+				|| "--file-root".equals(token)) {
+				if (i + 1 >= tokens.size()) {
+					throw usageError(json);
+				}
+				Path value = CliParsing.resolveUserPath(tokens.get(++i));
+				if ("--data-dir".equals(token)) {
+					requireSingleAssignment(dataDir, token, json);
+					dataDir = value;
+				} else if ("--rms-dir".equals(token)) {
+					requireSingleAssignment(rmsDir, token, json);
+					rmsDir = value;
+				} else {
+					requireSingleAssignment(fileRoot, token, json);
+					fileRoot = value;
+				}
+			} else if ("--worker-xmx".equals(token)) {
+				if (i + 1 >= tokens.size()) {
+					throw usageError(json);
+				}
+				requireSingleAssignment(workerXmx, token, json);
+				workerXmx = tokens.get(++i);
+			} else if ("--reset-state".equals(token)) {
+				if (resetState) {
+					throw duplicateOption(token, json);
+				}
+				resetState = true;
+			} else if ("--wait-ready".equals(token)) {
+				if (waitReady) {
+					throw duplicateOption(token, json);
+				}
+				waitReady = true;
+			} else if ("--headless".equals(token) || "--visible".equals(token)) {
+				startTokens.add(token);
+			} else if ("--runtime".equals(token) || "--size".equals(token)) {
+				if (i + 1 >= tokens.size()) {
+					throw usageError(json);
+				}
+				startTokens.add(token);
+				startTokens.add(tokens.get(++i));
+			} else {
+				throw usageError(json);
 			}
 		}
 
@@ -96,6 +133,12 @@ final class OpenOptionParsers {
 			inputPath,
 			midlet,
 			ControllerLifecycle.parseStartOptions(
-				stripMidlet(tokens, inputPathIndex + 1, json), 0, "open", json, true, false));
+				startTokens, 0, "open", json, true, false),
+			dataDir,
+			rmsDir,
+			fileRoot,
+			resetState,
+			waitReady,
+			workerXmx);
 	}
 }

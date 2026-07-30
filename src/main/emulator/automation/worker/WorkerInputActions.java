@@ -5,7 +5,10 @@ import emulator.EventQueue;
 import emulator.KeyMapping;
 import emulator.automation.shared.AutomationErrorCodes;
 import emulator.automation.shared.AutomationException;
+import java.util.concurrent.Callable;
 import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Display;
+import javax.microedition.lcdui.Displayable;
 import mjson.Json;
 
 final class WorkerInputActions {
@@ -77,39 +80,110 @@ final class WorkerInputActions {
 			Json.object().set("key", key));
 	}
 
-	static void pressKey(final int code, int durationMs) {
+	private static String classifyKey(final int code) {
+		return WorkerFrontendThread.call(new Callable<String>() {
+			public String call() {
+				Display display = Emulator.getCurrentDisplay();
+				Displayable current = display == null ? null : display.getCurrent();
+				if (KeyMapping.isLeftSoft(code) || KeyMapping.isRightSoft(code)) {
+					return "nokia-softkey";
+				}
+				if (current instanceof Canvas) {
+					return "raw-canvas-key";
+				}
+				if (current instanceof javax.microedition.lcdui.List
+					&& (code == KeyMapping.getArrowKeyFromDevice(Canvas.UP)
+						|| code == KeyMapping.getArrowKeyFromDevice(Canvas.DOWN)
+						|| code == KeyMapping.getArrowKeyFromDevice(Canvas.LEFT)
+						|| code == KeyMapping.getArrowKeyFromDevice(Canvas.RIGHT))) {
+					return "list-navigation";
+				}
+				return "native-lcdui-key";
+			}
+		});
+	}
+
+	private static void awaitDispatch(EventQueue queue, int sequence, long timeoutMs, String phase) {
+		try {
+			if (!queue.waitForInputDispatch(sequence, timeoutMs)) {
+				throw new AutomationException(
+					AutomationErrorCodes.TIMEOUT,
+					"Timed out waiting for input " + phase + " dispatch",
+					Json.object()
+						.set("phase", phase)
+						.set("sequence", sequence)
+						.set("timeoutMs", timeoutMs)
+						.set("lastRevision", WorkerEventModel.revision()));
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new AutomationException(
+				AutomationErrorCodes.WORKER_FAILURE,
+				"Interrupted while waiting for input dispatch",
+				null,
+				e);
+		}
+	}
+
+	static Json pressKey(final int code, int durationMs, boolean waitDispatched, boolean waitRelease) {
 		EventQueue queue = Emulator.getEventQueue();
 		if (queue == null) {
 			throw new AutomationException(
 				AutomationErrorCodes.APP_INPUT_UNAVAILABLE, "Application input is not available.");
 		}
 
-		queue.keyPress(code);
+		int pressSequence = queue.keyPressTracked(code);
+		if (waitDispatched || waitRelease) {
+			awaitDispatch(queue, pressSequence, 5000L, "press");
+		}
 		try {
 			Thread.sleep(durationMs);
 		} catch (InterruptedException ignored) {
+			Thread.currentThread().interrupt();
 		}
 
-		queue.keyRelease(code);
+		int releaseSequence = queue.keyReleaseTracked(code);
+		if (waitDispatched || waitRelease) {
+			awaitDispatch(queue, releaseSequence, 5000L, "release");
+		}
+		return Json.object()
+			.set("kind", classifyKey(code))
+			.set("pressSequence", pressSequence)
+			.set("releaseSequence", releaseSequence)
+			.set("pressDispatched", waitDispatched || waitRelease)
+			.set("releaseDispatched", waitDispatched || waitRelease)
+			.set("revision", WorkerEventModel.revision());
 	}
 
-	static void tap(int x, int y) {
+	static Json tap(int x, int y, boolean waitDispatched) {
 		EventQueue queue = Emulator.getEventQueue();
 		if (queue == null) {
 			throw new AutomationException(
 				AutomationErrorCodes.APP_INPUT_UNAVAILABLE, "Application input is not available.");
 		}
 
-		queue.mouseDown(x, y, 0);
+		int pressSequence = queue.mouseDownTracked(x, y, 0);
+		if (waitDispatched) {
+			awaitDispatch(queue, pressSequence, 5000L, "pointer-press");
+		}
 		try {
 			Thread.sleep(30L);
 		} catch (InterruptedException ignored) {
 		}
 
-		queue.mouseUp(x, y, 0);
+		int releaseSequence = queue.mouseUpTracked(x, y, 0);
+		if (waitDispatched) {
+			awaitDispatch(queue, releaseSequence, 5000L, "pointer-release");
+		}
+		return Json.object()
+			.set("kind", "pointer-event")
+			.set("pressSequence", pressSequence)
+			.set("releaseSequence", releaseSequence)
+			.set("dispatched", waitDispatched)
+			.set("revision", WorkerEventModel.revision());
 	}
 
-	static void drag(Json points, int delayMs) {
+	static Json drag(Json points, int delayMs, boolean waitDispatched) {
 		if (!points.isArray() || points.asJsonList().isEmpty()) {
 			throw new AutomationException(AutomationErrorCodes.INVALID_REQUEST, "drag requires at least one point");
 		}
@@ -127,7 +201,7 @@ final class WorkerInputActions {
 			throw new AutomationException(AutomationErrorCodes.INVALID_REQUEST, "drag point requires x and y");
 		}
 
-		queue.mouseDown(x, y, 0);
+		int lastSequence = queue.mouseDownTracked(x, y, 0);
 		for (int i = 1; i < points.asJsonList().size(); i++) {
 			Json point = points.at(i);
 			x = point.at("x", -1).asInteger();
@@ -136,13 +210,21 @@ final class WorkerInputActions {
 				throw new AutomationException(AutomationErrorCodes.INVALID_REQUEST, "drag point requires x and y");
 			}
 
-			queue.mouseDrag(x, y, 0);
+			lastSequence = queue.mouseDragTracked(x, y, 0);
 			try {
 				Thread.sleep(delayMs);
 			} catch (InterruptedException ignored) {
 			}
 		}
 
-		queue.mouseUp(x, y, 0);
+		lastSequence = queue.mouseUpTracked(x, y, 0);
+		if (waitDispatched) {
+			awaitDispatch(queue, lastSequence, 5000L, "pointer-release");
+		}
+		return Json.object()
+			.set("kind", "pointer-event")
+			.set("lastSequence", lastSequence)
+			.set("dispatched", waitDispatched)
+			.set("revision", WorkerEventModel.revision());
 	}
 }

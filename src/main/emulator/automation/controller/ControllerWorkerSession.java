@@ -4,7 +4,16 @@ import emulator.automation.shared.AutomationErrorCodes;
 import emulator.automation.shared.AutomationException;
 import emulator.automation.shared.TextValues;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import mjson.Json;
 
 final class ControllerWorkerSession {
@@ -120,7 +129,7 @@ final class ControllerWorkerSession {
 		return result;
 	}
 
-	Json openPath(String inputPath, Integer midletIndex) throws Exception {
+	Json openPath(String inputPath, Integer midletIndex, Json request) throws Exception {
 		String normalizedInputPath = TextValues.trimToNull(inputPath);
 		if (normalizedInputPath == null) {
 			throw new AutomationException(AutomationErrorCodes.INVALID_REQUEST, "open path requires a path");
@@ -137,7 +146,7 @@ final class ControllerWorkerSession {
 		entry = entryResolver.inspect(
 			Paths.get(normalizedInputPath).toAbsolutePath().normalize());
 		String midletClassName = entryResolver.resolveMidletClass(entry, midletIndex);
-		WorkerProcess worker = workerSupervisor.launchWorker(entry, midletClassName);
+		WorkerProcess worker = workerSupervisor.launchWorker(entry, midletClassName, request);
 		try {
 			Json session = workerSupervisor.waitUntilReady(worker, 30000L);
 			synchronized (this) {
@@ -216,6 +225,182 @@ final class ControllerWorkerSession {
 			.set("tail", workerSupervisor.readLogTail(worker, maxLines));
 	}
 
+	private static String logCursor(WorkerProcess worker, long offset) {
+		return worker.startedAt + ":" + offset;
+	}
+
+	private static long parseLogCursor(WorkerProcess worker, String cursor) {
+		if (cursor == null || cursor.length() == 0) {
+			return 0L;
+		}
+		int separator = cursor.indexOf(':');
+		if (separator <= 0) {
+			throw new AutomationException(
+				AutomationErrorCodes.INVALID_REQUEST,
+				"Invalid log cursor: " + cursor);
+		}
+		try {
+			long startedAt = Long.parseLong(cursor.substring(0, separator));
+			long offset = Long.parseLong(cursor.substring(separator + 1));
+			if (startedAt != worker.startedAt || offset < 0L) {
+				throw new NumberFormatException();
+			}
+			return offset;
+		} catch (NumberFormatException e) {
+			throw new AutomationException(
+				AutomationErrorCodes.INVALID_REQUEST,
+				"Log cursor does not belong to the active worker: " + cursor,
+				Json.object().set("cursor", cursor).set("workerStartedAt", worker.startedAt));
+		}
+	}
+
+	private static Json readWorkerLog(WorkerProcess worker, long offset) throws IOException {
+		if (worker.logPath == null || !Files.isRegularFile(worker.logPath)) {
+			return Json.object()
+				.set("cursor", logCursor(worker, 0L))
+				.set("fromOffset", 0L)
+				.set("toOffset", 0L)
+				.set("text", "");
+		}
+		long size = Files.size(worker.logPath);
+		long from = Math.min(offset, size);
+		if (size - from > Integer.MAX_VALUE) {
+			from = size - Integer.MAX_VALUE;
+		}
+		byte[] bytes = new byte[(int) (size - from)];
+		RandomAccessFile file = new RandomAccessFile(worker.logPath.toFile(), "r");
+		try {
+			file.seek(from);
+			file.readFully(bytes);
+		} finally {
+			file.close();
+		}
+		String text = new String(bytes, StandardCharsets.UTF_8);
+		Json lines = Json.array();
+		String[] split = text.split("\\r?\\n", -1);
+		for (int i = 0; i < split.length; i++) {
+			if (i == split.length - 1 && split[i].length() == 0) {
+				continue;
+			}
+			lines.add(Json.object().set("offset", from).set("line", split[i]));
+		}
+		return Json.object()
+			.set("cursor", logCursor(worker, size))
+			.set("fromOffset", from)
+			.set("toOffset", size)
+			.set("text", text)
+			.set("lines", lines);
+	}
+
+	synchronized Json workerLogCursor() throws Exception {
+		cleanupDeadWorkerLocked();
+		WorkerProcess worker = activeWorker != null ? activeWorker : lastWorkerForLogs;
+		if (worker == null) {
+			throw new AutomationException(AutomationErrorCodes.NO_ACTIVE_APP, "No active app");
+		}
+		long size = worker.logPath != null && Files.isRegularFile(worker.logPath)
+			? Files.size(worker.logPath)
+			: 0L;
+		return Json.object()
+			.set("cursor", logCursor(worker, size))
+			.set("offset", size)
+			.set("worker", worker.toJson());
+	}
+
+	synchronized Json workerLogsRead(Json arguments) throws Exception {
+		cleanupDeadWorkerLocked();
+		WorkerProcess worker = activeWorker != null ? activeWorker : lastWorkerForLogs;
+		if (worker == null) {
+			throw new AutomationException(AutomationErrorCodes.NO_ACTIVE_APP, "No active app");
+		}
+		long offset = parseLogCursor(
+			worker,
+			arguments.has("since") && !arguments.at("since").isNull()
+				? arguments.at("since").asString()
+				: null);
+		Json result = readWorkerLog(worker, offset);
+		result.set("worker", worker.toJson());
+		return result;
+	}
+
+	Json waitWorkerLog(Json arguments) throws Exception {
+		WorkerProcess worker = requireActiveWorker();
+		String regex = arguments.at("regex", "").asString();
+		if (regex.length() == 0) {
+			throw new AutomationException(
+				AutomationErrorCodes.INVALID_REQUEST,
+				"wait log requires regex");
+		}
+		final Pattern pattern;
+		try {
+			pattern = Pattern.compile(regex);
+		} catch (PatternSyntaxException e) {
+			throw new AutomationException(
+				AutomationErrorCodes.INVALID_REQUEST,
+				"Invalid log regex: " + e.getMessage());
+		}
+		long offset = parseLogCursor(
+			worker,
+			arguments.has("since") && !arguments.at("since").isNull()
+				? arguments.at("since").asString()
+				: null);
+		long timeoutMs = arguments.at("timeoutMs", 5000L).asLong();
+		long start = System.nanoTime();
+		long deadline = start + TimeUnit.MILLISECONDS.toNanos(timeoutMs);
+		Json last = Json.object();
+		WatchService watchService = worker.logPath.getFileSystem().newWatchService();
+		worker.logPath.getParent().register(
+			watchService,
+			StandardWatchEventKinds.ENTRY_CREATE,
+			StandardWatchEventKinds.ENTRY_MODIFY);
+		try {
+			while (true) {
+				last = readWorkerLog(worker, offset);
+				String text = last.at("text", "").asString();
+				if (pattern.matcher(text).find()) {
+					return Json.object()
+						.set("condition", "log")
+						.set("regex", regex)
+						.set("matched", true)
+						.set("elapsedMs", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start))
+						.set("cursor", last.at("cursor"))
+						.set("text", text)
+						.set("worker", worker.toJson());
+				}
+				offset = last.at("toOffset", offset).asLong();
+				if (!worker.process.isAlive()) {
+					throw WorkerDiagnostics.workerFailure(
+						AutomationErrorCodes.WORKER_FAILURE,
+						"Worker exited while waiting for log",
+						worker,
+						Json.object().set("lastLog", last));
+				}
+				long remaining = deadline - System.nanoTime();
+				if (remaining <= 0L) {
+					break;
+				}
+				WatchKey key = watchService.poll(remaining, TimeUnit.NANOSECONDS);
+				if (key == null) {
+					break;
+				}
+				key.pollEvents();
+				key.reset();
+			}
+		} finally {
+			watchService.close();
+		}
+		throw new AutomationException(
+			AutomationErrorCodes.TIMEOUT,
+			"Timed out waiting for log regex: " + regex,
+			Json.object()
+				.set("condition", "log")
+				.set("regex", regex)
+				.set("timeoutMs", timeoutMs)
+				.set("elapsedMs", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start))
+				.set("lastState", last)
+				.set("worker", worker.toJson()));
+	}
+
 	Json observe(Json arguments) throws Exception {
 		WorkerProcess worker = requireActiveWorker();
 
@@ -232,6 +417,51 @@ final class ControllerWorkerSession {
 
 	Json proxyWorkerControl(String operation, Json arguments) throws Exception {
 		return workerSupervisor.callControl(requireActiveWorker(), operation, arguments);
+	}
+
+	Json waitWorkerExit(Json arguments) throws Exception {
+		long timeoutMs = arguments.at("timeoutMs", 5000L).asLong();
+		long start = System.nanoTime();
+		WorkerProcess worker;
+		synchronized (this) {
+			cleanupDeadWorkerLocked();
+			worker = activeWorker != null ? activeWorker : lastWorkerForLogs;
+		}
+		if (worker == null || worker.process == null || !worker.process.isAlive()) {
+			return Json.object()
+				.set("condition", "worker-exit")
+				.set("exited", true)
+				.set("elapsedMs", 0);
+		}
+		boolean exited;
+		try {
+			exited = worker.process.waitFor(timeoutMs, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new AutomationException(
+				AutomationErrorCodes.WORKER_FAILURE,
+				"Interrupted while waiting for worker exit",
+				null,
+				e);
+		}
+		if (!exited) {
+			throw new AutomationException(
+				AutomationErrorCodes.TIMEOUT,
+				"Timed out waiting for worker exit",
+				Json.object()
+					.set("condition", "worker-exit")
+					.set("timeoutMs", timeoutMs)
+					.set("elapsedMs", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start))
+					.set("lastState", worker.toJson()));
+		}
+		synchronized (this) {
+			cleanupDeadWorkerLocked();
+		}
+		return Json.object()
+			.set("condition", "worker-exit")
+			.set("exited", true)
+			.set("exitCode", worker.process.exitValue())
+			.set("elapsedMs", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
 	}
 
 	Json captureSnapshot(Json arguments) throws Exception {

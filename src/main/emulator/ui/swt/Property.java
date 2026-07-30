@@ -281,16 +281,19 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	public String getRmsFolderPath() {
-		String s = this.rmsFolder;
+		String configuredRmsDir = System.getProperty("kemu.rms.dir");
+		String s = configuredRmsDir != null && configuredRmsDir.trim().length() > 0
+			? configuredRmsDir
+			: this.rmsFolder;
 		Label_0077:
 		{
 			StringBuffer sb;
 			String substring;
-			if (s.startsWith(".")) {
+			if (configuredRmsDir == null && s.startsWith(".")) {
 				sb = new StringBuffer().append(Emulator.getUserPath());
 				substring = s.substring(1);
 			} else {
-				if (!s.startsWith("/") && !s.startsWith("\\")) {
+				if (configuredRmsDir != null || (!s.startsWith("/") && !s.startsWith("\\"))) {
 					break Label_0077;
 				}
 				sb = new StringBuffer().append(Emulator.getUserPath());

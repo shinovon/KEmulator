@@ -7,6 +7,7 @@ import emulator.media.capture.CapturePlayerImpl;
 import emulator.ui.CommandsMenuPosition;
 import emulator.ui.IScreen;
 import emulator.ui.TargetedCommand;
+import emulator.automation.worker.AutomationWorkerRuntime;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -160,6 +161,7 @@ public class Displayable {
 		if (isShown()) {
 			this.updateCommands();
 		}
+		AutomationWorkerRuntime.onDisplayStateChanged("commands-changed");
 	}
 
 	public void removeCommand(final Command command) {
@@ -168,6 +170,7 @@ public class Displayable {
 			if (isShown()) {
 				updateCommands();
 			}
+			AutomationWorkerRuntime.onDisplayStateChanged("commands-changed");
 		}
 	}
 
@@ -248,6 +251,7 @@ public class Displayable {
 		if (isShown()) {
 			Emulator.getEmulator().getScreen().updateTitle();
 		}
+		AutomationWorkerRuntime.onDisplayStateChanged("title-changed");
 	}
 
 	protected void sizeChanged(final int n, final int n2) {
@@ -285,6 +289,7 @@ public class Displayable {
 			this.tickerX = this.w;
 			updateSize(true);
 		}
+		AutomationWorkerRuntime.onDisplayStateChanged("ticker-changed");
 	}
 
 	void _paintTicker(final Graphics graphics) {

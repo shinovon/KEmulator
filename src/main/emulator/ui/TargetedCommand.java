@@ -100,4 +100,49 @@ public class TargetedCommand {
 		throw new IllegalStateException();
 
 	}
+
+	public boolean isCurrentTarget() {
+		Displayable current = Emulator.getCurrentDisplay() == null
+			? null
+			: Emulator.getCurrentDisplay().getCurrent();
+		if (screen != null) {
+			return screen == current;
+		}
+		if (item != null) {
+			return item._getParent() == current;
+		}
+		return false;
+	}
+
+	private void invokeOnEventThread() {
+		if (command == null && item != null) {
+			((ChoiceGroup) item).setSelectedIndex(selectionIndex, true);
+			return;
+		}
+		if (command != null && screen != null) {
+			screen._callCommandAction(command);
+			return;
+		}
+		if (command != null && item != null) {
+			item._callCommandAction(command);
+			return;
+		}
+		throw new IllegalStateException();
+	}
+
+	public boolean invokeAndWait(final long timeoutMs) throws InterruptedException {
+		return invokeAndWait(timeoutMs, null);
+	}
+
+	public boolean invokeAndWait(final long timeoutMs, final Runnable beforeInvoke)
+		throws InterruptedException {
+		return Emulator.getEventQueue().callAndWait(new Runnable() {
+			public void run() {
+				if (beforeInvoke != null) {
+					beforeInvoke.run();
+				}
+				invokeOnEventThread();
+			}
+		}, timeoutMs);
+	}
 }

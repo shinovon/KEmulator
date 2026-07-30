@@ -625,6 +625,10 @@ public class AppSettings {
 		if (!save && Files.notExists(midletsPath)) return false;
 
 		try {
+			if (save && Files.notExists(midletsPath)) {
+				Files.createDirectories(midletsPath.getParent());
+				Files.createFile(midletsPath);
+			}
 			BufferedWriter writer = null;
 			Path tempPath = null;
 			if (save) {

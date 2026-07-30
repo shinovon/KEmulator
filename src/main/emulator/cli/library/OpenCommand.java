@@ -4,6 +4,8 @@ import emulator.cli.controller.*;
 import emulator.cli.core.*;
 import emulator.cli.output.CliResponses;
 import emulator.cli.output.CliTextRenderer;
+import emulator.cli.support.KemuPaths;
+import emulator.cli.support.SessionStoragePaths;
 import mjson.Json;
 
 public final class OpenCommand implements CliCommand {
@@ -27,10 +29,31 @@ public final class OpenCommand implements CliCommand {
 				if (options.midletIndex != null) {
 					args.set("midlet", options.midletIndex.intValue());
 				}
+				java.nio.file.Path dataDir = options.dataDir == null ? KemuPaths.dataDir() : options.dataDir;
+				args.set(
+					"dataDir",
+					dataDir.toString());
+				args.set(
+					"rmsDir",
+					(options.rmsDir == null ? dataDir.resolve("rms") : options.rmsDir).toString());
+				args.set(
+					"fileRoot",
+					(options.fileRoot == null ? dataDir.resolve("files") : options.fileRoot).toString());
+				args.set("resetState", options.resetState);
+				args.set("waitReady", true);
+				args.set("sessionId", KemuPaths.sessionId());
+				if (options.workerXmx != null) {
+					args.set("workerXmx", options.workerXmx);
+				}
 
 				Json result = ControllerCalls.callController(client, "app.open-path", args, "open", json);
 				Json payload = CliResponses.publicizeOpenResult(result);
 				payload.set("inputPath", options.inputPath.toString());
+				SessionStoragePaths.of(
+					java.nio.file.Paths.get(args.at("dataDir").asString()),
+					java.nio.file.Paths.get(args.at("rmsDir").asString()),
+					java.nio.file.Paths.get(args.at("fileRoot").asString()))
+					.write();
 
 				return new CommandResult("open", CliTextRenderer.renderOpen(payload), payload, json);
 			}

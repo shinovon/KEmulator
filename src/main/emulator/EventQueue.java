@@ -6,6 +6,8 @@ import emulator.ui.IScreen;
 import net.rim.device.api.system.Application;
 
 import javax.microedition.lcdui.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -40,6 +42,9 @@ public final class EventQueue implements Runnable {
 
 	private int[][] inputs;
 	private int inputsCount;
+	private int nextInputSequence = 1;
+	private int deliveredInputSequence;
+	private final Object inputDispatchLock = new Object();
 	private final InputThread input = new InputThread();
 	private final Thread inputThread;
 	private String pointerNumber;
@@ -97,42 +102,110 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void keyPress(int n) {
-		if (n == 10000) return;
+		keyPressTracked(n);
+	}
+
+	public int keyPressTracked(int n) {
+		if (n == 10000) return 0;
+		int sequence = nextInputSequence();
 		if (AppSettings.synchronizeKeyEvents) {
-			queueInput(new int[] {0, n, 0, -1});
-		} else input.queue(0, n, 0, -1);
+			queueInput(new int[] {0, n, 0, -1, sequence});
+		} else input.queue(0, n, 0, -1, sequence);
+		return sequence;
 	}
 
 	public void keyRelease(int n) {
-		if (n == 10000) return;
+		keyReleaseTracked(n);
+	}
+
+	public int keyReleaseTracked(int n) {
+		if (n == 10000) return 0;
+		int sequence = nextInputSequence();
 		if (AppSettings.synchronizeKeyEvents) {
-			queueInput(new int[] {1, n, 0, -1});
-		} else input.queue(1, n, 0, -1);
+			queueInput(new int[] {1, n, 0, -1, sequence});
+		} else input.queue(1, n, 0, -1, sequence);
+		return sequence;
 	}
 
 	public void keyRepeat(int n) {
 		if (n == 10000) return;
+		int sequence = nextInputSequence();
 		if (AppSettings.synchronizeKeyEvents) {
-			queueInput(new int[] {2, n, 0, -1});
-		} else input.queue(2, n, 0, -1);
+			queueInput(new int[] {2, n, 0, -1, sequence});
+		} else input.queue(2, n, 0, -1, sequence);
 	}
 
 	public void mouseDown(int x, int y, int pointer) {
+		mouseDownTracked(x, y, pointer);
+	}
+
+	public int mouseDownTracked(int x, int y, int pointer) {
+		int sequence = nextInputSequence();
 		if (AppSettings.synchronizeKeyEvents) {
-			queueInput(new int[] {0, x, y, pointer});
-		} else input.queue(0, x, y, pointer);
+			queueInput(new int[] {0, x, y, pointer, sequence});
+		} else input.queue(0, x, y, pointer, sequence);
+		return sequence;
 	}
 
 	public void mouseUp(int x, int y, int pointer) {
+		mouseUpTracked(x, y, pointer);
+	}
+
+	public int mouseUpTracked(int x, int y, int pointer) {
+		int sequence = nextInputSequence();
 		if (AppSettings.synchronizeKeyEvents) {
-			queueInput(new int[] {1, x, y, pointer});
-		} else input.queue(1, x, y, pointer);
+			queueInput(new int[] {1, x, y, pointer, sequence});
+		} else input.queue(1, x, y, pointer, sequence);
+		return sequence;
 	}
 
 	public void mouseDrag(int x, int y, int pointer) {
+		mouseDragTracked(x, y, pointer);
+	}
+
+	public int mouseDragTracked(int x, int y, int pointer) {
+		int sequence = nextInputSequence();
 		if (AppSettings.synchronizeKeyEvents) {
-			queueInput(new int[] {2, x, y, pointer});
-		} else input.queue(2, x, y, pointer);
+			queueInput(new int[] {2, x, y, pointer, sequence});
+		} else input.queue(2, x, y, pointer, sequence);
+		return sequence;
+	}
+
+	private int nextInputSequence() {
+		synchronized (inputDispatchLock) {
+			if (nextInputSequence == Integer.MAX_VALUE) {
+				nextInputSequence = 1;
+				deliveredInputSequence = 0;
+			}
+			return nextInputSequence++;
+		}
+	}
+
+	private void markInputDelivered(int[] inputEvent) {
+		if (inputEvent == null || inputEvent.length < 5) {
+			return;
+		}
+		synchronized (inputDispatchLock) {
+			deliveredInputSequence = inputEvent[4];
+			inputDispatchLock.notifyAll();
+		}
+	}
+
+	public boolean waitForInputDispatch(int sequence, long timeoutMs) throws InterruptedException {
+		if (sequence <= 0) {
+			return true;
+		}
+		long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(Math.max(0L, timeoutMs));
+		synchronized (inputDispatchLock) {
+			while (deliveredInputSequence != sequence) {
+				long remaining = deadline - System.nanoTime();
+				if (remaining <= 0L) {
+					return false;
+				}
+				TimeUnit.NANOSECONDS.timedWait(inputDispatchLock, remaining);
+			}
+			return true;
+		}
 	}
 
 	public void sizeChanged(int x, int y) {
@@ -249,6 +322,7 @@ public final class EventQueue implements Runnable {
 			}
 			scr.repaint();
 		}
+		emulator.automation.worker.AutomationWorkerRuntime.onFrameRendered();
 	}
 
 	public void gameGraphicsFlush(int x, int y, int w, int h) {
@@ -262,6 +336,7 @@ public final class EventQueue implements Runnable {
 			}
 			scr.repaint();
 		}
+		emulator.automation.worker.AutomationWorkerRuntime.onFrameRendered();
 	}
 
 	public void serviceRepaints() {
@@ -275,6 +350,7 @@ public final class EventQueue implements Runnable {
 		}
 		if (!AppSettings.j2lStyleFpsLimit)
 			Displayable._fpsLimiter(true);
+		emulator.automation.worker.AutomationWorkerRuntime.onFrameRendered();
 	}
 
 	public void notifyHidden(Displayable d) {
@@ -303,6 +379,7 @@ public final class EventQueue implements Runnable {
 							}
 							if (!AppSettings.j2lStyleFpsLimit)
 								Displayable._fpsLimiter(true);
+							emulator.automation.worker.AutomationWorkerRuntime.onFrameRendered();
 							break;
 						}
 						case EVENT_CALL: {
@@ -324,6 +401,7 @@ public final class EventQueue implements Runnable {
 								} catch (Exception ignored) {}
 							}
 							scr.repaint();
+							emulator.automation.worker.AutomationWorkerRuntime.onFrameRendered();
 							int interval = ((Screen) d)._repaintInterval();
 							if (interval > 0) {
 								synchronized (callbackLock) {
@@ -405,6 +483,8 @@ public final class EventQueue implements Runnable {
 							synchronized (callbackLock) {
 								processInputEvent(e);
 							}
+							markInputDelivered(e);
+							emulator.automation.worker.AutomationWorkerRuntime.onInputDispatched();
 							// skip 1ms delay
 							continue;
 						}
@@ -476,6 +556,44 @@ public final class EventQueue implements Runnable {
 			eventArguments.add(run);
 		}
 		queue(EVENT_CALL);
+	}
+
+	public boolean callAndWait(final Runnable run, long timeoutMs) throws InterruptedException {
+		if (Thread.currentThread() == eventThread) {
+			run.run();
+			return true;
+		}
+		final CountDownLatch done = new CountDownLatch(1);
+		final Throwable[] failure = new Throwable[1];
+		callSerially(new Runnable() {
+			public void run() {
+				try {
+					run.run();
+				} catch (Throwable t) {
+					failure[0] = t;
+				} finally {
+					done.countDown();
+				}
+			}
+		});
+		boolean completed = done.await(Math.max(0L, timeoutMs), TimeUnit.MILLISECONDS);
+		if (completed && failure[0] != null) {
+			if (failure[0] instanceof RuntimeException) {
+				throw (RuntimeException) failure[0];
+			}
+			if (failure[0] instanceof Error) {
+				throw (Error) failure[0];
+			}
+			throw new RuntimeException(failure[0]);
+		}
+		return completed;
+	}
+
+	public boolean waitUntilIdle(long timeoutMs) throws InterruptedException {
+		return callAndWait(new Runnable() {
+			public void run() {
+			}
+		}, timeoutMs);
 	}
 
 	public void waitRepaint() throws InterruptedException {
@@ -601,8 +719,8 @@ public final class EventQueue implements Runnable {
 			elements = new Object[16];
 		}
 
-		public void queue(int state, int arg1, int arg2, int pointer) {
-			append(new int[]{state, arg1, arg2, pointer});
+		public void queue(int state, int arg1, int arg2, int pointer, int sequence) {
+			append(new int[]{state, arg1, arg2, pointer, sequence});
 		}
 
 		private void append(Object o) {
@@ -636,6 +754,8 @@ public final class EventQueue implements Runnable {
 									processInputEvent(o);
 								}
 							} else processInputEvent(o);
+							markInputDelivered(o);
+							emulator.automation.worker.AutomationWorkerRuntime.onInputDispatched();
 						} catch (Throwable e) {
 							System.err.println("Exception in Input Thread!");
 							e.printStackTrace();

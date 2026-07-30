@@ -7,6 +7,10 @@ import emulator.automation.shared.TextValues;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 final class WorkerRuntimeLifecycle {
 	interface ServerLoop {
@@ -18,6 +22,25 @@ final class WorkerRuntimeLifecycle {
 	private static Thread watchdogThread;
 
 	private WorkerRuntimeLifecycle() {
+	}
+
+	static void writeReadyMarker() {
+		String configured = WorkerRuntimeState.readyFile();
+		if (TextValues.isBlank(configured)) {
+			return;
+		}
+		try {
+			Path path = Paths.get(configured).toAbsolutePath().normalize();
+			if (path.getParent() != null) {
+				Files.createDirectories(path.getParent());
+			}
+			Files.write(
+				path,
+				("{\"ready\":true,\"pid\":\"" + ProcessIdentity.currentPid() + "\"}\n")
+					.getBytes(StandardCharsets.UTF_8));
+		} catch (IOException e) {
+			System.err.println("Failed to write worker ready marker: " + e);
+		}
 	}
 
 	static void requestShutdown(String reason) {

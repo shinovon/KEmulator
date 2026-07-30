@@ -96,7 +96,7 @@ final class ControllerOperationRegistry {
 					? null
 					: Integer.valueOf(request.at("midlet").asInteger());
 
-				return workerSession.openPath(path, midlet);
+				return workerSession.openPath(path, midlet, request);
 			}
 		});
 		registerCommand("app.close", DispatchMode.PRIORITY, new ControllerAction() {
@@ -149,9 +149,64 @@ final class ControllerOperationRegistry {
 				return sleepTool(request);
 			}
 		});
+		registerCommand("app.wait-condition", DispatchMode.QUEUED, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.proxyWorker("wait", request);
+			}
+		});
+		registerCommand("app.wait-worker-exit", DispatchMode.PRIORITY, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.waitWorkerExit(request);
+			}
+		});
+		registerCommand("app.list.select", DispatchMode.QUEUED, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.proxyWorker("list-select", request);
+			}
+		});
+		registerCommand("app.list.move", DispatchMode.QUEUED, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.proxyWorker("list-move", request);
+			}
+		});
+		registerCommand("app.choice.set", DispatchMode.QUEUED, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.proxyWorker("choice-set", request);
+			}
+		});
+		registerCommand("app.gauge.set", DispatchMode.QUEUED, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.proxyWorker("gauge-set", request);
+			}
+		});
+		registerCommand("app.text-field.set", DispatchMode.QUEUED, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.proxyWorker("text-field-set", request);
+			}
+		});
+		registerCommand("app.events.read", DispatchMode.QUEUED, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.proxyWorker("events-read", request);
+			}
+		});
 		registerCommand("logs.worker", DispatchMode.QUEUED, new ControllerAction() {
 			public Json run(Json request) throws Exception {
 				return workerSession.workerLogTail(request);
+			}
+		});
+		registerCommand("logs.cursor", DispatchMode.QUEUED, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.workerLogCursor();
+			}
+		});
+		registerCommand("logs.read", DispatchMode.QUEUED, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.workerLogsRead(request);
+			}
+		});
+		registerCommand("logs.wait", DispatchMode.QUEUED, new ControllerAction() {
+			public Json run(Json request) throws Exception {
+				return workerSession.waitWorkerLog(request);
 			}
 		});
 	}

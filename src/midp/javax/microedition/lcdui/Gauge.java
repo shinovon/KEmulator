@@ -1,6 +1,7 @@
 package javax.microedition.lcdui;
 
 import emulator.lcdui.LCDUIUtils;
+import emulator.automation.worker.AutomationWorkerRuntime;
 
 public class Gauge extends Item {
 	public static final int INDEFINITE = -1;
@@ -58,6 +59,7 @@ public class Gauge extends Item {
 		}
 		this.value = value;
 		repaintForm();
+		AutomationWorkerRuntime.onDisplayStateChanged("gauge-changed");
 	}
 
 	public int getValue() {
@@ -79,6 +81,7 @@ public class Gauge extends Item {
 		}
 		max = maxValue;
 		repaintForm();
+		AutomationWorkerRuntime.onDisplayStateChanged("gauge-changed");
 	}
 
 	public int getMaxValue() {

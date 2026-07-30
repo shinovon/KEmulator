@@ -3,6 +3,7 @@ package javax.microedition.lcdui;
 import emulator.Emulator;
 import emulator.lcdui.LCDUIUtils;
 import emulator.lcdui.TextUtils;
+import emulator.automation.worker.AutomationWorkerRuntime;
 
 public class TextField extends Item {
 	public static final int ANY = 0;
@@ -47,6 +48,7 @@ public class TextField extends Item {
 		if (swtFocused)
 			Emulator.getEmulator().getScreen().getCaret().updateText(this, string);
 		layoutForm();
+		AutomationWorkerRuntime.onDisplayStateChanged("text-field-changed");
 	}
 
 	public int getChars(final char[] array) {
@@ -106,6 +108,7 @@ public class TextField extends Item {
 
 	public void setConstraints(final int anInt28) {
 		this.constraints = anInt28;
+		AutomationWorkerRuntime.onDisplayStateChanged("text-field-changed");
 	}
 
 	public int getConstraints() {
@@ -214,6 +217,7 @@ public class TextField extends Item {
 		this.string = text;
 		layoutForm();
 		notifyStateChanged();
+		AutomationWorkerRuntime.onDisplayStateChanged("text-field-changed");
 	}
 
 	public void _swtFocusLost() {

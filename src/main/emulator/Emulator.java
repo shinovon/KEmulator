@@ -880,6 +880,8 @@ public class Emulator implements Runnable {
 					AutomationWorkerRuntime.setControllerStartTimeMillis(value);
 				} else if (key.equalsIgnoreCase("automationcontrollerstartticks")) {
 					AutomationWorkerRuntime.setControllerStartTicks(value);
+				} else if (key.equalsIgnoreCase("automationreadyfile")) {
+					AutomationWorkerRuntime.setReadyFile(value);
 				} else if (key.equalsIgnoreCase("key")) {
 					KeyMapping.keyArg(value);
 				} else if (key.equals("new-project")) {
@@ -933,6 +935,10 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getAbsolutePath() {
+		String configuredHome = System.getProperty("kem.path");
+		if (configuredHome != null && configuredHome.trim().length() > 0) {
+			return Paths.get(configuredHome).toAbsolutePath().normalize().toString();
+		}
 		String s = System.getProperty("user.dir");
 		if (new File(s, "KEmulator.jar").exists() || new File(s, "sensorsimulator.jar").exists()) {
 			return s;
@@ -991,6 +997,16 @@ public class Emulator implements Runnable {
 	}
 
 	public static String getUserPath() {
+		String configuredDataDir = System.getProperty("kemu.data.dir");
+		if (configuredDataDir != null && configuredDataDir.trim().length() > 0) {
+			Path configuredPath = Paths.get(configuredDataDir).toAbsolutePath().normalize();
+			try {
+				Files.createDirectories(configuredPath);
+			} catch (IOException e) {
+				throw new RuntimeException("Could not create KEmulator data directory: " + configuredPath, e);
+			}
+			return configuredPath.toString();
+		}
 		installed:
 		{
 			if (!isPortable) {

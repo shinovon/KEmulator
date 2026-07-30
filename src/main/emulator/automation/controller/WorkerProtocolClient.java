@@ -44,7 +44,14 @@ final class WorkerProtocolClient {
 			Socket socket = new Socket();
 			try {
 				socket.connect(new InetSocketAddress("127.0.0.1", worker.port), WORKER_CONNECT_TIMEOUT_MS);
-				socket.setSoTimeout(controlPath ? WORKER_CONTROL_READ_TIMEOUT_MS : WORKER_READ_TIMEOUT_MS);
+				int readTimeout = controlPath ? WORKER_CONTROL_READ_TIMEOUT_MS : WORKER_READ_TIMEOUT_MS;
+				if (request != null
+					&& request.has("timeoutMs")
+					&& !request.at("timeoutMs").isNull()) {
+					long requestedTimeout = request.at("timeoutMs").asLong() + 2000L;
+					readTimeout = (int) Math.min(Integer.MAX_VALUE, Math.max(readTimeout, requestedTimeout));
+				}
+				socket.setSoTimeout(readTimeout);
 				Json envelope = Json.object()
 					.set("id", worker.nextRequestId++)
 					.set("op", operation)

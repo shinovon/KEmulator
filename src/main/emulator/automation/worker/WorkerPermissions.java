@@ -1,5 +1,6 @@
 package emulator.automation.worker;
 
+import emulator.Permission;
 import emulator.automation.shared.AutomationErrorCodes;
 import emulator.automation.shared.AutomationException;
 import java.util.HashMap;
@@ -19,12 +20,14 @@ final class WorkerPermissions {
 
 	static final class PendingPermission {
 		final int id;
+		final String name;
 		final String message;
 		private final Object lock = new Object();
 		private int response = -1;
 
-		private PendingPermission(int id, String message) {
+		private PendingPermission(int id, String name, String message) {
 			this.id = id;
+			this.name = name;
 			this.message = message;
 		}
 
@@ -62,7 +65,7 @@ final class WorkerPermissions {
 		}
 
 		Json toJson() {
-			return Json.object().set("id", id).set("message", message);
+			return Json.object().set("id", id).set("name", name).set("message", message);
 		}
 	}
 
@@ -102,7 +105,7 @@ final class WorkerPermissions {
 		}
 	}
 
-	static void resolve(int id, boolean allow) {
+	static Json resolve(int id, boolean allow, String mode) {
 		PendingPermission permission;
 		synchronized (LOCK) {
 			Integer head = pendingPermissionOrder.peek();
@@ -113,6 +116,9 @@ final class WorkerPermissions {
 					Json.object().set("id", id));
 			}
 
+			if (id < 0) {
+				id = head.intValue();
+			}
 			if (head.intValue() != id) {
 				throw new AutomationException(
 					AutomationErrorCodes.PERMISSION_ORDER_VIOLATION,
@@ -124,15 +130,23 @@ final class WorkerPermissions {
 			pendingPermissionOrder.remove(head);
 		}
 
+		if ("always".equals(mode) && permission.name != null && permission.name.length() > 0) {
+			Permission.setAutomationDecision(permission.name, allow);
+		}
 		permission.resolve(allow);
+		return Json.object()
+			.set("id", permission.id)
+			.set("name", permission.name)
+			.set("allow", allow)
+			.set("mode", mode);
 	}
 
-	static boolean request(String message) {
+	static boolean request(String name, String message) {
 		if (WorkerRuntimeState.isShutdownRequested()) {
 			return false;
 		}
 
-		PendingPermission request = new PendingPermission(nextPermissionId(), message);
+		PendingPermission request = new PendingPermission(nextPermissionId(), name, message);
 		synchronized (LOCK) {
 			if (WorkerRuntimeState.isShutdownRequested()) {
 				return false;
@@ -142,6 +156,9 @@ final class WorkerPermissions {
 			pendingPermissionOrder.add(Integer.valueOf(request.id));
 			LOCK.notifyAll();
 		}
+		WorkerEventModel.stateChanged(
+			"permission-requested",
+			Json.object().set("id", request.id).set("name", name).set("message", message));
 
 		return request.await();
 	}

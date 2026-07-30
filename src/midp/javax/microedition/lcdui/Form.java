@@ -3,6 +3,7 @@ package javax.microedition.lcdui;
 import emulator.Emulator;
 import emulator.ui.CommandsMenuPosition;
 import emulator.ui.TargetedCommand;
+import emulator.automation.worker.AutomationWorkerRuntime;
 
 import java.util.ArrayList;
 import java.util.Vector;
@@ -52,6 +53,7 @@ public class Form extends Screen {
 			super.items.add(item);
 			item.screen = this;
 			queueLayout(items.size() - 1);
+			AutomationWorkerRuntime.onDisplayStateChanged("form-items-changed");
 			return super.items.size() - 1;
 		}
 	}
@@ -76,6 +78,7 @@ public class Form extends Screen {
 			item.screen = this;
 		}
 		queueLayout(n);
+		AutomationWorkerRuntime.onDisplayStateChanged("form-items-changed");
 	}
 
 	public void delete(final int n) {
@@ -91,6 +94,7 @@ public class Form extends Screen {
 			super.items.remove(n);
 		}
 		queueLayout(n - 1);
+		AutomationWorkerRuntime.onDisplayStateChanged("form-items-changed");
 	}
 
 	public void deleteAll() {
@@ -102,6 +106,7 @@ public class Form extends Screen {
 		}
 		scrollTargetItem = scrollCurrentItem = focusedItem = null;
 		queueLayout(0);
+		AutomationWorkerRuntime.onDisplayStateChanged("form-items-changed");
 	}
 
 	public void set(final int n, final Item item) {
@@ -124,6 +129,7 @@ public class Form extends Screen {
 			item.screen = this;
 		}
 		queueLayout(n);
+		AutomationWorkerRuntime.onDisplayStateChanged("form-items-changed");
 	}
 
 	public Item get(final int n) {

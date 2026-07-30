@@ -171,50 +171,162 @@ final class WorkerCommandSnapshots {
 			.intValue();
 	}
 
+	private static TargetedCommand findByLabel(String label) {
+		TargetedCommand match = null;
+		for (TargetedCommand candidate : commandRegistry.values()) {
+			String candidateLabel = candidate.command == null
+				? candidate.text
+				: candidate.command.getLabel();
+			if (!label.equals(candidateLabel) && !label.equals(candidate.text)) {
+				continue;
+			}
+			if (match != null) {
+				throw new AutomationException(
+					AutomationErrorCodes.INVALID_REQUEST,
+					"Command label is ambiguous: " + label,
+					Json.object().set("label", label));
+			}
+			match = candidate;
+		}
+		return match;
+	}
+
 	static Json select(Json request) {
 		int id = request.at("id", -1).asInteger();
 		int snapshotId = request.at("snapshotId", -1).asInteger();
-		if (id < 0) {
-			throw new AutomationException(AutomationErrorCodes.INVALID_REQUEST, "select-command requires id");
-		}
-
-		if (snapshotId < 0) {
-			throw new AutomationException(AutomationErrorCodes.INVALID_REQUEST, "select-command requires snapshotId");
+		String label = request.has("label") && !request.at("label").isNull()
+			? request.at("label").asString()
+			: null;
+		if (id < 0 && (label == null || label.length() == 0)) {
+			throw new AutomationException(
+				AutomationErrorCodes.INVALID_REQUEST,
+				"select-command requires id or label");
 		}
 
 		int currentSnapshotId = refreshFromCurrentDisplay();
+		long oldRevision = WorkerEventModel.revision();
+		if (request.has("expectRevision") && !request.at("expectRevision").isNull()) {
+			long expectedRevision = request.at("expectRevision").asLong();
+			if (expectedRevision != oldRevision) {
+				throw new AutomationException(
+					AutomationErrorCodes.STALE_REVISION,
+					"Stale revision: " + expectedRevision + ", current: " + oldRevision,
+					Json.object()
+						.set("expectedRevision", expectedRevision)
+						.set("currentRevision", oldRevision));
+			}
+		}
 		final TargetedCommand command;
 		synchronized (LOCK) {
-			if (snapshotId != currentSnapshotId) {
+			if (snapshotId >= 0 && snapshotId != currentSnapshotId) {
 				throw new AutomationException(
 					AutomationErrorCodes.STALE_SNAPSHOT,
 					"Stale command snapshot: " + snapshotId + ", current: " + currentSnapshotId,
 					Json.object().set("snapshotId", snapshotId).set("currentSnapshotId", currentSnapshotId));
 			}
 
-			command = commandRegistry.get(Integer.valueOf(id));
+			command = id >= 0
+				? commandRegistry.get(Integer.valueOf(id))
+				: findByLabel(label);
 		}
 
 		if (command == null) {
 			throw new AutomationException(
 				AutomationErrorCodes.UNKNOWN_COMMAND_ID,
-				"Unknown command id: " + id,
-				Json.object().set("id", id).set("snapshotId", snapshotId));
+				id >= 0 ? "Unknown command id: " + id : "Unknown command label: " + label,
+				Json.object().set("id", id).set("label", label).set("snapshotId", snapshotId));
 		}
 
-		WorkerFrontendThread.call(new Callable<Object>() {
-			public Object call() {
-				command.invoke();
-				invalidate();
-
-				return null;
+		Json oldState = WorkerSessionSnapshot.build(false);
+		int oldDisplayIdentity = WorkerLcduiActions.currentDisplayIdentity();
+		String oldDisplaySignature = oldState.at("displayable").toString();
+		long timeoutMs = request.at("timeoutMs", 5000L).asLong();
+		long startedAt = System.nanoTime();
+		final Long requiredRevision = request.has("expectRevision")
+			&& !request.at("expectRevision").isNull()
+				? Long.valueOf(request.at("expectRevision").asLong())
+				: null;
+		try {
+			if (!command.invokeAndWait(timeoutMs, new Runnable() {
+				public void run() {
+					long currentRevision = WorkerEventModel.revision();
+					if (requiredRevision != null
+						&& requiredRevision.longValue() != currentRevision) {
+						throw new AutomationException(
+							AutomationErrorCodes.STALE_REVISION,
+							"Stale revision: " + requiredRevision + ", current: " + currentRevision,
+							Json.object()
+								.set("expectedRevision", requiredRevision.longValue())
+								.set("currentRevision", currentRevision));
+					}
+					if (!command.isCurrentTarget()) {
+						throw new AutomationException(
+							AutomationErrorCodes.STALE_REVISION,
+							"LCDUI command target is no longer current",
+							Json.object().set("currentRevision", currentRevision));
+					}
+				}
+			})) {
+				throw new AutomationException(
+					AutomationErrorCodes.TIMEOUT,
+					"Timed out waiting for LCDUI command dispatch",
+					Json.object()
+						.set("timeoutMs", timeoutMs)
+						.set("oldRevision", oldRevision)
+						.set("lastState", WorkerSessionSnapshot.build(false)));
 			}
-		});
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new AutomationException(
+				AutomationErrorCodes.WORKER_FAILURE,
+				"Interrupted while waiting for LCDUI command dispatch",
+				null,
+				e);
+		}
+		WorkerEventModel.stateChanged(
+			"command-finished",
+			Json.object()
+				.set("commandId", id)
+				.set("label", command.command == null ? command.text : command.command.getLabel()));
+		invalidate();
 
-		return Json.object()
+		Json transition = null;
+		if (request.at("waitNextDisplay", false).asBoolean()) {
+			long elapsedMs = java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(
+				System.nanoTime() - startedAt);
+			long remainingMs = timeoutMs - elapsedMs;
+			if (remainingMs <= 0L) {
+				throw new AutomationException(
+					AutomationErrorCodes.TIMEOUT,
+					"Timed out waiting for the next LCDUI display",
+					Json.object()
+						.set("timeoutMs", timeoutMs)
+						.set("elapsedMs", elapsedMs)
+						.set("oldRevision", oldRevision)
+						.set("lastState", WorkerSessionSnapshot.build(false)));
+			}
+			transition = WorkerWaits.waitForNextDisplay(
+				oldDisplayIdentity,
+				oldDisplaySignature,
+				remainingMs);
+		}
+		Json state = WorkerSessionSnapshot.build(false);
+		long elapsedMs = java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(
+			System.nanoTime() - startedAt);
+
+		Json result = Json.object()
 			.set("ok", true)
 			.set("snapshotId", snapshotId)
 			.set("id", id)
-			.set("text", command.text);
+			.set("label", command.command == null ? null : command.command.getLabel())
+			.set("text", command.text)
+			.set("oldRevision", oldRevision)
+			.set("newRevision", state.at("revision", WorkerEventModel.revision()).asLong())
+			.set("elapsedMs", elapsedMs)
+			.set("state", state);
+		if (transition != null) {
+			result.set("transition", transition);
+		}
+		return result;
 	}
 }

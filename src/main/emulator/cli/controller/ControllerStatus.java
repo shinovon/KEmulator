@@ -28,6 +28,8 @@ public final class ControllerStatus {
 	public String runtime;
 	public String screen;
 	public String logFile;
+	public String sessionId;
+	public String controllerJvmOptions;
 	public String loadError;
 	public boolean running;
 
@@ -124,6 +126,8 @@ public final class ControllerStatus {
 		status.runtime = firstValue(status.properties, "RUNTIME");
 		status.screen = firstValue(status.properties, "SCREEN");
 		status.logFile = firstValue(status.properties, "LOG_FILE");
+		status.sessionId = firstValue(status.properties, "SESSION_ID");
+		status.controllerJvmOptions = firstValue(status.properties, "CONTROLLER_JVM_OPTIONS");
 
 		return status;
 	}
@@ -140,6 +144,14 @@ public final class ControllerStatus {
 		Json props = Json.object();
 		for (Map.Entry<String, String> entry : properties.entrySet()) {
 			props.set(entry.getKey(), entry.getValue());
+		}
+
+		Json jvmOptions = Json.array();
+		if (controllerJvmOptions != null) {
+			try {
+				jvmOptions = Json.read(controllerJvmOptions);
+			} catch (RuntimeException ignored) {
+			}
 		}
 
 		return Json.object()
@@ -159,6 +171,8 @@ public final class ControllerStatus {
 			.set("runtime", runtime)
 			.set("screen", screen)
 			.set("logFile", logFile)
+			.set("sessionId", sessionId)
+			.set("controllerJvmOptions", jvmOptions)
 			.set("loadError", loadError)
 			.set("properties", props);
 	}

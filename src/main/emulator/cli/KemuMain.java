@@ -51,6 +51,8 @@ public final class KemuMain {
 		registry.add(new StartCommand());
 		registry.add(new StopCommand());
 		registry.add(new LogsCommand());
+		registry.add(new LogsCursorCommand());
+		registry.add(new LogsReadCommand());
 		registry.add(new InspectCommand());
 		registry.add(new OpenCommand());
 		registry.add(new CloseCommand());
@@ -58,12 +60,34 @@ public final class KemuMain {
 		registry.add(new ObserveCommand());
 		registry.add(new ScreenshotCommand());
 		registry.add(new WaitCommand());
+		registry.add(new ConditionWaitCommand("display"));
+		registry.add(new ConditionWaitCommand("worker-ready"));
+		registry.add(new ConditionWaitCommand("worker-exit"));
+		registry.add(new ConditionWaitCommand("idle"));
+		registry.add(new ConditionWaitCommand("frame"));
+		registry.add(new ConditionWaitCommand("permission"));
+		registry.add(new WaitLogCommand());
+		registry.add(new WaitLogCommand(true));
 		registry.add(new KeyCommand());
+		registry.add(new KeyActionCommand("press"));
+		registry.add(new KeyActionCommand("hold"));
 		registry.add(new TapCommand());
+		registry.add(new PointerTapCommand());
 		registry.add(new DragCommand());
+		registry.add(new LcduiControlCommand("list", "select"));
+		registry.add(new LcduiControlCommand("list", "move"));
+		registry.add(new LcduiControlCommand("choice", "set"));
+		registry.add(new LcduiControlCommand("gauge", "set"));
+		registry.add(new LcduiControlCommand("text-field", "set"));
 		registry.add(new CommandRootCommand());
 		registry.add(new RunUiCommand());
 		registry.add(new PermissionCommand());
+		registry.add(new EventsReadCommand());
+		registry.add(new SessionStorageCommand("rms", "reset"));
+		registry.add(new SessionStorageCommand("rms", "export"));
+		registry.add(new SessionStorageCommand("rms", "import"));
+		registry.add(new SessionStorageCommand("state", "snapshot"));
+		registry.add(new SessionStorageCommand("state", "restore"));
 
 		return new CliApp(registry, helpCommand);
 	}

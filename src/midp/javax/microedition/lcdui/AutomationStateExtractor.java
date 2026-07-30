@@ -35,6 +35,13 @@ public final class AutomationStateExtractor {
 		return displayable.getClass().getName();
 	}
 
+	public static String getStructuredDisplayableKind(Displayable displayable) {
+		if (displayable instanceof Form) {
+			return "form";
+		}
+		return getDisplayableKind(displayable);
+	}
+
 	public static String getLeftSoftLabel(Displayable displayable) {
 		if (displayable == null) {
 			return "";
@@ -57,5 +64,22 @@ public final class AutomationStateExtractor {
 
 	public static Vector<TargetedCommand> buildCommands(Displayable displayable) {
 		return displayable == null ? new Vector<TargetedCommand>() : displayable.buildAllCommands();
+	}
+
+	public static int getChoiceType(ChoiceGroup choiceGroup) {
+		return choiceGroup == null ? -1 : choiceGroup.choiceType;
+	}
+
+	public static int getFocusedItemIndex(Displayable displayable) {
+		if (!(displayable instanceof Form) || displayable.focusedItem == null) {
+			return -1;
+		}
+		Form form = (Form) displayable;
+		for (int i = 0; i < form.size(); i++) {
+			if (form.get(i) == displayable.focusedItem) {
+				return i;
+			}
+		}
+		return -1;
 	}
 }

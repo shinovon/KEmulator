@@ -25,9 +25,19 @@ public class Permission {
 	public static boolean askPermissions = true;
 	public static boolean askImei = true;
 
+	private static String policyName(String name) {
+		String normalized = name.toLowerCase();
+		if ("javax.microedition.io.connector.file.read".equals(normalized)
+			|| "javax.microedition.io.connector.file.write".equals(normalized)
+			|| "javax.microedition.io.connector.file.read_write".equals(normalized)) {
+			return "connector.open.file";
+		}
+		return normalized;
+	}
+
 	public static int getPermissionLevel(String s) {
 		if (!Settings.enableSecurity) return 2;
-		s = s.toLowerCase();
+		s = policyName(s);
 		if (permissions.containsKey(s))
 			return permissions.get(s);
 		// default
@@ -45,6 +55,12 @@ public class Permission {
 			return ask_always_until_no;
 		}
 		return ask_always_until_yes;
+	}
+
+	public static void setAutomationDecision(String name, boolean allow) {
+		permissions.put(
+			policyName(name),
+			Integer.valueOf(allow ? Permission.allowed : Permission.never));
 	}
 
 	public static String getPermissionLevelString(String s) {
@@ -89,7 +105,9 @@ public class Permission {
 		if (!askImei) return "0000000000000000";
 		if (imei != null) return imei;
 		if (AutomationWorkerRuntime.isEnabled()) {
-			if (!showConfirmDialog("Allow the application to access the device IMEI?")) {
+			if (!AutomationWorkerRuntime.requestPermission(
+				"imei",
+				"Allow the application to access the device IMEI?")) {
 				notAllowPerms.add("imei");
 				return null;
 			}
@@ -111,7 +129,18 @@ public class Permission {
 		return Emulator.getEmulator().getScreen().showSecurityDialog(message);
 	}
 
+	private static boolean showConfirmDialog(final String name, final String message) {
+		if (AutomationWorkerRuntime.isEnabled()) {
+			return AutomationWorkerRuntime.requestPermission(name, message);
+		}
+		return Emulator.getEmulator().getScreen().showSecurityDialog(message);
+	}
+
 	public static void checkPermission(String x) {
+		checkPermission(x, x);
+	}
+
+	public static void checkPermission(String x, String automationName) {
 		//0: always ask
 		//1: ask once if yes, ask next time if no is pressed
 		//2: always allowed
@@ -120,14 +149,14 @@ public class Permission {
 		//5: ask once
 		switch (getPermissionLevel(x)) {
 			case ask_always:
-				if (!showConfirmDialog(localizePerm(x)))
+				if (!showConfirmDialog(automationName, localizePerm(x)))
 					throw new SecurityException(x);
 				allowPerms.add(x);
 				break;
 			case ask_always_until_yes:
 				if (allowPerms.contains(x))
 					return;
-				if (!showConfirmDialog(localizePerm(x)))
+				if (!showConfirmDialog(automationName, localizePerm(x)))
 					throw new SecurityException(x);
 				allowPerms.add(x);
 			case allowed:
@@ -138,7 +167,7 @@ public class Permission {
 			case ask_always_until_no:
 				if (notAllowPerms.contains(x))
 					throw new SecurityException(x);
-				if (!showConfirmDialog(localizePerm(x))) {
+				if (!showConfirmDialog(automationName, localizePerm(x))) {
 					notAllowPerms.add(x);
 					throw new SecurityException(x);
 				}
@@ -149,7 +178,7 @@ public class Permission {
 					throw new SecurityException(x);
 				if (allowPerms.contains(x))
 					return;
-				if (!showConfirmDialog(localizePerm(x))) {
+				if (!showConfirmDialog(automationName, localizePerm(x))) {
 					notAllowPerms.add(x);
 					throw new SecurityException(x);
 				}

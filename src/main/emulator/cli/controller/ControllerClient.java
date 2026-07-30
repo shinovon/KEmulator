@@ -38,13 +38,23 @@ public final class ControllerClient {
 		return normalized.length() > 160 ? normalized.substring(0, 160) + "..." : normalized;
 	}
 
-	private int readTimeoutFor(String operation) {
+	private int readTimeoutFor(String operation, Json request) {
 		if ("health".equals(operation)) {
 			return HEALTH_READ_TIMEOUT_MS;
 		}
 
 		if ("shutdown".equals(operation)) {
 			return SHUTDOWN_READ_TIMEOUT_MS;
+		}
+
+		if (request != null
+			&& request.isObject()
+			&& request.has("timeoutMs")
+			&& !request.at("timeoutMs").isNull()) {
+			long requested = request.at("timeoutMs").asLong() + 2000L;
+			if (requested > DEFAULT_READ_TIMEOUT_MS) {
+				return requested > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) requested;
+			}
 		}
 
 		return DEFAULT_READ_TIMEOUT_MS;
@@ -86,7 +96,7 @@ public final class ControllerClient {
 		try {
 			try {
 				socket.connect(new InetSocketAddress(host, port), CONNECT_TIMEOUT_MS);
-				socket.setSoTimeout(readTimeoutFor(operation));
+				socket.setSoTimeout(readTimeoutFor(operation, request));
 				Json envelope = Json.object()
 					.set("id", UUID.randomUUID().toString())
 					.set("op", operation)

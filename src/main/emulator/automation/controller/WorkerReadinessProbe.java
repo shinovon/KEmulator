@@ -1,7 +1,11 @@
 package emulator.automation.controller;
 
 import emulator.automation.shared.AutomationErrorCodes;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.concurrent.TimeUnit;
 import mjson.Json;
 
 final class WorkerReadinessProbe {
@@ -9,35 +13,55 @@ final class WorkerReadinessProbe {
 	}
 
 	static Json waitUntilReady(WorkerProcess worker, long timeoutMs) throws Exception {
-		long deadline = System.currentTimeMillis() + timeoutMs;
-		Json last = null;
-		while (System.currentTimeMillis() < deadline) {
+		long start = System.nanoTime();
+		long deadline = start + TimeUnit.MILLISECONDS.toNanos(timeoutMs);
+		WatchService watchService = worker.readyPath.getFileSystem().newWatchService();
+		worker.readyPath.getParent().register(
+			watchService,
+			StandardWatchEventKinds.ENTRY_CREATE,
+			StandardWatchEventKinds.ENTRY_MODIFY);
+		try {
+			while (true) {
 			if (!worker.process.isAlive()) {
 				throw WorkerDiagnostics.workerFailure(
 					AutomationErrorCodes.WORKER_FAILURE, "Worker exited before becoming ready", worker, null);
 			}
 
-			try {
-				last = WorkerProtocolClient.call(
+			if (Files.isRegularFile(worker.readyPath)) {
+				Json session = WorkerProtocolClient.call(
 					worker, "session", Json.object(), WorkerProcessTerminator.timeoutHandler());
-				if (last.at("ready", false).asBoolean()) {
-					return last;
+				if (session.at("ready", false).asBoolean()) {
+					return session;
 				}
-			} catch (IOException ignored) {
+				throw WorkerDiagnostics.workerFailure(
+					AutomationErrorCodes.OPEN_TIMEOUT,
+					"Worker ready marker was written before the MIDlet display became ready",
+					worker,
+					Json.object().set("lastSession", WorkerDiagnostics.stripImage(session)));
 			}
 
-			Thread.sleep(500L);
-		}
-
-		if (last != null) {
-			throw WorkerDiagnostics.workerFailure(
-				AutomationErrorCodes.OPEN_TIMEOUT,
-				"Timed out waiting for worker readiness",
-				worker,
-				Json.object().set("lastSession", WorkerDiagnostics.stripImage(last)));
+			long remaining = deadline - System.nanoTime();
+			if (remaining <= 0L) {
+				break;
+			}
+			WatchKey key = watchService.poll(remaining, TimeUnit.NANOSECONDS);
+			if (key == null) {
+				break;
+			}
+			key.pollEvents();
+			key.reset();
+			}
+		} finally {
+			watchService.close();
 		}
 
 		throw WorkerDiagnostics.workerFailure(
-			AutomationErrorCodes.OPEN_TIMEOUT, "Timed out waiting for worker startup", worker, null);
+			AutomationErrorCodes.OPEN_TIMEOUT,
+			"Timed out waiting for worker readiness",
+			worker,
+			Json.object()
+				.set("timeoutMs", timeoutMs)
+				.set("elapsedMs", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start))
+				.set("readyPath", worker.readyPath.toString()));
 	}
 }

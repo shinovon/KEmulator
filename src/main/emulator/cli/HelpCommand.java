@@ -25,27 +25,32 @@ final class HelpCommand implements CliCommand {
 		if (topicTokens.isEmpty()) {
 			usage = CliTextRenderer.usageText();
 		} else {
+			String requestedTopic = join(topicTokens);
 			CliCommand target = registry.resolve(topicTokens);
 			if (target == null) {
-				throw new KemuCliException(
-					"UNKNOWN_COMMAND",
-					"Unknown command: " + join(topicTokens),
-					CliExitCodes.USAGE,
-					"help",
-					invocation.json());
-			}
+				if (!CliTextRenderer.hasUsageTopic(requestedTopic)) {
+					throw new KemuCliException(
+						"UNKNOWN_COMMAND",
+						"Unknown command: " + requestedTopic,
+						CliExitCodes.USAGE,
+						"help",
+						invocation.json());
+				}
+				topic = requestedTopic;
+				usage = CliTextRenderer.usageText(topic);
+			} else {
+				if (target.path().length() != topicTokens.size()) {
+					throw new KemuCliException(
+						"USAGE_ERROR",
+						CliTextRenderer.usageText(target.path().asString()),
+						CliExitCodes.USAGE,
+						target.path().asString(),
+						invocation.json());
+				}
 
-			if (target.path().length() != topicTokens.size()) {
-				throw new KemuCliException(
-					"USAGE_ERROR",
-					CliTextRenderer.usageText(target.path().asString()),
-					CliExitCodes.USAGE,
-					target.path().asString(),
-					invocation.json());
+				topic = target.path().asString();
+				usage = CliTextRenderer.usageText(topic);
 			}
-
-			topic = target.path().asString();
-			usage = CliTextRenderer.usageText(topic);
 		}
 
 		Json payload = Json.object()

@@ -7,10 +7,12 @@ import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import mjson.Json;
 
 final class WorkerLauncher {
 	private final Path logsRoot;
@@ -45,6 +47,15 @@ final class WorkerLauncher {
 		}
 
 		try {
+			java.lang.reflect.Method pidMethod = Process.class.getMethod("pid");
+			Object value = pidMethod.invoke(process);
+			if (value != null) {
+				return String.valueOf(value);
+			}
+		} catch (Throwable ignored) {
+		}
+
+		try {
 			Field field = process.getClass().getDeclaredField("pid");
 			field.setAccessible(true);
 			Object value = field.get(process);
@@ -55,14 +66,18 @@ final class WorkerLauncher {
 		}
 	}
 
-	WorkerProcess launch(AppTarget entry, String midletClassName) throws IOException {
+	WorkerProcess launch(AppTarget entry, String midletClassName, Json request) throws IOException {
 		int workerPort = findFreePort();
 		Path runtimeRoot = WorkerLaunchEnvironment.resolveRuntimeRoot();
+		WorkerLaunchOptions options = WorkerLaunchOptions.prepare(
+			request,
+			logsRoot.getParent(),
+			runtimeRoot);
 		Path kemHome = WorkerLaunchEnvironment.resolveKemHome();
 		Path javaAgent = WorkerLaunchEnvironment.resolveJavaAgentJar();
 		ArrayList<String> command = new ArrayList<String>();
 		command.add(WorkerLaunchEnvironment.javaBinary());
-		command.add("-Xmx512M");
+		command.addAll(options.jvmOptions);
 		command.add("-cp");
 		command.add(System.getProperty("java.class.path"));
 		if (javaAgent != null) {
@@ -70,7 +85,13 @@ final class WorkerLauncher {
 		}
 
 		command.add("-Dkemu.runtime.root=" + runtimeRoot.toString());
+		command.add("-Dkemu.data.dir=" + options.dataDir.toString());
+		command.add("-Dkemu.rms.dir=" + options.rmsDir.toString());
+		command.add("-Dkemu.file.root=" + options.fileRoot.toString());
+		command.add("-Dkemu.session.id=" + options.sessionId);
 		command.add("-Dkem.path=" + kemHome.toString());
+		command.add("-Duser.home=" + options.dataDir.toString());
+		command.add("-Djava.io.tmpdir=" + options.dataDir.resolve("tmp").toString());
 		command.add("-Djava.library.path=" + kemHome.toString());
 		command.add("-Dfile.encoding=UTF-8");
 		command.add("-Dswt.autoScale=false");
@@ -105,8 +126,12 @@ final class WorkerLauncher {
 
 		Path logDir = logsRoot.resolve(entry.appLogId);
 		Files.createDirectories(logDir);
-		Path logPath = logDir.resolve(
-			"worker-" + new SimpleDateFormat("yyyyMMdd-HHmmss-SSS", Locale.US).format(new Date()) + ".log");
+		String launchId = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS", Locale.US).format(new Date());
+		Path logPath = logDir.resolve("worker-" + launchId + ".log");
+		Path readyPath = logDir.resolve("worker-" + launchId + ".ready");
+		final Path exitPath = logDir.resolve("worker-" + launchId + ".exit");
+		Files.deleteIfExists(readyPath);
+		Files.deleteIfExists(exitPath);
 		command.add("emulator.automation.worker.AutomationWorkerMain");
 		command.add("--log-file");
 		command.add(logPath.toAbsolutePath().toString());
@@ -148,9 +173,11 @@ final class WorkerLauncher {
 
 		String controllerStartTicks = ProcessIdentity.currentStartTicks();
 		if (controllerStartTicks != null && controllerStartTicks.length() > 0) {
-			command.add("-automationcontrollerstartticks");
+		command.add("-automationcontrollerstartticks");
 			command.add(controllerStartTicks);
 		}
+		command.add("-automationreadyfile");
+		command.add(readyPath.toAbsolutePath().toString());
 
 		command.add("-screen");
 		command.add(screenWidth + "x" + screenHeight);
@@ -175,7 +202,30 @@ final class WorkerLauncher {
 		worker.process = process;
 		worker.startedAt = System.currentTimeMillis();
 		worker.logPath = logPath;
+		worker.readyPath = readyPath;
+		worker.exitPath = exitPath;
 		worker.command = new ArrayList<String>(command);
+		worker.jvmOptions = new ArrayList<String>(options.jvmOptions);
+		worker.dataDir = options.dataDir;
+		worker.rmsDir = options.rmsDir;
+		worker.fileRoot = options.fileRoot;
+		worker.sessionId = options.sessionId;
+		final Process watchedProcess = process;
+		Thread exitWatcher = new Thread(
+			new Runnable() {
+				public void run() {
+					try {
+						int exitCode = watchedProcess.waitFor();
+						Files.write(
+							exitPath,
+							("exitCode=" + exitCode + "\n").getBytes(StandardCharsets.UTF_8));
+					} catch (Exception ignored) {
+					}
+				}
+			},
+			"KEmulator-Automation-Worker-Exit-Watcher");
+		exitWatcher.setDaemon(true);
+		exitWatcher.start();
 
 		return worker;
 	}

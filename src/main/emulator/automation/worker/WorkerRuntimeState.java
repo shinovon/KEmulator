@@ -9,6 +9,7 @@ final class WorkerRuntimeState {
 	private static String controllerPid;
 	private static Long controllerStartTimeMillis;
 	private static String controllerStartTicks;
+	private static String readyFile;
 	private static volatile boolean midletStarted;
 	private static volatile boolean shutdownRequested;
 
@@ -80,6 +81,14 @@ final class WorkerRuntimeState {
 
 	static String controllerStartTicks() {
 		return controllerStartTicks;
+	}
+
+	static void setReadyFile(String readyFile) {
+		WorkerRuntimeState.readyFile = TextValues.trimToNull(readyFile);
+	}
+
+	static String readyFile() {
+		return readyFile;
 	}
 
 	static void setMidletStarted(boolean midletStarted) {

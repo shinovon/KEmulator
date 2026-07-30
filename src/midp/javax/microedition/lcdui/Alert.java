@@ -4,6 +4,7 @@ import emulator.Emulator;
 import emulator.UILocale;
 import emulator.lcdui.LCDUIUtils;
 import emulator.lcdui.TextUtils;
+import emulator.automation.worker.AutomationWorkerRuntime;
 
 public class Alert extends Screen {
 	public static final Command DISMISS_COMMAND;
@@ -55,6 +56,7 @@ public class Alert extends Screen {
 			throw new IllegalArgumentException("time should be positive");
 		}
 		this.timeout = n;
+		AutomationWorkerRuntime.onDisplayStateChanged("alert-changed");
 	}
 
 	void _shown() {
@@ -83,6 +85,7 @@ public class Alert extends Screen {
 		if (gauge != null && gauge.isInteractive())
 			throw new IllegalArgumentException();
 		this.gauge = gauge;
+		AutomationWorkerRuntime.onDisplayStateChanged("alert-changed");
 	}
 
 	public String getString() {
@@ -91,6 +94,7 @@ public class Alert extends Screen {
 
 	public void setString(final String string) {
 		this.string = string;
+		AutomationWorkerRuntime.onDisplayStateChanged("alert-changed");
 	}
 
 	public void setType(final AlertType alertType) {

@@ -4,6 +4,7 @@ import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.EventQueue;
 import emulator.Settings;
+import emulator.automation.worker.AutomationWorkerRuntime;
 import emulator.lcdui.LCDUIUtils;
 
 import javax.microedition.midlet.MIDlet;
@@ -76,6 +77,9 @@ public class Display {
 				}
 			}
 			d.updateCommands();
+			AutomationWorkerRuntime.onDisplayChanged(
+				AutomationStateExtractor.getStructuredDisplayableKind(d),
+				d.getTitle());
 		}
 	}
 
@@ -169,6 +173,9 @@ public class Display {
 		alert._shown();
 		Emulator.getEventQueue().queue(EventQueue.EVENT_SCREEN);
 		alert.updateCommands();
+		AutomationWorkerRuntime.onDisplayChanged(
+			AutomationStateExtractor.getStructuredDisplayableKind(alert),
+			alert.getTitle());
 	}
 
 	public void setCurrentItem(final Item item) {

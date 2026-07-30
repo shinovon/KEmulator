@@ -12,6 +12,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.lang.management.ManagementFactory;
+import mjson.Json;
 
 public final class AutomationControllerMain {
 	private AutomationControllerMain() {
@@ -26,6 +28,8 @@ public final class AutomationControllerMain {
 		Path logFile,
 		String mode,
 		String runtime,
+		String sessionId,
+		String controllerJvmOptions,
 		String currentPid,
 		Long currentStartTimeMs,
 		String currentStartTicks,
@@ -61,6 +65,12 @@ public final class AutomationControllerMain {
 
 		if (runtime != null) {
 			content.append("RUNTIME=").append(runtime).append('\n');
+		}
+		if (sessionId != null) {
+			content.append("SESSION_ID=").append(sessionId).append('\n');
+		}
+		if (controllerJvmOptions != null) {
+			content.append("CONTROLLER_JVM_OPTIONS=").append(controllerJvmOptions).append('\n');
 		}
 
 		Path tempFile = stateFile.resolveSibling(stateFile.getFileName().toString() + ".tmp");
@@ -146,6 +156,7 @@ public final class AutomationControllerMain {
 		Path stateFile = null;
 		String mode = null;
 		String runtime = null;
+		String sessionId = "default";
 		Path logFile = null;
 
 		for (int i = 0; i < args.length; i++) {
@@ -177,6 +188,9 @@ public final class AutomationControllerMain {
 			} else if ("--runtime".equals(key) && value != null) {
 				runtime = value;
 				i++;
+			} else if ("--session-id".equals(key) && value != null) {
+				sessionId = value;
+				i++;
 			} else if ("--log-file".equals(key) && value != null) {
 				logFile = Paths.get(value).toAbsolutePath().normalize();
 				i++;
@@ -200,6 +214,8 @@ public final class AutomationControllerMain {
 				logFile,
 				mode,
 				runtime,
+				sessionId,
+				Json.make(ManagementFactory.getRuntimeMXBean().getInputArguments()).toString(),
 				currentPid,
 				currentStartTimeMs,
 				currentStartTicks,

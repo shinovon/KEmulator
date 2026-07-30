@@ -22,6 +22,7 @@ public final class KeyCommand implements CliCommand {
 		String key = invocation.tokens().get(1);
 		Integer duration = null;
 		boolean sawDuration = false;
+		boolean waitDispatched = false;
 		for (int i = 2; i < invocation.tokens().size(); i++) {
 			String token = invocation.tokens().get(i);
 			if ("--duration".equals(token)) {
@@ -54,6 +55,10 @@ public final class KeyCommand implements CliCommand {
 					"key",
 					invocation.json()));
 			} else {
+				if ("--wait-dispatched".equals(token) && !waitDispatched) {
+					waitDispatched = true;
+					continue;
+				}
 				throw new KemuCliException(
 					"USAGE_ERROR", CliTextRenderer.usageText("key"), CliExitCodes.USAGE, "key", invocation.json());
 			}
@@ -64,6 +69,7 @@ public final class KeyCommand implements CliCommand {
 		if (duration != null) {
 			args.set("durationMs", duration.intValue());
 		}
+		args.set("waitDispatched", waitDispatched);
 
 		Json payload = CliResponses.normalizePublicJson(ControllerCalls.callController(
 			ControllerStatusService.controllerClient(status), "app.key", args, "key", invocation.json()));
