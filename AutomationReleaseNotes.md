@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-- Added schema 2 observations with monotonic revisions, structured LCDUI trees,
-  frame revisions, and cursor-addressable events while retaining legacy
-  observation fields.
+- Added schema 3 observations with monotonic revisions, structured LCDUI trees,
+  frame revisions, cursor-addressable events, and one canonical nested
+  `displayable` representation.
 - Added event-driven waits for displays, worker readiness/exit, LCDUI idle,
   frames, permissions, and worker log regular expressions. Timeouts return
   structured last-state diagnostics and elapsed time.
@@ -14,6 +14,9 @@
   callback completion acknowledgement, and optional next-display waiting,
   including applications that reuse one `Displayable` instance while replacing
   its title or contents.
+- Command callbacks that suspend on a permission request now return a structured
+  `permission-pending` result. The command later emits `command-finished` after
+  the request is answered instead of deadlocking the CLI until timeout.
 - Added acknowledged key and pointer delivery with delivery-kind metadata.
 - Added session IDs, writable data/RMS/file roots, read-only bundle support,
   RMS/state archives, configurable worker JVM options, and actual controller
@@ -26,8 +29,9 @@
   control mutations return, and initialized an empty writable `midlets.ini`
   when a session starts from a read-only bundle.
 - Added cursor-based worker log reads/waits and JSONL event reads.
-- Kept legacy `wait <ms>`, key/tap forms, command snapshots, and schema 1-style
-  top-level observation fields for existing automation clients.
+- Removed fixed `wait <ms>`, legacy key/tap forms, line-tail log commands,
+  command snapshots, positional command ids, and schema 1-style observation
+  duplicates. Current commands require revision guards and acknowledged input.
 
 This automation runtime is a functional MIDP/LCDUI/RMS/JSR-75/MMAPI test
 environment. Its wall time, audio timing, and rendered output are not evidence

@@ -207,24 +207,6 @@ final class ControllerWorkerSession {
 			.set("session", workerSupervisor.call(worker, "session", Json.object()));
 	}
 
-	synchronized Json workerLogTail(Json arguments) throws Exception {
-		cleanupDeadWorkerLocked();
-		WorkerProcess worker = activeWorker != null ? activeWorker : lastWorkerForLogs;
-		if (worker == null) {
-			throw new AutomationException(AutomationErrorCodes.NO_ACTIVE_APP, "No active app");
-		}
-
-		int maxLines = arguments.at("maxLines", 80).asInteger();
-		if (maxLines <= 0) {
-			throw new AutomationException(AutomationErrorCodes.INVALID_REQUEST, "maxLines must be positive");
-		}
-
-		return Json.object()
-			.set("app", worker.entry.toJson())
-			.set("worker", worker.toJson())
-			.set("tail", workerSupervisor.readLogTail(worker, maxLines));
-	}
-
 	private static String logCursor(WorkerProcess worker, long offset) {
 		return worker.startedAt + ":" + offset;
 	}

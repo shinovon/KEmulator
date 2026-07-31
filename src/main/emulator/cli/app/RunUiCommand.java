@@ -18,7 +18,7 @@ public final class RunUiCommand implements CliCommand {
 	}
 
 	public CommandResult run(CliInvocation invocation) throws Exception {
-		if (invocation.tokens().size() < 3) {
+		if (invocation.tokens().size() < 6) {
 			throw new KemuCliException(
 				"USAGE_ERROR",
 				CliTextRenderer.usageText("command run"),
@@ -29,30 +29,12 @@ public final class RunUiCommand implements CliCommand {
 
 		Integer id = null;
 		String label = null;
-		Integer snapshot = null;
 		Long expectRevision = null;
 		boolean waitNextDisplay = false;
 		int timeoutMs = 5000;
-		int start = 2;
-		String first = invocation.tokens().get(2);
-		if (!first.startsWith("--")) {
-			id = Integer.valueOf(CliParsing.parseIntegerArgument(first, "<id>", "command run", invocation.json()));
-			start = 3;
-		}
-		for (int i = start; i < invocation.tokens().size(); i++) {
+		for (int i = 2; i < invocation.tokens().size(); i++) {
 			String token = invocation.tokens().get(i);
-			if ("--snapshot".equals(token)) {
-				if (snapshot != null || i + 1 >= invocation.tokens().size()) {
-					throw new KemuCliException(
-						"USAGE_ERROR",
-						CliTextRenderer.usageText("command run"),
-						CliExitCodes.USAGE,
-						"command run",
-						invocation.json());
-				}
-				snapshot = Integer.valueOf(CliParsing.parseIntegerArgument(
-					invocation.tokens().get(++i), "--snapshot", "command run", invocation.json()));
-			} else if ("--id".equals(token)) {
+			if ("--id".equals(token)) {
 				if (id != null || label != null || i + 1 >= invocation.tokens().size()) {
 					throw new KemuCliException(
 						"USAGE_ERROR",
@@ -130,7 +112,7 @@ public final class RunUiCommand implements CliCommand {
 			}
 		}
 
-		if (id == null && label == null) {
+		if ((id == null && label == null) || expectRevision == null) {
 			throw new KemuCliException(
 				"USAGE_ERROR",
 				CliTextRenderer.usageText("command run"),
@@ -149,12 +131,7 @@ public final class RunUiCommand implements CliCommand {
 		if (label != null) {
 			request.set("label", label);
 		}
-		if (snapshot != null) {
-			request.set("snapshotId", snapshot.intValue());
-		}
-		if (expectRevision != null) {
-			request.set("expectRevision", expectRevision.longValue());
-		}
+		request.set("expectRevision", expectRevision.longValue());
 		Json payload = CliResponses.normalizePublicJson(ControllerCalls.callController(
 			ControllerStatusService.controllerClient(status),
 			"app.command.run",

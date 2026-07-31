@@ -4,6 +4,7 @@ Copyright (c) 2025 Fyodor Ryzhov
 package emulator.ui;
 
 import emulator.Emulator;
+import emulator.EventQueue;
 
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
@@ -114,34 +115,45 @@ public class TargetedCommand {
 		return false;
 	}
 
-	private void invokeOnEventThread() {
-		if (command == null && item != null) {
-			((ChoiceGroup) item).setSelectedIndex(selectionIndex, true);
-			return;
-		}
-		if (command != null && screen != null) {
-			screen._callCommandAction(command);
-			return;
-		}
-		if (command != null && item != null) {
-			item._callCommandAction(command);
-			return;
-		}
-		throw new IllegalStateException();
-	}
-
-	public boolean invokeAndWait(final long timeoutMs) throws InterruptedException {
-		return invokeAndWait(timeoutMs, null);
-	}
-
-	public boolean invokeAndWait(final long timeoutMs, final Runnable beforeInvoke)
+	public boolean enqueueAndWait(
+		final long timeoutMs,
+		final Runnable beforeInvoke,
+		final EventQueue.CommandDispatchListener listener)
 		throws InterruptedException {
 		return Emulator.getEventQueue().callAndWait(new Runnable() {
 			public void run() {
 				if (beforeInvoke != null) {
 					beforeInvoke.run();
 				}
-				invokeOnEventThread();
+				if (command == null && item != null) {
+					Throwable failure = null;
+					try {
+						((ChoiceGroup) item).setSelectedIndex(selectionIndex, true);
+					} catch (Throwable throwable) {
+						failure = throwable;
+					} finally {
+						listener.commandFinished(failure);
+					}
+					if (failure instanceof RuntimeException) {
+						throw (RuntimeException) failure;
+					}
+					if (failure instanceof Error) {
+						throw (Error) failure;
+					}
+					if (failure != null) {
+						throw new RuntimeException(failure);
+					}
+					return;
+				}
+				if (command != null && screen != null) {
+					Emulator.getEventQueue().commandActionTracked(command, screen, listener);
+					return;
+				}
+				if (command != null && item != null) {
+					Emulator.getEventQueue().commandActionTracked(command, item, listener);
+					return;
+				}
+				throw new IllegalStateException();
 			}
 		}, timeoutMs);
 	}

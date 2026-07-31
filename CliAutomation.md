@@ -69,8 +69,6 @@ controller defaults.
 - `start [--headless|--visible] [--runtime <advertised-runtime>] [--size WxH]`
 - `status`
 - `stop [--force]`
-- `logs <controller|worker> [--lines N]`, where `N` must be positive and
-  defaults to `100`
 - `logs cursor`
 - `logs read [--since CURSOR] [--jsonl]`
 - `logs wait --regex REGEX [--since CURSOR] [--timeout MS]`
@@ -86,7 +84,6 @@ controller defaults.
 - `observe`
 - `events read [--since CURSOR] [--jsonl]`
 - `screenshot --out FILE`
-- `wait <ms>`
 - `wait display [--kind KIND] [--title TITLE] [--selected-index N] [--after-revision REV] [--timeout MS]`
 - `wait worker-ready [--timeout MS]`
 - `wait worker-exit [--timeout MS]`
@@ -94,10 +91,8 @@ controller defaults.
 - `wait frame --after-revision REV [--timeout MS]`
 - `wait permission [--name NAME] [--timeout MS]`
 - `wait log --regex REGEX [--since CURSOR] [--timeout MS]`
-- `key <key> [--duration MS]`
 - `key press <key> [--wait-dispatched]`
 - `key hold <key> [--duration MS] [--wait-release]`
-- `tap <x> <y>`
 - `pointer tap <x> <y> [--wait-dispatched]`
 - `drag <x1> <y1> <x2> <y2> [<x3> <y3> ...] [--delay MS]`
 - `list select INDEX [--expect-revision REV]`
@@ -105,7 +100,7 @@ controller defaults.
 - `choice set INDEX [--item-index INDEX] [--expect-revision REV]`
 - `gauge set VALUE [--item-index INDEX] [--expect-revision REV]`
 - `text-field set TEXT [--item-index INDEX] [--expect-revision REV]`
-- `command run [ID|--id ID|--label LABEL] [--snapshot ID] [--expect-revision REV] [--wait-next-display] [--timeout MS]`
+- `command run <--id ID|--label LABEL> --expect-revision REV [--wait-next-display] [--timeout MS]`
 - `permission allow [id] [--once|--always]`
 - `permission deny [id]`
 
@@ -167,7 +162,7 @@ Expected failures use this shape:
 ```
 
 `error.details` is optional and contains operation-specific context when
-available, such as snapshot ids, permission ids, controller endpoint data, or
+available, such as permission ids, controller endpoint data, or
 failed paths.
 
 Automation callers should branch on `ok` and `error.code`, not on localized or
@@ -200,7 +195,6 @@ Common error codes include:
 - `APP_INPUT_UNAVAILABLE`
 - `MIDLET_SELECTION_REQUIRED`
 - `UNKNOWN_MIDLET`
-- `STALE_SNAPSHOT`
 - `STALE_REVISION`
 - `TIMEOUT`
 - `LCDUI_CONTROL_UNAVAILABLE`
@@ -242,7 +236,7 @@ snapshot. `state` still requires a running controller and can return
 
 `observe` returns the richer current MIDlet screen snapshot:
 
-- `schemaVersion` (currently `2`), monotonic `revision`, `frameRevision`, and
+- `schemaVersion` (currently `3`), monotonic `revision`, `frameRevision`, and
   `eventCursor`
 - readiness and active app metadata
 - screen size
@@ -259,9 +253,9 @@ snapshot. `state` still requires a running controller and can return
 `observe` is the preferred command for agents because it returns the current
 controller/app state in one call.
 
-Schema 2 retains the legacy top-level fields (`displayableKind`, `title`,
-`list`, `commands`, and `commandSnapshotId`) so existing callers keep working.
-New callers should use `schemaVersion`, `revision`, and `displayable`.
+Schema 3 has one LCDUI representation: `result.displayable`. Its nested object
+contains `kind`, `title`, `softkeys`, `commands`, and control-specific state.
+The former top-level duplicates and command snapshots are not emitted.
 
 After `open`, call `observe --json` before the first input even if the open
 response already contains session-like fields. Check `result.active` before
@@ -289,28 +283,22 @@ details. Rendering a frame does not advance the display `revision`;
 painted, so repaint traffic cannot invalidate an otherwise current command.
 LCDUI commands and native control mutations run on the LCDUI event
 thread and return only after their model mutation or callback completes.
+If a callback blocks on an automation-visible permission request,
+`command run` instead returns a successful result with
+`status: "permission-pending"`, `pending: true`, and `permissionRequest`.
+The command remains suspended on the LCDUI event thread until that request is
+answered; its eventual completion is emitted as `command-finished`.
+When `--wait-next-display` was requested, the pending result sets
+`waitNextDisplayRequested: true` but does not claim that a display transition
+already occurred.
 `--wait-next-display` also recognizes a structured display transition when an
 application reuses one `Displayable` object but replaces its title or contents.
 
-### Legacy Command Snapshots
-
-LCDUI commands are invoked with snapshot protection:
-
-1. Call `observe --json`.
-2. Read `result.commandSnapshotId`.
-3. Choose a command from `result.commands`.
-4. Call `command run <id> --snapshot <snapshotId> --json`.
-
-If the UI changes before the command is invoked, the CLI returns
-`STALE_SNAPSHOT` instead of running a command from an old screen.
-
-Command entries can include `id`, `text`, `choice`, `selected`, `label`, `type`,
-and `priority`. Command ids are valid only for the snapshot that produced them.
-After any UI-changing action, discard old ids and call `observe --json` again.
-
-If `command run` returns `STALE_SNAPSHOT` or `UNKNOWN_COMMAND_ID`, call
-`observe --json`, reselect the command by stable fields such as `label`, `text`,
-`type`, or `priority`, and retry with the new snapshot id.
+Command entries in `result.displayable.commands` can include `id`, `text`,
+`choice`, `selected`, `label`, `type`, and `priority`. Every invocation requires
+the observation revision. After any UI-changing action, call `observe --json`
+again. On `STALE_REVISION` or `UNKNOWN_COMMAND_ID`, re-observe and reselect the
+command by stable fields such as `label`, `text`, `type`, or `priority`.
 
 ## Permissions
 
@@ -331,7 +319,7 @@ Only the head pending permission can be answered. If the CLI returns
 again and use the current `permissionRequest.id`.
 
 After answering a permission request, call `observe --json` before issuing the
-next UI command because the screen and command snapshot may have changed.
+next UI command because the screen revision and command set may have changed.
 When the id is omitted, the head pending permission is answered atomically.
 `--always` changes the permission policy for the remaining lifetime of that
 worker; it does not claim device-level or OS-level persistence. If a permission
@@ -357,11 +345,10 @@ Limits and defaults:
 
 - condition waits accept `0..120000` ms and use condition variables or file
   events rather than polling sleeps
-- legacy `wait <ms>` remains for compatibility
-- `key --duration MS` accepts `10..5000` and defaults to `80`.
+- `key hold --duration MS` accepts `10..5000` and defaults to `80`.
 - `drag --delay MS` accepts `5..1000` and defaults to `20`.
 - `drag` requires at least two points and an even coordinate count.
-- `tap` and `drag` coordinates must be non-negative integers.
+- `pointer tap` and `drag` coordinates must be non-negative integers.
 
 For Canvas games, numeric keypad input is often more reliable than directional
 aliases because many J2ME games document movement as `1` through `9`.
@@ -474,8 +461,8 @@ Useful first checks:
 
 ```bash
 ./kemu.sh status --json
-./kemu.sh logs controller --lines 120 --json
-./kemu.sh logs worker --lines 120 --json
+./kemu.sh logs cursor --json
+./kemu.sh logs read --jsonl
 ```
 
 Reset a stuck run with:
@@ -491,10 +478,9 @@ Reset a stuck run with:
   runtime.
 - `CONTROLLER_UNREACHABLE`: run `./kemu.sh stop --force --json`, then start
   again.
-- `NO_ACTIVE_APP` from `logs worker` after `close`: expected when no MIDlet is
+- `NO_ACTIVE_APP` from `logs read` after `close`: expected when no MIDlet is
   active.
-- `STALE_SNAPSHOT`: run `observe --json` again and retry with the new
-  `commandSnapshotId`.
+- `STALE_REVISION`: run `observe --json` again and retry with the new revision.
 - `SCREENSHOT_WRITE_FAILED`: check the parent directory, permissions, and that
   `--out` is a file path. A non-`.png` extension is a `USAGE_ERROR`.
 
@@ -506,7 +492,6 @@ Reset a stuck run with:
 - Use condition waits after actions instead of fixed sleeps and repeated
   observations.
 - Use `revision` guards for LCDUI controls and atomic commands.
-- Keep command snapshots only for compatibility with older callers.
 - Answer pending permissions before normal UI input.
 - Use screenshots with unique output paths for Canvas games and visual
   verification.

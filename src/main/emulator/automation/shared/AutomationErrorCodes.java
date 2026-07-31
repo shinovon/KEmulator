@@ -12,7 +12,6 @@ public final class AutomationErrorCodes {
 	public static final String PATH_NOT_FOUND = "PATH_NOT_FOUND";
 	public static final String PERMISSION_ORDER_VIOLATION = "PERMISSION_ORDER_VIOLATION";
 	public static final String SCREENSHOT_FAILED = "SCREENSHOT_FAILED";
-	public static final String STALE_SNAPSHOT = "STALE_SNAPSHOT";
 	public static final String STALE_REVISION = "STALE_REVISION";
 	public static final String TIMEOUT = "TIMEOUT";
 	public static final String LCDUI_CONTROL_UNAVAILABLE = "LCDUI_CONTROL_UNAVAILABLE";

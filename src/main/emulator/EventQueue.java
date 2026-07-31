@@ -25,6 +25,24 @@ public final class EventQueue implements Runnable {
 	public static final int EVENT_COMMAND = 19;
 	public static final int EVENT_ITEM_STATE = 20;
 	public static final int EVENT_HIDE = 21;
+	public static final int EVENT_TRACKED_COMMAND = 22;
+
+	public interface CommandDispatchListener {
+		void commandFinished(Throwable failure);
+	}
+
+	private static final class TrackedCommandAction {
+		private final Command command;
+		private final Object target;
+		private final CommandDispatchListener listener;
+
+		private TrackedCommandAction(
+			Command command, Object target, CommandDispatchListener listener) {
+			this.command = command;
+			this.target = target;
+			this.listener = listener;
+		}
+	}
 
 	boolean running;
 	private int[] events;
@@ -311,6 +329,14 @@ public final class EventQueue implements Runnable {
 		queue(EVENT_COMMAND);
 	}
 
+	public void commandActionTracked(
+		Command command, Object target, CommandDispatchListener listener) {
+		synchronized (eventArguments) {
+			eventArguments.add(new TrackedCommandAction(command, target, listener));
+		}
+		queue(EVENT_TRACKED_COMMAND);
+	}
+
 	public void gameGraphicsFlush() {
 		synchronized (repaintLock) {
 			IScreen scr = Emulator.getEmulator().getScreen();
@@ -502,6 +528,31 @@ public final class EventQueue implements Runnable {
 								((Item) target)._callCommandAction(cmd);
 							} else {
 								((Displayable) target)._callCommandAction(cmd);
+							}
+							break;
+						}
+						case EVENT_TRACKED_COMMAND: {
+							TrackedCommandAction action = (TrackedCommandAction) nextArgument();
+							Throwable failure = null;
+							try {
+								if (action.target instanceof Item) {
+									((Item) action.target)._callCommandAction(action.command);
+								} else {
+									((Displayable) action.target)._callCommandAction(action.command);
+								}
+							} catch (Throwable throwable) {
+								failure = throwable;
+							} finally {
+								action.listener.commandFinished(failure);
+							}
+							if (failure instanceof RuntimeException) {
+								throw (RuntimeException) failure;
+							}
+							if (failure instanceof Error) {
+								throw (Error) failure;
+							}
+							if (failure != null) {
+								throw new RuntimeException(failure);
 							}
 							break;
 						}

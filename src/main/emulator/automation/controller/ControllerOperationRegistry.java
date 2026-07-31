@@ -2,7 +2,6 @@ package emulator.automation.controller;
 
 import emulator.automation.shared.AutomationErrorCodes;
 import emulator.automation.shared.AutomationException;
-import emulator.automation.shared.AutomationLimits;
 import java.util.HashMap;
 import java.util.Map;
 import mjson.Json;
@@ -25,19 +24,6 @@ final class ControllerOperationRegistry {
 		this.workerSession = workerSession;
 		this.shutdownHandler = shutdownHandler;
 		registerCommands();
-	}
-
-	private static Json sleepTool(Json arguments) throws InterruptedException {
-		int durationMs = Math.max(0, arguments.at("durationMs", 250).asInteger());
-		if (durationMs > AutomationLimits.MAX_WAIT_MS) {
-			throw new AutomationException(
-				AutomationErrorCodes.INVALID_REQUEST,
-				"wait duration must be between 0 and " + AutomationLimits.MAX_WAIT_MS + " ms");
-		}
-
-		Thread.sleep(durationMs);
-
-		return Json.object().set("sleptMs", durationMs);
 	}
 
 	private void registerCommand(final String op, final DispatchMode dispatchMode, final ControllerAction action) {
@@ -144,11 +130,6 @@ final class ControllerOperationRegistry {
 				return workerSession.captureSnapshot(request);
 			}
 		});
-		registerCommand("app.wait", DispatchMode.QUEUED, new ControllerAction() {
-			public Json run(Json request) throws Exception {
-				return sleepTool(request);
-			}
-		});
 		registerCommand("app.wait-condition", DispatchMode.QUEUED, new ControllerAction() {
 			public Json run(Json request) throws Exception {
 				return workerSession.proxyWorker("wait", request);
@@ -187,11 +168,6 @@ final class ControllerOperationRegistry {
 		registerCommand("app.events.read", DispatchMode.QUEUED, new ControllerAction() {
 			public Json run(Json request) throws Exception {
 				return workerSession.proxyWorker("events-read", request);
-			}
-		});
-		registerCommand("logs.worker", DispatchMode.QUEUED, new ControllerAction() {
-			public Json run(Json request) throws Exception {
-				return workerSession.workerLogTail(request);
 			}
 		});
 		registerCommand("logs.cursor", DispatchMode.QUEUED, new ControllerAction() {

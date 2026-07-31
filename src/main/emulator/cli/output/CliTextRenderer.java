@@ -84,7 +84,6 @@ public final class CliTextRenderer {
 			+ "  kemu start [--headless|--visible] [--runtime " + runtimeUsage + "] [--size WxH] [--json]\n"
 			+ "  kemu status [--json]\n"
 			+ "  kemu stop [--force] [--json]\n"
-			+ "  kemu logs <controller|worker> [--lines N] [--json]\n"
 			+ "  kemu logs cursor [--json]\n"
 			+ "  kemu logs read [--since CURSOR] [--jsonl] [--json]\n"
 			+ "  kemu logs wait --regex REGEX [--since CURSOR] [--timeout MS] [--json]\n"
@@ -99,24 +98,21 @@ public final class CliTextRenderer {
 			+ "  kemu observe [--json]\n"
 			+ "  kemu events read [--since CURSOR] [--jsonl] [--json]\n"
 			+ "  kemu screenshot --out FILE [--json]\n"
-			+ "  kemu wait <ms> [--json]\n"
 			+ "  kemu wait display [--kind KIND] [--title TITLE] [--selected-index N]"
 			+ " [--after-revision REV] [--timeout MS] [--json]\n"
 			+ "  kemu wait <worker-ready|worker-exit|idle> [--timeout MS] [--json]\n"
 			+ "  kemu wait frame --after-revision REV [--timeout MS] [--json]\n"
 			+ "  kemu wait log --regex REGEX [--since CURSOR] [--timeout MS] [--json]\n"
-			+ "  kemu key <key> [--duration MS] [--json]\n"
 			+ "  kemu key press <key> [--wait-dispatched] [--json]\n"
 			+ "  kemu key hold <key> [--duration MS] [--wait-release] [--json]\n"
-			+ "  kemu tap <x> <y> [--json]\n"
 			+ "  kemu pointer tap <x> <y> [--wait-dispatched] [--json]\n"
 			+ "  kemu drag <x1> <y1> <x2> <y2> [<x3> <y3> ...] [--delay MS] [--json]\n"
 			+ "  kemu list <select N|move up|move down> [--expect-revision REV] [--json]\n"
 			+ "  kemu choice set N [--item-index INDEX] [--expect-revision REV] [--json]\n"
 			+ "  kemu gauge set VALUE [--item-index INDEX] [--expect-revision REV] [--json]\n"
 			+ "  kemu text-field set TEXT [--item-index INDEX] [--expect-revision REV] [--json]\n"
-			+ "  kemu command run [ID|--id ID|--label LABEL] [--snapshot ID]"
-			+ " [--expect-revision REV] [--wait-next-display] [--timeout MS] [--json]\n"
+			+ "  kemu command run <--id ID|--label LABEL> --expect-revision REV"
+			+ " [--wait-next-display] [--timeout MS] [--json]\n"
 			+ "  kemu permission <allow [--once|--always]|deny> [id] [--json]\n"
 			+ "\n"
 			+ "Notes:\n"
@@ -135,8 +131,7 @@ public final class CliTextRenderer {
 		if ("stop".equals(topic))
 			return "kemu stop [--force] [--json]";
 		if ("logs".equals(topic))
-			return "kemu logs <controller|worker> [--lines N] [--json]\n"
-				+ "       kemu logs cursor [--json]\n"
+			return "kemu logs cursor [--json]\n"
 				+ "       kemu logs read [--since CURSOR] [--jsonl] [--json]\n"
 				+ "       kemu logs wait --regex REGEX [--since CURSOR] [--timeout MS] [--json]";
 		if ("logs cursor".equals(topic))
@@ -166,8 +161,7 @@ public final class CliTextRenderer {
 		if ("screenshot".equals(topic))
 			return "kemu screenshot --out FILE [--json]";
 		if ("wait".equals(topic))
-			return "kemu wait <ms> [--json]\n"
-				+ "       kemu wait display [--kind KIND] [--title TITLE] [--selected-index N]"
+			return "kemu wait display [--kind KIND] [--title TITLE] [--selected-index N]"
 				+ " [--after-revision REV] [--timeout MS] [--json]\n"
 				+ "       kemu wait <worker-ready|worker-exit|idle> [--timeout MS] [--json]\n"
 				+ "       kemu wait frame --after-revision REV [--timeout MS] [--json]\n"
@@ -187,15 +181,12 @@ public final class CliTextRenderer {
 		if ("wait permission".equals(topic))
 			return "kemu wait permission [--name NAME] [--timeout MS] [--json]";
 		if ("key".equals(topic))
-			return "kemu key <key> [--duration MS] [--json]\n"
-				+ "       kemu key press <key> [--wait-dispatched] [--json]\n"
+			return "kemu key press <key> [--wait-dispatched] [--json]\n"
 				+ "       kemu key hold <key> [--duration MS] [--wait-release] [--json]";
 		if ("key press".equals(topic))
 			return "kemu key press <key> [--wait-dispatched] [--json]";
 		if ("key hold".equals(topic))
 			return "kemu key hold <key> [--duration MS] [--wait-release] [--json]";
-		if ("tap".equals(topic))
-			return "kemu tap <x> <y> [--json]";
 		if ("pointer".equals(topic) || "pointer tap".equals(topic))
 			return "kemu pointer tap <x> <y> [--wait-dispatched] [--json]";
 		if ("drag".equals(topic))
@@ -214,11 +205,11 @@ public final class CliTextRenderer {
 		if ("text-field".equals(topic) || "text-field set".equals(topic))
 			return "kemu text-field set TEXT [--item-index INDEX] [--expect-revision REV] [--json]";
 		if ("command".equals(topic))
-			return "kemu command run [ID|--id ID|--label LABEL] [--snapshot ID]"
-				+ " [--expect-revision REV] [--wait-next-display] [--timeout MS] [--json]";
+			return "kemu command run <--id ID|--label LABEL> --expect-revision REV"
+				+ " [--wait-next-display] [--timeout MS] [--json]";
 		if ("command run".equals(topic))
-			return "kemu command run [ID|--id ID|--label LABEL] [--snapshot ID]"
-				+ " [--expect-revision REV] [--wait-next-display] [--timeout MS] [--json]";
+			return "kemu command run <--id ID|--label LABEL> --expect-revision REV"
+				+ " [--wait-next-display] [--timeout MS] [--json]";
 		if ("permission".equals(topic))
 			return "kemu permission <allow [--once|--always]|deny> [id] [--json]";
 		if ("events read".equals(topic))
@@ -375,11 +366,14 @@ public final class CliTextRenderer {
 		}
 
 		out.append("Ready: ").append(payload.at("ready", false).asBoolean()).append('\n');
+		Json displayable = payload.at("displayable");
 		out.append("Title: ")
 			.append(
-				payload.at("title", Json.nil()).isNull()
+				displayable == null
+					|| displayable.isNull()
+					|| displayable.at("title", Json.nil()).isNull()
 					? ""
-					: payload.at("title").asString())
+					: displayable.at("title").asString())
 			.append('\n');
 
 		return trimTrailingNewline(out);
@@ -405,13 +399,15 @@ public final class CliTextRenderer {
 		out.append("Midlet started: ")
 			.append(payload.at("midletStarted", false).asBoolean())
 			.append('\n');
-		if (payload.has("title") && !payload.at("title").isNull()) {
-			out.append("Title: ").append(payload.at("title").asString()).append('\n');
+		Json displayable = payload.at("displayable");
+		if (displayable != null && !displayable.isNull()
+			&& displayable.has("title") && !displayable.at("title").isNull()) {
+			out.append("Title: ").append(displayable.at("title").asString()).append('\n');
 		}
-
-		if (payload.has("displayableKind") && !payload.at("displayableKind").isNull()) {
+		if (displayable != null && !displayable.isNull()
+			&& displayable.has("kind") && !displayable.at("kind").isNull()) {
 			out.append("Displayable: ")
-				.append(payload.at("displayableKind").asString())
+				.append(displayable.at("kind").asString())
 				.append('\n');
 		}
 
@@ -438,23 +434,21 @@ public final class CliTextRenderer {
 		out.append("Midlet started: ")
 			.append(payload.at("midletStarted", false).asBoolean())
 			.append('\n');
-		if (payload.has("displayableKind") && !payload.at("displayableKind").isNull()) {
-			out.append("Displayable: ")
-				.append(payload.at("displayableKind").asString())
-				.append('\n');
-		}
+			Json displayable = payload.at("displayable", Json.nil());
+			if (!displayable.isNull() && displayable.has("kind") && !displayable.at("kind").isNull()) {
+				out.append("Displayable: ")
+					.append(displayable.at("kind").asString())
+					.append('\n');
+			}
 
-		if (payload.has("title") && !payload.at("title").isNull()) {
-			out.append("Title: ").append(payload.at("title").asString()).append('\n');
-		}
+			if (!displayable.isNull() && displayable.has("title") && !displayable.at("title").isNull()) {
+				out.append("Title: ").append(displayable.at("title").asString()).append('\n');
+			}
 
-		Json commands = payload.at("commands", Json.array());
-		out.append("Commands: ").append(commands.asJsonList().size()).append('\n');
-		if (payload.has("commandSnapshotId") && !payload.at("commandSnapshotId").isNull()) {
-			out.append("Command snapshot: ")
-				.append(payload.at("commandSnapshotId").asInteger())
-				.append('\n');
-		}
+			Json commands = displayable.isNull()
+				? Json.array()
+				: displayable.at("commands", Json.array());
+			out.append("Commands: ").append(commands.asJsonList().size()).append('\n');
 
 		for (Json command : commands.asJsonList()) {
 			out.append("  [").append(command.at("id").asInteger()).append("] ");

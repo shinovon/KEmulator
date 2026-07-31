@@ -50,7 +50,6 @@ public final class KemuMain {
 		registry.add(new StatusCommand());
 		registry.add(new StartCommand());
 		registry.add(new StopCommand());
-		registry.add(new LogsCommand());
 		registry.add(new LogsCursorCommand());
 		registry.add(new LogsReadCommand());
 		registry.add(new InspectCommand());
@@ -59,7 +58,6 @@ public final class KemuMain {
 		registry.add(new StateCommand());
 		registry.add(new ObserveCommand());
 		registry.add(new ScreenshotCommand());
-		registry.add(new WaitCommand());
 		registry.add(new ConditionWaitCommand("display"));
 		registry.add(new ConditionWaitCommand("worker-ready"));
 		registry.add(new ConditionWaitCommand("worker-exit"));
@@ -68,10 +66,8 @@ public final class KemuMain {
 		registry.add(new ConditionWaitCommand("permission"));
 		registry.add(new WaitLogCommand());
 		registry.add(new WaitLogCommand(true));
-		registry.add(new KeyCommand());
 		registry.add(new KeyActionCommand("press"));
 		registry.add(new KeyActionCommand("hold"));
-		registry.add(new TapCommand());
 		registry.add(new PointerTapCommand());
 		registry.add(new DragCommand());
 		registry.add(new LcduiControlCommand("list", "select"));

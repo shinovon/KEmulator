@@ -72,16 +72,16 @@ public final class CliResponses {
 			return Json.object().set("active", false);
 		}
 
+		Json snapshot = session.at("session");
 		return Json.object()
 			.set("active", true)
 			.set("app", current.at("app"))
-			.set("ready", session.at("session").at("ready", false).asBoolean())
-			.set(
-				"midletStarted",
-				session.at("session").at("midletStarted", false).asBoolean())
-			.set("title", session.at("session").at("title"))
-			.set("displayableKind", session.at("session").at("displayableKind"))
-			.set("permissionRequest", session.at("session").at("permissionRequest"));
+			.set("schemaVersion", snapshot.at("schemaVersion"))
+			.set("revision", snapshot.at("revision"))
+			.set("ready", snapshot.at("ready", false).asBoolean())
+			.set("midletStarted", snapshot.at("midletStarted", false).asBoolean())
+			.set("displayable", snapshot.at("displayable"))
+			.set("permissionRequest", snapshot.at("permissionRequest"));
 	}
 
 	public static Json buildObservePayload(Json current, Json session) {

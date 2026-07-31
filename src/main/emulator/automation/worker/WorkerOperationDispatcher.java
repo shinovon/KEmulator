@@ -37,7 +37,7 @@ final class WorkerOperationDispatcher {
 				durationMs,
 				request.at("waitDispatched", false).asBoolean(),
 				request.at("waitRelease", false).asBoolean());
-			WorkerCommandSnapshots.invalidate();
+			WorkerCommands.invalidate();
 
 			return Json.object()
 				.set("ok", true)
@@ -57,7 +57,7 @@ final class WorkerOperationDispatcher {
 				x,
 				y,
 				request.at("waitDispatched", false).asBoolean());
-			WorkerCommandSnapshots.invalidate();
+			WorkerCommands.invalidate();
 
 			return Json.object().set("ok", true).set("x", x).set("y", y).set("delivery", delivery);
 		}
@@ -79,7 +79,7 @@ final class WorkerOperationDispatcher {
 				points,
 				delayMs,
 				request.at("waitDispatched", false).asBoolean());
-			WorkerCommandSnapshots.invalidate();
+			WorkerCommands.invalidate();
 
 			return Json.object()
 				.set("ok", true)
@@ -88,7 +88,7 @@ final class WorkerOperationDispatcher {
 		}
 
 		if ("select-command".equals(op)) {
-			return WorkerCommandSnapshots.select(request);
+			return WorkerCommands.select(request);
 		}
 
 		if ("wait".equals(op)) {
@@ -125,7 +125,7 @@ final class WorkerOperationDispatcher {
 			String mode = request.at("mode", "once").asString();
 
 			Json result = WorkerPermissions.resolve(id, allow, mode);
-			WorkerCommandSnapshots.invalidate();
+			WorkerCommands.invalidate();
 			WorkerEventModel.stateChanged(
 				"permission-resolved",
 				Json.object().set("id", result.at("id")).set("allow", allow).set("mode", mode));
