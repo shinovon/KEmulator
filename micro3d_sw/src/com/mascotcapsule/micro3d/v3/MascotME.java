@@ -86,49 +86,5 @@ public class MascotME {
 	// noEnvMapping disables environment mapping.
 	// noBlending hides polygons and sprites with blending enabled.
 	static boolean noLighting = false, noEnvMapping = false, noBlending = false;
-	
-	private static final void parseKey(String key, String value) {
-		try {
-			if (key.equals("showFPS")) {
-				showFPS = Integer.parseInt(value) == 1;
-			} else if (key.equals("showTimeMetrics")) {
-				showTimeMetrics = Integer.parseInt(value) == 1;
-			} else if (key.equals("showHeapUsage")) {
-				showHeapUsage = Integer.parseInt(value) == 1;
-			} else if (key.equals("horizontalFovFix")) {
-				horizontalFovFix = Integer.parseInt(value) == 1;
-			} else if (key.equals("fbClearColor")) {
-				fbClearColor = Integer.parseInt(value, 16);
-			} else if (key.equals("fbSizeWorkaround")) {
-				fbSizeWorkaround = Integer.parseInt(value) == 1;
-			} else if (key.equals("halfResRender")) {
-				halfResRender = Integer.parseInt(value) == 1;
-			} else if (key.equals("no2DInbetween")) {
-				no2DInbetween = Integer.parseInt(value) == 1;
-			} else if (key.equals("overwrite2D")) {
-				overwrite2D = Integer.parseInt(value) == 1;
-			} else if (key.equals("doNotClear")) {
-				doNotClear = Integer.parseInt(value) == 1;
-			} else if (key.equals("useArrayCopyClear")) {
-				useArrayCopyClear = Integer.parseInt(value) == 1;
-			} else if (key.equals("noNearClipping")) {
-				noNearClipping = Integer.parseInt(value) == 1;
-			} else if (key.equals("noFarClipping")) {
-				noFarClipping = Integer.parseInt(value) == 1;
-			} else if (key.equals("noToonSplitting")) {
-				noToonSplitting = Integer.parseInt(value) == 1;
-			} else if (key.equals("noLighting")) {
-				noLighting = Integer.parseInt(value) == 1;
-			} else if (key.equals("noEnvMapping")) {
-				noEnvMapping = Integer.parseInt(value) == 1;
-			} else if (key.equals("noBlending")) {
-				noBlending = Integer.parseInt(value) == 1;
-			} else {
-				throw new IllegalArgumentException(key);
-			}
-		} catch (NumberFormatException e) {
-			throw new NumberFormatException(key + " = " + value);
-		}
-	}
 
 }
