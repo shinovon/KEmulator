@@ -29,7 +29,7 @@ public class DeviceControl {
 	}
 
 	public static void startVibra(int paramInt, long paramLong) {
-		Emulator.getEmulator().getScreen().startVibra(paramLong);
+		Emulator.getEmulator().getScreen().startVibra(paramInt, paramLong);
 	}
 
 	public static void stopVibra() {

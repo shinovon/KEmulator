@@ -3,6 +3,7 @@ Copyright (c) 2024 Arman Jussupgaliyev
 */
 package emulator.ui.swt;
 
+import emulator.Settings;
 import emulator.UILocale;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -94,5 +95,9 @@ public class ScreenSizeDialog extends Dialog {
 		shell.setDefaultButton(ok);
 
 		width.setFocus();
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 	}
 }

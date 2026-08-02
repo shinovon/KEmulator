@@ -11,7 +11,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 	}
 
 	public String getName() {
-		return "KEmulator nnmod";
+		return "KEmnn 2.21.4 KEADDON";
 	}
 
 	public String getTitleName() {
@@ -19,7 +19,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 	}
 
 	public String getInfoString(String version) {
-		return "KEmulator nnmod " + version;
+		return "KEmulator nnmod v2.21.4 KEADDON";
 	}
 
 	public void loadLibraries() {

@@ -176,9 +176,8 @@ public final class Memory {
 
 	public boolean isNotInitialized(Class cls) {
 		try {
-			return unsafe != null && unsafe.shouldBeInitialized(cls);
+			return unsafe != null && (Boolean) unsafe.getClass().getMethod("shouldBeInitialized", Class.class).invoke(unsafe, cls);
 		} catch (Throwable ignored) {
-			// not available in 22+
 			return false;
 		}
 	}

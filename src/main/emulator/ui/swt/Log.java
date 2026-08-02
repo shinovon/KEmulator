@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.UILocale;
 import emulator.custom.CustomMethod;
 import emulator.ui.ILogStream;
@@ -142,14 +143,18 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 	private void initWindows() {
 		final FillLayout layout;
 		(layout = new FillLayout()).spacing = 0;
-		layout.marginWidth = 1;
-		layout.marginHeight = 1;
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
 		(this.logShell = new Shell()).setText(UILocale.get("LOG_FRAME_TITLE", "Log"));
 		this.logShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.logShell.setLayout(layout);
 		this.logShell.setSize(new Point(310, 254));
 		int style = SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
 		this.styledText = new StyledText(this.logShell, style);
+		EmulatorScreen.markThemeable(logShell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(logShell, true);
+		}
 	}
 
 	public final boolean isAttachedToParent() {
@@ -210,8 +215,11 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 			if (!class11.logOpen || class11.styledText.isDisposed()) {
 				return;
 			}
+			boolean atBottom = class11.styledText.getTopIndex() + class11.styledText.getClientArea().height / class11.styledText.getLineHeight() >= class11.styledText.getLineCount();
 			class11.styledText.append(s);
-			class11.styledText.setTopIndex(class11.styledText.getLineCount());
+			if (atBottom) {
+				class11.styledText.setTopIndex(class11.styledText.getLineCount());
+			}
 		}
 	}
 

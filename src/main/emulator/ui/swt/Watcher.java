@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.debug.ClassTypes;
 import emulator.debug.Instance;
 import emulator.debug.Memory;
@@ -669,6 +670,10 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		this.treeEditor = new TreeEditor(this.tree);
 		this.treeEditor.horizontalAlignment = SWT.LEFT;
 		this.treeEditor.grabHorizontal = true;
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 	}
 
 	private void createFilter() {

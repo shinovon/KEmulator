@@ -132,6 +132,10 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 				clientArea.x + (int) (clientArea.height * 0.025),
 				clientArea.y + (int) (clientArea.height * 0.025)
 		);
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 	}
 
 	private void updateAll() {

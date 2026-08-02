@@ -2,6 +2,7 @@ package emulator.ui.swt;
 
 import emulator.Emulator;
 import emulator.KeyMapping;
+import emulator.Settings;
 import emulator.UILocale;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
@@ -10,6 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -111,7 +113,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 		this.aShell1404.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.aShell1404.setLayout(layout);
 		this.aShell1404.setSize(new Point(259, 280));
-		(this.aButton1405 = new Button(this.aShell1404, 8388608)).setText(UILocale.get("KEYPAD_FRAME_LSK", "Left Soft Key"));
+		(this.aButton1405 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText(UILocale.get("KEYPAD_FRAME_LSK", "Left Soft Key"));
 		KeyPad aClass161_14001 = this;
 		this.aButton1405.addMouseListener(new MouseAdapter() {
 			private final KeyPad aClass161_1400 = aClass161_14001;
@@ -124,9 +126,9 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1400, 17);
 			}
 		});
-		(this.aButton1428 = new Button(this.aShell1404, 8388608)).setEnabled(false);
+		(this.aButton1428 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setEnabled(false);
 		this.aButton1428.setVisible(false);
-		(this.aButton1407 = new Button(this.aShell1404, 8388608)).setText(UILocale.get("KEYPAD_FRAME_RSK", "Right Soft Key"));
+		(this.aButton1407 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText(UILocale.get("KEYPAD_FRAME_RSK", "Right Soft Key"));
 		this.aButton1407.setLayoutData(layoutData6);
 		KeyPad aClass161_13991 = this;
 		this.aButton1407.addMouseListener(new MouseAdapter() {
@@ -140,9 +142,9 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1399, 18);
 			}
 		});
-		(this.aButton1429 = new Button(this.aShell1404, 8388608)).setEnabled(false);
+		(this.aButton1429 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setEnabled(false);
 		this.aButton1429.setVisible(false);
-		(this.aButton1410 = new Button(this.aShell1404, 8388612)).setText("Up");
+		(this.aButton1410 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT | SWT.CENTER)).setText("Up");
 		this.aButton1410.setLayoutData(layoutData5);
 		KeyPad aClass161_13981 = this;
 		this.aButton1410.addMouseListener(new MouseAdapter() {
@@ -156,9 +158,9 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1398, 12);
 			}
 		});
-		(this.aButton1430 = new Button(this.aShell1404, 8388608)).setEnabled(false);
+		(this.aButton1430 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setEnabled(false);
 		this.aButton1430.setVisible(false);
-		(this.aButton1411 = new Button(this.method833(), 8404996)).setText("Left");
+		(this.aButton1411 = new Button(this.method833(), SWT.PUSH | SWT.FLAT | SWT.CENTER)).setText("Left");
 		this.aButton1411.setLayoutData(layoutData3);
 		KeyPad aClass161_13971 = this;
 		this.aButton1411.addMouseListener(new MouseAdapter() {
@@ -172,7 +174,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1397, 14);
 			}
 		});
-		(this.aButton1409 = new Button(this.aShell1404, 8388608)).setText("Pad");
+		(this.aButton1409 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("Pad");
 		this.aButton1409.setLayoutData(layoutData4);
 		((Control) this.aButton1409).setFocus();
 		KeyPad aClass161_13961 = this;
@@ -187,7 +189,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1396, 16);
 			}
 		});
-		(this.aButton1412 = new Button(this.method833(), 8519684)).setText("Right");
+		(this.aButton1412 = new Button(this.method833(), SWT.PUSH | SWT.FLAT | SWT.CENTER)).setText("Right");
 		this.aButton1412.setLayoutData(layoutData2);
 		KeyPad aClass161_13951 = this;
 		this.aButton1412.addMouseListener(new MouseAdapter() {
@@ -201,9 +203,9 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1395, 15);
 			}
 		});
-		(this.aButton1427 = new Button(this.aShell1404, 8388608)).setEnabled(false);
+		(this.aButton1427 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setEnabled(false);
 		this.aButton1427.setVisible(false);
-		(this.aButton1413 = new Button(this.method833(), 8389636)).setText("Down");
+		(this.aButton1413 = new Button(this.method833(), SWT.PUSH | SWT.FLAT | SWT.CENTER)).setText("Down");
 		this.aButton1413.setLayoutData(layoutData);
 		KeyPad aClass161_13941 = this;
 		this.aButton1413.addMouseListener(new MouseAdapter() {
@@ -217,9 +219,9 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1394, 13);
 			}
 		});
-		(this.aButton1426 = new Button(this.aShell1404, 8388608)).setEnabled(false);
+		(this.aButton1426 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setEnabled(false);
 		this.aButton1426.setVisible(false);
-		(this.aButton1414 = new Button(this.aShell1404, 8388608)).setText("1");
+		(this.aButton1414 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("1");
 		this.aButton1414.setLayoutData(gridData);
 		KeyPad aClass161_13931 = this;
 		this.aButton1414.addMouseListener(new MouseAdapter() {
@@ -233,7 +235,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1393, 1);
 			}
 		});
-		(this.aButton1415 = new Button(this.aShell1404, 8388608)).setText("2 abc");
+		(this.aButton1415 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("2 abc");
 		this.aButton1415.setLayoutData(gridData);
 		KeyPad aClass161_13761 = this;
 		this.aButton1415.addMouseListener(new MouseAdapter() {
@@ -247,7 +249,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1376, 2);
 			}
 		});
-		(this.aButton1416 = new Button(this.aShell1404, 8388608)).setText("3 def");
+		(this.aButton1416 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("3 def");
 		this.aButton1416.setLayoutData(gridData);
 		KeyPad aClass161_10541 = this;
 		this.aButton1416.addMouseListener(new MouseAdapter() {
@@ -261,7 +263,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1054, 3);
 			}
 		});
-		(this.aButton1417 = new Button(this.aShell1404, 8388608)).setText("4 ghi");
+		(this.aButton1417 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("4 ghi");
 		this.aButton1417.setLayoutData(gridData);
 		KeyPad aClass161_10471 = this;
 		this.aButton1417.addMouseListener(new MouseAdapter() {
@@ -275,7 +277,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1047, 4);
 			}
 		});
-		(this.aButton1418 = new Button(this.aShell1404, 8388608)).setText("5 jkl");
+		(this.aButton1418 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("5 jkl");
 		this.aButton1418.setLayoutData(gridData);
 		KeyPad aClass161_9401 = this;
 		this.aButton1418.addMouseListener(new MouseAdapter() {
@@ -289,7 +291,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_940, 5);
 			}
 		});
-		(this.aButton1419 = new Button(this.aShell1404, 8388608)).setText("6 mno");
+		(this.aButton1419 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("6 mno");
 		this.aButton1419.setLayoutData(gridData);
 		KeyPad aClass161_11991 = this;
 		this.aButton1419.addMouseListener(new MouseAdapter() {
@@ -303,7 +305,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1199, 6);
 			}
 		});
-		(this.aButton1420 = new Button(this.aShell1404, 8388608)).setText("7 pqrs");
+		(this.aButton1420 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("7 pqrs");
 		this.aButton1420.setLayoutData(gridData);
 		KeyPad aClass161_12861 = this;
 		this.aButton1420.addMouseListener(new MouseAdapter() {
@@ -317,7 +319,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1286, 7);
 			}
 		});
-		(this.aButton1421 = new Button(this.aShell1404, 8388608)).setText("8 tuv");
+		(this.aButton1421 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("8 tuv");
 		this.aButton1421.setLayoutData(gridData);
 		KeyPad aClass161_12321 = this;
 		this.aButton1421.addMouseListener(new MouseAdapter() {
@@ -331,7 +333,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1232, 8);
 			}
 		});
-		(this.aButton1422 = new Button(this.aShell1404, 8388608)).setText("9 wxyz");
+		(this.aButton1422 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("9 wxyz");
 		this.aButton1422.setLayoutData(gridData);
 		KeyPad aClass161_12971 = this;
 		this.aButton1422.addMouseListener(new MouseAdapter() {
@@ -345,7 +347,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1297, 9);
 			}
 		});
-		(this.aButton1423 = new Button(this.aShell1404, 8388608)).setText("* .");
+		(this.aButton1423 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("* .");
 		this.aButton1423.setLayoutData(gridData);
 		KeyPad aClass161_12951 = this;
 		this.aButton1423.addMouseListener(new MouseAdapter() {
@@ -359,7 +361,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1295, 10);
 			}
 		});
-		(this.aButton1424 = new Button(this.aShell1404, 8388608)).setText("0");
+		(this.aButton1424 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("0");
 		this.aButton1424.setLayoutData(gridData);
 		KeyPad aClass161_12131 = this;
 		this.aButton1424.addMouseListener(new MouseAdapter() {
@@ -373,7 +375,7 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1213, 0);
 			}
 		});
-		(this.aButton1425 = new Button(this.aShell1404, 8388608)).setText("# -+");
+		(this.aButton1425 = new Button(this.aShell1404, SWT.PUSH | SWT.FLAT)).setText("# -+");
 		this.aButton1425.setLayoutData(gridData);
 		KeyPad aClass161_12111 = this;
 		this.aButton1425.addMouseListener(new MouseAdapter() {
@@ -387,6 +389,10 @@ public final class KeyPad implements ControlListener, DisposeListener {
 				method840(this.aClass161_1211, 11);
 			}
 		});
+		EmulatorScreen.markThemeable(aShell1404);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(aShell1404, true);
+		}
 	}
 
 	private static void method832(final int n) {

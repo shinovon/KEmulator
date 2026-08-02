@@ -129,7 +129,6 @@ public final class SWTFrontend implements IEmulatorFrontend {
 	}
 
 	public final void disposeSubWindows() {
-		Settings.showLogFrame = this.ilogstream.isLogOpen();
 		Settings.showInfoFrame = this.infos.isShown();
 		this.keyPad.dipose();
 		this.ilogstream.dispose();

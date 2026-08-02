@@ -28,6 +28,8 @@ public interface IScreen {
 
 	void startVibra(final long p0);
 
+	void startVibra(final int intensity, final long duration);
+
 	void stopVibra();
 
 	ICaret getCaret();

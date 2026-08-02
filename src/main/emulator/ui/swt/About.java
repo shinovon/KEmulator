@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.graphics2D.swt.ImageSWT;
 import emulator.ui.effect.WaterEffect;
 import org.eclipse.swt.SWT;
@@ -71,7 +72,7 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 		layout.horizontalSpacing = 0;
 
 		this.aboutShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-		aboutShell.setText("About KEmulator");
+		aboutShell.setText("About KEmnnx64");
 		this.aboutShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.aboutShell.setLayout(layout);
 		aboutShell.addShellListener(new ShellAdapter() {
@@ -220,6 +221,10 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 		this.setText(helpText, "/res/help");
 		this.setText(apisText, "/res/apis");
 		this.setText(creditsText, "/res/credits");
+		EmulatorScreen.markThemeable(aboutShell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(aboutShell, true);
+		}
 	}
 
 	private void setText(StyledText styledText, String res) {

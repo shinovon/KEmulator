@@ -5,6 +5,7 @@ package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.ui.swt.EmulatorScreen;
 import emulator.Utils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
@@ -114,6 +115,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		if (Utils.macos) {
 			new Label(shell, SWT.NONE).setText("Mac OS is not supported yet. Reach us to become a tester!");
 			shell.layout(true, true);
+			EmulatorScreen.markThemeable(shell);
+			if (Settings.favoritesDarkMode) EmulatorScreen.applyThemeToShell(shell, true);
 			return;
 		}
 
@@ -485,6 +488,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 
 
 		shell.layout(true, true);
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) EmulatorScreen.applyThemeToShell(shell, true);
 		return;
 
 	}

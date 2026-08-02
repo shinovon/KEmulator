@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
 import emulator.Emulator;
+import emulator.Settings;
 import emulator.UILocale;
 import emulator.ui.IMessage;
 import org.eclipse.swt.custom.StyledText;
@@ -133,10 +134,17 @@ public final class MessageConsole implements IMessage, ControlListener, DisposeL
 	private void method487() {
 		(this.shell = new Shell()).setText(UILocale.get("SMS_CONSOLE_TITLE", "SMS Console"));
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		this.shell.setLayout(new GridLayout());
+		GridLayout gl = new GridLayout();
+		gl.marginWidth = 0;
+		gl.marginHeight = 0;
+		this.shell.setLayout(gl);
 		this.shell.setSize(new Point(100, 200));
 		this.method490();
 		this.method491();
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 	}
 
 	private void method490() {

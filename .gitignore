@@ -1,46 +1,17 @@
-# Compiled class file
-*.class
-
-# Log file
+build_out/
+home/
+tools/
+original-source-code/
+source-code/
+READY-TO-SHIP/
+KEADDON_x32/
+KEADDON_x64/
+git-snapshotter/
+generate-changes.ps1
+generate-changes.bat
+relevant-file-changes.txt
+wishlist.txt
+x32_KEmulator.jar
+x64_KEmulator.jar
+*.bak
 *.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-*.jar0
-
-# virtual machine crash logs
-hs_err_pid*
-
-*.cmd
-*.bat
-
-# compiled binaries
-bin
-KEmulator.jar
-emulator.jar
-mapping*.txt
-*.exe
-
-# emulator files
-kemulator.cfg
-
-# vlc dirs
-plugins
-
-config_fast.txt
-m3g_*.jar
-micro3d_*.jar
-KEmulator_x64.jar
-kemulator-debug.jar
-version.mf

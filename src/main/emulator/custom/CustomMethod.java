@@ -300,6 +300,7 @@ public class CustomMethod {
 			Emulator.getEventQueue().stop();
 			Emulator3D.exit();
 		} catch (Throwable ignored) {}
+		Emulator.killJ2MEGamepad();
 		if (trackWriter != null) {
 			try {
 				trackWriter.close();

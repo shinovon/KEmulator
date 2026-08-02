@@ -114,6 +114,10 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		memoryControls.setLayoutData(controlsLayout);
 
 		this.createSeparator();
+		EmulatorScreen.markThemeable(shell);
+		if (Settings.favoritesDarkMode) {
+			EmulatorScreen.applyThemeToShell(shell, true);
+		}
 	}
 
 	private void createSeparator() {
@@ -126,7 +130,8 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		horizontalSeparator = new SashForm(this.shell, 0);
 		horizontalSeparator.setOrientation(SWT.VERTICAL);
 		this.horizontalSeparator.setSashWidth(5);
-		this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+		if (!Settings.favoritesDarkMode)
+			this.horizontalSeparator.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
 		this.horizontalSeparator.setLayoutData(layoutData);
 
 		createMemoryView();
@@ -450,8 +455,15 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			y += fh * 4;
 		int x = 10;
 		int max = 0;
-		final Color background = new Color(null, 151, 150, 147);
-		final Color regularColor = new Color(null, 0, 0, 0);
+		final Color background;
+		final Color regularColor;
+		if (Settings.favoritesDarkMode) {
+			background = EmulatorScreen.getThemeDarkBg();
+			regularColor = EmulatorScreen.getThemeDarkFg();
+		} else {
+			background = new Color(null, 151, 150, 147);
+			regularColor = new Color(null, 0, 0, 0);
+		}
 
 		final Color releasedColor = new Color(null, 200, 0, 0);
 		final Color selectedColor = new Color(null, 0, 255, 0);
@@ -528,10 +540,13 @@ public final class MemoryView implements DisposeListener, ControlListener {
 				max = Math.max(max, imgH);
 			}
 		}
-		background.dispose();
+		if (!Settings.favoritesDarkMode) {
+			background.dispose();
+			regularColor.dispose();
+		}
 		releasedColor.dispose();
-		regularColor.dispose();
 		selectedColor.dispose();
+		texColor.dispose();
 		int anInt1144 = y + max + this.imagesCanvasScroll + 10;
 		this.imagesCanvas.getVerticalBar().setMaximum(anInt1144);
 		this.imagesCanvas.getVerticalBar().setThumb(Math.min(anInt1144, this.imagesCanvas.getClientArea().height));
