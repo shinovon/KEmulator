@@ -349,7 +349,10 @@ public final class Property implements IProperty, SelectionListener {
 			this.fontLargeSize = Integer.parseInt(properties.getProperty("FontLargeSize", String.valueOf(16)));
 //			Settings.g2d = (properties.getProperty("2D_Graphics_Engine", "AWT").equalsIgnoreCase("SWT") ? 0 : 1);
 			Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ").equalsIgnoreCase("SWERVE") ? 0 : 1);
-			Settings.micro3d = (properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL").equalsIgnoreCase("DLL") ? 0 : 1);
+			{
+				String s = properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL");
+				Settings.micro3d = s.equalsIgnoreCase("DLL") ? 0 : s.equalsIgnoreCase("SW") ? 2 : 1;
+			}
 
 			// keyboard mappings
 			if (properties.containsKey("MAP_KEY_NUM_0")) {
@@ -611,7 +614,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("FontLargeSize", String.valueOf(this.fontLargeSize));
 			properties.setProperty("2D_Graphics_Engine", /*(Settings.g2d == 0) ? "SWT" : */"AWT");
 			properties.setProperty("3D_Graphics_Engine", (Settings.g3d == 0) ? "SWERVE" : "LWJ");
-			properties.setProperty("Micro3D_Engine", (Settings.micro3d == 0) ? "DLL" : "GL");
+			properties.setProperty("Micro3D_Engine", Settings.micro3d == 0 ? "DLL" : Settings.micro3d == 2 ? "SW" : "GL");
 
 			// keyboard mappings
 			properties.setProperty("MAP_KEY_NUM_0", KeyMapping.get(0));

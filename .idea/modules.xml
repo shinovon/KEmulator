@@ -11,6 +11,7 @@
       <module fileurl="file://$PROJECT_DIR$/m3g_swerve/m3g_swerve.iml" filepath="$PROJECT_DIR$/m3g_swerve/m3g_swerve.iml" />
       <module fileurl="file://$PROJECT_DIR$/micro3d_dll/micro3d_dll.iml" filepath="$PROJECT_DIR$/micro3d_dll/micro3d_dll.iml" />
       <module fileurl="file://$PROJECT_DIR$/micro3d_gl/micro3d_gl.iml" filepath="$PROJECT_DIR$/micro3d_gl/micro3d_gl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/micro3d_sw/micro3d_sw.iml" filepath="$PROJECT_DIR$/micro3d_sw/micro3d_sw.iml" />
       <module fileurl="file://$PROJECT_DIR$/updater/updater.iml" filepath="$PROJECT_DIR$/updater/updater.iml" />
     </modules>
   </component>

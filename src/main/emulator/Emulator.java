@@ -817,6 +817,8 @@ public class Emulator implements Runnable {
 				Settings.micro3d = 1;
 			} else if (key.equals("mascotdll")) {
 				Settings.micro3d = 0;
+			} else if (key.equals("mascotsw")) {
+				Settings.micro3d = 2;
 			} else if (key.equalsIgnoreCase("log")) {
 				Settings.showLogFrame = true;
 			} else if (key.equalsIgnoreCase("uei")) {
@@ -1114,7 +1116,7 @@ public class Emulator implements Runnable {
 
 		cmd.add(engine2d == 0 ? "-swt" : "-awt");
 		cmd.add(engine3d == 0 ? "-swerve" : "-lwj");
-		cmd.add(mascotEngine == 0 ? "-mascotdll" : "-mascotgl");
+		cmd.add(mascotEngine == 0 ? "-mascotdll" : mascotEngine == 2 ? "-mascotsw" : "-mascotgl");
 
 		cmd.add("-s");
 

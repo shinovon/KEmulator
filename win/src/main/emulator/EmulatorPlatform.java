@@ -75,7 +75,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 			} catch (Throwable ignored) {
 			}
 			if (!mascotLoaded) {
-				addToClassPath(Settings.micro3d == 0 ? "micro3d_dll.jar" : "micro3d_gl.jar");
+				addToClassPath(Settings.micro3d == 0 ? "micro3d_dll.jar" : Settings.micro3d == 2 ? "micro3d_sw.jar" : "micro3d_gl.jar");
 			}
 		}
 	}

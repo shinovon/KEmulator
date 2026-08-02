@@ -171,6 +171,7 @@ public final class EmulatorScreen implements
 	private boolean pointerState;
 	private boolean win;
 	private MenuItem glM3DMenuItem;
+	private MenuItem dllM3DMenuItem;
 	private MenuItem softM3DMenuItem;
 	private Menu menuM3DEngine;
 	/**
@@ -1245,10 +1246,14 @@ public final class EmulatorScreen implements
 		glM3DMenuItem.setText("LWJGL");
 		glM3DMenuItem.setSelection(Settings.micro3d == 1);
 		glM3DMenuItem.addSelectionListener(this);
+		dllM3DMenuItem = new MenuItem(this.menuM3DEngine, SWT.RADIO);
+		dllM3DMenuItem.setText("Software (DLL)");
+		dllM3DMenuItem.setSelection(Settings.micro3d == 0);
+		dllM3DMenuItem.setEnabled(!Emulator.isX64());
+		dllM3DMenuItem.addSelectionListener(this);
 		softM3DMenuItem = new MenuItem(this.menuM3DEngine, SWT.RADIO);
-		softM3DMenuItem.setText("Software");
-		softM3DMenuItem.setSelection(Settings.micro3d == 0);
-		softM3DMenuItem.setEnabled(!Emulator.isX64());
+		softM3DMenuItem.setText("Software (MascotME)");
+		softM3DMenuItem.setSelection(Settings.micro3d == 2);
 		softM3DMenuItem.addSelectionListener(this);
 
 
@@ -1546,22 +1551,33 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (parent == menuM3DEngine) {
-			if (menuItem == softM3DMenuItem) {
+			if (menuItem == dllM3DMenuItem) {
 				if (pauseState != 0 && Settings.micro3d != 0) {
 					Emulator.loadGame(null, Settings.g2d, Settings.g3d, 0, false);
 					return;
 				}
 				Settings.micro3d = 0;
 				glM3DMenuItem.setSelection(false);
-				softM3DMenuItem.setSelection(true);
+				softM3DMenuItem.setSelection(false);
+				dllM3DMenuItem.setSelection(true);
 			} else if (menuItem == glM3DMenuItem) {
 				if (pauseState != 0 && Settings.micro3d != 1) {
 					Emulator.loadGame(null, Settings.g2d, Settings.g3d, 1, false);
 					return;
 				}
 				Settings.micro3d = 1;
+				dllM3DMenuItem.setSelection(false);
 				softM3DMenuItem.setSelection(false);
 				glM3DMenuItem.setSelection(true);
+			} else if (menuItem == softM3DMenuItem) {
+				if (pauseState != 0 && Settings.micro3d != 2) {
+					Emulator.loadGame(null, Settings.g2d, Settings.g3d, 2, false);
+					return;
+				}
+				Settings.micro3d = 2;
+				dllM3DMenuItem.setSelection(false);
+				glM3DMenuItem.setSelection(false);
+				softM3DMenuItem.setSelection(true);
 			}
 			return;
 		}

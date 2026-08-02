@@ -18,7 +18,7 @@ public final class Settings {
 	// 2d and 3d engines
 	public static int g2d = 1; // swt - 0, awt - 1
 	public static int g3d = 1; // 0 - swerve, 1 - lwjgl
-	public static int micro3d = 1; // 0 - dll, 1 - gl
+	public static int micro3d = 1; // 0 - dll, 1 - gl, 2 - sw
 	public static int m3gContextMode; // 0 - auto, 1 - glcanvas, 2 - lwjglx canvas, 3 - glfw window
 
 	// security and system properties
