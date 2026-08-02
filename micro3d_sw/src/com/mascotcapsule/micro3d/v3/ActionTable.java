@@ -6,6 +6,8 @@
 
 package com.mascotcapsule.micro3d.v3;
 
+import emulator.custom.ResourceManager;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +23,7 @@ public class ActionTable {
 	public ActionTable(String name) throws IOException {
 		if (name == null) throw new NullPointerException();
 		
-		InputStream is = getClass().getResourceAsStream(name);
+		InputStream is = ResourceManager.getResourceAsStream(name);
 		if (is == null) throw new IOException("Resource not found: " + name);
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
