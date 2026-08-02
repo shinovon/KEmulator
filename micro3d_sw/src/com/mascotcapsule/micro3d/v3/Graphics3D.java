@@ -312,8 +312,8 @@ public class Graphics3D {
 		boundGraphics = graphics;
 		
 		//Try to get framebuffer resolution
-		int clipX = graphics.getClipX();
-		int clipY = graphics.getClipY();
+		int clipX = graphics.getClipX() + graphics.getTranslateX();
+		int clipY = graphics.getClipY() + graphics.getTranslateY();
 		int clipW = graphics.getClipWidth();
 		int clipH = graphics.getClipHeight();
 		
