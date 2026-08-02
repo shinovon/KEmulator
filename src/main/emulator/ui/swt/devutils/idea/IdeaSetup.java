@@ -114,7 +114,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		if (Utils.macos) {
 			new Label(shell, SWT.NONE).setText("Mac OS is not supported yet. Reach us to become a tester!");
 			shell.layout(true, true);
-			return;
+			// return;
 		}
 
 		if (!Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei"))) {
@@ -146,6 +146,17 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				}
 				if (Files.exists(Paths.get(PROGUARD_AUR_PATH_UNIX))) {
 					Settings.proguardPath = PROGUARD_AUR_PATH_UNIX;
+					refreshContent();
+					return;
+				}
+			} else if (this instanceof IdeaSetupDarwin) {
+				if (Files.exists(Paths.get("/opt/homebrew/Cellar/proguard/"))) {
+					Settings.proguardPath = "/opt/homebrew/Cellar/proguard/";
+					refreshContent();
+					return;
+				}
+				if (Files.exists(Paths.get("/usr/local/Cellar/proguard/"))) {
+					Settings.proguardPath = "/usr/local/Cellar/proguard/";
 					refreshContent();
 					return;
 				}
@@ -367,6 +378,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 					new Label(jdkSetupGroup, SWT.NONE).setText("Nothing found.");
 				}
 			}
+			// todo add jdk for macos
 
 			Group manualJdkSetupGroup = new Group(shell, SWT.NONE);
 			manualJdkSetupGroup.setText("Manual selection");
@@ -713,6 +725,14 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 								throw new RuntimeException();
 							}
 						}
+						if (Utils.macos) {
+							Path path = Paths.get(System.getenv("HOME") + "/Library/Caches/JetBrains/" + defaultFolderName);
+							if (Files.exists(path)) {
+								Runtime.getRuntime().exec(new String[]{"/bin/rm", "-rf", path.toAbsolutePath().toString()}).waitFor();
+							} else {
+								throw new RuntimeException();
+							}
+						}
 					} catch (Exception ignored) {
 						errorMsg("Failed to clear caches", "If your IDE behaves wrong, try do that via \"File > Invalidate caches...\" menu there. Everything else is done successfully, you may get to work.");
 					}
@@ -737,6 +757,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			fd.setFilterExtensions(new String[]{"idea*.exe", "idea*.bat"});
 		else if (Utils.linux)
 			fd.setFilterExtensions(new String[]{"idea", "idea*.sh"});
+		else if (Utils.macos)
+			fd.setFilterExtensions(new String[]{"IntelliJ IDEA.app"});
 		String path = fd.open();
 		if (path == null) return;
 		Settings.ideaPath = path;
@@ -814,6 +836,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		Path infoPath;
 		if (Settings.ideaPath.equals("/usr/bin/idea"))
 			infoPath = Paths.get("/usr/share/idea/product-info.json");
+		else if (Settings.ideaPath.equals("/Applications/IntelliJ IDEA.app/Contents/MacOS/idea"))
+			infoPath = Paths.get("/Applications/IntelliJ IDEA.app/Contents/Resources/product-info.json");
 		else
 			infoPath = Paths.get(Settings.ideaPath).getParent().getParent().resolve("product-info.json");
 		String content = String.join("", Files.readAllLines(infoPath));
