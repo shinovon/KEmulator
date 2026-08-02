@@ -8,6 +8,7 @@ package com.mascotcapsule.micro3d.v3;
 import emulator.Emulator;
 
 import javax.microedition.lcdui.Graphics;
+import java.util.Arrays;
 
 public class Graphics3D {
 	//Constants
@@ -92,10 +93,9 @@ public class Graphics3D {
 	private int fbDrawCounter;
 	
 	private long prevStatsCheck;
-	private int framesCount, fps, frameTime;
+	private int framesCount;
 	private int bindAccum, figureAccum, primCmdAccum, flushAccum, releaseAccum;
 	private int bindTime, figureTime, primCmdTime, flushTime, releaseTime;
-	private int heapUsage;
 	
 	private boolean disposed;
 
@@ -323,10 +323,10 @@ public class Graphics3D {
 		} else {
 			int dummyW = Emulator.getEmulator().getScreen().getWidth();
 			int dummyH = Emulator.getEmulator().getScreen().getHeight();
-			
+
 			int clipX2 = clipW + clipX;
 			int clipY2 = clipH + clipY;
-			
+
 			if (clipX2 == dummyH || clipY2 == dummyW) {
 				fbWidth = dummyH;
 				fbHeight = dummyW;
@@ -339,8 +339,6 @@ public class Graphics3D {
 		if (frameBuffer == null || frameBuffer.length < fbWidth * fbHeight) {
 			frameBuffer = new int[fbWidth * fbHeight];
 		}
-		
-		if (MascotME.halfResRender) fbHeight /= 2;
 		
 		setClip(clipX, clipY, clipW, clipH);
 		
@@ -364,42 +362,7 @@ public class Graphics3D {
 	}
 	
 	private final void clearFB(int color) {
-		int[] fb = frameBuffer;
-		final int fbLen = fbWidth * fbHeight;
-		int cleared = fbLen;
-		if (MascotME.useArrayCopyClear) cleared >>= 8;
-
-		int i = 0;
-		while (cleared - i >= 16) {
-			fb[i] = color;
-			fb[i + 1] = color;
-			fb[i + 2] = color;
-			fb[i + 3] = color;
-			fb[i + 4] = color;
-			fb[i + 5] = color;
-			fb[i + 6] = color;
-			fb[i + 7] = color;
-			fb[i + 8] = color;
-			fb[i + 9] = color;
-			fb[i + 10] = color;
-			fb[i + 11] = color;
-			fb[i + 12] = color;
-			fb[i + 13] = color;
-			fb[i + 14] = color;
-			fb[i + 15] = color;
-			i += 16;
-		}
-
-		for (; i < cleared; i++) {
-			fb[i] = color;
-		}
-		
-		while (cleared < fbLen) {
-			int cleared2 = cleared << 1;
-			if (cleared2 > fbLen) cleared2 = fbLen;
-			System.arraycopy(fb, 0, fb, cleared, cleared2 - cleared);
-			cleared = cleared2;
-		}
+		Arrays.fill(frameBuffer, 0, fbWidth * fbHeight, color);
 	}
 	
 	private final void clearFBAlpha(int clipX, int clipY, int clipW, int clipH) {
@@ -438,23 +401,8 @@ public class Graphics3D {
 	
 	private final void drawFB(int clipX, int clipY, int clipW, int clipH) {
 		boolean alphaBlending = MascotME.overwrite2D ? (fbDrawCounter > 0) : true;
-		
-		if (MascotME.halfResRender) {
-			int[] fb = frameBuffer;
-			int fbWidth = this.fbWidth, fbHeight = this.fbHeight;
-			
-			int y1 = clipY;
-			int y2 = clipY + clipH;
-			if (y2 > fbHeight * 2) y2 = fbHeight * 2;
-			
-			for (int y = y2 - 1; y >= y1; y--) {
-				System.arraycopy(fb, fbWidth * (y >> 1) + clipX, fb, fbWidth * y + clipX, clipW);
-			}
-			
-			boundGraphics.drawRGB(frameBuffer, 0, fbWidth, 0, 0, fbWidth, fbHeight * 2, alphaBlending);
-		} else {
-			boundGraphics.drawRGB(frameBuffer, 0, fbWidth, 0, 0, fbWidth, fbHeight, alphaBlending);
-		}
+
+		boundGraphics.drawRGB(frameBuffer, 0, fbWidth, 0, 0, fbWidth, fbHeight, alphaBlending);
 		
 		fbDrawCounter++;
 	}
@@ -468,11 +416,7 @@ public class Graphics3D {
 		if (sortPrimCount > 0) {
 			//Clear fb alpha when necessary
 			if (!MascotME.no2DInbetween && fbDrawCounter > 0) {
-				if (!MascotME.halfResRender) {
-					clearFBAlpha(clipX, clipY, clipW, clipH);
-				} else {
-					clearFBAlpha(clipX, clipY / 2, clipW, clipH / 2);
-				}
+				clearFBAlpha(clipX, clipY, clipW, clipH);
 			}
 			
 			//Render all primitives
@@ -518,9 +462,7 @@ public class Graphics3D {
 		if (graphics == null) throw new NullPointerException();
 		if (graphics != boundGraphics) throw new IllegalArgumentException();
 		
-		boolean showSomeStats = MascotME.showFPS | MascotME.showTimeMetrics | MascotME.showHeapUsage;
-		
-		if (!MascotME.no2DInbetween && !showSomeStats) {
+		if (!MascotME.no2DInbetween) {
 			boundGraphics = null;
 			return;
 		}
@@ -531,74 +473,14 @@ public class Graphics3D {
 		int prevClipY = graphics.getClipY();
 		int prevClipW = graphics.getClipWidth();
 		int prevClipH = graphics.getClipHeight();
-		graphics.setClip(0, 0, fbWidth, MascotME.halfResRender ? fbHeight * 2 : fbHeight);
+		graphics.setClip(0, 0, fbWidth, fbHeight);
 				
 		int prevTx = graphics.getTranslateX();
 		int prevTy = graphics.getTranslateY();
 		graphics.translate(-prevTx, -prevTy);
 		
 		if (MascotME.no2DInbetween) {
-			drawFB(0, 0, fbWidth, MascotME.halfResRender ? fbHeight * 2 : fbHeight);
-		}
-		
-		if (showSomeStats) {
-			long time = System.currentTimeMillis();
-			
-			framesCount++;
-			if (time - prevStatsCheck >= 1000) {
-				if (MascotME.showFPS) {
-					fps = framesCount * 1000 / (int) (time - prevStatsCheck);
-					frameTime = (int) (time - prevStatsCheck) * 10 / framesCount;
-				}
-				
-				if (MascotME.showTimeMetrics) {
-					bindTime = bindAccum / framesCount;
-					figureTime = figureAccum / framesCount;
-					primCmdTime = primCmdAccum / framesCount;
-					flushTime = flushAccum / framesCount;
-					releaseTime = releaseAccum / framesCount;
-					
-					bindAccum = figureAccum = 0;
-					primCmdAccum = flushAccum = releaseAccum = 0;
-				}
-				
-				if (MascotME.showHeapUsage) {
-					Runtime runtime = Runtime.getRuntime();
-					heapUsage = (int) ((runtime.totalMemory() - runtime.freeMemory()) >> 10);
-				}
-				
-				prevStatsCheck = time;
-				framesCount = 0;
-			}
-			
-			int prevColor = graphics.getColor();
-			int fontH = graphics.getFont().getHeight();
-			int drawY = 0;
-			
-			if (MascotME.showTimeMetrics) {
-				drawStatsText("Bind: " + bindTime, 0, drawY, graphics);
-				drawY += fontH;
-				drawStatsText("Figure: " + figureTime, 0, drawY, graphics);
-				drawY += fontH;
-				drawStatsText("PrimCmd: " + primCmdTime, 0, drawY, graphics);
-				drawY += fontH;
-				drawStatsText("Flush: " + flushTime, 0, drawY, graphics);
-				drawY += fontH;
-				drawStatsText("Release: " + releaseTime, 0, drawY, graphics);
-				drawY += fontH;
-			}
-			
-			if (MascotME.showHeapUsage) {
-				drawStatsText("Heap: " + heapUsage + " kb", 0, drawY, graphics);
-				drawY += fontH;
-			}
-			
-			if (MascotME.showFPS) {
-				drawStatsText("FPS: " + fps + " / " + frameTime, 0, drawY, graphics);
-				drawY += fontH;
-			}
-			
-			graphics.setColor(prevColor);
+			drawFB(0, 0, fbWidth, fbHeight);
 		}
 		
 		graphics.setClip(prevClipX, prevClipY, prevClipW, prevClipH);
@@ -673,11 +555,6 @@ public class Graphics3D {
 		int fbWidth = this.fbWidth, fbHeight = this.fbHeight;
 		int clipX1 = clipX, clipY1 = clipY;
 		int clipX2 = clipX1 + clipW, clipY2 = clipY1 + clipH;
-		
-		if (MascotME.halfResRender) {
-			clipY1 >>= 1;
-			clipY2 >>= 1;
-		}
 		
 		for (int p = 0; p < sortPrimCount; p++) {
 			int sortEntry = sortPrimIdx[p];
@@ -987,8 +864,6 @@ public class Graphics3D {
 			drawCenterX = x;
 			drawCenterY = y;
 		}
-		
-		if (MascotME.halfResRender) drawCenterY /= 2;
 	}
 
 	private final void setProjection(FigureLayout layout) {
@@ -1009,7 +884,6 @@ public class Graphics3D {
 		projectionMode = PROJ_PARALLEL;
 		projScaleX = scaleX;
 		projScaleY = scaleY;
-		if (MascotME.halfResRender) projScaleY /= 2;
 	}
 	
 	private final void setOrthographicWH(int w, int h) {
@@ -1034,12 +908,10 @@ public class Graphics3D {
 			projScaleX = (int) (fbWidth * scale);
 		} else {
 			int tmpHeight = fbHeight;
-			if (MascotME.halfResRender) tmpHeight *= 2;
 			projScaleX = (int) (fbWidth * scale / 320 * 240 / fbWidth * tmpHeight);
 		}
 		
 		projScaleY = projScaleX;
-		if (MascotME.halfResRender) projScaleY /= 2;
 	}
 	
 	private final void setPerspectiveWH(int near, int far, int w, int h) {
@@ -1080,7 +952,7 @@ public class Graphics3D {
 	
 	private final void setClip(int x, int y, int w, int h) {
 		int fbWidth = this.fbWidth;
-		int fbHeight = MascotME.halfResRender ? this.fbHeight * 2 : this.fbHeight;
+		int fbHeight = this.fbHeight;
 		
 		int x2 = x + w, y2 = y + h;
 		
@@ -2102,7 +1974,7 @@ public class Graphics3D {
 		int scaleX = projScaleX, scaleY = projScaleY;
 		int centerX = drawCenterX, centerY = drawCenterY;
 		int fbWidth = this.fbWidth, fbHeight = this.fbHeight;
-		int pxHScale = MascotME.halfResRender ? 1 : 0;
+		int pxHScale = 0;
 		
 		int projectionMode = this.projectionMode;
 		int perspectiveNear = this.projNear;

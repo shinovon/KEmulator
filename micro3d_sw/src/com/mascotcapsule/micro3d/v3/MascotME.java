@@ -5,24 +5,8 @@
 
 package com.mascotcapsule.micro3d.v3;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 public class MascotME {
-	static String version = "MascotME 1.1.1";
-	
-	// Debug options:
-	
-	// FPS counter.
-	static boolean showFPS = false;
-	
-	// Detailed frametime metrics.
-	// Includes Graphic3D.bind, .flush, .release calls, and figure, primitives, command lists submitting.
-	static boolean showTimeMetrics = false;
-	
-	// Heap memory usage. Warning, can reduce performance.
-	static boolean showHeapUsage = false;
+//	static String version = "MascotME 1.1.1";
 	
 	// Enhancements:
 	
@@ -45,10 +29,6 @@ public class MascotME {
 	static boolean fbSizeWorkaround = false;
 	
 	// Performance hack, high performance impact.
-	// Reduces framebuffer resolution.
-	static boolean halfResRender = false;
-	
-	// Performance hack, high performance impact.
 	// Disables support of 2D graphics inbetween 3D geometry.
 	// Framebuffer will be drawn on screen only when Graphics3D is released (by API design 3D graphics should be drawn on each flush).
 	static boolean no2DInbetween = true;
@@ -59,10 +39,6 @@ public class MascotME {
 	// Disables framebuffer clearing, useful when game fully overwrites framebuffer with geometry.
 	// Please use with overwrite2D for bigger performance win.
 	static boolean doNotClear = false;
-	// Performance hack, medium performance impact.
-	// Enables alternative method to clear framebuffer using System.arraycopy.
-	// Can be faster on Series 40 cellphones.
-	static boolean useArrayCopyClear = false;
 	
 	// Clipping related hacks:
 	
