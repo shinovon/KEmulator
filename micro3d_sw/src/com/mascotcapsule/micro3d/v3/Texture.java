@@ -7,6 +7,7 @@
 package com.mascotcapsule.micro3d.v3;
 
 import emulator.custom.ResourceManager;
+import emulator.graphics2D.IImage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -233,5 +234,10 @@ public class Texture {
 		bitmapData = null;
 		envmapData = null;
 		palette = null;
+	}
+
+	public IImage _getDebugImage() {
+		// TODO
+		return null;
 	}
 }

@@ -127,6 +127,9 @@ public final class MemoryViewImage extends Image {
 				}
 
 				return img;
+			} else if (Settings.micro3d == 2) {
+				IImage img = (IImage) texCls.getMethod("_getDebugImage").invoke(tex);
+				return img;
 			} else {
 				IImage img = (IImage) texCls.getField("debugImage").get(tex);
 				return img;
