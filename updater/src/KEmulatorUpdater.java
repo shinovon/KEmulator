@@ -164,9 +164,9 @@ public class KEmulatorUpdater implements Runnable {
 					try {
 						update(UPDATE_URL + branch + "/" + type + "/m3g_lwjgl.jar", "m3g_lwjgl.jar");
 						update(UPDATE_URL + branch + "/" + type + "/m3g_swerve.jar", "m3g_swerve.jar");
-						update(UPDATE_URL + branch + "/" + type + "/micro3d_gl.jar", "micro3d_gl.jar");
+						update(UPDATE_URL + branch + "/micro3d_gl.jar", "micro3d_gl.jar");
 						update(UPDATE_URL + branch + "/" + type + "/micro3d_dll.jar", "micro3d_dll.jar");
-//						update(UPDATE_URL + branch + "/" + type + "/micro3d_sw.jar", "micro3d_sw.jar"); // TODO
+						update(UPDATE_URL + branch + "/micro3d_sw.jar", "micro3d_sw.jar");
 						update(UPDATE_URL + branch + "/" + type + "/amrdecoder.dll", "amrdecoder.dll");
 					} catch (Exception e) {
 						fail("Failed to download libraries", e);
@@ -175,8 +175,8 @@ public class KEmulatorUpdater implements Runnable {
 				} else {
 					try {
 						updateExtract(UPDATE_URL + branch + "/lwjgl.zip", "lwjgl.zip", kemulatorDir);
-						update(UPDATE_URL + branch + "/" + type + "/micro3d_gl.jar", "micro3d_gl.jar");
-//						update(UPDATE_URL + branch + "/" + type + "/micro3d_sw.jar", "micro3d_sw.jar"); // TODO
+						update(UPDATE_URL + branch + "/micro3d_gl.jar", "micro3d_gl.jar");
+						update(UPDATE_URL + branch + "/micro3d_sw.jar", "micro3d_sw.jar");
 					} catch (Exception e) {
 						fail("Failed to download lwjgl.zip", e);
 						return;
