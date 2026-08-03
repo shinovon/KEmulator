@@ -111,7 +111,7 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 			s1 -= imgsSize;
 			s2 -= imgsSize;
 		}
-		objectsSize.setText(s1 + "B / " + s2 + "B");
+		objectsSize.setText(s1 + " / " + s2 + " bytes");
 		totalSize.setText(((objSize + Memory.getBytecodeSize()) / 1024) + "KiB");
 		jvmSize.setText(((t - f) / 1048576) + "/" + (t / 1048576) + "MiB");
 		this.layout(true, true);
