@@ -58,6 +58,7 @@ public final class Settings {
 	public static boolean enableNewTrack;
 	public static boolean threadMethodTrack;
 	public static boolean storeCreatedImages = true;
+	public static boolean countImagesInObjectsSize = true;
 
 	public static boolean jdwpDebug;
 	public static int debugPort = 29292;
