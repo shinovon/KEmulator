@@ -1,6 +1,8 @@
+/*
+Copyright (c) 2025 Fyodor Ryzhov
+*/
 package emulator.ui.bridge;
 
-import emulator.Emulator;
 import emulator.graphics2D.IFont;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.FontAWT;
@@ -105,7 +107,6 @@ public class BridgeFrontend implements IEmulatorFrontend {
 	public void requestCommandsChoice(Vector<TargetedCommand> list) {
 		synchronized (stateWriteLock) {
 			try {
-
 				commandsCache.clear();
 				if (list == null || list.isEmpty()) {
 					sendToState('O', new byte[0]);
@@ -117,6 +118,7 @@ public class BridgeFrontend implements IEmulatorFrontend {
 				baos.write(bb.array());
 				bb.clear();
 				for (TargetedCommand command : list) {
+					if (command == null) continue;
 					int id = commandsCounter;
 					commandsCache.put(commandsCounter, command);
 					bb.putInt(id);
@@ -175,13 +177,23 @@ public class BridgeFrontend implements IEmulatorFrontend {
 	}
 
 	@Override
-	public IFont newFont(int size, int style) {
+	public IFont newFont(int face, int size, int style) {
 		return new FontAWT(this.iproperty.getDefaultFontName(), size, style, false);
 	}
 
 	@Override
-	public IFont newCustomFont(int height, int style) {
-		return new FontAWT(this.iproperty.getDefaultFontName(), height, style, true);
+	public IFont newCustomFont(int face, int size, int style, boolean height) {
+		return new FontAWT(this.iproperty.getDefaultFontName(), size, style, height);
+	}
+
+	@Override
+	public IFont newFont(String name, int size, int style) {
+		return new FontAWT(name, size, style, false);
+	}
+
+	@Override
+	public IFont loadFont(InputStream fontData, int size) {
+		return null;
 	}
 
 	@Override
@@ -244,5 +256,9 @@ public class BridgeFrontend implements IEmulatorFrontend {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void openAppSettings(boolean start) {
 	}
 }

@@ -1,6 +1,7 @@
 package com.siemens.mp.ui;
 
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.game.Sprite;
 import java.io.IOException;
 
 public class Image extends com.siemens.mp.misc.NativeMem {
@@ -120,7 +121,7 @@ public class Image extends com.siemens.mp.misc.NativeMem {
 	}
 
 	public static void mirrorImageVertically(javax.microedition.lcdui.Image image) {
-		// TODO
+		image.getGraphics().drawRegion(image, 0, 0, image.getWidth(), image.getHeight(), Sprite.TRANS_MIRROR, 0, 0, 0);
 	}
 	protected static void setNativeImage(javax.microedition.lcdui.Image img, Image simg) {}
 

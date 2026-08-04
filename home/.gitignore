@@ -6,9 +6,21 @@ log.txt
 property.txt
 track.txt
 classwatcher.txt
-midlets.txt
+midlets.*
 updater.jar
+builder.jar
 
 !.package
 !KEmulator*.bat
 !kemulator.sh
+
+M5_*.dll
+M7_*.dll
+
+# IDA
+*.id0
+*.id1
+*.id2
+*.nam
+*.til
+*.idb

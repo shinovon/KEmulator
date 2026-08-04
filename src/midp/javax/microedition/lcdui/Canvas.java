@@ -3,13 +3,16 @@ package javax.microedition.lcdui;
 import com.nokia.mid.ui.CanvasGraphicsItem;
 import com.nokia.mid.ui.CanvasItem;
 import com.nokia.mid.ui.TextEditor;
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.KeyMapping;
 import emulator.Settings;
 import emulator.graphics2D.IImage;
+import emulator.lcdui.LCDUIUtils;
 import emulator.ui.IScreen;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public abstract class Canvas extends Displayable {
 	public static final int UP = 1;
@@ -46,7 +49,7 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public void _invokePaint(IImage buffer, IImage xray) {
-		if (!Settings.xrayView) xray = null;
+		if (!AppSettings.xrayView) xray = null;
 		if (graphics == null) {
 			graphics = new Graphics(buffer, xray);
 		}
@@ -57,7 +60,7 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public void _invokePaint(IImage buffer, IImage xray, int x, int y, int w, int h) {
-		if (!Settings.xrayView) xray = null;
+		if (!AppSettings.xrayView) xray = null;
 		if (graphics == null) {
 			graphics = new Graphics(buffer, xray);
 		}
@@ -71,9 +74,10 @@ public abstract class Canvas extends Displayable {
 	protected void _paintOverlay(Graphics graphics) {
 		super._paintTicker(graphics);
 		super._paintSoftMenu(graphics);
-		for (CanvasItem i: nokiaCanvasItems) {
+		ArrayList<CanvasItem> list = new ArrayList<>(nokiaCanvasItems);
+		list.sort(Comparator.comparingInt(CanvasItem::getZPosition));
+		for (CanvasItem i: list) {
 			if (!i.isVisible()) continue;
-			// TODO z-position
 			if (i instanceof CanvasGraphicsItem) {
 				graphics.setClip(i.getPositionX(), i.getPositionY(), i.getWidth(), i.getHeight());
 				graphics.translate(-i.getPositionX(), -i.getPositionY());
@@ -84,6 +88,18 @@ public abstract class Canvas extends Displayable {
 			if (i instanceof TextEditor) {
 				((TextEditor) i)._invokePaint(graphics);
 			}
+		}
+		if (!fullScreen) {
+			int w = getWidth();
+			int sh = Emulator.getEmulator().getScreen().getHeight();
+			int bh = getBorderHeight();
+			int y = sh - bh;
+			graphics.setClip(0, 0, w, sh);
+			graphics.setColor(LCDUIUtils.backgroundColor);
+			graphics.fillRect(0, y, w, bh);
+			graphics.setFont(Font.getFont(0, 0, Font.SIZE_SMALL));
+			graphics.setColor(LCDUIUtils.foregroundColor);
+			graphics.drawString("Fake soft bar", w >> 1, y + 2, Graphics.HCENTER | Graphics.TOP);
 		}
 	}
 
@@ -121,17 +137,24 @@ public abstract class Canvas extends Displayable {
 		}
 	}
 
-	int getActualHeight() {
-		int h = Emulator.getEmulator().getScreen().getHeight();
+	int getBorderHeight() {
+		int h = 0;
 		if (!fullScreen) {
-			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
+			if (ticker != null) {
+				h += Screen.fontHeight4;
+			}
+			h += AppSettings.softbankApi ? 20 : Screen.fontHeight4;
 		}
 		return h;
 	}
 
+	int getActualHeight() {
+		return Emulator.getEmulator().getScreen().getHeight() - getBorderHeight();
+	}
+
 	public void _invokeSizeChanged(int w, int h) {
 		if (!fullScreen) {
-			h -= (ticker == null ? Screen.fontHeight4 : Screen.fontHeight4 * 2);
+			h -= getBorderHeight();
 		}
 		if (this.w != w || this.h != h || forceUpdateSize) {
 			this.w = bounds[W] = w;
@@ -181,7 +204,7 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public void setFullScreenMode(final boolean b) {
-		if (!Settings.ignoreFullScreen) {
+		if (!AppSettings.ignoreFullScreen) {
 			if (b == fullScreen) return;
 			fullScreen = b;
 			updateSize(true);
@@ -407,15 +430,15 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public boolean hasPointerEvents() {
-		return Settings.hasPointerEvents;
+		return AppSettings.hasPointerEvents;
 	}
 
 	public boolean hasPointerMotionEvents() {
-		return Settings.hasPointerEvents;
+		return AppSettings.hasPointerEvents;
 	}
 
 	public boolean hasRepeatEvents() {
-		return Settings.enableKeyRepeat;
+		return AppSettings.enableKeyRepeat;
 	}
 
 	public boolean isDoubleBuffered() {
@@ -494,5 +517,15 @@ public abstract class Canvas extends Displayable {
 				return i;
 		}
 		return null;
+	}
+
+	void _defocus() {
+		super._defocus();
+		if (nokiaCanvasItems.isEmpty()) return;
+		for (CanvasItem i : nokiaCanvasItems) {
+			if (!i.isVisible()) continue;
+			if (i instanceof TextEditor)
+				((TextEditor) i).setFocus(false);
+		}
 	}
 }

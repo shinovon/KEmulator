@@ -16,7 +16,7 @@
 
 package ru.woesss.j2me.micro3d;
 
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -59,7 +59,7 @@ public class FigureImpl {
 	}
 
 	public FigureImpl(String name) throws IOException {
-		byte[] bytes = CustomJarResources.getBytes(name);
+		byte[] bytes = ResourceManager.getBytes(name);
 		if (bytes == null) {
 			throw new IOException("Error reading resource: " + name);
 		}

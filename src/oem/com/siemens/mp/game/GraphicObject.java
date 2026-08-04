@@ -25,6 +25,7 @@
 package com.siemens.mp.game;
 
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 public class GraphicObject extends com.siemens.mp.misc.NativeMem {
 	private boolean visible = true;
@@ -41,5 +42,15 @@ public class GraphicObject extends com.siemens.mp.misc.NativeMem {
 		this.visible = visible;
 	}
 
-	protected void paint(Graphics g, int x, int y) {}
+	protected void paint(Graphics g, int x, int y) {
+	}
+
+	protected boolean containsTransparentColor(Image image) {
+		for (int x = 0; x < image.getWidth(); x++) {
+			for (int y = 0; y < image.getHeight(); y++) {
+				if ((image._getImpl().getRGB(x, y) & 0xFF000000) == 0) {return true;}
+			}
+		}
+		return false;
+	}
 }

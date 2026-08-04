@@ -1,9 +1,8 @@
 package com.nttdocomo.ui.maker;
 
 import com.nttdocomo.io.maker.*;
-import emulator.*;
 import com.nttdocomo.io.*;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import java.io.*;
 
@@ -55,7 +54,7 @@ public abstract class MediaImpl {
 						openDataInputStream.close();
 						open.close();
 					} else if (this.location.startsWith("resource:")) {
-						final InputStream resourceAsStream = CustomJarResources.getResourceAsStream(this.location.substring(11));
+						final InputStream resourceAsStream = ResourceManager.getResourceAsStream(this.location.substring(11));
 						this.resource = this.loadResource(resourceAsStream);
 						resourceAsStream.close();
 					}

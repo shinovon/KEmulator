@@ -88,8 +88,8 @@ public class ImageItem extends Item {
 		}
 	}
 
-	void layout(Row row) {
-		super.layout(row);
+	void _layout(Row row) {
+		super._layout(row);
 		int n = 0;
 		int w = row.getAvailableWidth(screen.bounds[W]);
 		int[] tw = new int[1];

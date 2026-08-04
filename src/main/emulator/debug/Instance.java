@@ -32,7 +32,7 @@ public final class Instance {
 		} else {
 			this.method880(this.aClass, s);
 		}
-		return this.fields.size() > 0;
+		return this.fields.size() != 0;
 	}
 
 	private void method880(final Class clazz, final String s) {
@@ -41,7 +41,9 @@ public final class Instance {
 			for (int i = 0; i < declaredFields.length; ++i) {
 				if (declaredFields[i] != null) {
 					if (s == null || method884(declaredFields[i].getName(), s)) {
-						if (!Modifier.isFinal(declaredFields[i].getModifiers()) || !declaredFields[i].getType().isPrimitive()) {
+						if (!Modifier.isFinal(declaredFields[i].getModifiers())
+								|| !declaredFields[i].getType().isPrimitive()
+								|| !Modifier.isStatic(declaredFields[i].getModifiers())) {
 							this.fields.add(declaredFields[i]);
 							declaredFields[i].setAccessible(true);
 						}

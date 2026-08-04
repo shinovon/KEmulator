@@ -1,11 +1,13 @@
 package emulator.ui.swt;
 
 import com.nokia.mid.ui.TextEditor;
+import com.nokia.mid.ui.TextEditorListener;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.ui.ICaret;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Caret;
@@ -82,7 +84,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 	public final void a(Transform paramTransform, int paramInt) {
 	}
 
-	public final void setCaretLocation(final int x, final int y) {
+	public synchronized final void setCaretLocation(final int x, final int y) {
 		this.caretLocX = x;
 		this.caretLocY = y;
 		int[] i = ((EmulatorScreen) Emulator.getEmulator().getScreen()).transformCaret(x, y, true);
@@ -92,23 +94,24 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 
 	public final void setWindowZoom(final float aFloat840) {
 		this.zoom = aFloat840;
-		if (currentItem != null) {
+		Object item = currentItem;
+		if (item != null) {
 			if (swtFont != null && !swtFont.isDisposed() && swtText != null) {
 				swtText.setFont(null);
 				swtFont.dispose();
 			}
-			if (currentItem instanceof DateField) {
+			if (item instanceof DateField) {
 				this.swtCaret.setSize(Math.min(1, (int) aFloat840), (int) (font.getBaselinePosition() * aFloat840));
 				this.setCaretLocation(this.caretLocX, this.caretLocY);
 //				swtCaret.setVisible(true);
 			} else {
 				int w, h;
-				if (currentItem instanceof TextEditor) {
-					w = ((TextEditor) currentItem).getWidth();
-					h = ((TextEditor) currentItem).getHeight();
+				if (item instanceof TextEditor) {
+					w = ((TextEditor) item).getWidth();
+					h = ((TextEditor) item).getHeight();
 				} else {
-					w = ((TextField) currentItem)._getTextAreaWidth();
-					h = ((TextField) currentItem)._getTextAreaHeight();
+					w = ((TextField) item)._getTextAreaWidth();
+					h = ((TextField) item)._getTextAreaHeight();
 				}
 				swtFont = new org.eclipse.swt.graphics.Font(swtCanvas.getDisplay(),
 						Emulator.getEmulator().getProperty().getDefaultFontName(),
@@ -176,6 +179,16 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 					swtText = text;
 				}
 
+				if (item instanceof TextEditor) {
+					int c = ((TextEditor) item).getForegroundColor();
+					if (c != 0) {
+						text.setForeground(new Color(null, (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF, 0xFF));
+					}
+					c = ((TextEditor) item).getBackgroundColor();
+					if (c != 0) {
+						text.setBackground(new Color(null, (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF, 0xFF));
+					}
+				}
 				text.setEditable(!(item instanceof TextField) || !((TextField) item)._isUneditable());
 				text.setVisible(true);
 				text.setFocus();
@@ -265,7 +278,18 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 				break;
 			case SWT.TRAVERSE_ARROW_PREVIOUS:
 			case SWT.TRAVERSE_ARROW_NEXT:
-				if (item instanceof TextEditor) break;
+				if (item instanceof TextEditor) {
+					if (length == 0
+							|| (key == SWT.ARROW_UP && line == 0)
+							|| (key == SWT.ARROW_DOWN && !text.contains("\n"))) {
+						if (key == SWT.ARROW_UP) {
+							((TextEditor) item)._inputAction(TextEditorListener.ACTION_TRAVERSE_PREVIOUS);
+						} else if (key == SWT.ARROW_DOWN) {
+							((TextEditor) item)._inputAction(TextEditorListener.ACTION_TRAVERSE_NEXT);
+						}
+					}
+					break;
+				}
 				if (length == 0) {
 					defocusItem(item);
 					break;

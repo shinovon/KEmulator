@@ -4,6 +4,7 @@ import com.jblend.graphics.j3d.Effect3D;
 import com.jblend.graphics.j3d.Figure;
 import com.jblend.graphics.j3d.FigureLayout;
 import com.jblend.graphics.j3d.Texture;
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.debug.Profiler;
@@ -19,6 +20,16 @@ public class Graphics
 		implements com.vodafone.v10.graphics.j3d.Graphics3D,
 		com.motorola.graphics.j3d.Graphics3D,
 		com.jblend.graphics.j3d.Graphics3D {
+	public static final int HCENTER = 1;
+	public static final int VCENTER = 2;
+	public static final int LEFT = 4;
+	public static final int RIGHT = 8;
+	public static final int TOP = 16;
+	public static final int BOTTOM = 32;
+	public static final int BASELINE = 64;
+	public static final int SOLID = 0;
+	public static final int DOTTED = 1;
+
 	IGraphics2D impl;
 	IImage image;
 	IImage copyimage;
@@ -29,15 +40,8 @@ public class Graphics
 	int ty;
 	Font font;
 	int[] anIntArray521;
-	public static final int HCENTER = 1;
-	public static final int VCENTER = 2;
-	public static final int LEFT = 4;
-	public static final int RIGHT = 8;
-	public static final int TOP = 16;
-	public static final int BOTTOM = 32;
-	public static final int BASELINE = 64;
-	public static final int SOLID = 0;
-	public static final int DOTTED = 1;
+	private int alpha;
+	private boolean alphaSet;
 
 	public Graphics(final IImage i1, final IImage i2) {
 		super();
@@ -51,6 +55,7 @@ public class Graphics
 			this.xrayImage = i2;
 			(this.xrayGraphics = i2.createGraphics()).setAlpha(60);
 		}
+		alpha = 255;
 		this.setFont(Font.getDefaultFont());
 	}
 
@@ -72,7 +77,7 @@ public class Graphics
 	}
 
 	public IGraphics2D getImpl() {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			return this.xrayGraphics;
 		}
 		return this.impl;
@@ -165,7 +170,7 @@ public class Graphics
 				n2 = n5 - height;
 			}
 
-			impl.drawImage(image.getImpl(), n, n2);
+			impl.drawImage(image._getImpl(), n, n2);
 			updateDebugData(image, 0, 0, n, n2, image.getWidth(), image.getHeight());
 			++image.usedCount;
 			++Profiler.drawImageCallCount;
@@ -185,7 +190,7 @@ public class Graphics
 			this.impl.transform(transform);
 			this.impl.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
 			this.impl.setTransform(transform2);
-			if (n5 >= 0 && Settings.xrayView && xrayGraphics != null) {
+			if (n5 >= 0 && AppSettings.xrayView && xrayGraphics != null) {
 				this.xrayGraphics.transform(transform);
 				if (Settings.xrayOverlapScreen) {
 					this.xrayGraphics.drawImage(image, n, n2, n3, n4, 0, 0, n3, n4);
@@ -213,7 +218,7 @@ public class Graphics
 		if (sx < 0 || sx + w > image.getWidth() || sy < 0 || sy + h > image.getHeight()) {
 			throw new IllegalArgumentException("region exceeds the bounds of the source image");
 		}
-		if (image.getImpl() == this.image) {
+		if (image._getImpl() == this.image) {
 			throw new IllegalArgumentException("src is the same image as the destination of this Graphics object");
 		}
 		if (!method294(a, 64)) {
@@ -223,7 +228,7 @@ public class Graphics
 			final ITransform transform2 = this.impl.getTransform();
 			final ITransform transform = transform2.newTransform(w, h, t, dx, dy, a);
 			this.impl.transform(transform);
-			this.impl.drawImage(image.getImpl(), sx, sy, w, h, 0, 0, w, h);
+			this.impl.drawImage(image._getImpl(), sx, sy, w, h, 0, 0, w, h);
 			this.impl.setTransform(transform2);
 			if (xrayGraphics != null) {
 				this.xrayGraphics.transform(transform);
@@ -246,7 +251,7 @@ public class Graphics
 		if (sx < 0 || sx + w > image.getWidth() || sy < 0 || sy + h > image.getHeight()) {
 			throw new IllegalArgumentException("region exceeds the bounds of the source image");
 		}
-		if (image.getImpl() == this.image) {
+		if (image._getImpl() == this.image) {
 			throw new IllegalArgumentException("src is the same image as the destination of this Graphics object");
 		}
 		if (!method294(a, 64)) {
@@ -256,7 +261,7 @@ public class Graphics
 			final ITransform transform2 = this.impl.getTransform();
 			final ITransform transform = transform2.newTransform(w, h, t, dx, dy, a);
 			this.impl.transform(transform);
-			this.impl.drawImage(image.getImpl(), sx, sy, w, h, 0, 0, dw, dh);
+			this.impl.drawImage(image._getImpl(), sx, sy, w, h, 0, 0, dw, dh);
 			this.impl.setTransform(transform2);
 			if (xrayGraphics != null) {
 				this.xrayGraphics.transform(transform);
@@ -394,15 +399,15 @@ public class Graphics
 		final int n8 = clipY2 - clipY;
 		final int n9 = clipX - (n3 - n);
 		final int n10 = clipY - (n4 - n2);
-		image.getUsedRegion().setAlpha(n9, n10, n7, n8, 0);
-		if (!Settings.xrayView || xrayGraphics == null) {
+		image._getUsedRegion().setAlpha(n9, n10, n7, n8, 0);
+		if (!AppSettings.xrayView || xrayGraphics == null) {
 			return;
 		}
 		if (Settings.xrayOverlapScreen) {
-			this.xrayGraphics.drawImage(image.getImpl(), n, n2, n5, n6, n3, n4, n5, n6);
+			this.xrayGraphics.drawImage(image._getImpl(), n, n2, n5, n6, n3, n4, n5, n6);
 		}
-		if (image.isMutable() && image.getXRayBuffer() != null) {
-			this.xrayGraphics.drawImage(image.getXRayBuffer(), n3, n4);
+		if (image.isMutable() && image._getXRayBuffer() != null) {
+			this.xrayGraphics.drawImage(image._getXRayBuffer(), n3, n4);
 		}
 		this.xrayFillRect(n3, n4, n5, n6, 16777215);
 		if (Settings.xrayShowClipBorder) {
@@ -414,7 +419,7 @@ public class Graphics
 	}
 
 	private void xrayFillArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			this.xrayGraphics.setColor(16777215, false);
 			this.xrayGraphics.fillArc(n, n2, n3, n4, n5, n6);
 			this.xrayUpdate();
@@ -422,7 +427,7 @@ public class Graphics
 	}
 
 	private void xrayDrawArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			this.xrayGraphics.setColor(16777215, false);
 			this.xrayGraphics.drawArc(n, n2, n3, n4, n5, n6);
 			this.xrayUpdate();
@@ -430,7 +435,7 @@ public class Graphics
 	}
 
 	private void xrayFillRect(final int n, final int n2, final int n3, final int n4, final int n5) {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			this.xrayGraphics.setColor(n5, false);
 			this.xrayGraphics.fillRect(n, n2, n3, n4);
 			this.xrayUpdate();
@@ -438,7 +443,7 @@ public class Graphics
 	}
 
 	private void xrayDrawRect(final int n, final int n2, final int n3, final int n4) {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			this.xrayGraphics.setColor(16777215, false);
 			this.xrayGraphics.drawRect(n, n2, n3, n4);
 			this.xrayUpdate();
@@ -446,7 +451,7 @@ public class Graphics
 	}
 
 	private void xrayDrawLine(final int n, final int n2, final int n3, final int n4) {
-		if (Settings.xrayView && xrayGraphics != null) {
+		if (AppSettings.xrayView && xrayGraphics != null) {
 			this.xrayGraphics.setColor(16777215, false);
 			this.xrayGraphics.drawLine(n, n2, n3, n4);
 			this.xrayUpdate();
@@ -459,7 +464,7 @@ public class Graphics
 		}
 	}
 
-	protected static void resetXRayCache() {
+	static void resetXRayCache() {
 		for (int i = Graphics.xrayCache.size() - 1; i >= 0; --i) {
 			final IImage image;
 			final IGraphics2D graphics;
@@ -525,16 +530,31 @@ public class Graphics
 
 	public void setColor(final int n) {
 		++Profiler.drawCallCount;
+		alpha = 255;
+		if (alphaSet) {
+			impl.setAlpha(255);
+			alphaSet = false;
+		}
 		this.impl.setColor(n, false);
 	}
 
 	public void _setColor(final int n) {
 		++Profiler.drawCallCount;
+		alpha = n >> 24;
+		if (alphaSet) {
+			impl.setAlpha(255);
+			alphaSet = false;
+		}
 		this.impl.setColor(n, true);
 	}
 
 	public void setColor(final int n, final int n2, final int n3) {
 		++Profiler.drawCallCount;
+		alpha = 255;
+		if (alphaSet) {
+			impl.setAlpha(255);
+			alphaSet = false;
+		}
 		this.impl.setColor(n, n2, n3);
 	}
 
@@ -679,5 +699,24 @@ public class Graphics
 
 	public int _getHeight() {
 		return image.getHeight();
+	}
+
+	// MIDP 3.0
+
+	public void setAlpha(int a) {
+		alphaSet = true;
+		this.impl.setAlpha(alpha = a);
+	}
+
+	public void setAlphaColor(int ARGB) {
+		_setColor(ARGB);
+	}
+
+	public void setAlphaColor(int a, int r, int g, int b) {
+		_setColor((a << 24) | (r << 16) | (g << 8) | b);
+	}
+
+	public int getAlpha() {
+		return alpha;
 	}
 }

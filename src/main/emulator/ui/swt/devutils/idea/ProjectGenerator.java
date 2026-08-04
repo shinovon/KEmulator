@@ -1,0 +1,425 @@
+/*
+Copyright (c) 2025-2026 Fyodor Ryzhov
+*/
+package emulator.ui.swt.devutils.idea;
+
+import emulator.Emulator;
+import emulator.Utils;
+import emulator.ui.swt.devutils.ClasspathEntry;
+import emulator.ui.swt.devutils.ClasspathEntryType;
+import emulator.ui.swt.devutils.DevtimeMIDlet;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
+
+/**
+ * Uses {@link ProjectConfigGenerator} to create project structure on disk.
+ */
+public class ProjectGenerator {
+
+	public static final String PROGUARD_LOCAL_CFG = "proguard-local.cfg";
+	public static final String PROGUARD_GLOBAL_CFG = "proguard.cfg";
+
+	public static String create(String location, String projectName, String midletClassName, String readableName) throws IOException, ParserConfigurationException, TransformerException, SAXException {
+		Path dir = Paths.get(location, projectName).toAbsolutePath();
+
+		createDirectories(dir);
+
+		// root
+		Files.write(dir.resolve(".gitignore"), ProjectConfigGenerator.rootGitignoreFile.getBytes(StandardCharsets.UTF_8));
+		ProjectConfigGenerator.generateIML(null, dir.resolve(projectName + ".iml"));
+		generateProGuardConfig(dir, projectName, new ClasspathEntry[0]);
+
+		// code
+		createDirSilently(dir.resolve("META-INF"));
+		String midletCodePath = null;
+		if (midletClassName != null) { // completely new project
+			Files.write(dir.resolve("META-INF").resolve("MANIFEST.MF"), ProjectConfigGenerator.buildManifest(projectName, midletClassName, readableName).getBytes(StandardCharsets.UTF_8));
+			midletCodePath = generateDummyMidlet(dir, midletClassName);
+		} // on regeneration, this is skipped
+
+		// ide config
+		generateMiscXmls(dir, projectName);
+
+		// jars
+		generateBuildConfigs(dir, projectName, false);
+
+		// run configs
+		if (midletClassName != null)
+			generateRunConfigs(dir, projectName, new DevtimeMIDlet[]{new DevtimeMIDlet(midletClassName, readableName)}, new ClasspathEntry[0], false);
+		else
+			restore(dir.toString()); // on recreation, we know nothing. Restore is good at understanding what we have.
+
+		return midletCodePath;
+	}
+
+
+	public static boolean restore(String dir) throws IOException, ParserConfigurationException, SAXException {
+		Path dirp = Paths.get(dir);
+		Path appDecrPath = dirp.resolve("Application Descriptor");
+		Path mfPath = dirp.resolve("META-INF").resolve("MANIFEST.MF");
+		Path imlPath = ClasspathEntry.findImlAt(dirp);
+
+		createDirectories(dirp);
+
+		DevtimeMIDlet[] midletNames;
+
+		boolean isEclipse = Files.exists(appDecrPath);
+
+		if (Files.exists(mfPath)) {
+			if (isEclipse) {
+				System.out.println("Warning: both \"Application Descriptor\" and \"MANIFEST.MF\" exist. Run configurations will be updated based on \"Application Descriptor\".");
+				fixManifestWithVersion(mfPath);
+				fixManifestWithVersion(appDecrPath);
+				midletNames = DevtimeMIDlet.readMidletsList(appDecrPath);
+			} else {
+				fixManifestWithVersion(mfPath);
+				midletNames = DevtimeMIDlet.readMidletsList(mfPath);
+			}
+		} else {
+			if (isEclipse) {
+				fixManifestWithVersion(appDecrPath);
+				midletNames = DevtimeMIDlet.readMidletsList(appDecrPath);
+			} else {
+				throw new IllegalArgumentException("Neither \"Application Descriptor\" nor \"MANIFEST.MF\" files found!");
+			}
+		}
+
+		String projectName = dirp.getFileName().toString();
+
+		if (imlPath != null) {
+			ClasspathEntry[] classpath = new ClasspathEntry[0];
+
+			try {
+				classpath = ClasspathEntry.readFromIml(imlPath);
+			} catch (Exception e) {
+				System.out.println("Failed to parse IML! No libraries will be exported.");
+			}
+			generateProGuardConfig(dirp, projectName, classpath);
+			generateRunConfigs(dirp, imlPath.getFileName().toString().replace(".iml", ""), midletNames, classpath, isEclipse);
+			if (!"1.8 CLDC Devtime".equals(getProjectJdkName(dirp.resolve(".idea").resolve("misc.xml"))))
+				System.out.println("For compatibility reasons, it's recommended to name project's JDK as \"1.8 CLDC Devtime\". " +
+						"You can rerun IDE setup to bring your configuration to recommended one.");
+		} else {
+			System.out.println("No IML found! Run configuration will not be created.");
+			generateProGuardConfig(dirp, projectName, new ClasspathEntry[0]);
+		}
+
+		return imlPath != null;
+	}
+
+	public static void convertEclipse(String appDescriptorPath) throws IOException, InterruptedException, ParserConfigurationException, TransformerException, SAXException {
+		Path dir = Paths.get(appDescriptorPath).getParent().toAbsolutePath();
+		String projectName = dir.getFileName().toString(); //folder name
+
+		if (Files.exists(dir.resolve("META-INF").resolve("MANIFEST.MF"))) {
+			System.out.println("MANIFEST.MF found! It will be ignored, converted projects use \"Application Descriptor\".");
+		}
+
+		createDirectories(dir);
+
+		// root
+
+		HashSet<String> gitignore = new HashSet<>();
+		boolean needStartNl = false;
+		Path gitignorePath = dir.resolve(".gitignore");
+		if (Files.exists(gitignorePath)) {
+			List<String> lines = Files.readAllLines(gitignorePath);
+			gitignore = new HashSet<>(lines);
+			long size = Files.size(gitignorePath);
+			try (SeekableByteChannel channel = Files.newByteChannel(gitignorePath, StandardOpenOption.READ)) {
+				ByteBuffer buffer = ByteBuffer.allocate(1);
+				channel.position(size - 1);
+				channel.read(buffer);
+				buffer.flip();
+				byte lastByte = buffer.get();
+				needStartNl = !(lastByte == '\n' || lastByte == '\r');
+			}
+		}
+
+		try (BufferedWriter gi = new BufferedWriter(new FileWriter(gitignorePath.toString(), true))) {
+			if (needStartNl)
+				gi.newLine();
+			if (!gitignore.contains(".idea") && !gitignore.contains(".idea/") && !gitignore.contains(".idea/*") && !gitignore.contains(".idea/runConfigurations")) {
+				gi.write(".idea/runConfigurations");
+				gi.newLine();
+			}
+			if (!gitignore.contains(PROGUARD_GLOBAL_CFG)) {
+				gi.write(PROGUARD_LOCAL_CFG);
+				gi.newLine();
+			}
+		}
+		ClasspathEntry[] cp = ProjectConfigGenerator.generateIML(dir.resolve(".classpath"), dir.resolve(projectName + ".iml"));
+		generateProGuardConfig(dir, projectName, cp);
+
+		// manifest
+		fixManifestWithVersion(Paths.get(appDescriptorPath));
+
+		DevtimeMIDlet[] midlets = DevtimeMIDlet.readMidletsList(dir.resolve("Application Descriptor"));
+
+		// ide config
+		generateMiscXmls(dir, projectName);
+
+		// jars
+		generateBuildConfigs(dir, projectName, true);
+
+		// run configs
+		generateRunConfigs(dir, projectName, midlets, cp, true);
+	}
+
+
+	public static void convertDecompiled(Path root) throws IOException, ParserConfigurationException, TransformerException, SAXException {
+		String projectName = root.getFileName().toString();
+		sortProjectFiles(root);
+		createDirectories(root);
+		Files.write(root.resolve(".gitignore"), ProjectConfigGenerator.rootGitignoreFile.getBytes(StandardCharsets.UTF_8));
+		ProjectConfigGenerator.generateIML(null, root.resolve(projectName + ".iml"));
+		generateProGuardConfig(root, projectName, new ClasspathEntry[0]);
+		generateMiscXmls(root, projectName);
+		generateBuildConfigs(root, projectName, false);
+		DevtimeMIDlet[] midlets = DevtimeMIDlet.readMidletsList(root.resolve("META-INF").resolve("MANIFEST.MF"));
+		generateRunConfigs(root, projectName, midlets, new ClasspathEntry[0], false);
+	}
+
+	//#region impls
+
+	private static void fixManifestWithVersion(Path manifestPath) throws IOException {
+		List<String> manifest = Files.readAllLines(manifestPath);
+		boolean hasVersion = false;
+		for (String line : manifest) {
+			if (line.startsWith("Manifest-Version:")) {
+				hasVersion = true;
+				break;
+			}
+		}
+		if (!hasVersion) {
+			manifest.add(0, "Manifest-Version: 1.0");
+			Files.write(manifestPath, manifest);
+		}
+	}
+
+	private static void createDirectories(Path dir) throws IOException {
+		Files.createDirectories(dir.resolve(".idea"));
+		Files.createDirectories(dir.resolve(".idea").resolve("artifacts"));
+		Files.createDirectories(dir.resolve(".idea").resolve("runConfigurations"));
+		createDirSilently(dir.resolve("src")); // some folders may be symlinks. This is a valid case (but NIO doesn't think so)
+		createDirSilently(dir.resolve("res"));
+		createDirSilently(dir.resolve("bin"));
+		createDirSilently(dir.resolve("deployed"));
+	}
+
+	private static void createDirSilently(Path path) throws IOException {
+		try {
+			Files.createDirectories(path);
+		} catch (FileAlreadyExistsException ignored) {
+		}
+	}
+
+	private static void generateRunConfigs(Path dir, String moduleName, DevtimeMIDlet[] midletNames, ClasspathEntry[] classpath, boolean eclipseManifest) throws IOException, ParserConfigurationException, SAXException {
+		Path runConfigs = dir.resolve(".idea").resolve("runConfigurations");
+		Files.createDirectories(runConfigs);
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(runConfigs, "kemauto_*.xml")) {
+			for (Path file : stream) {
+				try {
+					Files.delete(file);
+				} catch (IOException ignored) {
+				}
+			}
+		}
+		for (int i = 0; i < midletNames.length; i++) {
+			Path configPath = runConfigs.resolve("kemauto_Launch_with_KEmulator_" + (i + 1) + ".xml");
+			String configText = ProjectConfigGenerator.buildKemRunConfig(moduleName, midletNames[i].readableName, midletNames[i].className, eclipseManifest);
+			Files.write(configPath, configText.getBytes(StandardCharsets.UTF_8));
+		}
+
+		Artifact[] artifacts = Artifact.extractJarArtifacts(dir);
+		for (Artifact artifact : artifacts) {
+			ArrayList<String> inJars = new ArrayList<>();
+			inJars.add(artifact.outputPath + File.separator + artifact.jarName);
+			for (ClasspathEntry c : classpath) {
+				if (c.type != ClasspathEntryType.ExportedLibrary)
+					continue;
+				if (c.isLocalPath)
+					inJars.add(dir.resolve(c.path).toString());
+				else
+					inJars.add(c.path);
+			}
+			String outJarName = "$PROJECT_DIR$/deployed/" + artifact.name + ".jar";
+			Files.write(runConfigs.resolve("kemauto_Package_" + artifact.name + "_dbg.xml"), ProjectConfigGenerator.buildPackageRunConfig(artifact.name, inJars, outJarName, true).getBytes(StandardCharsets.UTF_8));
+			Files.write(runConfigs.resolve("kemauto_Package_" + artifact.name + "_rel.xml"), ProjectConfigGenerator.buildPackageRunConfig(artifact.name, inJars, outJarName, false).getBytes(StandardCharsets.UTF_8));
+		}
+		Files.write(runConfigs.resolve("Restore_project.xml"), ProjectConfigGenerator.buildRestoreRunConfig(moduleName).getBytes(StandardCharsets.UTF_8));
+	}
+
+	private static void generateBuildConfigs(Path dir, String projectName, boolean eclipseManifest) throws IOException {
+		Path path = dir.resolve(".idea").resolve("artifacts").resolve(projectName + ".xml");
+		Files.write(path, ProjectConfigGenerator.buildArtifactConfig(projectName, eclipseManifest).getBytes(StandardCharsets.UTF_8));
+	}
+
+	private static void generateMiscXmls(Path dir, String projectName) throws IOException {
+		Files.write(dir.resolve(".idea").resolve("encodings.xml"), ProjectConfigGenerator.encodingFile.getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve(".idea").resolve("misc.xml"), ProjectConfigGenerator.miscFile.getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve(".idea").resolve(".gitignore"), ProjectConfigGenerator.ideaGitignoreFile.getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve(".idea").resolve(".name"), projectName.getBytes(StandardCharsets.UTF_8));
+		Files.write(dir.resolve(".idea").resolve("modules.xml"), ProjectConfigGenerator.buildModulesFile(projectName).getBytes(StandardCharsets.UTF_8));
+	}
+
+	private static String generateDummyMidlet(Path dir, String midletName) throws IOException {
+		Path src = dir.resolve("src");
+		Path midletCodePath;
+		if (midletName.indexOf('.') != -1) {
+			String[] splitted = ProjectConfigGenerator.splitByLastDot(midletName);
+			Path midletFolder = Paths.get(src.toString(), splitted[0].replace('.', File.separatorChar));
+			Files.createDirectories(midletFolder);
+			midletCodePath = midletFolder.resolve(splitted[1] + ".java");
+			Files.write(midletCodePath, ProjectConfigGenerator.buildDummyMidlet(midletName).getBytes(StandardCharsets.UTF_8));
+		} else {
+			midletCodePath = src.resolve(midletName + ".java");
+			Files.write(midletCodePath, ProjectConfigGenerator.buildDummyMidlet(midletName).getBytes(StandardCharsets.UTF_8));
+		}
+
+		return midletCodePath.toString();
+	}
+
+	private static void generateProGuardConfig(Path dir, String projName, ClasspathEntry[] classpath) throws IOException {
+		Files.write(dir.resolve(PROGUARD_LOCAL_CFG), ProjectConfigGenerator.buildLocalProguardConfig(dir.toString(), projName, classpath).getBytes(StandardCharsets.UTF_8));
+		if (!Files.exists(dir.resolve(PROGUARD_GLOBAL_CFG))) {
+			Files.write(dir.resolve(PROGUARD_GLOBAL_CFG), System.lineSeparator().getBytes(StandardCharsets.UTF_8));
+		}
+	}
+
+	public static String getProjectJdkName(Path miscXml) {
+		try {
+			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(miscXml.toFile());
+			NodeList components = doc.getElementsByTagName("component");
+			for (int i = 0; i < components.getLength(); i++) {
+				Element component = (Element) components.item(i);
+				if ("ProjectRootManager".equals(component.getAttribute("name"))) {
+					return component.getAttribute("project-jdk-name");
+				}
+			}
+		} catch (Exception ignored) {
+		}
+		return null;
+	}
+
+	public static String readManifestFromNetbeans(Path projPropsPath) throws IOException {
+		List<String> lines = Files.readAllLines(projPropsPath);
+		Hashtable<String, String> manifestProps = new Hashtable<>();
+		for (String line : lines) {
+			if (!line.startsWith("manifest.")) {
+				continue;
+			}
+			String[] split = line.split("=", 2);
+			manifestProps.put(split[0].substring("manifest.".length()), Utils.translateEscapes(split[1]));
+		}
+		return "Manifest-Version: 1.0\n" + manifestProps.get("midlets") + manifestProps.get("apipermissions") + manifestProps.get("others") + manifestProps.get("manifest");
+	}
+
+	private static boolean checkRunConfiguration(Path runPath, DevtimeMIDlet midletName) throws IOException {
+		List<String> manifest = Files.readAllLines(runPath);
+		boolean hasName = false;
+		boolean hasParams = false;
+		boolean hasWorkingDir = false;
+		// NOTE: synchronize with ProjectConfigGenerator.buildKemRunConfig !
+		for (String line : manifest) {
+			String trimmed = line.trim();
+			if (trimmed.startsWith("<configuration default=\"false\" name=\"Run &quot;")) {
+				if (!line.contains("&quot;" + midletName.readableName + "&quot;")) {
+					return false;
+				}
+				hasName = true;
+				continue;
+			}
+			if (trimmed.startsWith("<option name=\"PROGRAM_PARAMETERS\" value=\"")) {
+				if (!line.contains("-midlet " + midletName.className)) {
+					return false;
+				}
+				hasParams = true;
+				continue;
+			}
+			if (trimmed.startsWith("<option name=\"WORKING_DIRECTORY\" value=\"")) {
+				if (!line.contains("\"" + Emulator.getAbsolutePath() + "\"")) {
+					return false;
+				}
+				hasWorkingDir = true;
+				continue;
+			}
+		}
+		return hasName && hasParams && hasWorkingDir;
+	}
+
+	private static void sortProjectFiles(Path root) throws IOException {
+		if (!Files.isDirectory(root))
+			throw new IllegalArgumentException("Project root is not a folder");
+		ArrayList<Path[]> moveMap = new ArrayList<>();
+
+		Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+				Path fileName = dir.getFileName();
+
+				if (fileName == null)
+					return FileVisitResult.CONTINUE;
+
+				if (fileName.toString().startsWith(".")) {
+					return FileVisitResult.SKIP_SUBTREE;
+				}
+
+				if ("META-INF".equals(fileName.toString()) && dir.getParent() != null && dir.getParent().equals(root)) {
+					return FileVisitResult.SKIP_SUBTREE;
+				}
+
+				return FileVisitResult.CONTINUE;
+			}
+
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				if (!attrs.isRegularFile()) {
+					return FileVisitResult.CONTINUE;
+				}
+
+				String fileName = file.getFileName().toString();
+
+				if (fileName.startsWith(".")) {
+					return FileVisitResult.CONTINUE;
+				}
+
+				int dotIndex = fileName.lastIndexOf('.');
+				String extension = dotIndex == -1 || dotIndex == fileName.length() - 1 ? "" : fileName.substring(dotIndex);
+
+				Path targetRoot = ".java".equalsIgnoreCase(extension) ? root.resolve("src") : root.resolve("res");
+				Path target = targetRoot.resolve(root.relativize(file));
+
+				moveMap.add(new Path[]{file, target});
+
+				return FileVisitResult.CONTINUE;
+			}
+		});
+
+		Path srcDir = root.resolve("src");
+		Path resDir = root.resolve("res");
+		Files.createDirectories(srcDir);
+		Files.createDirectories(resDir);
+
+		for (Path[] move : moveMap) {
+			Path targetParent = move[1].getParent();
+			if (targetParent != null) {
+				Files.createDirectories(targetParent);
+			}
+			Files.move(move[0], move[1], StandardCopyOption.ATOMIC_MOVE);
+		}
+	}
+
+	//#endregion
+}

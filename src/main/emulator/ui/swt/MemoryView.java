@@ -34,7 +34,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private int imagesSortingMethod;
 	private boolean sortImagesByAscending;
 	private static final Object updateLock = new Object();
-	static final Vector<Image> allImages = new Vector();
+	static final ArrayList<Image> allImages = new ArrayList<>();
 	static final ArrayList<ImageViewItem> imagesToShow = new ArrayList<>();
 	int imagesCanvasScroll;
 	private boolean imagesDrawn = true;
@@ -50,6 +50,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 	private ArrayList<String> classesList = new ArrayList<>();
 	private AutoUpdate autoUpdater;
 	private int sortColumn = -1;
+	private int objectSortColumn = -1;
 
 	public static final String SHELL_TYPE = "MEMORY_VIEW";
 	private Group objectPaths;
@@ -146,15 +147,28 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		final TableColumn tableColumn;
 		(tableColumn = new TableColumn(this.classTable, 0)).setWidth(170);
 		tableColumn.setText(UILocale.get("MEMORY_VIEW_CLASS", "Class"));
-		tableColumn.addSelectionListener(new Class31(this));
+		tableColumn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				changeClassesSort(0);
+			}
+		});
 		final TableColumn tableColumn2;
 		(tableColumn2 = new TableColumn(this.classTable, 0)).setWidth(70);
 		tableColumn2.setText(UILocale.get("MEMORY_VIEW_INSTANCES", "Instances"));
-		tableColumn2.addSelectionListener(new Class140(this));
+		tableColumn2.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				changeClassesSort(1);
+			}
+		});
 		final TableColumn tableColumn3;
 		(tableColumn3 = new TableColumn(this.classTable, 0)).setWidth(100);
 		tableColumn3.setText(UILocale.get("MEMORY_VIEW_TOTAL_HEAP_SIZE", "Total Heap Size"));
-		tableColumn3.addSelectionListener(new Class17(this));
+		tableColumn3.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				changeClassesSort(2);
+			}
+		});
 
 		SashForm objectsPanel = new SashForm(memoryPanel, 0);
 		objectsPanel.setOrientation(SWT.VERTICAL);
@@ -168,12 +182,24 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		final TableColumn tableColumn4;
 		(tableColumn4 = new TableColumn(this.objectsTable, 0)).setWidth(230);
 		tableColumn4.setText(UILocale.get("MEMORY_VIEW_REFERENCE", "Reference"));
+		tableColumn4.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				changeObjectsSort(0);
+			}
+		});
 		final TableColumn tableColumn5;
 		(tableColumn5 = new TableColumn(this.objectsTable, 0)).setWidth(70);
 		tableColumn5.setText(UILocale.get("MEMORY_VIEW_INSTANCE", "Instance"));
 		final TableColumn tableColumn6;
 		(tableColumn6 = new TableColumn(this.objectsTable, 0)).setWidth(100);
 		tableColumn6.setText(UILocale.get("MEMORY_VIEW_SIZE", "Size"));
+		tableColumn6.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				changeObjectsSort(2);
+			}
+		});
 
 		// borders
 		objectPaths = new Group(objectsPanel, SWT.NONE);
@@ -228,10 +254,32 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		Menu menuSave = new Menu(this.shell, 8);
 		final MenuItem menuItem = new MenuItem(menuSave, 8);
 		menuItem.setText(UILocale.get("MEMORY_VIEW_SAVE_ONE", "Export selected image"));
-		menuItem.addSelectionListener(new SaveImageListener(this));
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				exportSelectedImage();
+			}
+		});
 		final MenuItem menuItem2 = new MenuItem(menuSave, 8);
 		menuItem2.setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Export all images"));
-		menuItem2.addSelectionListener(new SaveAllImagesListener(this));
+		menuItem2.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				final DirectoryDialog directoryDialog;
+				(directoryDialog = new DirectoryDialog(getShell())).setText(UILocale.get("MEMORY_VIEW_SAVE_ALL", "Export all images"));
+				directoryDialog.setMessage(UILocale.get("MEMORY_VIEW_CHOOSE_DIRECTORY", "Choose a directory"));
+				directoryDialog.setFilterPath(System.getProperty("user.dir"));
+				final String open;
+				if ((open = directoryDialog.open()) != null) {
+					for (int i = 0; i < MemoryView.imagesToShow.size(); ++i) {
+						try {
+							MemoryView.imagesToShow.get(i).drawable._getImpl().saveToFile(open + "/" + i + ".png");
+						} catch (Exception ignored) {
+						}
+					}
+				}
+			}
+		});
 
 		imagesCanvas.setMenu(menuSave);
 	}
@@ -267,18 +315,73 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 	public void resortImages() {
 		synchronized (MemoryView.updateLock) {
-			MemoryView.imagesToShow.sort(new ImagesComparator(this));
+			Comparator<ImageViewItem> comp;
+			switch (getSortingMethod()) {
+				case 0:
+					MemoryView mv2 = this;
+					comp = new Comparator<ImageViewItem>() {
+						private final MemoryView mv = mv2;
+						private final IdentityHashMap<Image, Integer> positions;
+
+						{
+							positions = new IdentityHashMap<>(MemoryView.allImages.size());
+							for (int i = 0; i < MemoryView.allImages.size(); i++) {
+								positions.put(MemoryView.allImages.get(i), i);
+							}
+						}
+
+						public int compare(final ImageViewItem i1, final ImageViewItem i2) {
+							int index1 = positions.get(i1.drawable);
+							int index2 = positions.get(i2.drawable);
+							int n = index2 - index1;
+							return mv.getSortByAscending() ? n : -n;
+						}
+					};
+					break;
+				case 1:
+					MemoryView mv1 = this;
+					comp = new Comparator<ImageViewItem>() {
+						private final MemoryView mv = mv1;
+
+						public int compare(final ImageViewItem i1, final ImageViewItem i2) {
+							Image o1 = i1.drawable;
+							Image o2 = i2.drawable;
+							int size1 = o1.getWidth() * o1.getHeight();
+							int size2 = o2.getWidth() * o2.getHeight();
+							int n = size1 - size2;
+							return mv.getSortByAscending() ? n : -n;
+						}
+					};
+					break;
+				case 2:
+					MemoryView mv3 = this;
+					comp = new Comparator<ImageViewItem>() {
+						private final MemoryView mv = mv3;
+
+						public int compare(final ImageViewItem i1, final ImageViewItem i2) {
+							Image o1 = i1.drawable;
+							Image o2 = i2.drawable;
+							int n = o1._getUsedCount() - o2._getUsedCount();
+							return mv.getSortByAscending() ? n : -n;
+						}
+					};
+					break;
+				default:
+					throw new IllegalArgumentException("Unsupported sort method");
+			}
+			MemoryView.imagesToShow.sort(comp);
 		}
 	}
 
 	private void updateImagesList() {
 		synchronized (MemoryView.updateLock) {
 			MemoryView.allImages.clear();
+			allImages.ensureCapacity(memoryMgr.images.size());
 			MemoryView.imagesToShow.clear();
-			synchronized (this.memoryMgr) {
-				for (Image image : this.memoryMgr.images) {
+			synchronized (memoryMgr) {
+				for (Image image : memoryMgr.images) {
 					allImages.add(image);
-					boolean add = (imagesDrawn && image.getUsedCount() > 0) || (imagesNeverDrawn && image.getUsedCount() == 0);
+					boolean add = (imagesDrawn && image._getUsedCount() > 0) || (imagesNeverDrawn && image._getUsedCount() == 0);
 					if (!add)
 						continue;
 					ImageViewItem i = new ImageViewItem(image, false);
@@ -377,9 +480,12 @@ public final class MemoryView implements DisposeListener, ControlListener {
 				}
 				if (y + imgH > 0 || y > canvasH) {
 					try {
-						image.getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
+						if (item.ensureCache())
+							gc.drawImage(item.cache, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
+						else
+							image._getImpl().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
 						if (this.darkenUnused) {
-							image.getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
+							image._getUsedRegion().copyToScreen(gc, 0, 0, image.getWidth(), image.getHeight(), x, y, imgW, imgH);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -401,7 +507,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 						if (item.released)
 							gc.drawString("Released", x - 1, y - fh, true);
 						else
-							gc.drawString("x" + image.getUsedCount(), x - 1, y - fh, true);
+							gc.drawString("x" + image._getUsedCount(), x - 1, y - fh, true);
 					}
 					gc.drawRectangle(x - 1, y - 1, imgW + 1, imgH + 1);
 					item.drawnRect = new Rectangle(x - 1, y - 1, imgW + 1, imgH + 1);
@@ -441,14 +547,48 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		resortClasses();
 	}
 
+	void changeObjectsSort(int n) {
+		objectsTable.setSortColumn(objectsTable.getColumn(n));
+		objectsTable.setSortDirection((objectsTable.getSortDirection() == 128) ? 1024 : 128);
+		objectSortColumn = n;
+
+		TableItem[] array = classTable.getSelection();
+		if (array == null || array.length < 1) {
+			return;
+		}
+
+		String cls = (String) array[0].getData();
+		if (selectedObject != null && !selectedObject.getClass().getName().equals(cls))
+			selectedObject = null;
+		objectsTable.removeAll();
+		addObjects(cls);
+		clearObjectPaths();
+	}
+
 	private void resortClasses() {
 		if (sortColumn == -1) return;
-		classesList.sort(new ClassListComparator(this, sortColumn));
+		classesList.sort((var1, var2) -> {
+			int r;
+			switch (sortColumn) {
+			case 0:
+				r = var1.compareTo(var2);
+				break;
+			case 1:
+				r = memoryMgr.instancesCount(var1) - memoryMgr.instancesCount(var2);
+				break;
+			case 2:
+				r = memoryMgr.totalObjectsSize(var1) - memoryMgr.totalObjectsSize(var2);
+				break;
+			default:
+				return 0;
+			}
+			return classTable.getSortDirection() == 128 ? r : -r;
+		});
 		setClassTableContent();
 	}
 
 	private void updateClassesView() {
-		this.classesList = Collections.list(this.memoryMgr.classesTable.keys());
+		this.classesList = new ArrayList<>(memoryMgr.classesTable.keySet());
 		for (int i = 0; i < this.classesList.size(); ++i) {
 			if (this.memoryMgr.totalObjectsSize(this.classesList.get(i)) == 0) {
 				this.classesList.remove(i--);
@@ -488,19 +628,40 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		if (array == null || array.length < 1) {
 			return;
 		}
+		// TODO sort
 		objectsTable.removeAll();
 		String cls = (String) array[0].getData();
-		Vector<ObjInstance> objs = this.memoryMgr.objs(cls);
 		if (selectedObject != null && !selectedObject.getClass().getName().equals(cls))
 			selectedObject = null;
+		addObjects(cls);
+		clearObjectPaths();
+	}
+
+	void addObjects(String cls) {
+		ArrayList<ObjInstance> objs = this.memoryMgr.objs(cls);
+		objs.sort((var1, var2) -> {
+			int r;
+			switch (objectSortColumn) {
+			case 0:
+				r = var1.paths.size() - var2.paths.size();
+				break;
+			// TODO sort by values?
+			case 2:
+				r = var1.size - var2.size;
+				break;
+			default:
+				return 0;
+			}
+			return objectsTable.getSortDirection() == 128 ? r : -r;
+		});
 		for (ObjInstance o : objs) {
 			TableItem ti = new TableItem(objectsTable, 0);
 			if (o.paths.isEmpty())
 				ti.setText(0, "Unknown reference");
 			else if (o.paths.size() == 1)
-				ti.setText(0, o.paths.get(0).toString(displayPkgNames));
+				ti.setText(0, o.paths.iterator().next().toString(displayPkgNames));
 			else
-				ti.setText(0, o.paths.get(0).toString(displayPkgNames) + "; " + (o.paths.size() - 1) + " more");
+				ti.setText(0, o.paths.iterator().next().toString(displayPkgNames) + "; " + (o.paths.size() - 1) + " more");
 			String s = String.valueOf(o.value);
 			//XXX
 			if (s.length() > 128) {
@@ -510,7 +671,6 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			ti.setText(2, String.valueOf(o.size));
 			ti.setData(o);
 		}
-		clearObjectPaths();
 	}
 
 	public void widgetDisposed(final DisposeEvent disposeEvent) {
@@ -519,8 +679,13 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 	void setAutoUpdate(boolean enabled, int interval) {
 		if (autoUpdater != null) {
-			autoUpdater.stopThread();
-			autoUpdater = null;
+			if (!enabled) {
+				autoUpdater.stopThread();
+				autoUpdater = null;
+			} else {
+				autoUpdater.updateInterval = interval;
+			}
+			return;
 		}
 		if (enabled) {
 			if (interval < 10)
@@ -649,7 +814,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 			return;
 		}
 		final Object value = ((ObjInstance) array[0].getData()).value;
-		if (value != null && emulator.debug.ClassTypes.isObject(value.getClass())) {
+		if (value != null && (ClassTypes.isObject(value.getClass()) || value.getClass().isArray())) {
 			new Watcher(value).open(shell);
 		}
 	}
@@ -661,7 +826,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 		}
 		try {
 			new Watcher(Memory.cls(array[0].getData().toString())).open(getShell());
-		} catch (Exception ignored) {
+		} catch (Throwable ignored) {
 			// arrays will throw
 		}
 	}
@@ -675,7 +840,7 @@ public final class MemoryView implements DisposeListener, ControlListener {
 					fileDialog.setFilterExtensions(new String[]{"*.png"});
 					final String open;
 					if ((open = fileDialog.open()) != null) {
-						item.drawable.getImpl().saveToFile(open);
+						item.drawable._getImpl().saveToFile(open);
 					}
 					return;
 				}
@@ -727,8 +892,10 @@ public final class MemoryView implements DisposeListener, ControlListener {
 
 		public void stopThread() {
 			shouldRun = false;
-			if (isAlive())
+			if (isAlive()) {
 				interrupt();
+//				join();
+			}
 		}
 	}
 }

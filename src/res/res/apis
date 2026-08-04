@@ -1,0 +1,38 @@
+$[Supported APIs]
+MIDP 2.0 (JSR-118)
+FileConnection (JSR-75)
+Wireless Messaging API 1.0 (JSR-120)
+MMAPI (JSR-135)
+Location (JSR-179)
+M3G 1.1 (JSR-184)
+OpenGL ES (JSR-239)
+Mobile Sensor API (JSR-256)
+NokiaUI 1.4
+Samsung 1.0 (win32 only)
+Sprint 1.0
+Siemens API
+MascotCapsule v3
+SoftBank MEXA (com.mexa, com.jblend, com.j_phone)
+Nokia M3D(O)
+Vodafone API 1.0
+PantechAudio (win32 only)
+LG MMPP API (mmpp.media)
+Siemens S60 Game API (com.siemens.s60.lcdui.game)
+Pigler Notifications API (org.pigler)
+com.gcjsp.v10
+tw.com.fareastone.v10
+com.bmc.media
+
+$[Stub APIs]
+PIM (JSR-75)
+Bluetooth (JSR-82)
+ContentHandler (JSR-211)
+AMMS (JSR-234)
+Nokia In-App
+Nokia IAPInfo API
+Immersion VibeTonz
+com.nec
+BlackBerry API (net.rim.device.api)
+Motorola FunLights API 1.0
+Motorola VibeLight API
+Motorola iDEN API (multimedia, micro3d)

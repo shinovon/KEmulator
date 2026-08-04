@@ -16,31 +16,11 @@
 
 package com.j_phone.amuse.j3d;
 
-import ru.woesss.j2me.micro3d.MathUtil;
-
-public class Vector3D {
-	public int x;
-	public int y;
-	public int z;
-
+public class Vector3D extends com.jblend.graphics.j3d.Vector3D {
 	public Vector3D() {}
 
 	public Vector3D(int x, int y, int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public int getZ() {
-		return z;
+		super(x, y, z);
 	}
 
 	public int innerProduct(Vector3D v) {
@@ -79,50 +59,5 @@ public class Vector3D {
 		int y = v1.z * v2.x - v1.x * v2.z;
 		int z = v1.x * v2.y - v1.y * v2.x;
 		return new Vector3D(x, y, z);
-	}
-
-	public void set(int x, int y, int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public void setY(int y) {
-		this.y = y;
-	}
-
-	public void setZ(int z) {
-		this.z = z;
-	}
-
-	public void unit() {
-		int x = this.x;
-		int y = this.y;
-		int z = this.z;
-		int shift = Integer.numberOfLeadingZeros(Math.abs(x) | Math.abs(y) | Math.abs(z)) - 17;
-		if (shift > 0) {
-			x <<= shift;
-			y <<= shift;
-			z <<= shift;
-		} else if (shift < 0) {
-			shift = -shift;
-			x >>= shift;
-			y >>= shift;
-			z >>= shift;
-		}
-		int i = MathUtil.uSqrt(x * x + y * y + z * z);
-		if (i != 0) {
-			this.x = (x << 12) / i;
-			this.y = (y << 12) / i;
-			this.z = ((z << 12) / i);
-		} else {
-			this.x = 0;
-			this.y = 0;
-			this.z = 4096;
-		}
 	}
 }

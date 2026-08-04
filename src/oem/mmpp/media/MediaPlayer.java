@@ -16,7 +16,7 @@
 
 package mmpp.media;
 
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import javax.microedition.media.Manager;
 import javax.microedition.media.MediaException;
@@ -34,7 +34,7 @@ public class MediaPlayer {
 
 	public void setMediaLocation(String location) {
 		try {
-			InputStream is = CustomJarResources.getResourceAsStream(null, location);
+			InputStream is = ResourceManager.getResourceAsStream(null, location);
 			player = Manager.createPlayer(is, "audio/midi");
 			player.realize();
 			is.close();

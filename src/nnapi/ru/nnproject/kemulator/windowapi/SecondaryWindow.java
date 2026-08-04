@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024 Arman Jussupgaliyev
+*/
 package ru.nnproject.kemulator.windowapi;
 
 import emulator.graphics2D.awt.ImageAWT;

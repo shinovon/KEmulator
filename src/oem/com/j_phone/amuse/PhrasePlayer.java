@@ -1,10 +1,24 @@
+/*
+Copyright (c) 2026 Arman Jussupgaliyev
+*/
 package com.j_phone.amuse;
 
+import emulator.media.mmf.PhrasePlayerImpl;
+import emulator.media.mmf.PhraseTrackImpl;
+
 public class PhrasePlayer {
+	private static PhrasePlayer phrasePlayer;
+	private final PhrasePlayerImpl impl;
+
 	protected int trackCount;
 	protected PhraseTrack[] tracks;
 	protected boolean[] useFlag;
-	protected static PhrasePlayer phrasePlayer;
+
+	PhrasePlayer() {
+		impl = PhrasePlayerImpl.open(true);
+		tracks = new PhraseTrack[trackCount = impl.getTracksCount()];
+		useFlag = new boolean[trackCount];
+	}
 
 	public static PhrasePlayer getPlayer() {
 		if (phrasePlayer == null) phrasePlayer = new PhrasePlayer();
@@ -12,34 +26,59 @@ public class PhrasePlayer {
 	}
 
 	public PhraseTrack getTrack() {
-		return new PhraseTrack();
+		PhraseTrackImpl impl = this.impl.createTrack(-1);
+		useFlag[impl.getID()] = true;
+		PhraseTrack t = tracks[impl.getID()] = new PhraseTrack(impl);
+		impl.setEventListener(t);
+		return t;
 	}
 
 	public int getTrackCount() {
-		return 16;
+		return trackCount;
 	}
 
-	public PhraseTrack getTrack(int paramInt) {
-		return new PhraseTrack();
+	public PhraseTrack getTrack(int track) {
+		if (track < 0 || track >= tracks.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		PhraseTrack t = tracks[track];
+		if (t == null) {
+			tracks[track] = t = new PhraseTrack(impl.createTrack(track));
+		}
+		return t;
 	}
 
 	public PhraseTrack getTrackPair() {
-		return null;
+		// TODO
+		return getTrack();
 	}
 
-	public PhraseTrack getTrackPair(int paramInt) {
-		return null;
+	public PhraseTrack getTrackPair(int id) {
+		// TODO
+		return getTrack(id);
 	}
 
-	public void disposeTrack(PhraseTrack paramPhraseTrack) {
+	public void disposeTrack(PhraseTrack t) {
+		int id = t.getID();
+		if (tracks[id] == t) {
+			useFlag[id] = false;
+			impl.disposeTrack(id);
+			tracks[id] = null;
+		}
 	}
 
 	public void kill() {
+		impl.kill();
+		for (int i = 0; i < tracks.length; ++i) {
+			tracks[i] = null;
+		}
 	}
 
 	public void pause() {
+		impl.pause();
 	}
 
 	public void resume() {
+		impl.resume();
 	}
 }

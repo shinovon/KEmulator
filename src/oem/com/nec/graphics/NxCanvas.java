@@ -11,6 +11,7 @@ public abstract class NxCanvas
 	public static final int NX_KEY_FIRE = -5;
 
 	public int getPressedKeys() {
+		// TODO
 		return 0;
 	}
 }

@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024-2026 Arman Jussupgaliyev
+*/
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -6,25 +9,44 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.security.KeyFactory;
+import java.security.Signature;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class KEmulatorUpdater implements Runnable {
 	
-	private static final String VERSION = "0.4";
+	private static final String VERSION = "0.8";
 	
 	private static final String UPDATE_URL = "https://nnproject.cc/kem/releases/";
-	
+	@SuppressWarnings("SpellCheckingInspection")
+	private static final String PUBLIC =
+			"MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtZlt6VdFb3lF0HxD88gs" +
+			"ToLdrBouEpR1t9fjTb0lpzk1VOgkNRkPkV3z5hfzOTa3qmpGrUGNXVZf8t+ULMv1" +
+			"1FuvmI/TAbAgLqjqtOufU3xLxdTP9p3KRiX+rQLfqCa4oq6+F0+DOtJkWgoFeuVW" +
+			"Z3eO0GxPhgR2XXcVhj1NFt2XhViI4dKJ4/7J1mMnH9sGaKQAFVLLo39afbCe5MzU" +
+			"/OIyWUDbWN7dhhCO+W8PGEFHd9ayQDLeV74SNYNLE6vGRf8J2whDDvr947htHIRE" +
+			"9iDBZgXZqpluZ9S9PHHOSTX/qmCaQj+AfYeXCGcfbM8LM4v60IBsrL7o2NAXWNca" +
+			"EKh3K8Vq/4TYLulSosDw/vvyB9Ion/mUaMn4P7yzYXk5/jO8et1UO4t6mKbBczj2" +
+			"Msj5IQh4yFH09P8gkdm+A0Z3s7gJrbV9oeS5iAKx/eTn3/vY0dEF/Ss6GV7BPeKu" +
+			"D/yOqeAmLdGeDVO9NuONOErjtFDO7Z151OHHH3+TetPgqP2r3Ciy/m1fB0dC167n" +
+			"LxE2j8GaFGolf+4dq2xmA5+cglLmEPOJDlbxWHDJ9EKo4FNDdvOxj/h6EclSIxPB" +
+			"ya602KEMLvcT3j5s41sf8evqJX5yQRDcz0Hc+iPoTJPhyCymdHY7xIEg0uuhJwix" +
+			"CnwVAeUoL4MXpCgytCqM2ysCAwEAAQ==";
+
 	private static KEmulatorUpdater inst;
 
-	private static JFrame frame;
-	private static JProgressBar progressBar;
 	private static JLabel label;
+	private static JProgressBar progressBar;
 
 //	private static StringBuilder log = new StringBuilder();
 
@@ -39,6 +61,10 @@ public class KEmulatorUpdater implements Runnable {
 	private static boolean installed;
 	private static String jar;
 	private static String jad;
+
+	private static int length;
+	private static int progress;
+	private static JFrame frame;
 
 	public static void main(String[] args) {
 		kemulatorDir = Paths.get(".");
@@ -81,13 +107,14 @@ public class KEmulatorUpdater implements Runnable {
 			
 			if (currentVersion == 0 || type == null) {
 				fail("Not enough arguments", null);
-				exitDelay(0);
 				return;
 			}
 			
 			// initialize ui
 			inst = new KEmulatorUpdater();
-			EventQueue.invokeAndWait(inst);
+			try {
+				EventQueue.invokeAndWait(inst);
+			} catch (Exception ignored) {}
 
 			state("KEmulator Updater v" + VERSION);
 			
@@ -95,19 +122,13 @@ public class KEmulatorUpdater implements Runnable {
 			Thread.sleep(1000);
 			
 			kemulatorJar = kemulatorDir.resolve("KEmulator.jar");
-//			if (!(Files.exists(kemulatorJar))) {
-//				state("KEmulator.jar is missing");
-//				exitDelay(3000);
-//				return;
-//			}
 
 			update: {
 				// get latest version
 				state("Obtaining latest version info");
 				try {
 					if ("stable".equals(branch)) {
-						int latest = Integer.parseInt(
-								getHttpString(UPDATE_URL + branch + "/version.txt"));
+						int latest = Integer.parseInt(getHttpString(UPDATE_URL + branch + "/version.txt"));
 						if (latest == currentVersion) {
 							state("Already up to date!");
 							Thread.sleep(3000);
@@ -122,99 +143,39 @@ public class KEmulatorUpdater implements Runnable {
 					return;
 				}
 				
-				state("Deleting KEmulator.jar");
-				
-				try {
-					if (Files.exists(kemulatorJar)) {
-						Files.delete(kemulatorJar);
-					}
-				} catch (IOException e) {
-					fail("Failed to delete KEmulator.jar", e);
-					return;
-				}
-				
-				if (!x64) {
-					state("Deleting 3d engines");
-					try {
-						Files.delete(kemulatorDir.resolve("m3g_lwjgl.jar"));
-					} catch (IOException ignored) {}
-					try {
-						Files.delete(kemulatorDir.resolve("m3g_swerve.jar"));
-					} catch (IOException ignored) {}
-					try {
-						Files.delete(kemulatorDir.resolve("micro3d_gl.jar"));
-					} catch (IOException ignored) {}
-					try {
-						Files.delete(kemulatorDir.resolve("micro3d_dll.jar"));
-					} catch (IOException ignored) {}
-				}
-				
 				try {
 					state("Downloading KEmulator.jar");
-					download(UPDATE_URL
+					update(UPDATE_URL
 							+ branch + "/" + type
-							+ (x64 ? "/KEmulator_x64.jar" : "/KEmulator.jar"), kemulatorJar);
-				} catch (IOException e) {
+							+ (x64 ? "/KEmulator_x64.jar" : "/KEmulator.jar"), "KEmulator.jar");
+				} catch (Exception e) {
 					fail("Failed to download KEmulator.jar", e);
 					return;
 				}
-				
-				Path tempZip = Files.createTempFile(null, ".zip");
+
 				try {
-					state("Downloading lang.zip");
-					download(UPDATE_URL + branch + "/lang.zip", tempZip);
-				} catch (IOException e) {
+					updateExtract(UPDATE_URL + branch + "/lang.zip", "lang.zip", kemulatorDir);
+				} catch (Exception e) {
 					fail("Failed to download lang.zip", e);
 					return;
 				}
 				
-				try {
-					state("Extracting lang.zip");
-					extract(tempZip, kemulatorDir.resolve("lang"));
-				} catch (IOException e) {
-					fail("Failed to extract lang.zip", e);
-					return;
-				}
-				
 				if (!x64) {
 					try {
-						state("Downloading m3g_lwjgl.jar");
-						download(UPDATE_URL
-								+ branch + "/" + type + "/m3g_lwjgl.jar",
-								kemulatorDir.resolve("m3g_lwjgl.jar"));
-	
-						state("Downloading m3g_swerve.jar");
-						download(UPDATE_URL
-								+ branch + "/" + type + "/m3g_swerve.jar",
-								kemulatorDir.resolve("m3g_swerve.jar"));
-	
-						state("Downloading micro3d_gl.jar");
-						download(UPDATE_URL
-								+ branch + "/" + type + "/micro3d_gl.jar",
-								kemulatorDir.resolve("micro3d_gl.jar"));
-	
-						state("Downloading micro3d_dll.jar");
-						download(UPDATE_URL
-								+ branch + "/" + type + "/micro3d_dll.jar",
-								kemulatorDir.resolve("micro3d_dll.jar"));
-					} catch (IOException e) {
-						fail("Failed to download KEmulator.jar", e);
+						update(UPDATE_URL + branch + "/" + type + "/m3g_lwjgl.jar", "m3g_lwjgl.jar");
+						update(UPDATE_URL + branch + "/" + type + "/m3g_swerve.jar", "m3g_swerve.jar");
+						update(UPDATE_URL + branch + "/" + type + "/micro3d_gl.jar", "micro3d_gl.jar");
+						update(UPDATE_URL + branch + "/" + type + "/micro3d_dll.jar", "micro3d_dll.jar");
+						update(UPDATE_URL + branch + "/" + type + "/amrdecoder.dll", "amrdecoder.dll");
+					} catch (Exception e) {
+						fail("Failed to download libraries", e);
 						return;
 					}
 				} else {
 					try {
-						state("Downloading lwjgl.zip");
-						download(UPDATE_URL + branch + "/lwjgl.zip", tempZip);
-					} catch (IOException e) {
+						updateExtract(UPDATE_URL + branch + "/lwjgl.zip", "lwjgl.zip", kemulatorDir);
+					} catch (Exception e) {
 						fail("Failed to download lwjgl.zip", e);
-						return;
-					}
-
-					try {
-						state("Extracting lwjgl.zip");
-						extract(tempZip, kemulatorDir);
-					} catch (IOException e) {
-						fail("Failed to extract lwjgl.zip", e);
 						return;
 					}
 				}
@@ -223,7 +184,7 @@ public class KEmulatorUpdater implements Runnable {
 			}
 			
 			if (!runAfterDone) {
-				exitDelay(1000);
+				exitDelay(0, 1000);
 				return;
 			}
 			
@@ -231,13 +192,12 @@ public class KEmulatorUpdater implements Runnable {
 				start();
 			} catch (Exception e) {
 				fail("Failed to run KEmulator", e);
-				return;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			log(e);
+			fail("Unhandled exception", e);
 		}
-		exitDelay(3000);
+		// should not reach here
+		exitDelay(0, 3000);
 	}
 
 	/**
@@ -248,9 +208,11 @@ public class KEmulatorUpdater implements Runnable {
 		frame.setTitle("KEmulator Updater");
 		frame.setBounds(100, 100, 320, 100);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		
+
 		progressBar = new JProgressBar();
 		progressBar.setPreferredSize(new Dimension(-1, 20));
+		progressBar.setMinimum(0);
+		progressBar.setMaximum(100);
 		progressBar.setIndeterminate(true);
 		frame.getContentPane().add(progressBar, BorderLayout.SOUTH);
 		
@@ -267,7 +229,7 @@ public class KEmulatorUpdater implements Runnable {
 	}
 	
 	static void start() throws IOException {
-		ArrayList<String> cmd = new ArrayList<String>();
+		ArrayList<String> cmd = new ArrayList<>();
 		String os = System.getProperty("os.name").toLowerCase();
 		java: {
 			Path javaExe = kemulatorDir.resolve("jre").resolve("bin").resolve("java.exe");
@@ -312,7 +274,11 @@ public class KEmulatorUpdater implements Runnable {
 			cmd.add("--add-opens");
 			cmd.add("java.base/java.util=ALL-UNNAMED");
 			cmd.add("--add-opens");
-			cmd.add("java.base/sun.misc=ALL-UNNAMED");
+			cmd.add("jdk.unsupported/sun.misc=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.desktop/com.sun.media.sound=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.desktop/javax.sound.midi=ALL-UNNAMED");
 			if (getJavaVersionMajor() >= 17)
 				cmd.add("--enable-native-access=ALL-UNNAMED");
 		}
@@ -335,7 +301,7 @@ public class KEmulatorUpdater implements Runnable {
 			cmd.add(jad);
 		}
 		
-		new ProcessBuilder(new String[0])
+		new ProcessBuilder()
 			.directory(kemulatorDir.toFile())
 			.command(cmd)
 			.start();
@@ -347,14 +313,17 @@ public class KEmulatorUpdater implements Runnable {
 		if (exception != null) {
 			log(exception);
 		}
-		exitDelay(3000);
+		try {
+			JOptionPane.showMessageDialog(frame, message + (exception != null ? ("\n" + getExceptionString(exception)) : ""), "Failed to update KEmulator", JOptionPane.ERROR_MESSAGE);
+		} catch (Throwable ignored) {}
+		exitDelay(1, 3000);
 	}
 
-	private static void exitDelay(long time) {
+	private static void exitDelay(int code, long time) {
 		try {
 			Thread.sleep(time);
-		} catch (Exception e) {}
-		System.exit(0);
+		} catch (Exception ignored) {}
+		System.exit(code);
 	}
 	
 	static void state(String message) {
@@ -364,14 +333,7 @@ public class KEmulatorUpdater implements Runnable {
 	}
 	
 	static void log(Throwable exception) {
-		String res = null;
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			exception.printStackTrace(new PrintStream(baos));
-			res = baos.toString();
-		} catch (Throwable t) {}
-		
-		if (res == null) return;
+		String res = getExceptionString(exception);
 		log(res, true);
 	}
 	
@@ -380,6 +342,16 @@ public class KEmulatorUpdater implements Runnable {
 //		if (textArea == null) return;
 //		log.append(text).append('\n');
 //		if (show) textArea.setText(log.toString());
+	}
+
+	static String getExceptionString(Throwable exception) {
+		String res = "";
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			exception.printStackTrace(new PrintStream(baos));
+			res = baos.toString();
+		} catch (Throwable ignored) {}
+		return res;
 	}
 	
 	static int getJavaVersionMajor() {
@@ -390,35 +362,87 @@ public class KEmulatorUpdater implements Runnable {
 		}
 	}
 
+	static void update(String url, String name) throws Exception {
+		state("Downloading " + name);
+		Path dest = kemulatorDir.resolve(name);
+		Path tmp = kemulatorDir.resolve(name + ".tmp");
+		download(url, tmp);
+		state("Verifying " + name);
+		if (!verifyFile(tmp, getHttpBytes(url + ".sig"))) {
+			Files.delete(tmp);
+			throw new Exception("Could not verify " + name + " signature");
+		}
+		Files.move(tmp, dest, StandardCopyOption.REPLACE_EXISTING);
+	}
+
+	static void updateExtract(String url, String name, Path dir) throws Exception {
+		state("Downloading " + name);
+		Path tmp = Files.createTempFile(null, ".zip");
+		try {
+			download(url, tmp);
+			state("Verifying " + name);
+			if (!verifyFile(tmp, getHttpBytes(url + ".sig"))) {
+				Files.delete(tmp);
+				throw new Exception("Could not verify " + name + " signature");
+			}
+			state("Extracting " + name);
+			extract(tmp, dir);
+		} finally {
+			Files.delete(tmp);
+		}
+	}
+
 	
 	// http utils
 	
 	static void download(String url, Path path) throws IOException {
-		ReadableByteChannel inChannel = null;
-		FileOutputStream fileStream = null;
-		FileChannel fileChannel = null;
-		try {
-			inChannel = Channels.newChannel(getHttpStream(url));
-			fileStream = new FileOutputStream(path.toFile());
-			
-			fileChannel = fileStream.getChannel();
-			fileChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
+		if (progressBar != null) {
+			EventQueue.invokeLater(() -> {
+				progressBar.setValue(0);
+				progressBar.setIndeterminate(false);
+			});
+		}
+
+		length = -1;
+		progress = 0;
+
+		try (InputStream in = getHttpStream(url);
+			 FileOutputStream fileStream = new FileOutputStream(path.toFile())) {
+			if (progressBar == null) {
+				length = -1;
+			} else if (length == -1) {
+				EventQueue.invokeLater(() -> {
+					progressBar.setIndeterminate(true);
+				});
+			}
+
+			byte[] buffer = new byte[64 * 1024];
+			int read;
+			while ((read = in.read(buffer)) != -1) {
+				fileStream.write(buffer, 0, read);
+				if (length != -1) {
+					progress += read;
+					EventQueue.invokeLater(() -> {
+						progressBar.setValue(Math.min(100, progress * 100 / length));
+					});
+				}
+			}
 		} finally {
-			if (inChannel != null) inChannel.close();
-			if (fileChannel != null) fileChannel.close();
-			if (fileStream != null) fileStream.close();
+			if (progressBar != null) {
+				EventQueue.invokeLater(() -> {
+					progressBar.setValue(100);
+					progressBar.setIndeterminate(true);
+				});
+			}
 		}
 	}
-	
+
 	static String getHttpString(String url) throws IOException {
-		return new String(getHttpBytes(url), "UTF-8");
+		return new String(getHttpBytes(url), StandardCharsets.UTF_8);
 	}
 	
 	static byte[] getHttpBytes(String url) throws IOException {
-		InputStream inputStream = null;
-		try {
-			inputStream = getHttpStream(url);
-			
+		try (InputStream inputStream = getHttpStream(url)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			byte[] buffer = new byte[16384];
 			int read;
@@ -426,19 +450,27 @@ public class KEmulatorUpdater implements Runnable {
 				baos.write(buffer, 0, read);
 			}
 			return baos.toByteArray();
-		} finally {
-			if (inputStream != null) inputStream.close();
 		}
 	}
 	
 	static InputStream getHttpStream(String url) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-		connection.setRequestProperty("User-Agent", "KEmulatorUpdater/" + VERSION);
-		connection.setRequestProperty("Accept-Encoding", "gzip");
-		int responseCode = connection.getResponseCode();
-		if (responseCode == 404) {
-			throw new FileNotFoundException(url);
+		HttpURLConnection connection;
+		while (true) {
+			connection = (HttpURLConnection) new URL(url).openConnection();
+			connection.setRequestProperty("User-Agent", "KEmulatorUpdater/" + VERSION);
+			connection.setRequestProperty("Accept-Encoding", "gzip");
+			connection.setUseCaches(false);
+			int responseCode = connection.getResponseCode();
+			if (responseCode == 404) {
+				throw new FileNotFoundException(url);
+			}
+			if (responseCode == 301 || responseCode == 302) {
+				url = connection.getHeaderField("Location");
+				continue;
+			}
+			break;
 		}
+		length = connection.getContentLength();
 		InputStream inputStream = connection.getInputStream();
 		if (inputStream == null) {
 			throw new IOException("No input stream");
@@ -448,6 +480,22 @@ public class KEmulatorUpdater implements Runnable {
 			return new GZIPInputStream(inputStream);
 		}
 		return inputStream;
+	}
+
+	private static boolean verifyFile(Path file, byte[] signature) throws Exception {
+		Signature sign = Signature.getInstance("SHA256withRSA");
+		sign.initVerify(KeyFactory.getInstance("RSA")
+				.generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(PUBLIC))));
+
+		try (InputStream is = Files.newInputStream(file)) {
+			byte[] buffer = new byte[8192];
+			int len;
+			while ((len = is.read(buffer)) != -1) {
+				sign.update(buffer, 0, len);
+			}
+		}
+
+		return sign.verify(Base64.getDecoder().decode(signature));
 	}
 	
 	// zip
@@ -466,14 +514,10 @@ public class KEmulatorUpdater implements Runnable {
 						Files.createDirectory(path);
 					}
 				} else {
-					FileOutputStream fileStream = new FileOutputStream(path.toFile());
-					try {
+					try (FileOutputStream fileStream = new FileOutputStream(path.toFile())) {
 						fileStream.getChannel().transferFrom(inChannel, 0, Long.MAX_VALUE);
-					} finally {
-						fileStream.close();
 					}
 				}
-				
 			}
 		} finally {
 			zipStream.close();

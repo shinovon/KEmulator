@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024 Arman Jussupgaliyev
+*/
 package org.pigler.api;
 
 import com.nokia.mid.ui.SoftNotificationImpl;
@@ -65,7 +68,7 @@ public class PiglerAPI {
     public void updateNotification(int uid, Image icon) throws Exception {
         if(icon == null) return;
         try {
-            SoftNotificationImpl.trayIcon.setImage(((ImageAWT) icon.getImpl()).getBufferedImage());
+            SoftNotificationImpl.trayIcon.setImage(((ImageAWT) icon._getImpl()).getBufferedImage());
             SoftNotificationImpl.trayIcon.setImageAutoSize(true);
         } catch (Exception ignored) {}
     }

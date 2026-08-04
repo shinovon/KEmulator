@@ -1,7 +1,8 @@
 package com.nokia.mid.sound;
 
 import emulator.Settings;
-import emulator.media.b;
+import emulator.media.ott.NokiaOTTDecoder;
+import emulator.media.ott.RingtoneParser;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.MidiToneConstants;
 import emulator.media.tone.ToneManager;
@@ -87,23 +88,36 @@ public class Sound {
 		return new int[]{1, 5};
 	}
 
-	public void init(byte[] paramArrayOfByte, int paramInt) {
-		if (paramArrayOfByte == null) {
+	public void init(byte[] data, int paramInt) {
+		if (data == null) {
 			throw new NullPointerException();
 		}
 		if (paramInt == 1) {
 			// TODO fix memory leaks
-			if (Settings.enableOTT) {
-				paramArrayOfByte = new b(paramArrayOfByte).method726();
-			} else {
+			switch (Settings.ottDecoder) {
+			case 1:
+				try {
+					data = new RingtoneParser(data).getMIDIData();
+					break;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			case 2:
+				try {
+					data = NokiaOTTDecoder.convertToMidi(data);
+					break;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			default:
 				m_player = new MIDITonePlayer();
 				state = 3;
 				return;
 			}
 		}
-		if (Settings.enableMediaDump) data = paramArrayOfByte;
+		if (Settings.enableMediaDump) this.data = data;
 		try {
-			ByteArrayInputStream localByteArrayInputStream = new ByteArrayInputStream(paramArrayOfByte);
+			ByteArrayInputStream localByteArrayInputStream = new ByteArrayInputStream(data);
 			m_player = new PlayerImpl(localByteArrayInputStream, type == FORMAT_WAV ? "audio/wav" : null);
 			m_player.addPlayerListener(playerListener);
 			localByteArrayInputStream.close();

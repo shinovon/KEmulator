@@ -39,8 +39,9 @@ public class Sprite extends GraphicObject {
 				|| (mask != null && pixels.length != mask.length)
 				|| width % 8 != 0)
 			throw new IllegalArgumentException();
-		Image image = com.siemens.mp.ui.Image.createImageFromBitmap(pixels, mask, width, height * numFrames);
-		init(image, null, numFrames);
+		init(com.siemens.mp.ui.Image.createImageFromBitmap(pixels, width, height * numFrames),
+				mask == null ? null : com.siemens.mp.ui.Image.createImageFromBitmap(mask, width, height * numFrames),
+				numFrames);
 	}
 
 	public Sprite(ExtendedImage pixels, ExtendedImage mask, int numFrames) {
@@ -58,15 +59,10 @@ public class Sprite extends GraphicObject {
 		}
 		int width = pixels.getWidth();
 		int height = pixels.getHeight();
-		// TODO mask
-//		if (mask != null) {
-//			sprite = Image.createImage(width, height);
-//			Graphics g = sprite.getGraphics();
-//			g.drawImage(pixels, 0, 0, 0);
-//			g.setColor(0);
-//		} else {
+		if (mask != null) {
+			pixels = com.siemens.mp.lcdui.Image.createTransparentImageFromMask(pixels, mask);
+		}
 		sprite = pixels;
-//		}
 		frameHeight = height / numFrames;
 		frameBounds = new Rectangle(0, 0, width, frameHeight);
 		dstBounds = new Rectangle(frameBounds);

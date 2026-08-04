@@ -18,7 +18,7 @@ package com.mexa.opgl;
 
 import org.lwjgl.BufferUtils;
 
-public class ByteBuffer extends Buffer {
+public class ByteBuffer extends Buffer implements com.nttdocomo.ui.ogl.ByteBuffer {
 
 	private ByteBuffer(int size) {
 		super(BufferUtils.createByteBuffer(size));
@@ -38,6 +38,10 @@ public class ByteBuffer extends Buffer {
 		return new ByteBuffer(buffer);
 	}
 
+	public byte[] get(int paramInt, byte[] paramArrayOfByte) {
+		return get(paramInt, paramArrayOfByte, 0, paramArrayOfByte.length);
+	}
+
 	public byte[] get(int srcIndex, byte[] buf, int dstIndex, int length) {
 		java.nio.ByteBuffer nio = (java.nio.ByteBuffer) super.buffer;
 		nio.position(srcIndex);
@@ -45,9 +49,25 @@ public class ByteBuffer extends Buffer {
 		return buf;
 	}
 
+	public void put(int paramInt, byte[] paramArrayOfByte) {
+		put(paramInt, paramArrayOfByte, 0, paramArrayOfByte.length);
+	}
+
 	public void put(int dstIndex, byte[] buf, int srcIndex, int length) {
 		java.nio.ByteBuffer nio = (java.nio.ByteBuffer) super.buffer;
 		nio.position(dstIndex);
 		nio.put(buf, srcIndex, length);
+	}
+
+	public ShortBuffer asShortBuffer() {
+		return new ShortBuffer(this);
+	}
+
+	public IntBuffer asIntBuffer() {
+		return new IntBuffer(this);
+	}
+
+	public FloatBuffer asFloatBuffer() {
+		return new FloatBuffer(this);
 	}
 }

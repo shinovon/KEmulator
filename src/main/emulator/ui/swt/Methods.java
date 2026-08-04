@@ -1,13 +1,13 @@
 package emulator.ui.swt;
 
+import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
 import emulator.custom.h;
 import emulator.custom.h.MethodInfo;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -15,87 +15,148 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.*;
 
 public final class Methods implements Runnable, DisposeListener {
 	private Shell shell;
-	private SashForm aSashForm785;
-	private Composite aComposite787;
-	private Button aButton783;
-	private Button aButton795;
-	private Table aTable788;
-	private Composite aComposite796;
-	private Button aButton797;
-	private Button aButton798;
-	private Text aText789;
-	private Button aButton799;
-	private StyledText aStyledText790;
+	private SashForm mainSashForm;
+	private Composite tablePanel;
+	private Button resetCallsBtn;
+	private Button exportBytecodeBtn;
+	private Table methodsTable;
+	private Composite detailsPanel;
+	private Button showLineNumbersBtn;
+	private Button showFramesBtn;
+	private Text searchText;
+	private Button searchBtn;
+	private StyledText codeViewer;
 	private Display display;
 	private boolean visible;
-	private static NumberFormat aNumberFormat794;
-	private int anInt786;
-	private ArrayList anArrayList792;
+	private static NumberFormat numberFormat;
+	private int sortColumnIndex;
+	private ArrayList methodDataList;
 
 	public Methods() {
 		super();
 		this.shell = null;
-		this.aSashForm785 = null;
-		this.aComposite787 = null;
-		this.aButton783 = null;
-		this.aButton795 = null;
-		this.aTable788 = null;
-		this.aComposite796 = null;
-		this.aButton797 = null;
-		this.aButton798 = null;
-		this.aText789 = null;
-		this.aButton799 = null;
-		this.aStyledText790 = null;
-		Methods.aNumberFormat794 = NumberFormat.getInstance();
-		this.anArrayList792 = new ArrayList();
+		this.mainSashForm = null;
+		this.tablePanel = null;
+		this.resetCallsBtn = null;
+		this.exportBytecodeBtn = null;
+		this.methodsTable = null;
+		this.detailsPanel = null;
+		this.showLineNumbersBtn = null;
+		this.showFramesBtn = null;
+		this.searchText = null;
+		this.searchBtn = null;
+		this.codeViewer = null;
+		Methods.numberFormat = NumberFormat.getInstance();
+		this.methodDataList = new ArrayList();
 	}
 
-	private void method448() {
-		this.anArrayList792.clear();
-		this.anArrayList792.addAll(h.aHashtable1061.values());
-		final Enumeration<h.MethodInfo> elements = h.aHashtable1061.elements();
+	private void refreshMethodData() {
+		this.methodDataList.clear();
+		this.methodDataList.addAll(h.methodProfiles.values());
+		final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
 		while (elements.hasMoreElements()) {
 			final h.MethodInfo data = elements.nextElement();
 			final TableItem tableItem;
-			(tableItem = new TableItem(this.aTable788, 0)).setData(data);
-			tableItem.setText(0, data.aString1172);
-			tableItem.setText(1, data.aString1177);
-			tableItem.setText(2, data.aString1181);
-			tableItem.setText(3, String.valueOf(data.anInt1173));
+			(tableItem = new TableItem(this.methodsTable, 0)).setData(data);
+			tableItem.setText(0, data.className);
+			tableItem.setText(1, data.methodName);
+			tableItem.setText(2, data.methodSignature);
+			tableItem.setText(3, String.valueOf(data.codeSize));
 			tableItem.setText(4, String.valueOf(data.refCount));
-			tableItem.setText(5, String.valueOf(data.anInt1182));
-			tableItem.setText(6, Methods.aNumberFormat794.format(data.aLong1179));
-			tableItem.setText(7, Methods.aNumberFormat794.format(data.aFloat1175));
-			tableItem.setText(8, Methods.aNumberFormat794.format(data.aFloat1180));
+			tableItem.setText(5, String.valueOf(data.callCount));
+			tableItem.setText(6, Methods.numberFormat.format(data.totalExecutionTime));
+			tableItem.setText(7, Methods.numberFormat.format(data.averageExecutionTime));
+			tableItem.setText(8, Methods.numberFormat.format(data.timePercentage));
 		}
 		this.run();
-		this.method435(0);
+		this.sortMethodTable(0);
 	}
 
-	private void method435(final int n) {
-		this.aTable788.setSortColumn(this.aTable788.getColumn(n));
-		this.aTable788.setSortDirection((this.aTable788.getSortDirection() == 128) ? 1024 : 128);
-		Collections.sort((List<Object>) this.anArrayList792, new Class169(this, n));
-		for (int i = this.anArrayList792.size() - 1; i >= 0; --i) {
-			final h.MethodInfo data = (MethodInfo) this.anArrayList792.get(i);
+	private void sortMethodTable(final int n) {
+		this.methodsTable.setSortColumn(this.methodsTable.getColumn(n));
+		this.methodsTable.setSortDirection((this.methodsTable.getSortDirection() == 128) ? 1024 : 128);
+		Methods aClass46_14391 = this;
+		int anInt14381 = n;
+		Collections.sort((List<Object>) this.methodDataList, new Comparator() {
+			private final int anInt1438 = anInt14381;
+			private final Methods aClass46_1439 = aClass46_14391;
+
+			public final int compare(final Object o, final Object o2) {
+				int n = 0;
+				final MethodInfo methodInfo = (MethodInfo) o;
+				final MethodInfo methodInfo2 = (MethodInfo) o2;
+				Label_0290:
+				{
+					int n2 = 0;
+					switch (this.anInt1438) {
+						case 0: {
+							n2 = methodInfo.className.compareTo(methodInfo2.className);
+							break;
+						}
+						case 1: {
+							n2 = methodInfo.methodName.compareTo(methodInfo2.methodName);
+							break;
+						}
+						case 2: {
+							n2 = methodInfo.methodSignature.compareTo(methodInfo2.methodSignature);
+							break;
+						}
+						case 3: {
+							n2 = methodInfo.codeSize - methodInfo2.codeSize;
+							break;
+						}
+						case 4: {
+							n2 = methodInfo.refCount - methodInfo2.refCount;
+							break;
+						}
+						case 5: {
+							n2 = methodInfo.callCount - methodInfo2.callCount;
+							break;
+						}
+						case 6: {
+							n = ((methodInfo.totalExecutionTime - methodInfo2.totalExecutionTime == 0L) ? 0 : ((methodInfo.totalExecutionTime - methodInfo2.totalExecutionTime > 0L) ? 1 : -1));
+							break Label_0290;
+						}
+						case 7: {
+							n = ((methodInfo.averageExecutionTime - methodInfo2.averageExecutionTime == 0.0f) ? 0 : ((methodInfo.averageExecutionTime - methodInfo2.averageExecutionTime > 0.0f) ? 1 : -1));
+							break Label_0290;
+						}
+						case 8: {
+							n2 = ((methodInfo.timePercentage - methodInfo2.timePercentage == 0.0f) ? 0 : ((methodInfo.timePercentage - methodInfo2.timePercentage > 0.0f) ? 1 : -1));
+							break;
+						}
+					}
+					n = n2;
+				}
+				if (method441(this.aClass46_1439).getSortDirection() == 128) {
+					return n;
+				}
+				return -n;
+			}
+		});
+		for (int i = this.methodDataList.size() - 1; i >= 0; --i) {
+			final h.MethodInfo data = (MethodInfo) this.methodDataList.get(i);
 			final TableItem item;
-			(item = this.aTable788.getItem(i)).setData(data);
-			item.setText(0, data.aString1172);
-			item.setText(1, data.aString1177);
-			item.setText(2, data.aString1181);
-			item.setText(3, String.valueOf(data.anInt1173));
+			(item = this.methodsTable.getItem(i)).setData(data);
+			item.setText(0, data.className);
+			item.setText(1, data.methodName);
+			item.setText(2, data.methodSignature);
+			item.setText(3, String.valueOf(data.codeSize));
 			item.setText(4, String.valueOf(data.refCount));
-			item.setText(5, String.valueOf(data.anInt1182));
-			item.setText(5, String.valueOf(data.anInt1182));
-			item.setText(6, Methods.aNumberFormat794.format(data.aLong1179));
-			item.setText(7, Methods.aNumberFormat794.format(data.aFloat1175));
-			item.setText(8, Methods.aNumberFormat794.format(data.aFloat1180));
+			item.setText(5, String.valueOf(data.callCount));
+			item.setText(5, String.valueOf(data.callCount));
+			item.setText(6, Methods.numberFormat.format(data.totalExecutionTime));
+			item.setText(7, Methods.numberFormat.format(data.averageExecutionTime));
+			item.setText(8, Methods.numberFormat.format(data.timePercentage));
 		}
 	}
 
@@ -105,32 +166,32 @@ public final class Methods implements Runnable, DisposeListener {
 		}
 		try {
 			long max = 0L;
-			final Enumeration<h.MethodInfo> elements = (Enumeration<h.MethodInfo>) h.aHashtable1061.elements();
+			final Enumeration<h.MethodInfo> elements = (Enumeration<h.MethodInfo>) h.methodProfiles.elements();
 			while (elements.hasMoreElements()) {
-				max = Math.max(max, elements.nextElement().aLong1179);
+				max = Math.max(max, elements.nextElement().totalExecutionTime);
 			}
 			if (max > 0L) {
-				final Enumeration<h.MethodInfo> elements2 = (Enumeration<h.MethodInfo>) h.aHashtable1061.elements();
+				final Enumeration<h.MethodInfo> elements2 = (Enumeration<h.MethodInfo>) h.methodProfiles.elements();
 				while (elements2.hasMoreElements()) {
 					final h.MethodInfo methodInfo = elements2.nextElement();
-					methodInfo.aFloat1180 = 100.0f * methodInfo.aLong1179 / max;
+					methodInfo.timePercentage = 100.0f * methodInfo.totalExecutionTime / max;
 				}
 			}
-			for (int i = this.anArrayList792.size() - 1; i >= 0; --i) {
-				final h.MethodInfo methodInfo2 = (MethodInfo) this.anArrayList792.get(i);
+			for (int i = this.methodDataList.size() - 1; i >= 0; --i) {
+				final h.MethodInfo methodInfo2 = (MethodInfo) this.methodDataList.get(i);
 				final TableItem item;
-				(item = this.aTable788.getItem(i)).setText(5, String.valueOf(methodInfo2.anInt1182));
-				item.setText(6, Methods.aNumberFormat794.format(methodInfo2.aLong1179));
-				item.setText(7, Methods.aNumberFormat794.format(methodInfo2.aFloat1175));
-				item.setText(8, Methods.aNumberFormat794.format(methodInfo2.aFloat1180));
+				(item = this.methodsTable.getItem(i)).setText(5, String.valueOf(methodInfo2.callCount));
+				item.setText(6, Methods.numberFormat.format(methodInfo2.totalExecutionTime));
+				item.setText(7, Methods.numberFormat.format(methodInfo2.averageExecutionTime));
+				item.setText(8, Methods.numberFormat.format(methodInfo2.timePercentage));
 			}
 		} catch (Exception ignored) {
 		}
 	}
 
-	public final void method436() {
-		if (h.aHashtable1061 == null) {
-			h.aHashtable1061 = new Hashtable();
+	public final void showWindow() {
+		if (h.methodProfiles == null) {
+			h.methodProfiles = new Hashtable();
 			h.method591();
 		}
 		this.method449();
@@ -141,7 +202,7 @@ public final class Methods implements Runnable, DisposeListener {
 		this.shell.open();
 		this.shell.addDisposeListener(this);
 		this.visible = true;
-		this.method448();
+		this.refreshMethodData();
 		while (!this.shell.isDisposed()) {
 			if (!this.display.readAndDispatch()) {
 				this.display.sleep();
@@ -175,9 +236,9 @@ public final class Methods implements Runnable, DisposeListener {
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.verticalAlignment = 4;
-		(this.aSashForm785 = new SashForm(this.shell, 0)).setOrientation(512);
+		(this.mainSashForm = new SashForm(this.shell, 0)).setOrientation(512);
 		this.method451();
-		this.aSashForm785.setLayoutData(layoutData);
+		this.mainSashForm.setLayoutData(layoutData);
 		this.method452();
 	}
 
@@ -192,62 +253,138 @@ public final class Methods implements Runnable, DisposeListener {
 		(layout = new GridLayout()).numColumns = 2;
 		layout.marginHeight = 3;
 		layout.marginWidth = 3;
-		(this.aComposite787 = new Composite(this.aSashForm785, 0)).setLayout(layout);
-		(this.aButton783 = new Button(this.aComposite787, 8388608)).setText(UILocale.get("METHOD_FRAME_RESET_CALLS", "Reset Calls"));
-		this.aButton783.addSelectionListener(new Class170(this));
-		(this.aButton795 = new Button(this.aComposite787, 8388608)).setText(UILocale.get("METHOD_FRAME_EXPORT_BYTECODE", "Export ByteCode"));
-		this.aButton795.addSelectionListener(new Class164(this));
+		(this.tablePanel = new Composite(this.mainSashForm, 0)).setLayout(layout);
+		(this.resetCallsBtn = new Button(this.tablePanel, 8388608)).setText(UILocale.get("METHOD_FRAME_RESET_CALLS", "Reset Calls"));
+		this.resetCallsBtn.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
+				while (elements.hasMoreElements()) {
+					final h.MethodInfo methodInfo;
+					(methodInfo = elements.nextElement()).callCount = 0;
+					methodInfo.totalExecutionTime = 0L;
+					methodInfo.averageExecutionTime = 0.0f;
+					methodInfo.timePercentage = 0.0f;
+				}
+			}
+		});
+		(this.exportBytecodeBtn = new Button(this.tablePanel, 8388608)).setText(UILocale.get("METHOD_FRAME_EXPORT_BYTECODE", "Export ByteCode"));
+		this.exportBytecodeBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				Emulator.getEmulator().getScreen();
+				EmulatorScreen.pauseStep();
+				final FileDialog fileDialog;
+				(fileDialog = new FileDialog(shell, 8192)).setText(UILocale.get("METHOD_FRAME_SAVE_BYTECODE", "Save all the methods bytecode:"));
+				fileDialog.setFileName("bytecode.txt");
+				final String open;
+				if ((open = fileDialog.open()) != null) {
+					try {
+						final PrintWriter printWriter = new PrintWriter(new FileOutputStream(open));
+						final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
+						while (elements.hasMoreElements()) {
+							printWriter.write(elements.nextElement().method705(true, true));
+						}
+						printWriter.close();
+					} catch (FileNotFoundException ex) {
+						ex.printStackTrace();
+					}
+				}
+				((EmulatorScreen) Emulator.getEmulator().getScreen()).resumeStep();
+			}
+		});
 		if (!Settings.enableMethodTrack)
-			new Label(this.aComposite787, 8388608).setText("To track calls, enable it in System settings");
-		(this.aTable788 = new Table(this.aComposite787, 67584)).setHeaderVisible(true);
-		this.aTable788.setLayoutData(layoutData);
-		this.aTable788.setLinesVisible(true);
-		this.aTable788.addSelectionListener(new Class165(this));
+			new Label(this.tablePanel, 8388608).setText("To track calls, enable it in System settings");
+		(this.methodsTable = new Table(this.tablePanel, 67584)).setHeaderVisible(true);
+		this.methodsTable.setLayoutData(layoutData);
+		this.methodsTable.setLinesVisible(true);
+		this.methodsTable.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				try {
+					displayMethodDetails(methodsTable.getSelection());
+				} catch (Exception ignored) {}
+			}
+		});
 		final TableColumn tableColumn;
-		(tableColumn = new TableColumn(this.aTable788, 0)).setWidth(100);
+		(tableColumn = new TableColumn(this.methodsTable, 0)).setWidth(100);
 		tableColumn.setText("Class");
-		tableColumn.addSelectionListener(new Class166(this));
+		tableColumn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(0);
+			}
+		});
 		final TableColumn tableColumn2;
-		(tableColumn2 = new TableColumn(this.aTable788, 0)).setWidth(100);
+		(tableColumn2 = new TableColumn(this.methodsTable, 0)).setWidth(100);
 		tableColumn2.setText("Name");
-		tableColumn2.addSelectionListener(new Class167(this));
+		tableColumn2.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(1);
+			}
+		});
 		final TableColumn tableColumn3;
-		(tableColumn3 = new TableColumn(this.aTable788, 0)).setWidth(200);
+		(tableColumn3 = new TableColumn(this.methodsTable, 0)).setWidth(200);
 		tableColumn3.setText("Description");
-		tableColumn3.addSelectionListener(new Class160(this));
+		tableColumn3.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(2);
+			}
+		});
 		final TableColumn tableColumn4;
-		(tableColumn4 = new TableColumn(this.aTable788, 0)).setWidth(60);
+		(tableColumn4 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn4.setText("Code Size");
-		tableColumn4.addSelectionListener(new Class99(this));
+		tableColumn4.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(3);
+			}
+		});
 		final TableColumn tableColumn5;
-		(tableColumn5 = new TableColumn(this.aTable788, 0)).setWidth(60);
+		(tableColumn5 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn5.setText("References");
-		tableColumn5.addSelectionListener(new Class95(this));
+		tableColumn5.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(4);
+			}
+		});
 		final TableColumn tableColumn6;
-		(tableColumn6 = new TableColumn(this.aTable788, 0)).setWidth(60);
+		(tableColumn6 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn6.setText("Calls");
-		tableColumn6.addSelectionListener(new Class73(this));
+		tableColumn6.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(5);
+			}
+		});
 		final TableColumn tableColumn7;
-		(tableColumn7 = new TableColumn(this.aTable788, 0)).setWidth(60);
+		(tableColumn7 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn7.setText("Total Time(ms)");
-		tableColumn7.addSelectionListener(new Class72(this));
+		tableColumn7.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				sortMethodTable(6);
+			}
+		});
 		final TableColumn tableColumn8;
-		(tableColumn8 = new TableColumn(this.aTable788, 0)).setWidth(60);
+		(tableColumn8 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn8.setText("Average Time(ms)");
-		tableColumn8.addSelectionListener(new Class75(this));
+		tableColumn8.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				sortMethodTable(7);
+			}
+		});
 		final TableColumn tableColumn9;
-		(tableColumn9 = new TableColumn(this.aTable788, 0)).setWidth(60);
+		(tableColumn9 = new TableColumn(this.methodsTable, 0)).setWidth(60);
 		tableColumn9.setText("% Time");
-		tableColumn9.addSelectionListener(new Class74(this));
+		tableColumn9.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				sortMethodTable(8);
+			}
+		});
 	}
 
-	private void method439(final TableItem[] array) {
+	private void displayMethodDetails(final TableItem[] array) {
 		if (array == null || array.length < 1) {
 			return;
 		}
 		final h.MethodInfo methodInfo;
 		if ((methodInfo = (h.MethodInfo) array[0].getData()) != null) {
-			this.aStyledText790.setText(methodInfo.method705(this.aButton797.getSelection(), this.aButton798.getSelection()));
+			this.codeViewer.setText(methodInfo.method705(this.showLineNumbersBtn.getSelection(), this.showFramesBtn.getSelection()));
 		}
 	}
 
@@ -266,18 +403,41 @@ public final class Methods implements Runnable, DisposeListener {
 		(layout = new GridLayout()).numColumns = 4;
 		layout.marginHeight = 3;
 		layout.marginWidth = 3;
-		(this.aComposite796 = new Composite(this.aSashForm785, 0)).setLayout(layout);
-		(this.aButton797 = new Button(this.aComposite796, 32)).setText("Show Line Numbers");
-		this.aButton797.addSelectionListener(new Class77(this));
-		(this.aButton798 = new Button(this.aComposite796, 32)).setText("Show Frames    ");
-		this.aButton798.addSelectionListener(new Class76(this));
-		(this.aText789 = new Text(this.aComposite796, 2048)).setLayoutData(layoutData);
-		(this.aButton799 = new Button(this.aComposite796, 8388608)).setText(UILocale.get("METHOD_FRAME_SEARCH", "Search"));
-		this.aButton799.addSelectionListener(new Class79(this));
-		this.aButton799.addFocusListener(new Class78(this));
-		(this.aStyledText790 = new StyledText(this.aComposite796, 2562)).setLayoutData(layoutData2);
-		this.aStyledText790.setEditable(false);
-		this.aStyledText790.setIndent(3);
+		(this.detailsPanel = new Composite(this.mainSashForm, 0)).setLayout(layout);
+		(this.showLineNumbersBtn = new Button(this.detailsPanel, 32)).setText("Show Line Numbers");
+		this.showLineNumbersBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				displayMethodDetails(methodsTable.getSelection());
+			}
+		});
+		(this.showFramesBtn = new Button(this.detailsPanel, 32)).setText("Show Frames    ");
+		this.showFramesBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				displayMethodDetails(methodsTable.getSelection());
+			}
+		});
+		(this.searchText = new Text(this.detailsPanel, 2048)).setLayoutData(layoutData);
+		(this.searchBtn = new Button(this.detailsPanel, 8388608)).setText(UILocale.get("METHOD_FRAME_SEARCH", "Search"));
+		this.searchBtn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				final String text;
+				if ((text = searchText.getText()).trim().length() > 0) {
+					sortColumnIndex = codeViewer.getText().indexOf(text, sortColumnIndex);
+					if (sortColumnIndex != -1) {
+						codeViewer.setSelection(sortColumnIndex, sortColumnIndex + text.length());
+					}
+					sortColumnIndex++;
+				}
+			}
+		});
+		this.searchBtn.addFocusListener(new FocusAdapter() {
+			public void focusLost(FocusEvent focusEvent) {
+				sortColumnIndex = 0;
+			}
+		});
+		(this.codeViewer = new StyledText(this.detailsPanel, 2562)).setLayoutData(layoutData2);
+		this.codeViewer.setEditable(false);
+		this.codeViewer.setIndent(3);
 	}
 
 	public final void widgetDisposed(final DisposeEvent disposeEvent) {
@@ -285,7 +445,7 @@ public final class Methods implements Runnable, DisposeListener {
 	}
 
 	static Table method441(final Methods class46) {
-		return class46.aTable788;
+		return class46.methodsTable;
 	}
 
 	static Shell method442(final Methods class46) {
@@ -293,30 +453,6 @@ public final class Methods implements Runnable, DisposeListener {
 	}
 
 	static void method443(final Methods class46, final TableItem[] array) {
-		class46.method439(array);
-	}
-
-	static void method444(final Methods class46, final int n) {
-		class46.method435(n);
-	}
-
-	static Text method434(final Methods class46) {
-		return class46.aText789;
-	}
-
-	static int method445(final Methods class46, final int anInt786) {
-		return class46.anInt786 = anInt786;
-	}
-
-	static int method437(final Methods class46) {
-		return class46.anInt786;
-	}
-
-	static StyledText method440(final Methods class46) {
-		return class46.aStyledText790;
-	}
-
-	static int method447(final Methods class46) {
-		return class46.anInt786++;
+		class46.displayMethodDetails(array);
 	}
 }

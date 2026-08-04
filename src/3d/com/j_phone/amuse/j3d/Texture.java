@@ -20,14 +20,16 @@ import ru.woesss.j2me.micro3d.TextureImpl;
 
 import java.io.IOException;
 
-public class Texture {
-	public final TextureImpl impl;
-
+public class Texture extends com.jblend.graphics.j3d.Texture {
 	public Texture(byte[] b) {
-		impl = new TextureImpl(b);
+		super(b, true);
 	}
 
 	public Texture(String name) throws IOException {
-		impl = new TextureImpl(name);
+		super(name, true);
+	}
+
+	TextureImpl getImpl() {
+		return impl;
 	}
 }

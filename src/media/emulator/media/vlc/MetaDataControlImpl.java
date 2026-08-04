@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024 Arman Jussupgaliyev
+*/
 package emulator.media.vlc;
 
 import uk.co.caprica.vlcj.media.Meta;

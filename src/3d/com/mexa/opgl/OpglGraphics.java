@@ -16,6 +16,7 @@
 
 package com.mexa.opgl;
 
+import emulator.AppSettings;
 import emulator.Settings;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.Graphics2DAWT;
@@ -36,6 +37,7 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.ImageObserver;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+
 
 /** @noinspection unused*/
 public class OpglGraphics {
@@ -425,7 +427,7 @@ public class OpglGraphics {
 	private static ImageData swtImageBuffer;
 
 	private OpglGraphics() {
-		Settings.m3gThread = true;
+		AppSettings.m3gThread = true;
 		egl = (EGL10) EGLContext.getEGL();
 		eglDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
 		egl.eglInitialize(eglDisplay, null);
@@ -589,15 +591,15 @@ public class OpglGraphics {
 		gl.glColorPointer(size, type, stride, offset);
 	}
 
-	public void glCompressedTexImage2D(int target,
-									   int level,
-									   int internalformat,
-									   int width,
-									   int height,
-									   int border,
-									   ByteBuffer data) {
+    public void glCompressedTexImage2D(int target,
+                                       int level,
+                                       int internalformat,
+                                       int width,
+                                       int height,
+                                       int border,
+                                       ByteBuffer data) {
 		gl.glCompressedTexImage2D(target, level, internalformat, width, height, border, data.length(), data.getNioBuffer());
-	}
+    }
 
 	public void glCompressedTexSubImage2D(int target,
 										  int level,

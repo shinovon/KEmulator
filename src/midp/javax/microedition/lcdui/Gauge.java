@@ -136,7 +136,7 @@ public class Gauge extends Item {
 			g.drawString("0", x + 2, y + yoff, 0);
 			g.drawString(Integer.toString(max), x + w - xoff2 + 2, y + yoff, 0);
 			w -= xoff1 + xoff2;
-			g.setColor(LCDUIUtils.borderColor);
+			g.setColor(focused ? LCDUIUtils.highlightedBorderColor : LCDUIUtils.borderColor);
 			g.drawRect(x + xoff1, y + yoff, w, h);
 			int val = value;
 			if (max <= 0 || val < 0) return;
@@ -145,8 +145,8 @@ public class Gauge extends Item {
 		}
 	}
 
-	void layout(Row row) {
-		super.layout(row);
+	void _layout(Row row) {
+		super._layout(row);
 		final Font font = Item.font;
 		if (!interactive) {
 			int n2 = font.getHeight() + 4;

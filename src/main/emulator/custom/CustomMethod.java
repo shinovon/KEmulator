@@ -1,15 +1,17 @@
 package emulator.custom;
 
+import com.github.sarxos.webcam.Webcam;
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Permission;
 import emulator.Settings;
 import emulator.custom.h.MethodInfo;
 import emulator.debug.Profiler;
 import emulator.graphics3D.lwjgl.Emulator3D;
-import emulator.ui.swt.SWTFrontend;
 import emulator.ui.swt.EmulatorScreen;
 
 import javax.microedition.media.Manager;
+import java.awt.*;
 import java.io.*;
 import java.util.Hashtable;
 
@@ -29,13 +31,13 @@ public class CustomMethod {
 
 	public static void gc() {
 		++Profiler.gcCallCount;
-		if (!Settings.ignoreGc) {
+		if (!AppSettings.ignoreGc) {
 			System.gc();
 		}
 	}
 
 	public static void yield() throws InterruptedException {
-		if (Settings.patchYield) {
+		if (AppSettings.patchYield) {
 			Thread.sleep(1L);
 		} else {
 			Thread.yield();
@@ -43,12 +45,12 @@ public class CustomMethod {
 	}
 
 	public static void sleep(long t) throws InterruptedException {
-		if (Settings.ignoreSleep) return;
-		if (Settings.applySpeedToSleep && Settings.speedModifier != 1 && t > 1) {
-			if (Settings.speedModifier < 0) {
-				t = t * ((100L - Settings.speedModifier * 1024L) / 100L);
+		if (AppSettings.ignoreSleep) return;
+		if (AppSettings.applySpeedToSleep && AppSettings.speedModifier != 1 && t > 1) {
+			if (AppSettings.speedModifier < 0) {
+				t = t * ((100L - AppSettings.speedModifier * 1024L) / 100L);
 			} else {
-				t = t / Settings.speedModifier;
+				t = t / AppSettings.speedModifier;
 			}
 		}
 		Thread.sleep(t);
@@ -58,7 +60,17 @@ public class CustomMethod {
 	public static String getProperty(final String prop) {
 		String res = System.getProperty(prop);
 		boolean b = true;
-		if (Settings.systemProperties != null && Settings.systemProperties.containsKey(prop)) {
+		if (AppSettings.systemProperties.containsKey(prop)) {
+			res = AppSettings.systemProperties.get(prop);
+			if (res.startsWith(":")) {
+				res = res.substring(1);
+				if (res.equals("null")) {
+					res = null;
+				} else {
+					res = System.getProperty(res);
+				}
+			}
+		} else if (Settings.systemProperties.containsKey(prop)) {
 			res = Settings.systemProperties.get(prop);
 			if (res.startsWith(":")) {
 				res = res.substring(1);
@@ -72,9 +84,11 @@ public class CustomMethod {
 			if (prop.equalsIgnoreCase("fileconn.dir.private")) {
 				res = "file://root/private_" + Emulator.midletClassName.replace("\\", "_").replace("/", "_").replace(".", "_") + "/";
 			} else if (prop.equalsIgnoreCase("user.name")) {
-				res = "KEmulator";
+				res = Settings.hideEmulation ? null : "KEmulator";
 			} else if (prop.equalsIgnoreCase("console.encoding")) {
 				res = System.getProperty("file.encoding");
+			} else if (prop.equalsIgnoreCase("file.encoding")) {
+				res = AppSettings.fileEncoding;
 			} else if (prop.equalsIgnoreCase("com.nokia.mid.networkavailability")) {
 				res = Settings.networkNotAvailable ? "unavailable" : "available";
 			} else if (prop.equalsIgnoreCase("com.nokia.mid.batterylevel")) {
@@ -102,32 +116,71 @@ public class CustomMethod {
 					res = Emulator.getEventQueue().getPointerNumber();
 				} catch (Exception ignored) {}
 			} else if (prop.equals("microedition.locale")) {
-				res = Settings.locale;
+				res = AppSettings.locale;
 			} else if (prop.equals("microedition.encoding")) {
-				res = Settings.fileEncoding;
+				res = AppSettings.fileEncoding;
 			} else if (prop.equals("Platform")) {
 				res = "";
-			} else if(prop.equals("fileconn.dir.roots.names")) {
+			} else if (prop.equals("device.model")) {
+				res = AppSettings.microeditionPlatform;
+			} else if (prop.equals("fileconn.dir.roots.names")) {
 				res = "Root";
 			} else if(prop.startsWith("kemulator")) {
-				try {
-					if (prop.equals("kemulator.libvlc.supported")) {
-						res = String.valueOf(Manager.isLibVlcSupported());
-					} else if (prop.equals("kemulator.threadtrace")) {
-						b = false;
-						res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
-					} else if (prop.equals("kemulator.touch.enabled")) {
-						res = String.valueOf(((EmulatorScreen) Emulator.getEmulator().getScreen()).getTouchEnabled());
-					} else if (prop.startsWith("kemulator.set.title=")) {
-						if ((res = prop.substring(prop.indexOf('=') + 1)).equals("null")) {
-							res = null;
-						}
-						Settings.customTitle = res;
+				if (Settings.hideEmulation) {
+					res = null;
+				} else {
+					try {
+						if (prop.equals("kemulator.libvlc.supported")) {
+							res = String.valueOf(Manager._isLibVlcSupported());
+						} else if (prop.equals("kemulator.threadtrace")) {
+							b = false;
+							res = getStackTrace(new Exception("Trace")).replace("\t", "").replace("\r", "");
+						} else if (prop.equals("kemulator.touch.enabled")) {
+							res = String.valueOf(((EmulatorScreen) Emulator.getEmulator().getScreen()).getTouchEnabled());
+						} else if (prop.startsWith("kemulator.set.title=")) {
+							if ((res = prop.substring(prop.indexOf('=') + 1)).equals("null")) {
+								res = null;
+							}
+							AppSettings.customTitle = res;
 
-						Emulator.getEmulator().getScreen().updateTitle();
-						res = "true";
+							Emulator.getEmulator().getScreen().updateTitle();
+							res = "true";
+						}
+					} catch (Exception ignored) {
 					}
-				} catch (Exception ignored) {}
+				}
+			} else if (res == null
+					&& (prop.equals("supports.video.capture")
+					|| prop.equals("supports.photo.capture")
+					|| prop.equals("supports.mediacapabilities")
+					|| prop.equals("camera.orientations")
+					|| prop.equals("camera.resolutions"))) {
+				r: {
+					if (!Emulator.getPlatform().isX64() && System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
+						try {
+							Webcam w = Webcam.getDefault();
+							if (w != null) {
+								System.setProperty("supports.video.capture", "true");
+								System.setProperty("supports.photo.capture", "true");
+								System.setProperty("supports.mediacapabilities", "camera");
+								System.setProperty("camera.orientations", "devcam0:inwards");
+								Dimension d = w.getViewSize();
+								System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
+								
+								res = System.getProperty(prop);
+								break r;
+							}
+						} catch (Throwable ignored) {
+						}
+					}
+					if (prop.equals("supports.video.capture") || prop.equals("supports.photo.capture")) {
+						res = "false";
+					}
+				}
+			} else if (Settings.hideEmulation &&
+					(prop.startsWith("os.") || prop.startsWith("java.") || prop.startsWith("sun.")
+							|| prop.startsWith("org.pigler.") || prop.startsWith("ru.nnproject."))) {
+				res = null;
 			}
 			// Hide properties of disabled APIs
 			if(!Settings.protectedPackages.isEmpty()) {
@@ -155,7 +208,7 @@ public class CustomMethod {
 		++Profiler.currentTimeMillisCallCount;
 		final long currentTimeMillis = System.currentTimeMillis();
 		final long n2;
-		final long n = ((n2 = Settings.speedModifier) < 0L) ? ((100L + n2 << 10) / 100L) : (n2 << 10);
+		final long n = ((n2 = AppSettings.speedModifier) < 0L) ? ((100L + n2 << 10) / 100L) : (n2 << 10);
 		if (Settings.aLong1235 > 0L) {
 			CustomMethod.aLong13 += n * (currentTimeMillis - CustomMethod.aLong17 - Settings.aLong1235) >> 10;
 			CustomMethod.aLong17 = currentTimeMillis;
@@ -168,7 +221,7 @@ public class CustomMethod {
 	}
 
 	public static InputStream getResourceAsStream(final Object o, final String s) {
-		return CustomJarResources.getResourceAsStream(o, s);
+		return ResourceManager.getResourceAsStream(o, s);
 	}
 
 	public static void showTrackInfo(final String s) {
@@ -209,14 +262,14 @@ public class CustomMethod {
 	}
 
 	public static void beginMethod(final String s) {
-		if (h.aHashtable1061 == null) {
-			h.aHashtable1061 = new Hashtable();
+		if (h.methodProfiles == null) {
+			h.methodProfiles = new Hashtable();
 			h.method591();
 		}
 		final h.MethodInfo methodInfo;
-		if ((methodInfo = (MethodInfo) h.aHashtable1061.get(s)) != null) {
+		if ((methodInfo = (MethodInfo) h.methodProfiles.get(s)) != null) {
 			final int method16 = method16();
-			++methodInfo.anInt1182;
+			++methodInfo.callCount;
 			trackStr = "";
 			for (int i = 0; i < method16; ++i) {
 				trackStr += ("  ");
@@ -229,10 +282,10 @@ public class CustomMethod {
 
 	public static void endMethod(final String s) {
 		final h.MethodInfo methodInfo;
-		if ((methodInfo = (MethodInfo) h.aHashtable1061.get(s)) != null) {
-			if (methodInfo.anInt1182 > 0) {
-				methodInfo.aLong1179 += System.currentTimeMillis() - methodInfo.aLong1174;
-				methodInfo.aFloat1175 = (float) methodInfo.aLong1179 / methodInfo.anInt1182;
+		if ((methodInfo = (MethodInfo) h.methodProfiles.get(s)) != null) {
+			if (methodInfo.callCount > 0) {
+				methodInfo.totalExecutionTime += System.currentTimeMillis() - methodInfo.aLong1174;
+				methodInfo.averageExecutionTime = (float) methodInfo.totalExecutionTime / methodInfo.callCount;
 			}
 			method17();
 		}
@@ -279,6 +332,26 @@ public class CustomMethod {
 	public static void checkDouble()  {
 		if (CustomClassLoader.isProtected("java.lang.Double", true))
 			throw new Error("Double usage restricted");
+	}
+
+	public static Class forName(String s) throws ClassNotFoundException {
+		if ((Settings.hideEmulation && s.startsWith("emulator.custom.")) || CustomClassLoader.isProtected(s, false)) {
+			throw new ClassNotFoundException(s);
+		}
+
+		return Class.forName(s, true, Emulator.getCustomClassLoader());
+	}
+
+	public static long totalMemory(Object runtime) {
+		return 2 * 1024 * 1024L;
+	}
+
+	public static long freeMemory(Object runtime) {
+		return Math.max(((Runtime) runtime).freeMemory(), 1024 * 1024L + (System.currentTimeMillis() % 1024));
+	}
+
+	public static String getEncoding() {
+		return AppSettings.fileEncoding;
 	}
 
 	static {

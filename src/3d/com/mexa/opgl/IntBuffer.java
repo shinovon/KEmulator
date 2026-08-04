@@ -18,7 +18,7 @@ package com.mexa.opgl;
 
 import org.lwjgl.BufferUtils;
 
-public class IntBuffer extends Buffer {
+public class IntBuffer extends Buffer implements com.nttdocomo.ui.ogl.IntBuffer {
 
 	private IntBuffer(int size) {
 		super(BufferUtils.createIntBuffer(size));
@@ -30,6 +30,10 @@ public class IntBuffer extends Buffer {
 		nio.put((java.nio.IntBuffer) buffer.getNioBuffer());
 	}
 
+	IntBuffer(ByteBuffer b) {
+		super(((java.nio.ByteBuffer) b.getNioBuffer()).asShortBuffer());
+	}
+
 	public static IntBuffer allocateDirect(int size) {
 		return new IntBuffer(size);
 	}
@@ -38,11 +42,19 @@ public class IntBuffer extends Buffer {
 		return new IntBuffer(buffer);
 	}
 
+	public int[] get(int paramInt, int[] paramArrayOfInt) {
+		return get(paramInt, paramArrayOfInt, 0, paramArrayOfInt.length);
+	}
+
 	public int[] get(int srcIndex, int[] buf, int dstIndex, int length) {
 		java.nio.IntBuffer nio = (java.nio.IntBuffer) super.buffer;
 		nio.position(srcIndex);
 		nio.get(buf, dstIndex, length);
 		return buf;
+	}
+
+	public void put(int paramInt, int[] paramArrayOfInt) {
+		put(paramInt, paramArrayOfInt, 0, paramArrayOfInt.length);
 	}
 
 	public void put(int dstIndex, int[] buf, int srcIndex, int length) {

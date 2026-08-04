@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2021 Arman Jussupgaliyev
+*/
 package emulator.media.capture;
 
 import javax.microedition.media.MediaException;

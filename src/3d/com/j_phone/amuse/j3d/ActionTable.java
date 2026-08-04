@@ -16,26 +16,20 @@
 
 package com.j_phone.amuse.j3d;
 
-import java.io.IOException;
-
 import ru.woesss.j2me.micro3d.ActTableImpl;
 
-public class ActionTable {
-	final ActTableImpl impl;
+import java.io.IOException;
 
+public class ActionTable extends com.jblend.graphics.j3d.ActionTable {
 	public ActionTable(byte[] b) {
-		impl = new ActTableImpl(b);
+		super(b);
 	}
 
 	public ActionTable(String name) throws IOException {
-		impl = new ActTableImpl(name);
+		super(name);
 	}
 
-	public int getNumAction() {
-		return impl.getNumActions();
-	}
-
-	public int getNumFrame(int idx) {
-		return impl.getNumFrames(idx);
+	ActTableImpl getImpl() {
+		return impl;
 	}
 }

@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024 Arman Jussupgaliyev
+*/
 package emulator;
 
 import java.io.File;

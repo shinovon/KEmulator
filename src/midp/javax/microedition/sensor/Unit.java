@@ -3,12 +3,12 @@ package javax.microedition.sensor;
 import java.util.Hashtable;
 
 public class Unit {
-	private static Hashtable aHashtable1317;
-	private String aString1318;
+	private static Hashtable units;
+	private String symbols;
 
-	private Unit(final String aString1318) {
+	private Unit(final String symbols) {
 		super();
-		this.aString1318 = aString1318;
+		this.symbols = symbols;
 	}
 
 	public static Unit getUnit(final String s) {
@@ -19,11 +19,11 @@ public class Unit {
 			throw new IllegalArgumentException();
 		}
 		Unit unit = null;
-		synchronized (Unit.aHashtable1317) {
+		synchronized (Unit.units) {
 			Unit unit2;
-			if ((unit2 = (Unit) Unit.aHashtable1317.get(s)) == null) {
+			if ((unit2 = (Unit) Unit.units.get(s)) == null) {
 				unit2 = new Unit(s);
-				Unit.aHashtable1317.put(s, unit2);
+				Unit.units.put(s, unit2);
 			}
 			unit = unit2;
 		}
@@ -31,10 +31,10 @@ public class Unit {
 	}
 
 	public String toString() {
-		return this.aString1318;
+		return this.symbols;
 	}
 
 	static {
-		Unit.aHashtable1317 = new Hashtable();
+		Unit.units = new Hashtable();
 	}
 }

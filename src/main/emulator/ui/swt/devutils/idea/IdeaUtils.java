@@ -1,0 +1,479 @@
+/*
+Copyright (c) 2025 Fyodor Ryzhov
+*/
+package emulator.ui.swt.devutils.idea;
+
+import emulator.Emulator;
+import emulator.Settings;
+import emulator.Utils;
+import emulator.ui.swt.devutils.JavaTypeValidator;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.*;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class IdeaUtils implements SelectionListener, ModifyListener {
+	private final Shell shell;
+	private final Shell parent;
+
+	private final Button chooseEclipse;
+	private final Text projectName;
+	private final Text midletClassName;
+	private final Text midletName;
+	private final Text reposPath;
+	private final Button chooseProjectsPath;
+	private final Button createProject;
+	private final Button fixClonedBtn;
+	private final Button restartSetup;
+	private final Label creationStatus;
+	private final Group createNewProject;
+	private final Link docsLink;
+
+	IdeaUtils(Shell parent) {
+		if (!Settings.ideaJdkTablePatched)
+			throw new RuntimeException("Attempt to open utils window when IDE is not configured.");
+		this.parent = parent;
+		shell = new Shell(parent, SWT.MAX | SWT.FOREGROUND | SWT.TITLE | SWT.MENU | SWT.MIN);
+		shell.setText("Intellij IDEA support");
+		shell.setMinimumSize(450, 600);
+		shell.setSize(450, 600);
+
+		GridLayout layout = new GridLayout(1, true);
+		shell.setLayout(layout);
+
+		Group fixupIdeaClonedProject = new Group(shell, SWT.NONE);
+		fixupIdeaClonedProject.setText("Fix a project after clone");
+		fixupIdeaClonedProject.setLayout(genGLo());
+		fixupIdeaClonedProject.setLayoutData(genGd());
+
+		new Label(fixupIdeaClonedProject, SWT.NONE).setText("Some files are gitignored by default because they contain absolute paths.");
+		new Label(fixupIdeaClonedProject, SWT.NONE).setText("They should be recreated if you downloaded someone's project.");
+		fixClonedBtn = new Button(fixupIdeaClonedProject, SWT.FLAT);
+		fixClonedBtn.setText("Choose a project");
+		fixClonedBtn.addSelectionListener(this);
+
+		createNewProject = new Group(shell, SWT.NONE);
+		createNewProject.setText("Create a new project");
+		createNewProject.setLayout(genGLo());
+		createNewProject.setLayoutData(genGd());
+
+		projectName = new Text(createNewProject, 2048);
+		projectName.setMessage("Project name");
+		projectName.setToolTipText("Name of folder, JAR file, various configurations. Only ASCII letters, numbers, hyphen and underscore allowed.\nExample: \"mahocart_midp\"");
+		projectName.setLayoutData(new RowData(400, SWT.DEFAULT));
+		projectName.addModifyListener(this);
+
+		midletClassName = new Text(createNewProject, 2048);
+		midletClassName.setMessage("MIDlet class name");
+		midletClassName.setToolTipText("Full name of your MIDlet class. Must be valid java type name.\n\nExample: \"ru.symansel.mahocart.MahoCartMIDlet\"");
+		midletClassName.setLayoutData(new RowData(400, SWT.DEFAULT));
+		midletClassName.addModifyListener(this);
+
+		midletName = new Text(createNewProject, 2048);
+		midletName.setMessage("Readable MIDlet name");
+		midletName.setToolTipText("Name of your MIDlet, shown to user. Can contain any symbols except commas, just make sure your target device has enough fonts to display the name.\n\nExample: \"МАХОКАРТ\uD83D\uDEA8\uD83D\uDEA8\uD83D\uDEA8\"");
+		midletName.setLayoutData(new RowData(400, SWT.DEFAULT));
+		midletName.addModifyListener(this);
+
+		reposPath = new Text(createNewProject, 2048);
+		reposPath.setText(Settings.lastIdeaRepoPath);
+		reposPath.setMessage("Project location");
+		reposPath.setToolTipText("Location of folder where the project's folder will be created.\n\nExample: \"" + (Utils.linux ? "/mnt/projects/" : "D:\\projects\\") + "\"");
+		reposPath.setLayoutData(new RowData(400, SWT.DEFAULT));
+		reposPath.addModifyListener(this);
+
+		chooseProjectsPath = new Button(createNewProject, SWT.FLAT);
+		chooseProjectsPath.setText("Choose location via file explorer");
+		chooseProjectsPath.addSelectionListener(this);
+		createProject = new Button(createNewProject, SWT.FLAT);
+		createProject.setText("Create project");
+		createProject.addSelectionListener(this);
+		createProject.setEnabled(false);
+
+		creationStatus = new Label(createNewProject, 0);
+		creationStatus.setText("Hover fields to see tooltips with details.");
+		creationStatus.setSize(400, SWT.DEFAULT);
+
+		Group convertGroup = new Group(shell, SWT.NONE);
+		convertGroup.setText("Convert a project");
+		convertGroup.setLayout(genGLo());
+		convertGroup.setLayoutData(genGd());
+
+		chooseEclipse = new Button(convertGroup, SWT.FLAT);
+		chooseEclipse.setText("Eclipse MTJ -> IDEA");
+		chooseEclipse.addSelectionListener(this);
+
+		docsLink = new Link(convertGroup, SWT.NONE);
+		docsLink.setText("See <a>documentation</a> to learn limitations and known issues.");
+		docsLink.addSelectionListener(this);
+
+		Group maintenanceGroup = new Group(shell, SWT.NONE);
+		maintenanceGroup.setText("Maintenance");
+		maintenanceGroup.setLayout(genGLo());
+		maintenanceGroup.setLayoutData(genGd());
+
+		restartSetup = new Button(maintenanceGroup, SWT.PUSH);
+		restartSetup.setText("Reset all settings and run setup again");
+		restartSetup.addSelectionListener(this);
+
+		shell.layout(true, true);
+	}
+
+	public static void open(Shell p) {
+		if (Settings.ideaPath != null && !Files.exists(Paths.get(Settings.ideaPath)))
+			Settings.ideaPath = null;
+		if (Settings.proguardPath != null && !Files.exists(Paths.get(Settings.proguardPath)))
+			Settings.proguardPath = null;
+		if (!Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei"))) {
+			Settings.ideaJdkTablePatched = false; // reset only patch status
+		}
+		if (JdkTablePatcher.getDevTimeJars().isEmpty()) {
+			Settings.ideaJdkTablePatched = false; // reset only patch status
+		}
+		if (Settings.ideaJdkTablePatched && Settings.ideaPath != null && Settings.proguardPath != null) {
+			// ready for work
+			new IdeaUtils(p).shell.open();
+		} else {
+			Settings.ideaJdkTablePatched = false;
+			if (Utils.linux)
+				new IdeaSetupXdgLinux(p).open();
+			else
+				new IdeaSetupWindows(p).open();
+			// TODO macos? headless linux?
+		}
+	}
+
+	//#region Utils / empty handlers
+
+	private GridData genGd() {
+		GridData gd = new GridData();
+		gd.horizontalAlignment = GridData.FILL;
+		gd.verticalAlignment = GridData.FILL;
+		gd.grabExcessHorizontalSpace = true;
+		return gd;
+	}
+
+	private RowLayout genGLo() {
+		RowLayout l = new RowLayout(SWT.VERTICAL);
+		l.spacing = 5;
+		return l;
+	}
+
+	private void errorMsg(String header, String text) {
+		final MessageBox mb = new MessageBox(this.shell, SWT.ICON_ERROR | SWT.OK);
+		mb.setText(header);
+		mb.setMessage(text);
+		mb.open();
+	}
+
+	@Override
+	public void widgetDefaultSelected(SelectionEvent selectionEvent) {
+
+	}
+
+	private static boolean isValidRepoName(String input) {
+		for (int i = 0; i < input.length(); i++) {
+			char c = input.charAt(i);
+			if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-' || c == '_')) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private static ValidationResult validateInput(String repoName, String className, String appName, String location) {
+		if (repoName.isEmpty()) {
+			return new ValidationResult("Project name must not be empty.", false, true);
+		}
+		if (!isValidRepoName(repoName)) {
+			return new ValidationResult("Project name must meet certain restrictions, check tooltip on the field.", false, true);
+		}
+		if (location.isEmpty() || ".".equals(location)) {
+			return new ValidationResult("Specify location for the project", false, true);
+		}
+		if (!Files.exists(Paths.get(location))) {
+			return new ValidationResult("Location for project doesn't exist.", false, true);
+		}
+		if (Files.exists(Paths.get(location, repoName))) {
+			return new ValidationResult("The folder already exists. Project files will be overwritten.", true, false);
+		}
+		if (className.isEmpty()) {
+			return new ValidationResult("Class name must not be empty.", false, true);
+		}
+		if (!JavaTypeValidator.isValidJavaTypeName(className)) {
+			return new ValidationResult("Class name must be a valid Java class name.", false, true);
+		}
+		if (appName.isEmpty()) {
+			return new ValidationResult("MIDlet name must not be empty.", false, true);
+		}
+		if (appName.indexOf(',') != -1) {
+			return new ValidationResult("MIDlet name must not contain commas.", false, true);
+		}
+
+		return new ValidationResult("Code will be placed at " + Paths.get(location, repoName, "src"), true, true);
+	}
+
+	//#endregion
+
+	//#region Handlers
+
+	@Override
+	public void modifyText(ModifyEvent modifyEvent) {
+		String repoName = projectName.getText().trim();
+		String className = midletClassName.getText().trim();
+		String appName = midletName.getText().trim();
+		String location = reposPath.getText().trim();
+
+		if (location.endsWith("/") || location.endsWith("\\")) location = location.substring(0, location.length() - 1);
+
+		ValidationResult validation = validateInput(repoName, className, appName, location);
+		creationStatus.setText(validation.message);
+		createProject.setEnabled(validation.allowCreation);
+		midletClassName.setEnabled(validation.generateCode);
+		midletName.setEnabled(validation.generateCode);
+		createNewProject.layout(true, true);
+	}
+
+	@Override
+	public void widgetSelected(SelectionEvent e) {
+		if (e.widget == chooseProjectsPath) {
+			DirectoryDialog dd = new DirectoryDialog(shell, SWT.OPEN);
+			dd.setText("Choose folder where you store your projects");
+			String path = dd.open();
+			if (path != null) reposPath.setText(path);
+		} else if (e.widget == createProject) {
+			createProject();
+		} else if (e.widget == fixClonedBtn) {
+			restoreProject();
+		} else if (e.widget == chooseEclipse) {
+			convertProject();
+		} else if (e.widget == restartSetup) {
+			Settings.ideaJdkTablePatched = false;
+			Settings.proguardPath = null;
+			Settings.ideaPath = null;
+			shell.close();
+			shell.dispose();
+			open(parent);
+		} else if (e.widget == docsLink) {
+			Emulator.openUrlExternallySilent("https://github.com/shinovon/KEmulator/blob/main/IdeaSupport.md");
+		}
+	}
+
+	//#endregion
+
+	//#region Implementation
+
+	private void createProject() {
+		String repoName = projectName.getText().trim();
+		String className = midletClassName.getText().trim();
+		String appName = midletName.getText().trim();
+		String location = reposPath.getText().trim();
+
+		if (location.endsWith("/") || location.endsWith("\\")) location = location.substring(0, location.length() - 1);
+
+		ValidationResult validation = validateInput(repoName, className, appName, location);
+		if (!validation.allowCreation) {
+			errorMsg("Project creation", validation.message);
+			return;
+		}
+		try {
+			//null is passed to block code generation
+			String code = ProjectGenerator.create(location, repoName, validation.generateCode ? className : null, appName);
+			Settings.lastIdeaRepoPath = location;
+			if (code == null)
+				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, Paths.get(location, repoName).toString()});
+			else
+				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, Paths.get(location, repoName).toString(), code});
+			shell.close();
+			shell.dispose();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			errorMsg("Project creation", "Failed to generate project: " + ex.getMessage());
+		}
+	}
+
+	private void restoreProject() {
+		FileDialog fd = new FileDialog(shell, SWT.OPEN);
+		fd.setText("Choose IDEA project file");
+		fd.setFilterExtensions(new String[]{"*.iml"});
+		String path = fd.open();
+		if (path == null) return;
+		if (!path.endsWith(".iml")) {
+			errorMsg("Project restore", "Selected not an IDEA project file.");
+			return;
+		}
+		String dir = Paths.get(path).getParent().toString();
+		try {
+			boolean runIdea = ProjectGenerator.restore(dir);
+			if (runIdea)
+				Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
+			shell.close();
+			shell.dispose();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			errorMsg("Project restore", "Failed to generate project: " + ex.getMessage() + "\nNote that this works only with projects created by KEmulator.");
+		}
+	}
+
+	private void convertProject() {
+		FileDialog fd = new FileDialog(shell, SWT.OPEN);
+		fd.setText("Choose Eclipse application descriptor");
+		fd.setFilterExtensions(new String[]{"Application Descriptor"});
+		String path = fd.open();
+		if (path == null) return;
+		try {
+			ProjectGenerator.convertEclipse(path);
+			String dir = Paths.get(path).getParent().toAbsolutePath().toString();
+			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, dir});
+			shell.close();
+			shell.dispose();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			if (ex instanceof IllegalArgumentException)
+				errorMsg("Project conversion", "Failed to convert project: " + ex.getMessage());
+			else errorMsg("Project conversion", "Failed to convert project: " + ex);
+		}
+	}
+
+	//#endregion
+
+	//#region CLI implementation
+
+	private static void checkConfigured() {
+		if (!Settings.ideaJdkTablePatched) {
+			System.out.println("IDE support is not configured, please run setup first.");
+			System.exit(2);
+		}
+		if (!Files.exists(Paths.get(Settings.ideaPath))) {
+			System.out.println("IDE binary is gone. Please run setup again.");
+			System.exit(2);
+		}
+		if (!Files.exists(Paths.get(Settings.proguardPath))) {
+			System.out.println("Proguard is gone. Please run setup again.");
+			System.exit(2);
+		}
+		if (!Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei"))) {
+			System.out.println("UEI libs folder is missing. Please run setup again.");
+			System.exit(2);
+		}
+		if (JdkTablePatcher.getDevTimeJars().isEmpty()) {
+			System.out.println("No UEI libraries found. Please run setup again.");
+			System.exit(2);
+		}
+	}
+
+	public static void restoreProjectCLI(String path) {
+		try {
+			System.out.println("Fixing project at " + path);
+			ProjectGenerator.restore(path);
+			System.out.println("OK");
+			System.exit(0);
+		} catch (Exception ex) {
+			System.out.println("Failed!");
+			System.out.println(ex.getMessage());
+			System.exit(1);
+		}
+	}
+
+	public static void createProjectCLI(String path) {
+		checkConfigured();
+		try {
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+			System.out.println();
+			System.out.println("\033[92mPlease enter project name.\033[0m");
+			System.out.println("Name of folder, JAR file, various configurations. Only ASCII letters, numbers, hyphen and underscore allowed.");
+			System.out.print("> ");
+			String name = br.readLine();
+
+			System.out.println();
+			System.out.println("\033[92mPlease enter MIDlet class name.\033[0m");
+			System.out.println("Full name of your MIDlet class. Must be valid java type name.");
+			System.out.print("> ");
+			String className = br.readLine();
+
+			System.out.println();
+			System.out.println("\033[92mPlease enter MIDlet name.\033[0m");
+			System.out.println("Name of your MIDlet, shown to user. Can contain any symbols except commas, just make sure your target device has enough fonts to display the name.");
+			System.out.print("> ");
+			String midletName = br.readLine();
+
+			ValidationResult validation = validateInput(name, className, midletName, path);
+			if (!validation.allowCreation) {
+				System.out.println(validation);
+				System.exit(1);
+			}
+			if (!validation.generateCode) {
+				System.out.println("Folder already exists. Nothing was done.");
+				System.exit(1);
+			}
+
+			ProjectGenerator.create(path, name, className, midletName);
+			Settings.lastIdeaRepoPath = path;
+
+			System.out.println();
+			System.out.println("\033[92mDone. Do you want to edit this new project?\033[0m (y/N)");
+
+			String editConfirm = br.readLine();
+
+			if (!editConfirm.isEmpty() && editConfirm.toLowerCase().charAt(0) == 'y') {
+				editProjectCLI(path + File.separator + name);
+			}
+
+			System.exit(0);
+		} catch (Exception ex) {
+			System.out.println("Failed!");
+			System.out.println(ex.getMessage());
+			System.exit(1);
+		}
+	}
+
+	public static void convertProjectCLI(String path) {
+		checkConfigured();
+		try {
+			ProjectGenerator.convertEclipse(Paths.get(path).resolve("Application Descriptor").toAbsolutePath().toString());
+			System.out.println("OK");
+			System.exit(0);
+		} catch (Exception ex) {
+			System.out.println("Failed!");
+			System.out.println(ex.getMessage());
+			System.exit(1);
+		}
+	}
+
+	public static void editProjectCLI(String path) {
+		checkConfigured();
+		try {
+			Runtime.getRuntime().exec(new String[]{Settings.ideaPath, path});
+			System.out.println("OK");
+			System.exit(0);
+		} catch (Exception ex) {
+			System.out.println("Failed!");
+			System.out.println(ex.getMessage());
+			System.exit(1);
+		}
+	}
+
+	//#endregion
+
+	private static class ValidationResult {
+		public String message;
+		public boolean allowCreation;
+		public boolean generateCode;
+
+		public ValidationResult(String message, boolean allowCreation, boolean generateCode) {
+			this.message = message;
+			this.allowCreation = allowCreation;
+			this.generateCode = generateCode;
+		}
+	}
+}

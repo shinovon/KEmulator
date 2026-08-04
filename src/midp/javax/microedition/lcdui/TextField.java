@@ -24,7 +24,7 @@ public class TextField extends Item {
 	private String[] textArr;
 	private int caretX;
 	private int caretY;
-	protected boolean isTextBox;
+	boolean isTextBox;
 	private boolean updateFocus;
 	private boolean swtFocused;
 
@@ -115,19 +115,19 @@ public class TextField extends Item {
 	public void setInitialInputMode(final String s) {
 	}
 
-	void focus() {
-		super.focus();
+	void _focus() {
+		super._focus();
 		Emulator.getEmulator().getScreen().getCaret().focusItem(this, this.caretX, this.caretY);
 		swtFocused = true;
 		updateFocus = true;
 	}
 
-	void defocus() {
+	void _defocus() {
 		if (focused || !updateFocus) {
 			Emulator.getEmulator().getScreen().getCaret().defocusItem(this);
 			swtFocused = false;
 		}
-		super.defocus();
+		super._defocus();
 		updateFocus = true;
 	}
 
@@ -167,8 +167,8 @@ public class TextField extends Item {
 		g.drawString(this.textArr[0], x + 4, yo + 2, 0);
 	}
 
-	void layout(Row row) {
-		super.layout(row);
+	void _layout(Row row) {
+		super._layout(row);
 		int n = 4;
 		final int availableWidth = row.getAvailableWidth(screen.bounds[W]) - 8;
 		if (hasLabel()) {
@@ -206,7 +206,7 @@ public class TextField extends Item {
 		return Screen.font.getHeight() + 5;
 	}
 
-	 public boolean _isUneditable() {
+	public boolean _isUneditable() {
 		return (constraints & UNEDITABLE) == UNEDITABLE;
 	 }
 
@@ -220,8 +220,8 @@ public class TextField extends Item {
 		swtFocused = false;
 	}
 
-	protected void _itemApplyCommand() {
-		focus();
+	void _itemApplyCommand() {
+		_focus();
 	}
 	
 	public void setPreferredSize(int width, int height) {

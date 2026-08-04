@@ -1,7 +1,7 @@
 package emulator.custom;
 
+import emulator.AppSettings;
 import emulator.Emulator;
-import emulator.Settings;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 import org.objectweb.asm.*;
@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public final class h {
-	public static Hashtable aHashtable1061;
+	public static Hashtable methodProfiles;
 
 	public h() {
 		super();
@@ -29,19 +29,19 @@ public final class h {
 	public static void method591() {
 		try {
 			for (int i = 0; i < Emulator.jarClasses.size(); ++i) {
-				final InputStream method592 = method592((String) Emulator.jarClasses.get(i));
-				final ClassReader classReader = new ClassReader(method592);
 				final ClassNode classNode = new ClassNode();
-				classReader.accept((ClassVisitor) classNode, Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
-				method592.close();
+                try (InputStream method592 = getClassStream((String) Emulator.jarClasses.get(i))) {
+                    final ClassReader classReader = new ClassReader(method592);
+                    classReader.accept((ClassVisitor) classNode, AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+                }
 				for (Object o : classNode.methods) {
 					final MethodInfo methodInfo = new MethodInfo(classNode, (MethodNode) o);
-					h.aHashtable1061.put(methodInfo.method704(), methodInfo);
+					h.methodProfiles.put(methodInfo.method704(), methodInfo);
 				}
 			}
 			for (int j = 0; j < Emulator.jarClasses.size(); ++j) {
-				final InputStream method593 = method592((String) Emulator.jarClasses.get(j));
-				new ClassReader(method593).accept((ClassVisitor) new TraceClassAdapter((ClassVisitor) new ClassWriter(0)), Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+				final InputStream method593 = getClassStream((String) Emulator.jarClasses.get(j));
+				new ClassReader(method593).accept((ClassVisitor) new TraceClassAdapter((ClassVisitor) new ClassWriter(0)), AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
 				method593.close();
 			}
 		} catch (Exception e) {
@@ -49,20 +49,22 @@ public final class h {
 		}
 	}
 
-	private static InputStream method592(final String s) throws IOException {
-		if (Emulator.midletJar == null) {
+	private static InputStream getClassStream(final String s) throws IOException {
+		if (Emulator.midletJarPath == null) {
 			final File fileFromClassPath;
 			if ((fileFromClassPath = Emulator.getFileFromClassPath(s.replace('.', '/') + ".class")) == null || !fileFromClassPath.exists()) {
 				return null;
 			}
 			return new FileInputStream(fileFromClassPath);
 		} else {
-			final ZipFile zipFile;
-			final ZipEntry entry;
-			if ((entry = (zipFile = new ZipFile(Emulator.midletJar)).getEntry(s.replace('.', '/') + ".class")) == null) {
-				return null;
-			}
-			return zipFile.getInputStream(entry);
+            synchronized (Emulator.jarFileLock) {
+                final ZipFile zipFile = Emulator.midletJar;
+                final ZipEntry entry = zipFile.getEntry(s.replace('.', '/') + ".class");
+                if (entry == null) {
+                    return null;
+                }
+                return zipFile.getInputStream(entry);
+            }
 		}
 	}
 
@@ -80,7 +82,7 @@ public final class h {
 		public final MethodVisitor visitMethod(int acc, final String name, final String desc, final String s3, final String[] array) {
 			final MethodVisitor visitMethod;
 			if ((visitMethod = super.visitMethod(acc, name, desc, s3, array)) != null) {
-				return (MethodVisitor) new TraceMethodAdapter(visitMethod, (MethodInfo) h.aHashtable1061.get(this.aString1366 + '.' + name + desc));
+				return (MethodVisitor) new TraceMethodAdapter(visitMethod, (MethodInfo) h.methodProfiles.get(this.aString1366 + '.' + name + desc));
 			}
 			return null;
 		}
@@ -96,7 +98,7 @@ public final class h {
 
 		public final void visitMethodInsn(final int n, final String s, final String s2, final String s3) {
 			final MethodInfo methodInfo;
-			if ((methodInfo = (MethodInfo) h.aHashtable1061.get(s + '.' + s2 + s3)) != null) {
+			if ((methodInfo = (MethodInfo) h.methodProfiles.get(s + '.' + s2 + s3)) != null) {
 				final MethodInfo methodInfo2 = methodInfo;
 				++methodInfo2.refCount;
 			}
@@ -105,7 +107,7 @@ public final class h {
 
 		public final void visitEnd() {
 			if (this.ane1200 != null) {
-				this.ane1200.aList1171 = ((AbstractVisitor) this).getText();
+				this.ane1200.disassembledCode = ((AbstractVisitor) this).getText();
 			}
 			super.visitEnd();
 		}
@@ -114,28 +116,28 @@ public final class h {
 	public static final class MethodInfo {
 		ClassNode classNode;
 		MethodNode methodNode;
-		List aList1171;
-		public String aString1172;
-		public String aString1177;
-		public String aString1181;
-		public int anInt1173;
+		List disassembledCode;
+		public String className;
+		public String methodName;
+		public String methodSignature;
+		public int codeSize; //amount of instructions?
 		public int refCount;
-		public int anInt1182;
+		public int callCount;
 		public long aLong1174;
-		public long aLong1179;
-		public float aFloat1175;
-		public float aFloat1180;
+		public long totalExecutionTime;
+		public float averageExecutionTime;
+		public float timePercentage;
 		static StringBuffer byteCodeBuf;
 
 		public MethodInfo(final ClassNode aClassNode1169, final MethodNode aMethodNode1170) {
 			super();
 			this.classNode = aClassNode1169;
 			this.methodNode = aMethodNode1170;
-			this.aString1181 = method703(this.methodNode);
-			this.anInt1173 = this.methodNode.instructions.size();
+			this.methodSignature = method703(this.methodNode);
+			this.codeSize = this.methodNode.instructions.size();
 			this.refCount = 0;
-			this.aString1172 = this.classNode.name.replace('/', '.');
-			this.aString1177 = this.methodNode.name;
+			this.className = this.classNode.name.replace('/', '.');
+			this.methodName = this.methodNode.name;
 		}
 
 		private static String method703(final MethodNode methodNode) {
@@ -149,7 +151,7 @@ public final class h {
 		}
 
 		public final String method704() {
-			return this.aString1172 + '.' + this.aString1177 + this.methodNode.desc;
+			return this.className + '.' + this.methodName + this.methodNode.desc;
 		}
 
 		public final String toString() {
@@ -166,9 +168,9 @@ public final class h {
 				}
 				s = s2 + "\n";
 			}
-			if (this.aList1171 != null) {
+			if (this.disassembledCode != null) {
 				MethodInfo.byteCodeBuf.setLength(0);
-				final Iterator<String> iterator2 = this.aList1171.iterator();
+				final Iterator<String> iterator2 = this.disassembledCode.iterator();
 				while (iterator2.hasNext()) {
 					final String s3;
 					if ((!(s3 = iterator2.next()).startsWith("FRAME ") || b2) && (!s3.startsWith("    LINENUMBER") || b)) {

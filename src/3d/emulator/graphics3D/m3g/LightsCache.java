@@ -41,7 +41,7 @@ public final class LightsCache {
 				m_lightsTransform.add(new Transform(transform));
 			}
 
-			return m_lights.size();
+			return m_lights.size() - 1;
 		}
 	}
 

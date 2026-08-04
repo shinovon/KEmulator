@@ -1,8 +1,9 @@
 package javax.microedition.lcdui;
 
-import emulator.Devices;
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.custom.ResourceManager;
 import emulator.debug.Profiler;
 import emulator.graphics2D.GraphicsUtils;
 import emulator.graphics2D.IImage;
@@ -10,8 +11,12 @@ import emulator.graphics2D.IImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 public class Image {
+	public static Set<Image> images = Collections.newSetFromMap(new WeakHashMap());
 	private boolean mutable;
 	private IImage imageImpl;
 	private IImage xrayBuffer;
@@ -23,45 +28,45 @@ public class Image {
 		super();
 		this.imageImpl = img;
 		this.usedRegion = Emulator.getEmulator().newImage(this.imageImpl.getWidth(), this.imageImpl.getHeight(), true);
-		this.resetUsedRegion();
+		this._resetUsedRegion();
 		Profiler.totalImagePixelCount += this.getWidth() * this.getHeight();
 		++Profiler.totalImageInstances;
 	}
 
-	public void finalize() {
+	protected void finalize() {
 		Profiler.totalImagePixelCount -= this.getWidth() * this.getHeight();
 		--Profiler.totalImageInstances;
 	}
 
-	public IImage getImpl() {
+	public IImage _getImpl() {
 		return this.imageImpl;
 	}
 
-	protected IImage getXRayBuffer() {
-		if (this.xrayBuffer == null && Settings.xrayView) {
+	IImage _getXRayBuffer() {
+		if (this.xrayBuffer == null && (AppSettings.xrayView || AppSettings.xrayBuffer)) {
 			this.xrayBuffer = Emulator.getEmulator().newImage(this.getWidth(), this.getHeight(), true);
 		}
 		return this.xrayBuffer;
 	}
 
-	public IImage getUsedRegion() {
+	public IImage _getUsedRegion() {
 		return this.usedRegion;
 	}
 
-	public void resetUsedRegion() {
+	public void _resetUsedRegion() {
 		this.usedRegion.setAlpha(0, 0, this.getWidth(), this.getHeight(), 128);
 		this.usedCount = 0;
 	}
 
-	public int getUsedCount() {
+	public int _getUsedCount() {
 		return this.usedCount;
 	}
 
 	public Graphics getGraphics() {
-		if (!this.mutable && !Devices.curPlatform.hasNokiaUI()) {
-			throw new IllegalStateException("the image is immutable.");
-		}
-		if (this.xrayBuffer == null && Settings.xrayView) {
+//		if (!this.mutable) {
+//			throw new IllegalStateException("the image is immutable.");
+//		}
+		if (this.xrayBuffer == null && (AppSettings.xrayView || AppSettings.xrayBuffer)) {
 			this.xrayBuffer = Emulator.getEmulator().newImage(this.getWidth(), this.getHeight(), true);
 		}
 
@@ -82,7 +87,9 @@ public class Image {
 
 	private static Image decode(final byte[] array) throws IllegalArgumentException {
 		try {
-			return new Image(Emulator.getEmulator().newImage(array));
+			Image image = new Image(Emulator.getEmulator().newImage(array));
+			if (Settings.storeCreatedImages) images.add(image);
+			return image;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			Emulator.getEmulator().getLogStream().println("*** createImage error!! check it ***");
@@ -101,7 +108,7 @@ public class Image {
 			throw new NullPointerException();
 		}
 		try {
-			return decode(emulator.custom.CustomJarResources.getBytes(inputStream));
+			return decode(ResourceManager.getBytes(inputStream));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new IOException();
@@ -112,7 +119,7 @@ public class Image {
 		if (n <= 0 || n2 <= 0) throw new IllegalArgumentException();
 		final Image image;
 		(image = new Image(Emulator.getEmulator().newImage(n, n2, false))).mutable = true;
-		if (Settings.xrayView)
+		if (AppSettings.xrayView || AppSettings.xrayBuffer)
 			image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true);
 		return image;
 	}
@@ -121,7 +128,7 @@ public class Image {
 		if (n <= 0 || n2 <= 0) throw new IllegalArgumentException();
 		final Image image;
 		(image = new Image(Emulator.getEmulator().newImage(n, n2, true, color))).mutable = true;
-		if (Settings.xrayView)
+		if (AppSettings.xrayView || AppSettings.xrayBuffer)
 			image.xrayBuffer = Emulator.getEmulator().newImage(n, n2, true, color);
 		return image;
 	}
@@ -136,7 +143,7 @@ public class Image {
 		final int n7 = b ? n4 : n3;
 		final Image image2;
 		(image2 = new Image(Emulator.getEmulator().newImage(n6, n7, true, 0))).mutable = true;
-		if (Settings.xrayView)
+		if (AppSettings.xrayView || AppSettings.xrayBuffer)
 			image2.xrayBuffer = Emulator.getEmulator().newImage(n6, n7, true, 0);
 		image2.getGraphics().drawRegion(image, n, n2, n3, n4, n5, 0, 0, 20);
 		image2.mutable = false;
@@ -151,7 +158,7 @@ public class Image {
 			if (!string.startsWith("/")) {
 				string = "/" + string;
 			}
-			return createImage(emulator.custom.CustomJarResources.getResourceAsStream(string));
+			return createImage(ResourceManager.getResourceAsStream(string));
 		} catch (Exception ex) {
 			//ex.printStackTrace();
 			throw new IOException(string, ex);
@@ -161,6 +168,7 @@ public class Image {
 	public static Image createRGBImage(final int[] array, final int n, final int n2, final boolean b) {
 		final Image image;
 		GraphicsUtils.setImageData((image = new Image(Emulator.getEmulator().newImage(n, n2, b))).imageImpl, array, b, 0, n, n, n2);
+		if (Settings.storeCreatedImages) images.add(image);
 		return image;
 	}
 
@@ -197,11 +205,11 @@ public class Image {
 		disposed = true;
 	}
 
-	public int size() {
+	public int _size() {
 		if (disposed) return 5;
 		int i = 5 + imageImpl.size();
-		if (xrayBuffer != null) i += xrayBuffer.size();
-		if (usedRegion != null) i += usedRegion.size();
+//		if (xrayBuffer != null) i += xrayBuffer.size();
+//		if (usedRegion != null) i += usedRegion.size();
 		return i;
 	}
 }

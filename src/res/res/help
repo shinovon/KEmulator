@@ -1,48 +1,99 @@
-$KEmulator Usage
-==================
+$v2.21.5 [2026.08.xx]
+Fixed crash in debug tools on Java 22+
+Fixed crash when showing empty POPUP ChoiceGroup
+Fixed handling of Graphics translation in M3G
+Fixed Sprint Media API
+Fixed item command not showing in left softkey label
+Added option to pass window minimized state to MIDlet
+Removed SWT 2D engine
+Added 320x480 device preset
+Added option to exclude images from objects size in Memory View
+Added custom class watcher view for Hashtable
+Added datagram support
 
-$[Main Class]
-emulator.Emulator
+$v2.21.4 [2026.04.08]
+Improved MIDI playback on default JRE synthesizer
+Implemented VolumeControl in MIDI player
+Implemented arrays view in Class Watcher
+Improved VLC player
+Improved LCDUI layout
+Allowed using CORS headers in HttpConnection
+Fixed freeze on startup when MemoryView is enabled
+Fixed M3G ambient light
+Fixed volume control on Linux
+Fixed soft key labels appearance on GTK
 
-$[Program parameters]
--jar    midlet jar path
+$v2.21.3 [2026.03.04]
+Improved automatic updates security
+Added MIDI playback with MA-3/MA-5 emulator option
+Added 640x480 device preset
+Fixed non-functional platformRequest
+Fixed SMAF phrase player
+Fixed crash when going to full-screen mode with logs window visible
 
--cp     classes path [;]
--midlet MIDlet class name
--jad    jad path for -cp
+$v2.21.2 [2026.01.22]
+Added MA-7 emulator support
+Added fullscreen exit on esc
+Fixed fire keycode save
+Added default app settings saving
 
--device specify handset  e.g."SonyEricssonK750"
+$v2.21.1 [2026.01.17]
+Implemented SMAF playback in SoftBank MEXA
+Implemented SMAF Phrase in SoftBank MEXA, VSCL, LG MMPP API
+Improved resources loading time
+Added missing Motorola presets
+Fixed application encoding
+Fixed sensor simulator launch in win32 build
+Updated JNA library to 5.7.0
 
--rec    specify key record
+$v2.21 [2026.01.12]
+New device presets
+Application settings
+MIDI soundfont changing
+Added Nokia OTT decoder from FreeJ2ME-Plus
+Added Nokia-Platform check bypass
+Added monospaced font choice
+Updated About window
+Improved JSR 239 OpenGL API
+Implemented missing SkinnedMesh functions from M3G 1.1
+Replaced mmfplayer.dll with JNA implementation
+Added MA-5 emulator support
+Stub com.nokia.mid.ui.gestures API
+Optimized image rendering in MemoryView
+Updated sensorsimulator.jar to 1.1.1
+Improved siemens api
+Fixed Media View on Java 9+
+Fixed LWJGL libraries loading on Intel Mac
+Fixed M3G on macOS 11 and later
+Fixed Siemens File API
+Fixed AMR dumping
+Fixed MMAPI events lock
+Fixed Canvas.hideNotify
+Fixed compatibility with JMUnit
 
--awt    use AWT Graphics 2D Engine
--swt    use SWT GDI+ 2D Engine
+$v2.20 [2025.08.24]
+DoJa initial support
+Reworked Memory View
+Moved sounds to Media View
+New amr decoder
+Font.FACE_MONOSPACE support
+Fixed TriangleStrippArray.getIndices()
+Fixed Graphics3d.addLight()
+Fixed blend color not appearing in M3G View
+Added OES_matrix_pallete emulation in JSR-239
+Added compressed texture formats conversion in JSR-239
+Fixed Canvas.hideNotify not calling when switching screens
+Fixed pointer events lag
+Fixed random softlock related to CaretImpl
+Fixed softkeys handling in TextBox
+Fixed controller events when game is not loaded
+Improved Graphics.drawRGB performance
+Fixed resource: connection not throwing IOException on missing files
+Fixed mouse wheel scroll to key mapping
+Fixed resource loading with mixed case names
+Fixed nnx64 starter scripts
+Fixed lcdui.List selection in MULTIPLE mode
 
--fontname	specify system font name
--fontsmall	specify small font size
--fontmedium	specify medium font size
--fontlarge	specify large font size
-
--log    open log frame on app start
--key    custom key mapping [;]
-
-==================
-$[Files]
-KEmulator.jar    main jar
-KEmulator.exe    win32 launcher
-*.dll            win32 dlls
-
-libs/        auto-load libs
-records/     key records
-capture/     image & avi captures
-rms/         record store
-file/        file system
-uei/         SDK integration
-property.txt properties of KEmulator
-log.txt      log file
-
-==================
-$[Changelog]
 $v2.19.2 [2025.04.24]
 StringItem layout improvements
 Fixed FileConnection filter
@@ -1054,65 +1105,3 @@ v0.1.7 [2006.06.22]
 v0.1.6 [2006.06.21]
 v0.1.3 [2006.06.20]
 v0.1.0 [2006.06.15]
-
-==================
-$[Supported APIs]
-MIDP 2.0 (JSR118)
-FileConnection (JSR75)
-Wireless Messaging API 1.0 (JSR120)
-MMAPI (JSR135)
-Location (JSR179)
-M3G 1.1 (JSR184)
-OpenGL ES (JSR239)
-Mobile Sensor API (JSR256)
-NokiaUI 1.4
-Samsung 1.0 (win32 only)
-Sprint 1.0
-Siemens API
-MascotCapsule v3
-SoftBank MEXA (com.mexa, com.jblend, com.j_phone)
-Nokia M3D(O)
-Vodafone API 1.0
-PantechAudio (win32 only)
-LG MMPP API (mmpp.media)
-Siemens S60 Game API (com.siemens.s60.lcdui.game)
-Pigler Notifications API (org.pigler)
-com.gcjsp.v10
-tw.com.fareastone.v10
-com.bmc.media
-
-$[Stub APIs]
-PIM (JSR75)
-Bluetooth (JSR82)
-ContentHandler (JSR211)
-AMMS (JSR234)
-Nokia In-App
-Nokia IAPInfo API
-Immersion VibeTonz
-com.nec
-BlackBerry API (net.rim.device.api)
-Motorola FunLights API 1.0
-Motorola VibeLight API
-Motorola iDEN API (multimedia, micro3d)
-
-==================
-$[Libs]
-swt-4.20 / 4.7 (32-bit)
-asm-5.2
-lwjgl-3.3.3
-java-discord-rpc-2.0.1
-jinput
-jna-5.2.0
-webcam-capture-0.3.12
-slf4j-api-1.7.2
-bridj-0.7.0
-vlcj-4.7.1
-
-==================
-$[Bug Report]
-telegram @nnmidletschat / @shinovon
-
-$Special thanks to:
-Афабыч, TwoSpacesSG, sym_ansel, rmn20
-
-292 labs

@@ -1,8 +1,12 @@
+/*
+Copyright (c) 2024 Arman Jussupgaliyev
+*/
 package emulator.media.capture;
 
 import com.github.sarxos.webcam.Webcam;
 import emulator.Emulator;
 import emulator.Permission;
+import emulator.Settings;
 import emulator.graphics2D.awt.AWTImageUtils;
 import emulator.graphics2D.awt.ImageAWT;
 import emulator.media.vlc.VLCPlayerImpl;
@@ -258,7 +262,7 @@ public class CapturePlayerImpl implements Player {
 			if ((inst.canvas == null || obj == inst.canvas) && !inst.isItem) {
 				inst.paint(g);
 			}
-		} else {
+		} else if (Settings.enableVlc) {
 			VLCPlayerImpl.draw(g, obj);
 		}
 	}

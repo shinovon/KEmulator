@@ -1,30 +1,56 @@
 # KEmulator nnmod
 Cross-platform J2ME emulator, based on decompiled KEmulator 1.0.3
 
+![screenshot](/screenshot.png)
+
 ## Links
 - [Webpage](https://nnproject.cc/kem)
 - [Discord server](https://discord.gg/ETvTpMehXV)
 - [Telegram channel](https://t.me/nnmidlets)
 
-## Compatibility
+## Main changes from KEmulator 1.0.3
+
+- Active development and bug tracking
+- Fixed a lot of games based on bug reports
+- Cross-platform
+- Hardware accelerated 3D engine
+- Freely resizable window and fullscreen mode
+- Fixed keyboard controls
+- Improved lcdui implementation
+- Improved multimedia support
+- Improved debug tools (Memory View, Class Watcher, Profiler)
+- Returned M3G View from v0.9.8
+- Customizable MIDI soundfont
+- Fixed network connection issues
+- Mascot Capsule and SoftBank MEXA support
+- Limited DoJa profile support
+- Implemented NokiaUI 1.4
+- Support of obscure OEM APIs
+- Support of UEI integration with IDEs (Eclipse with MTJ, NetBeans, etc)
+- Tools for J2ME development with IntelliJ IDEA
+
+## Requirements
 JRE:
 - Java 8 by Oracle
-- OpenJDK 9-21
+- OpenJDK 17-21 (Will run on 22+, but debug tools work is not guaranteed)
 
 System:
-- Windows XP - 11 (x86, x86_64)
-- Linux (x86, x86_64, arm64, arm32)
-- Mac OS X 10.13 and higher (x86_64)
+- Windows XP - 11 (x86, x86_64, arm64)
+- Linux GTK3, glibc 2.24+ (x86, x86_64, arm64, arm32)
+- Mac OS X 10.13 and later (x86_64)
 - macOS 11 Big Sur (arm64)
+- Termux / Android, GTK3 (arm64)
 
-## Developing in IntelliJ IDEA
+## Building in IntelliJ IDEA
+
 ### Importing project
 - Install Ant plugin
 - Open repository root as project in IDEA
 ### Building
 - Build artifacts: `KEmulator_win`, `KEmulator_x64`, `m3g_lwjgl`, `m3g_swerve`, `micro3d_dll`, `micro3d_gl`
 
-## Developing in Eclipse IDE
+## Building in Eclipse IDE
+
 ### Importing project
 - Open `eclipse` directory as workspace in Eclipse IDE
 - File>Import...>General>Existing Projects into Workspace
@@ -38,10 +64,11 @@ System:
 - Select launch configuration, export destination, and click Finish
 
 ## Uses
+
 ### Libraries
 - [SWT](https://www.eclipse.org/swt/) 4.20 / 4.7
 - [LWJGL](https://github.com/LWJGL/lwjgl3) 3.3.6
-- [JNA](https://github.com/java-native-access/jna) 5.2.0
+- [JNA](https://github.com/java-native-access/jna) 5.7.0
 - [ASM](https://asm.ow2.io/) 5.2
 - [vlcj](https://github.com/caprica/vlcj) 4.7.3
 - [JInput](https://github.com/jinput/jinput) 2.0.5
@@ -51,6 +78,7 @@ System:
 - [BrigJ](https://github.com/nativelibs4java/BridJ) 0.7.0
 - [lwjgl3-swt](https://github.com/LWJGLX/lwjgl3-swt)
 - org.apache.tools.zip
+- [opencore-amr](https://sourceforge.net/projects/opencore-amr) 0.1.6
 
 ### Source code
 - [J2ME-Loader](https://github.com/nikita36078/J2ME-Loader) Apache-2.0 license

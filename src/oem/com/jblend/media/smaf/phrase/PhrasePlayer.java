@@ -1,70 +1,107 @@
 /*
- * Copyright 2023 Yury Kharchenko
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+Copyright (c) 2026 Arman Jussupgaliyev
+*/
 package com.jblend.media.smaf.phrase;
 
+import emulator.media.mmf.AudioPhraseTrackImpl;
+import emulator.media.mmf.PhrasePlayerImpl;
+import emulator.media.mmf.PhraseTrackImpl;
+
 public class PhrasePlayer {
-	private static final PhrasePlayer phrasePlayer = new PhrasePlayer();
+	private static PhrasePlayer phrasePlayer;
+
+	private PhrasePlayerImpl impl;
 
 	protected int trackCount;
 	protected int audioTrackCount;
 
+	private PhraseTrack[] tracks;
+	private AudioPhraseTrack[] audioTracks;
+
+	PhrasePlayer() {
+		impl = PhrasePlayerImpl.open(true);
+		tracks = new PhraseTrack[trackCount = impl.getTracksCount()];
+		audioTracks = new AudioPhraseTrack[audioTrackCount = impl.getAudioTracksCount()];
+	}
+
 	public static PhrasePlayer getPlayer() {
+		if (phrasePlayer == null) phrasePlayer = new PhrasePlayer();
 		return phrasePlayer;
 	}
 
 	public void disposePlayer() {
+		impl.close();
+		phrasePlayer = null;
 	}
 
 	public PhraseTrack getTrack() {
-		return new PhraseTrack(trackCount++);
+		PhraseTrackImpl t = impl.createTrack(-1);
+		return tracks[t.getID()] = new PhraseTrack(t);
 	}
 
 	public AudioPhraseTrack getAudioTrack() {
-		return new AudioPhraseTrack(audioTrackCount++);
+		AudioPhraseTrackImpl t = impl.createAudioTrack(-1);
+		return audioTracks[t.getID()] = new AudioPhraseTrack(t);
 	}
 
 	public int getTrackCount() {
-		return 16;
+		return trackCount;
 	}
 
 	public int getAudioTrackCount() {
-		return 16;
+		return audioTrackCount;
 	}
 
 	public PhraseTrack getTrack(int track) {
-		return new PhraseTrack(track);
+		if (track < 0 || track >= tracks.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		PhraseTrack t = tracks[track];
+		if (t == null) {
+			tracks[track] = t = new PhraseTrack(impl.createTrack(track));
+		}
+		return t;
 	}
 
 	public AudioPhraseTrack getAudioTrack(int track) {
-		return new AudioPhraseTrack(track);
+		if (track < 0 || track >= audioTracks.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		AudioPhraseTrack t = audioTracks[track];
+		if (t == null) {
+			audioTracks[track] = t = new AudioPhraseTrack(impl.createAudioTrack(track));
+		}
+		return t;
 	}
 
 	public void disposeTrack(PhraseTrack t) {
+		int id = t.getID();
+		if (tracks[id] == t) {
+			impl.disposeTrack(id);
+			tracks[id] = null;
+		}
 	}
 
 	public void disposeAudioTrack(AudioPhraseTrack t) {
+		int id = t.getID();
+		if (audioTracks[id] == t) {
+			impl.disposeAudioTrack(id);
+			audioTracks[id] = null;
+		}
 	}
 
 	public void kill() {
+		impl.kill();
+		for (int i = 0; i < tracks.length; ++i) {
+			tracks[i] = null;
+		}
 	}
 
 	public void pause() {
+		impl.pause();
 	}
 
 	public void resume() {
+		impl.resume();
 	}
 }

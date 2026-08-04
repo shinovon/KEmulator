@@ -1,5 +1,6 @@
 package emulator.custom;
 
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
 import org.objectweb.asm.Label;
@@ -20,6 +21,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 
 
 	public final void visitMethodInsn(final int acc, final String cls, String name, String sign) {
+//		System.out.println("visitMethod " + cls + " " + name + " " + sign);
 		Label_0576:
 		{
 			if (cls.equals("java/lang/System")) {
@@ -37,6 +39,17 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				}
 				if (name.equals("exit")) {
 					if (sign.equals("(I)V")) {
+						if (Settings.bypassVserv) {
+							try {
+								// bypass nokia platform check
+								if (methodName.equals("<clinit>") && Emulator.getEmulator().getAppProperty("Nokia-Platform") != null) {
+									Emulator.getEmulator().getLogStream().println("Patched Nokia-Platform check: " + cls + '.' + name + sign);
+									super.visitInsn(Opcodes.POP);
+									return;
+								}
+							} catch (Throwable ignored) {}
+						}
+
 						super.visitMethodInsn(184, "emulator/custom/CustomMethod", "exit", sign);
 						return;
 					}
@@ -59,7 +72,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "yield", sign);
 					return;
 				}
-				if (Settings.patchSleep && name.equals("sleep")) {
+				if (name.equals("sleep")) {
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "sleep", sign);
 					return;
 				}
@@ -68,17 +81,28 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getResourceAsStream", "(Ljava/lang/Object;Ljava/lang/String;)Ljava/io/InputStream;");
 					return;
 				}
+				if (Settings.hideEmulation && name.equals("forName")) {
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "forName", "(Ljava/lang/String;)Ljava/lang/Class;");
+					return;
+				}
 			} else if (cls.equals("java/lang/String")) {
 				if (name.equals("<init>") && sign.startsWith("([B") && !sign.endsWith("Ljava/lang/String;)V")) {
 					this.method707(1);
-					super.visitLdcInsn(Settings.fileEncoding);
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding", "()Ljava/lang/String;");
 					super.visitMethodInsn(acc, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
 					return;
 				}
 				if (name.equals("getBytes") && sign.startsWith("()")) {
 					this.method707(1);
-					super.visitLdcInsn(Settings.fileEncoding);
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding", "()Ljava/lang/String;");
 					super.visitMethodInsn(acc, cls, name, "(Ljava/lang/String;)[B");
+					return;
+				}
+			} else if (cls.equals("java/io/InputStreamReader")) {
+				if (name.equals("<init>") && sign.equals("(Ljava/io/InputStream;)V")) {
+					this.method707(1);
+					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding", "()Ljava/lang/String;");
+					super.visitMethodInsn(acc, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
 					return;
 				}
 			} else if (cls.equals("java/util/Vector")) {
@@ -88,7 +112,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			} else {
 				if (cls.equals("java/util/Timer")) {
 					if (sign.contains("java/util/TimerTask")) {
-						sign = sign.replaceAll("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask");
+						sign = sign.replace("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask");
 					}
 					super.visitMethodInsn(acc, "emulator/custom/subclass/Timer", name, sign);
 					return;
@@ -109,8 +133,16 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 					super.visitMethodInsn(acc, cls.replace("com/bmc/media/", "com/sprintpcs/media/"), name, sign.replace("com/bmc/media/", "com/sprintpcs/media/"));
 					return;
 				}
+				if (cls.startsWith("com/docomostar/") || sign.contains("com/docomostar/")) {
+					super.visitMethodInsn(acc, cls.replace("com/docomostar/", "com/nttdocomo/"), name, sign.replace("com/docomostar/", "com/nttdocomo/"));
+					return;
+				}
 				if (cls.equals("com/immersion/VibeTonz") && acc == Opcodes.INVOKESTATIC) {
 					super.visitMethodInsn(acc, cls.concat("Static"), name, sign);
+					return;
+				}
+				if (cls.equals("com/siemens/mp/io/Connection") && acc == Opcodes.INVOKESTATIC) {
+					super.visitMethodInsn(acc, cls, name.concat("Compat"), sign);
 					return;
 				}
 				if (Settings.g3d == 0) {
@@ -139,6 +171,20 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 						}
 					}
 				}
+				if (cls.equals("java/nio/ByteBuffer") && name.equals("allocateDirect") && sign.equals("(I)Ljava/nio/ByteBuffer;")) {
+					super.visitMethodInsn(acc, cls, name, sign);
+					super.visitMethodInsn(Opcodes.INVOKESTATIC, "java/nio/ByteOrder", "nativeOrder", "()Ljava/nio/ByteOrder;");
+					super.visitMethodInsn(Opcodes.INVOKEVIRTUAL, cls, "order", "(Ljava/nio/ByteOrder;)Ljava/nio/ByteBuffer;");
+					return;
+				}
+				if (Settings.hideEmulation) {
+					if (cls.equals("java/lang/Runtime")) {
+						if (name.equals("totalMemory") || name.equals("freeMemory")) {
+							super.visitMethodInsn(184, "emulator/custom/CustomMethod", name, "(Ljava/lang/Object;)J");
+							return;
+						}
+					}
+				}
 				String s5;
 				String s6;
 				if (sign.contains("java/util/TimerTask")) {
@@ -156,30 +202,38 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				} else if (sign.contains("com/bmc/media/")) {
 					s5 = "com/bmc/media/";
 					s6 = "com/sprintpcs/media/";
+				} else if (sign.contains("com/docomostar/")) {
+					s5 = "com/docomostar/";
+					s6 = "com/nttdocomo/";
 				} else {
 					break Label_0576;
 				}
-				sign = sign.replaceAll(s5, s6);
+				sign = sign.replace(s5, s6);
 			}
 		}
 		if (CustomClassAdapter.hasRenamedMethods && CustomClassAdapter.renamedClasses.contains(cls) && "()V".equals(sign) &&
-				(name.equals("stop") || name.equals("resume") || name.equals("suspend"))) {
+				(name.equals("stop") || name.equals("resume") || name.equals("suspend") || name.equals("finalize"))) {
 			name = name + "_";
 		}
 		super.visitMethodInsn(acc, cls, name, sign);
 	}
 
-	public final void visitFieldInsn(final int n, final String s, final String s2, String s3) {
-		if (s3.equals("Ljava/util/TimerTask;")) {
-			s3 = "Lemulator/custom/subclass/SubTimerTask;";
-		} else if (s3.equals("Ljava/util/Timer;")) {
-			s3 = "Lemulator/custom/subclass/Timer;";
+	public final void visitFieldInsn(final int n, String s, final String s2, String s3) {
+		if (s.contains("com/docomostar/")) {
+			s = s.replace("com/docomostar/", "com/nttdocomo/");
+		}
+		if (s3.contains("java/util/TimerTask")) {
+			s3 = s3.replace("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask");
+		} else if (s3.contains("java/util/Timer")) {
+			s3 = s3.replace("java/util/Timer", "emulator/custom/subclass/Timer");
 		} else if (s3.contains("com/gcjsp/v10/")) {
 			s3 = s3.replace("com/gcjsp/v10/", "com/vodafone/v10/");
 		} else if (s3.contains("tw/com/fareastone/v10/")) {
 			s3 = s3.replace("tw/com/fareastone/v10/", "com/vodafone/v10/");
 		} else if (s3.contains("com/bmc/media/")) {
 			s3 = s3.replace("com/bmc/media/", "com/sprintpcs/media/");
+		} else if (s3.contains("com/docomostar/")) {
+			s3 = s3.replace("com/docomostar/", "com/nttdocomo/");
 		}
 		super.visitFieldInsn(n, s, s2, s3);
 	}
@@ -225,8 +279,13 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 	}
 
 	public final void visitMultiANewArrayInsn(final String s, final int n) {
+//		System.out.println("visitMulti " + s);
 		if (Settings.enableNewTrack) {
 			this.method708("new " + emulator.debug.ClassTypes.method870(s));
+		}
+		if (s.contains("com/docomostar/")) {
+			super.visitMultiANewArrayInsn(s.replace("com/docomostar/", "com/nttdocomo/"), n);
+			return;
 		}
 		super.visitMultiANewArrayInsn(s, n);
 	}
@@ -258,20 +317,28 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				f.method708(sb.append(s2).toString());
 			}
 		}
-		if (s.equals("java/util/Timer")) {
-			super.visitTypeInsn(n, "emulator/custom/subclass/Timer");
+		if (s.contains("java/util/TimerTask")) {
+			super.visitTypeInsn(n, s.replace("java/util/TimerTask", "emulator/custom/subclass/SubTimerTask"));
 			return;
 		}
-		if (s.startsWith("com/gcjsp/v10/")) {
+		if (s.contains("java/util/Timer")) {
+			super.visitTypeInsn(n, s.replace("java/util/Timer", "emulator/custom/subclass/Timer"));
+			return;
+		}
+		if (s.contains("com/gcjsp/v10/")) {
 			super.visitTypeInsn(n, s.replace("com/gcjsp/v10/", "com/vodafone/v10/"));
 			return;
 		}
-		if (s.startsWith("tw/com/fareastone/v10/")) {
+		if (s.contains("tw/com/fareastone/v10/")) {
 			super.visitTypeInsn(n, s.replace("tw/com/fareastone/v10/", "com/vodafone/v10/"));
 			return;
 		}
-		if (s.startsWith("com/bmc/media/")) {
+		if (s.contains("com/bmc/media/")) {
 			super.visitTypeInsn(n, s.replace("com/bmc/media/", "com/sprintpcs/media/"));
+			return;
+		}
+		if (s.contains("com/docomostar/")) {
+			super.visitTypeInsn(n, s.replace("com/docomostar/", "com/nttdocomo/"));
 			return;
 		}
 		super.visitTypeInsn(n, s);
@@ -338,6 +405,13 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			}
 		}
 		super.visitIntInsn(n, n2);
+	}
+
+	public void visitTryCatchBlock(Label var1, Label var2, Label var3, String var4) {
+		if (var4 != null && var4.startsWith("com/docomostar/")) {
+			var4 = var4.replace("com/docomostar/", "com/nttdocomo/");
+		}
+		super.visitTryCatchBlock(var1, var2, var3, var4);
 	}
 
 	public final void visitCode() {

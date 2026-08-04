@@ -1,29 +1,29 @@
 package javax.microedition.sensor;
 
 public class MeasurementRange {
-	private double aDouble1503;
-	private double aDouble1504;
-	private double aDouble1505;
+	private double smallest;
+	private double largest;
+	private double resolution;
 
-	public MeasurementRange(final double aDouble1503, final double aDouble1504, final double aDouble1505) {
+	public MeasurementRange(final double smallest, final double largest, final double resolution) {
 		super();
-		if (aDouble1505 < 0.0 || aDouble1503 > aDouble1504) {
+		if (resolution < 0.0 || smallest > largest) {
 			throw new IllegalArgumentException();
 		}
-		this.aDouble1503 = aDouble1503;
-		this.aDouble1504 = aDouble1504;
-		this.aDouble1505 = aDouble1505;
+		this.smallest = smallest;
+		this.largest = largest;
+		this.resolution = resolution;
 	}
 
 	public double getLargestValue() {
-		return this.aDouble1504;
+		return this.largest;
 	}
 
 	public double getResolution() {
-		return this.aDouble1505;
+		return this.resolution;
 	}
 
 	public double getSmallestValue() {
-		return this.aDouble1503;
+		return this.smallest;
 	}
 }

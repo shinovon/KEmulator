@@ -21,7 +21,7 @@ import ru.woesss.j2me.micro3d.FigureImpl;
 import java.io.IOException;
 
 public class Figure {
-	public FigureImpl impl;
+	protected FigureImpl impl;
 
 	public Figure(byte[] b) {
 		impl = new FigureImpl(b);
@@ -38,6 +38,6 @@ public class Figure {
 		if (actionTable == null) {
 			throw new NullPointerException();
 		}
-		impl.setPosture(actionTable.impl, action, frame);
+		impl.setPosture(actionTable.getImpl(), action, frame);
 	}
 }

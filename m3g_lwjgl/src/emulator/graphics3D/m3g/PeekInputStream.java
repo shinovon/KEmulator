@@ -4,44 +4,44 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public final class PeekInputStream extends InputStream {
-	private int[] anIntArray1076;
-	private InputStream anInputStream1077;
-	private int anInt1078;
-	private int anInt1079;
+	private int[] peekBuffer;
+	private InputStream stream;
+	private int buffered;
+	private int counter;
 
 	public final int read() throws IOException {
-		if (this.anInt1079 < this.anInt1078) {
-			return this.anIntArray1076[this.anInt1079++];
+		if (this.counter < this.buffered) {
+			return this.peekBuffer[this.counter++];
 		} else {
-			int var1 = this.anInputStream1077.read();
-			if (this.anInt1078 < this.anIntArray1076.length) {
-				this.anIntArray1076[this.anInt1078] = var1;
-				++this.anInt1078;
+			int var1 = this.stream.read();
+			if (this.buffered < this.peekBuffer.length) {
+				this.peekBuffer[this.buffered] = var1;
+				++this.buffered;
 			}
 
-			++this.anInt1079;
+			++this.counter;
 			return var1;
 		}
 	}
 
 	public final int available() throws IOException {
-		return this.anInt1079 < this.anInt1078 ? this.anInt1078 - this.anInt1079 + this.anInputStream1077.available() : this.anInputStream1077.available();
+		return this.counter < this.buffered ? this.buffered - this.counter + this.stream.available() : this.stream.available();
 	}
 
 	public final void close() throws IOException {
-		this.anInputStream1077.close();
+		this.stream.close();
 	}
 
 	public final void rewind() throws IOException {
-		if (this.anInt1079 > this.anInt1078) {
+		if (this.counter > this.buffered) {
 			throw new IOException("Peek buffer overrun.");
 		} else {
-			this.anInt1079 = 0;
+			this.counter = 0;
 		}
 	}
 
 	public PeekInputStream(InputStream var1, int var2) {
-		this.anInputStream1077 = var1;
-		this.anIntArray1076 = new int[var2];
+		this.stream = var1;
+		this.peekBuffer = new int[var2];
 	}
 }

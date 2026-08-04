@@ -65,28 +65,29 @@ public class Displayable {
 	}
 
 	public boolean isShown() {
-		return Display.current == this;
+		return Display.current == this &&
+				(!Settings.hideDisplayableOnMinimize || Emulator.getEmulator().getScreen().isShown());
 	}
 
-	protected void defocus() {
+	void _defocus() {
 		if (this.focusedItem != null) {
-			this.focusedItem.defocus();
+			this.focusedItem._defocus();
 			this.focusedItem = null;
 		}
 	}
 
-	protected void setItemCommands(final Item item) {
+	void setItemCommands(final Item item) {
 		this.focusedItem = item;
 		updateCommands();
 	}
 
-	protected void removeItemCommands(final Item item) {
+	void removeItemCommands(final Item item) {
 		if (item == null || item != focusedItem) return;
 		this.focusedItem = null;
 		updateCommands();
 	}
 
-	protected void updateCommands() {
+	void updateCommands() {
 		leftCommand = null;
 		rightCommand = null;
 		Command ok = null;
@@ -126,6 +127,8 @@ public class Displayable {
 		String leftLabel = "", rightLabel = "";
 		if (hasMenuOnLeft()) {
 			leftLabel = UILocale.get("LCDUI_MENU_COMMAND", "Menu");
+		} else if (focusedItem != null && !focusedItem.commands.isEmpty()) {
+			leftLabel = focusedItem.commands.get(0).getLabel();
 		} else if (!menuCommands.isEmpty()) {
 			leftLabel = menuCommands.get(0).getLabel();
 		} else if (leftCommand != null) {
@@ -145,7 +148,7 @@ public class Displayable {
 		return count > 1;
 	}
 
-	protected boolean isCommandsEmpty() {
+	boolean isCommandsEmpty() {
 		return this.commands.isEmpty();
 	}
 
@@ -168,7 +171,7 @@ public class Displayable {
 		}
 	}
 
-	protected Command getLeftSoftCommand() {
+	Command getLeftSoftCommand() {
 		if (focusedItem != null && !focusedItem.commands.isEmpty()) {
 			return focusedItem.commands.get(0);
 		}
@@ -178,7 +181,7 @@ public class Displayable {
 		return leftCommand;
 	}
 
-	protected Command getRightSoftCommand() {
+	Command getRightSoftCommand() {
 		return rightCommand;
 	}
 
@@ -186,7 +189,7 @@ public class Displayable {
 		if (cmdListener == null && this instanceof Canvas) {
 			return false;
 		}
-		boolean fix = Settings.motorolaSoftKeyFix || Settings.softbankApi;
+		boolean fix = AppSettings.motorolaSoftKeyFix || AppSettings.softbankApi;
 		if (KeyMapping.isLeftSoft(n)) {
 			if (hasMenuOnLeft()) {
 				if (b) {
@@ -284,7 +287,7 @@ public class Displayable {
 		}
 	}
 
-	protected void _paintTicker(final Graphics graphics) {
+	void _paintTicker(final Graphics graphics) {
 		synchronized (lock) {
 			if (ticker == null) {
 				if (!fullScreen && this instanceof Canvas) {
@@ -326,21 +329,20 @@ public class Displayable {
 		repaintScreen();
 	}
 
-	protected void _paintSoftMenu(final Graphics graphics) {
+	void _paintSoftMenu(final Graphics graphics) {
 		CapturePlayerImpl.draw(graphics, Emulator.getCurrentDisplay().getCurrent());
 	}
 
-	public static synchronized void _fpsLimiter(boolean b) {
-		if (b && (Settings.speedModifier == 1 || Settings.patchSleep) && Settings.frameRate <= 120) {
+	public static void _fpsLimiter(boolean b) {
+		if (b && (AppSettings.speedModifier == 1 || AppSettings.applySpeedToSleep) && AppSettings.frameRate <= 120) {
 			long elapsed = System.nanoTime() - lastFrameTime;
-			long var2 = (long) ((MILLI_TO_NANO * 1000) / Settings.frameRate);
+			long var2 = (MILLI_TO_NANO * 1000L) / AppSettings.frameRate;
 
 			long delta = var2 - elapsed;
 			if (delta > 0) {
 				try {
 					Thread.sleep(delta / MILLI_TO_NANO/*, (int) (delta % MILLI_TO_NANO)*/);
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 			}
 		}
 		lastFrameTime = System.nanoTime();
@@ -348,18 +350,18 @@ public class Displayable {
 		if (b) ++framesCount;
 		long l = lastFrameTime - lastFpsUpdateTime;
 		if (l >= 2000L * MILLI_TO_NANO) {
-			Profiler.FPS = (int) (((framesCount * 1000L + 500) * MILLI_TO_NANO) / l);
+			Profiler.FPS = (int) ((framesCount * 1000L * MILLI_TO_NANO) / l);
 			lastFpsUpdateTime = lastFrameTime;
 			framesCount = 0;
 		}
 	}
 
 	public static void _checkForSteps(Object lock) {
-		if (Settings.steps >= 0) {
-			if (Settings.steps == 0) {
+		if (AppSettings.steps >= 0) {
+			if (AppSettings.steps == 0) {
 				final long currentTimeMillis = System.currentTimeMillis();
 				try {
-					while (Settings.steps == 0) {
+					while (AppSettings.steps == 0) {
 						if (lock == null) Thread.sleep(50);
 						else synchronized (lock) {
 							lock.wait(50L);
@@ -369,7 +371,7 @@ public class Displayable {
 				}
 				Settings.aLong1235 += System.currentTimeMillis() - currentTimeMillis;
 			}
-			--Settings.steps;
+			--AppSettings.steps;
 		}
 	}
 
@@ -377,7 +379,7 @@ public class Displayable {
 		Graphics.resetXRayCache();
 	}
 
-	protected void _shown() {
+	void _shown() {
 		updateSize(false);
 	}
 
@@ -390,6 +392,8 @@ public class Displayable {
 	Vector<TargetedCommand> buildAllCommands() {
 		Vector<TargetedCommand> cmds = new Vector<>();
 		buildItemCommands(cmds, focusedItem);
+		// separator
+		if (!cmds.isEmpty()) cmds.add(null);
 		buildScreenCommands(cmds);
 		return cmds;
 	}

@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024 Arman Jussupgaliyev
+*/
 package com.j_phone.util;
 
 public class FixedPoint {

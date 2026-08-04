@@ -1,8 +1,7 @@
 package emulator.ui.swt;
 
-import emulator.Devices;
-import emulator.Emulator;
-import emulator.Settings;
+import emulator.*;
+import emulator.custom.ResourceManager;
 import emulator.graphics2D.IFont;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.FontAWT;
@@ -11,10 +10,20 @@ import emulator.graphics2D.swt.FontSWT;
 import emulator.graphics2D.swt.ImageSWT;
 import emulator.graphics3D.IGraphics3D;
 import emulator.ui.*;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.*;
 
 import javax.microedition.lcdui.Font;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
@@ -35,11 +44,15 @@ public final class SWTFrontend implements IEmulatorFrontend {
 	private InfosBox infos;
 	private M3GViewUI m3gView;
 	private MessageConsole sms;
+	private AppSettingsUI appSettingsUI;
 	public Properties midletProps;
 	private static Hashtable<String, FontSWT> swtFontsCache = new Hashtable<String, FontSWT>();
 
+	protected int dialogSelection;
+
 	public SWTFrontend() {
 		super();
+		Display.setAppName("KEmulator");
 		display = new Display();
 		this.plugins = new Vector();
 		this.screenDepth = SWTFrontend.display.getDepth();
@@ -51,6 +64,7 @@ public final class SWTFrontend implements IEmulatorFrontend {
 		this.classWatcher = Watcher.createForStatics();
 		this.profiler = Watcher.createForProfiler();
 		this.methods = new Methods();
+		this.appSettingsUI = new AppSettingsUI();
 	}
 
 	public void dispose() {
@@ -151,7 +165,7 @@ public final class SWTFrontend implements IEmulatorFrontend {
 
 	public final IScreen getScreen() {
 		if (screen == null) {
-			screen = new EmulatorScreen(Devices.getPropertyInt("SCREEN_WIDTH"), Devices.getPropertyInt("SCREEN_HEIGHT"));
+			screen = new EmulatorScreen();
 		}
 		return screen;
 	}
@@ -160,30 +174,53 @@ public final class SWTFrontend implements IEmulatorFrontend {
 		return this.sms;
 	}
 
-	public final IFont newFont(final int size, final int style) {
+	private String getFontName(int face) {
+		if (face == Font.FACE_MONOSPACE) {
+			return iproperty.getMonospaceFontName();
+		}
+		return iproperty.getDefaultFontName();
+	}
+
+	public final IFont newFont(int face, final int size, final int style) {
+		String name = getFontName(face);
 		if (Settings.g2d == 0) {
-			String s = this.iproperty.getDefaultFontName() + "." + size + "." + style;
+			String s = name + "." + size + "." + style;
 			if (swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
-			FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), size, style & ~Font.STYLE_UNDERLINED);
+			FontSWT f = new FontSWT(name, size, style & ~Font.STYLE_UNDERLINED);
 			swtFontsCache.put(s, f);
 			return f;
 		}
 		if (Settings.g2d == 1) {
-			return new FontAWT(this.iproperty.getDefaultFontName(), size, style, false);
+			return new FontAWT(name, size, style, false);
 		}
 		return null;
 	}
 
-	public final IFont newCustomFont(final int height, final int style) {
+	public final IFont newCustomFont(int face, final int size, final int style, boolean height) {
+		return newFont(getFontName(face), style, size, height);
+	}
+
+	public final IFont newFont(String name, int style, int pixelSize) {
+		return newFont(name, style, pixelSize, false);
+	}
+
+	private IFont newFont(String name, int style, int size, boolean height) {
 		if (Settings.g2d == 0) {
-			String s = this.iproperty.getDefaultFontName() + ".-" + height + "." + style;
+			String s = name + "." + size + "." + style + height;
 			if (swtFontsCache.containsKey(s)) return swtFontsCache.get(s);
-			FontSWT f = new FontSWT(this.iproperty.getDefaultFontName(), height, style & ~Font.STYLE_UNDERLINED, true);
+			FontSWT f = new FontSWT(name, size, style & ~Font.STYLE_UNDERLINED, height);
 			swtFontsCache.put(s, f);
 			return f;
 		}
 		if (Settings.g2d == 1) {
-			return new FontAWT(this.iproperty.getDefaultFontName(), height, style, true);
+			return new FontAWT(name, size, style, height);
+		}
+		return null;
+	}
+
+	public final IFont loadFont(InputStream fontData, int size) throws IOException {
+		if (Settings.g2d == 1) {
+			return new FontAWT(fontData, size);
 		}
 		return null;
 	}
@@ -248,5 +285,9 @@ public final class SWTFrontend implements IEmulatorFrontend {
 	 */
 	public void updateLanguage() {
 		((EmulatorScreen) getScreen()).updateLanguage();
+	}
+
+	public void openAppSettings(boolean start) {
+		appSettingsUI.open(Display.getCurrent(), start ? null : screen.getShell(), start);
 	}
 }

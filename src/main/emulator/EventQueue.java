@@ -22,6 +22,7 @@ public final class EventQueue implements Runnable {
 	public static final int EVENT_INPUT = 18;
 	public static final int EVENT_COMMAND = 19;
 	public static final int EVENT_ITEM_STATE = 20;
+	public static final int EVENT_HIDE = 21;
 
 	boolean running;
 	private int[] events;
@@ -51,23 +52,36 @@ public final class EventQueue implements Runnable {
 		inputs = new int[128][];
 		paused = false;
 		running = true;
+
 		eventThread = new Thread(this, "KEmulator-EventQueue");
 		eventThread.setPriority(3);
 		eventThread.start();
+
 		inputThread = new Thread(input, "KEmulator-InputQueue");
 		inputThread.setPriority(3);
 		inputThread.start();
+
+		Thread daemonThread = new Thread(() -> {
+			try {
+				Thread.sleep(Integer.MAX_VALUE);
+			} catch (Exception ignored) {}
+		});
+		daemonThread.setDaemon(true);
+		daemonThread.start();
+
 		Thread crashThread = new Thread() {
 			public void run() {
 				long time = System.currentTimeMillis();
 				try {
 					while (running) {
-						if (alive || paused || Settings.steps >= 0) {
+						if (alive || paused || AppSettings.steps >= 0) {
 							time = System.currentTimeMillis();
 							alive = false;
 						} else if ((System.currentTimeMillis() - time) > 5000) {
 							time = System.currentTimeMillis();
-							Emulator.getEmulator().getLogStream().println("Event thread is not responding! Is it dead locked?");
+							if (!AppSettings.uei) {
+								Emulator.getEmulator().getLogStream().println("Event thread is not responding! Is it dead locked?");
+							}
 						}
 						Displayable._fpsLimiter(false);
 						sleep(1000);
@@ -84,39 +98,39 @@ public final class EventQueue implements Runnable {
 
 	public void keyPress(int n) {
 		if (n == 10000) return;
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {0, n, 0, -1});
 		} else input.queue(0, n, 0, -1);
 	}
 
 	public void keyRelease(int n) {
 		if (n == 10000) return;
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {1, n, 0, -1});
 		} else input.queue(1, n, 0, -1);
 	}
 
 	public void keyRepeat(int n) {
 		if (n == 10000) return;
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {2, n, 0, -1});
 		} else input.queue(2, n, 0, -1);
 	}
 
 	public void mouseDown(int x, int y, int pointer) {
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {0, x, y, pointer});
 		} else input.queue(0, x, y, pointer);
 	}
 
 	public void mouseUp(int x, int y, int pointer) {
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {1, x, y, pointer});
 		} else input.queue(1, x, y, pointer);
 	}
 
 	public void mouseDrag(int x, int y, int pointer) {
-		if (Settings.synchronizeKeyEvents) {
+		if (AppSettings.synchronizeKeyEvents) {
 			queueInput(new int[] {2, x, y, pointer});
 		} else input.queue(2, x, y, pointer);
 	}
@@ -179,7 +193,7 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void queueRepaint(int x, int y, int w, int h) {
-		if (Settings.j2lStyleFpsLimit)
+		if (AppSettings.j2lStyleFpsLimit)
 			Displayable._fpsLimiter(true);
 
 		synchronized (repaintLock) {
@@ -227,11 +241,11 @@ public final class EventQueue implements Runnable {
 	public void gameGraphicsFlush() {
 		synchronized (repaintLock) {
 			IScreen scr = Emulator.getEmulator().getScreen();
-			if (Settings.asyncFlush) {
+			if (AppSettings.asyncFlush) {
 				final IImage screenImage = scr.getScreenImg();
 				final IImage backBufferImage2 = scr.getBackBufferImage();
 				final IImage xRayScreenImage2 = scr.getXRayScreenImage();
-				(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
+				(AppSettings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage);
 			}
 			scr.repaint();
 		}
@@ -240,11 +254,11 @@ public final class EventQueue implements Runnable {
 	public void gameGraphicsFlush(int x, int y, int w, int h) {
 		synchronized (repaintLock) {
 			IScreen scr = Emulator.getEmulator().getScreen();
-			if (Settings.asyncFlush) {
+			if (AppSettings.asyncFlush) {
 				final IImage screenImage = scr.getScreenImg();
 				final IImage backBufferImage2 = scr.getBackBufferImage();
 				final IImage xRayScreenImage2 = scr.getXRayScreenImage();
-				(Settings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage, x, y, w, h);
+				(AppSettings.xrayView ? xRayScreenImage2 : backBufferImage2).cloneImage(screenImage, x, y, w, h);
 			}
 			scr.repaint();
 		}
@@ -259,8 +273,13 @@ public final class EventQueue implements Runnable {
 			repaintX = repaintY = repaintW = repaintH = -1;
 			internalRepaint(x, y, w, h);
 		}
-		if (!Settings.j2lStyleFpsLimit)
+		if (!AppSettings.j2lStyleFpsLimit)
 			Displayable._fpsLimiter(true);
+	}
+
+	public void notifyHidden(Displayable d) {
+		eventArguments.add(d);
+		queue(EVENT_HIDE);
 	}
 
 	public void run() {
@@ -282,7 +301,7 @@ public final class EventQueue implements Runnable {
 								repaintX = repaintY = repaintW = repaintH = -1;
 								internalRepaint(x, y, w, h);
 							}
-							if (!Settings.j2lStyleFpsLimit)
+							if (!AppSettings.j2lStyleFpsLimit)
 								Displayable._fpsLimiter(true);
 							break;
 						}
@@ -298,9 +317,9 @@ public final class EventQueue implements Runnable {
 							final IImage backBufferImage3 = scr.getBackBufferImage();
 							final IImage xRayScreenImage3 = scr.getXRayScreenImage();
 							((Screen) d)._invokePaint(new Graphics(backBufferImage3, xRayScreenImage3));
-							if (Settings.asyncFlush) {
+							if (AppSettings.asyncFlush) {
 								try {
-									(Settings.xrayView ? xRayScreenImage3 : backBufferImage3)
+									(AppSettings.xrayView ? xRayScreenImage3 : backBufferImage3)
 											.cloneImage(scr.getScreenImg());
 								} catch (Exception ignored) {}
 							}
@@ -326,7 +345,7 @@ public final class EventQueue implements Runnable {
 						}
 						case EVENT_START: {
 							if (Emulator.getMIDlet() == null) break;
-							Thread t = new Thread(new InvokeStartAppRunnable(true));
+							Thread t = new Thread(new InvokeStartAppRunnable(true), "KEmulator-StartApp");
 							t.setPriority(5);
 							t.start();
 							break;
@@ -334,7 +353,7 @@ public final class EventQueue implements Runnable {
 						case EVENT_EXIT: {
 							this.stop();
 							if (Emulator.getMIDlet() == null) break;
-							Thread t = new Thread(new InvokeDestroyAppRunnable(this));
+							Thread t = new Thread(new InvokeDestroyAppRunnable(this), "KEmulator-DestroyApp");
 							t.setPriority(5);
 							t.start();
 							break;
@@ -350,7 +369,7 @@ public final class EventQueue implements Runnable {
 							if (!(d instanceof Canvas)) break;
 							((Canvas) d)._invokeHideNotify();
 							this.paused = true;
-							if (Settings.startAppOnResume) {
+							if (AppSettings.startAppOnResume) {
 								try {
 									Emulator.getMIDlet().invokePauseApp();
 								} catch (Exception e) {
@@ -361,7 +380,7 @@ public final class EventQueue implements Runnable {
 						}
 						case EVENT_RESUME: {
 							Displayable d = getCurrent();
-							if (Settings.startAppOnResume) {
+							if (AppSettings.startAppOnResume) {
 								try {
 									Thread t = new Thread(new InvokeStartAppRunnable(false));
 									t.setPriority(5);
@@ -386,7 +405,8 @@ public final class EventQueue implements Runnable {
 							synchronized (callbackLock) {
 								processInputEvent(e);
 							}
-							break;
+							// skip 1ms delay
+							continue;
 						}
 						case EVENT_ITEM_STATE: {
 							Item item = (Item) nextArgument();
@@ -402,6 +422,13 @@ public final class EventQueue implements Runnable {
 								((Item) target)._callCommandAction(cmd);
 							} else {
 								((Displayable) target)._callCommandAction(cmd);
+							}
+							break;
+						}
+						case EVENT_HIDE: {
+							Displayable d = (Displayable) nextArgument();
+							if (d instanceof Canvas) {
+								((Canvas) d)._invokeHideNotify();
 							}
 							break;
 						}
@@ -421,7 +448,7 @@ public final class EventQueue implements Runnable {
 							break;
 						}
 					}
-					if (Settings.queueSleep) Thread.sleep(1);
+					Thread.yield();
 				} catch (Throwable e) {
 					System.err.println("Exception in Event Thread!");
 					System.err.println("Event: " + event);
@@ -451,6 +478,13 @@ public final class EventQueue implements Runnable {
 		queue(EVENT_CALL);
 	}
 
+	public void waitRepaint() throws InterruptedException {
+		if (Thread.currentThread() == eventThread) return;
+		while (repaintPending) {
+			Thread.sleep(1);
+		}
+	}
+
 	private void internalRepaint(int x, int y, int w, int h) {
 		repaintPending = false;
 		try {
@@ -459,11 +493,11 @@ public final class EventQueue implements Runnable {
 					|| Emulator.getCurrentDisplay().getCurrent() != Emulator.getCanvas()) {
 				return;
 			}
-			if (Settings.xrayView) Displayable._resetXRayGraphics();
+			if (AppSettings.xrayView) Displayable._resetXRayGraphics();
 			IScreen scr = Emulator.getEmulator().getScreen();
 			IImage backBufferImage, xRayScreenImage;
 			if (canvas instanceof SpriteCanvas) {
-				backBufferImage = SpriteCanvas._virtualImage.getImpl();
+				backBufferImage = SpriteCanvas._virtualImage._getImpl();
 				xRayScreenImage = null;
 			} else {
 				backBufferImage = scr.getBackBufferImage();
@@ -486,8 +520,8 @@ public final class EventQueue implements Runnable {
 				}
 				return;
 			}
-			if (Settings.asyncFlush) {
-				(Settings.xrayView ? xRayScreenImage : backBufferImage)
+			if (AppSettings.asyncFlush) {
+				(AppSettings.xrayView ? xRayScreenImage : backBufferImage)
 						.cloneImage(scr.getScreenImg());
 			}
 			scr.repaint();
@@ -597,7 +631,7 @@ public final class EventQueue implements Runnable {
 					while (count > 0) {
 						try {
 							int[] o = (int[]) elements[0];
-							if (Settings.synchronizeKeyEvents) {
+							if (AppSettings.synchronizeKeyEvents) {
 								synchronized (callbackLock) {
 									processInputEvent(o);
 								}

@@ -16,7 +16,7 @@
 
 package ru.woesss.j2me.micro3d;
 
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import java.io.IOException;
 
@@ -56,7 +56,7 @@ public class ActTableImpl {
 		if (name == null) {
 			throw new NullPointerException();
 		}
-		byte[] bytes = CustomJarResources.getBytes(name);
+		byte[] bytes = ResourceManager.getBytes(name);
 		if (bytes == null) {
 			throw new IOException();
 		}

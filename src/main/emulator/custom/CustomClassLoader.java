@@ -1,5 +1,6 @@
 package emulator.custom;
 
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
 import org.apache.tools.zip.ZipEntry;
@@ -55,7 +56,7 @@ public final class CustomClassLoader extends ClassLoader {
 				if ((entry = (zipFile = new ZipFile((String) Emulator.jarLibrarys.get(i))).getEntry(s.replace('.', '/') + ".class")) != null) {
 					final ClassReader classReader = new ClassReader(zipFile.getInputStream(entry));
 					final ClassWriter classWriter = new ClassWriter(0);
-					classReader.accept(new ClassVisitor(Opcodes.ASM4, classWriter) {}, Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+					classReader.accept(new ClassVisitor(Opcodes.ASM4, classWriter) {}, AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
 					final byte[] byteArray = classWriter.toByteArray();
 					defineClass = this.defineClass(s, byteArray, 0, byteArray.length);
 				}
@@ -73,11 +74,18 @@ public final class CustomClassLoader extends ClassLoader {
 			try {
 				bytes = load(s);
 			} catch (ArrayIndexOutOfBoundsException e) {
-				if (Settings.asmSkipDebug) throw e;
-				Settings.asmSkipDebug = true;
+				if (AppSettings.asmSkipDebug) throw e;
+				AppSettings.asmSkipDebug = true;
 				bytes = load(s);
 			}
-			defineClass = this.defineClass(s, bytes, 0, bytes.length);
+			try {
+				defineClass = this.defineClass(s, bytes, 0, bytes.length);
+			} catch (ClassFormatError e) {
+				if (AppSettings.asmSkipDebug) throw e;
+				AppSettings.asmSkipDebug = true;
+				bytes = load(s);
+				defineClass = this.defineClass(s, bytes, 0, bytes.length);
+			}
 		} catch (ClassNotFoundException e) {
 			return super.findClass(s);
 		} catch (Exception e) {
@@ -88,34 +96,35 @@ public final class CustomClassLoader extends ClassLoader {
 	}
 
 	private byte[] load(String s) throws Exception {
-		InputStream inputStream;
-		if (Emulator.midletJar == null) {
-			final File fileFromClassPath;
-			if ((fileFromClassPath = Emulator.getFileFromClassPath(s.replace('.', '/') + ".class")) == null || !fileFromClassPath.exists()) {
-				throw new ClassNotFoundException();
+		synchronized (Emulator.jarFileLock) {
+			InputStream inputStream;
+			if (Emulator.midletJarPath == null) {
+				final File fileFromClassPath;
+				if ((fileFromClassPath = Emulator.getFileFromClassPath(s.replace('.', '/') + ".class")) == null || !fileFromClassPath.exists()) {
+					throw new ClassNotFoundException();
+				}
+				inputStream = new FileInputStream(fileFromClassPath);
+			} else {
+				final ZipEntry entry = Emulator.midletJar.getEntry(s.replace('.', '/') + ".class");
+				if (entry == null) {
+					throw new ClassNotFoundException();
+				}
+				inputStream = Emulator.midletJar.getInputStream(entry);
 			}
-			inputStream = new FileInputStream(fileFromClassPath);
-		} else {
-			final ZipFile zipFile;
-			final ZipEntry entry;
-			if ((entry = (zipFile = new ZipFile(Emulator.midletJar)).getEntry(s.replace('.', '/') + ".class")) == null) {
-				throw new ClassNotFoundException();
-			}
-			inputStream = zipFile.getInputStream(entry);
-		}
 
-		final ClassReader classReader = new ClassReader(inputStream);
-		final ClassWriter classWriter = new ClassWriter(0);
-		try {
-			classReader.accept(new CustomClassAdapter(classWriter, s), Settings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
-		} finally {
-			inputStream.close();
+			final ClassReader classReader = new ClassReader(inputStream);
+			final ClassWriter classWriter = new ClassWriter(0);
+			try {
+				classReader.accept(new CustomClassAdapter(classWriter, s), AppSettings.asmSkipDebug ? ClassReader.SKIP_DEBUG : 0);
+			} finally {
+				inputStream.close();
+			}
+			return classWriter.toByteArray();
 		}
-		return classWriter.toByteArray();
 	}
 
 	public static boolean isProtected(String s, boolean stack) {
-		if (Settings.protectedPackages == null || Settings.protectedPackages.isEmpty())
+		if (!Settings.hideEmulation && (Settings.protectedPackages == null || Settings.protectedPackages.isEmpty()))
 			return false;
 
 		if (s.startsWith("__")) return true;
@@ -129,8 +138,33 @@ public final class CustomClassLoader extends ClassLoader {
 			}
 		}
 
-		if (Settings.protectedPackages.contains(s))
+		if (Settings.protectedPackages.contains(s)
+				|| (Settings.hideEmulation && !s.startsWith("emulator.custom.")
+				&& (s.startsWith("kemnn.") || s.startsWith("emulator.")
+				|| s.startsWith("club.") || s.startsWith("com.github.")
+				|| s.startsWith("uk.co.caprica") || s.startsWith("ru.woesss.")
+				|| s.startsWith("org.slf4j.") || s.startsWith("org.pigler.")
+				|| s.startsWith("org.objectweb.") || s.startsWith("org.bridj")
+				|| s.startsWith("com.sun.jna.") || s.startsWith("org.lwjgl.")
+				|| s.startsWith("org.apache.tools.")|| s.startsWith("net.java.games.")
+				|| s.startsWith("ru.nnproject")
+				|| s.equals("javax.microedition.lcdui.a")) && !Emulator.jarClasses.contains(s)))
 			return true;
+
+		if (Settings.hideEmulation
+				&& (s.startsWith("java.applet") || s.startsWith("java.awt") || s.startsWith("java.swing")
+				|| s.startsWith("org.eclipse.swt") || s.startsWith("java.lang.CharSequence")
+				|| s.startsWith("java.util.Collection") || s.startsWith("java.util.ArrayList")
+				|| s.startsWith("java.lang.ClassLoader") || s.startsWith("java.util.Map")
+				|| s.startsWith("java.util.Base64") || s.startsWith("java.util.Objects")
+				|| s.startsWith("java.util.Deque") || s.startsWith("java.util.regex.")
+				|| s.startsWith("java.util.Terminator") || s.startsWith("java.lang.Enum")
+				|| s.startsWith("java.lang.SecurityManager") || s.startsWith("java.lang.Terminator")
+				|| s.startsWith("java.nio.DoubleBuffer") || s.startsWith("java.lang.Compiler")
+				|| s.startsWith("java.util.Observer") || s.startsWith("sun.") || s.startsWith("jdk."))) {
+			return true;
+		}
+
 		int idx = -1;
 		while ((idx = s.indexOf('.', idx + 1)) != -1) {
 			if (Settings.protectedPackages.contains(s.substring(0, idx))) return true;

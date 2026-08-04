@@ -1,12 +1,20 @@
 package emulator.debug;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.Vector;
 
 public final class ClassInfo implements Comparable<ClassInfo> {
 	final String name;
-	int instancesCount;
+	int instancesCount = 0;
 	final int staticsSize;
-	public final Vector<ObjInstance> objs;
+	public final ArrayList<ObjInstance> objs = new ArrayList<>();
+	/**
+	 * Helper map for faster instance lookup during paths merge
+	 */
+	public final IdentityHashMap<Object, ObjInstance> objsMap = new IdentityHashMap<>();
+	public final Field[] cachedFields;
 
 	public int size() {
 		int total = this.staticsSize;
@@ -22,9 +30,8 @@ public final class ClassInfo implements Comparable<ClassInfo> {
 
 	ClassInfo(final Memory m, final Class cls) {
 		super();
-		this.objs = new Vector();
-		this.instancesCount = 0;
-		this.staticsSize = m.size(cls, null);
-		this.name = cls.getName();
+		cachedFields = Memory.fields(cls);
+		staticsSize = m.size(cls, cachedFields, null);
+		name = cls.getName();
 	}
 }

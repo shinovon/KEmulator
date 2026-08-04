@@ -54,6 +54,10 @@ public class Font {
 		return new Font(javax.microedition.lcdui.Font.getFont(n2, n3, n4));
 	}
 
+	public static Font getFont(int n, int n2) {
+		return getFont(n);
+	}
+
 	public static Font getDefaultFont() {
 		if (Font.defaultFont == null) {
 			Font.defaultFont = new Font(javax.microedition.lcdui.Font.getDefaultFont());

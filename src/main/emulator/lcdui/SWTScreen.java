@@ -1,8 +1,12 @@
+/*
+Copyright (c) 2025 Arman Jussupgaliyev
+*/
 package emulator.lcdui;
 
 import emulator.Emulator;
 import emulator.KeyMapping;
 import emulator.Settings;
+import emulator.graphics2D.CopyUtils;
 import emulator.graphics2D.swt.FontSWT;
 import emulator.ui.swt.EmulatorScreen;
 import emulator.ui.swt.SWTFrontend;
@@ -171,9 +175,9 @@ public class SWTScreen {
 		// TODO
 		if (img == null) return null;
 		if (Settings.g2d == 0) {
-			return (org.eclipse.swt.graphics.Image) img.getImpl().getNative();
+			return (org.eclipse.swt.graphics.Image) img._getImpl().getNative();
 		}
-		BufferedImage b = (BufferedImage) img.getImpl().getNative();
-		return new org.eclipse.swt.graphics.Image(SWTFrontend.getDisplay(), emulator.graphics2D.c.toSwt(b));
+		BufferedImage b = (BufferedImage) img._getImpl().getNative();
+		return new org.eclipse.swt.graphics.Image(SWTFrontend.getDisplay(), CopyUtils.toSwt(b));
 	}
 }

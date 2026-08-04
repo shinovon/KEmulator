@@ -13,6 +13,10 @@ public class ConnectionNotFoundException extends IOException {
 		super(e);
 	}
 
+	public ConnectionNotFoundException(String message, Exception cause) {
+		super(message, cause);
+	}
+
 	public ConnectionNotFoundException(String s) {
 		super(s);
 	}

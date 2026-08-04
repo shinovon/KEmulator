@@ -1,5 +1,6 @@
 package javax.microedition.m3g;
 
+import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.debug.Profiler3D;
@@ -61,7 +62,7 @@ public class Graphics3D {
 			throw new IllegalArgumentException("hints");
 		}
 
-		boolean overwrite = !Settings.m3gIgnoreOverwrite && (hints & OVERWRITE) != 0;
+		boolean overwrite = !AppSettings.m3gIgnoreOverwrite && (hints & OVERWRITE) != 0;
 
 		Background bck = new Background();
 		bck.setColorClearEnable(!overwrite);
@@ -78,7 +79,7 @@ public class Graphics3D {
 
 			Graphics3D.target = target;
 			impl.bindTarget(g);
-			setViewport(g.getClipX(), g.getClipY(), g.getClipWidth(), g.getClipHeight());
+			setViewport(g.getClipX() + g.getTranslateX(), g.getClipY() + g.getTranslateY(), g.getClipWidth(), g.getClipHeight());
 
 			if (!overwrite) {
 				if (tempBgImage == null || tempBgImage.getWidth() != targetW || tempBgImage.getHeight() != targetH)

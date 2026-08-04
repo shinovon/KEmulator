@@ -1,6 +1,10 @@
+/*
+Copyright (c) 2021-2026 Arman Jussupgaliyev
+*/
 package emulator.media.vlc;
 
 import emulator.Emulator;
+import emulator.Permission;
 import emulator.Settings;
 import emulator.graphics2D.awt.AWTImageUtils;
 import emulator.graphics2D.awt.ImageAWT;
@@ -89,7 +93,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		rateControl = new RateControlImpl(this);
 		stopTimeControl = new StopTimeControlImpl(this);
 		metaDataControl = new MetaDataControlImpl(this);
-		controls = new Control[]{videoControl, volumeControl, rateControl, stopTimeControl};
+		controls = new Control[]{videoControl, volumeControl, rateControl, stopTimeControl, metaDataControl};
 		this.timeBase = Manager.getSystemTimeBase();
 		if (Settings.enableMediaDump)
 			PlayerImpl.players.add(this);
@@ -320,6 +324,9 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		if (!prepared) {
 			synchronized (vlcLock) {
 				load();
+				if (mediaUrl.startsWith("v4l2:") || mediaUrl.startsWith("ddraw:")) {
+					Permission.checkPermission("media.camera");
+				}
 				try {
 					if (mediaCallback != null) {
 						if (!mediaPlayer.media().prepare(mediaCallback)) {
@@ -372,23 +379,30 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	public void close() {
-		if (this.state == CLOSED) {
-			return;
-		}
-		PlayerImpl.players.remove(this);
-		state = CLOSED;
-		if (inst == this) inst = null;
-		if (playing) {
-			try {
-				this.stop();
-			} catch (Exception ignored) {
+		synchronized (vlcLock) {
+			if (this.state == CLOSED) {
+				return;
 			}
+			PlayerImpl.players.remove(this);
+			state = CLOSED;
+			if (inst == this) inst = null;
+			if (mediaPlayer != null) {
+				mediaPlayer.events().removeMediaPlayerEventListener(this);
+
+				if (mediaPlayer.status().isPlaying()) {
+					mediaPlayer.controls().stop();
+				}
+
+				mediaPlayer.release();
+				mediaPlayer = null;
+			}
+
+			if (dataSource != null) {
+				dataSource.disconnect();
+			}
+			released = true;
+			this.state = 0;
 		}
-		released = true;
-		if (dataSource != null) {
-			dataSource.disconnect();
-		}
-		this.state = 0;
 		this.notifyListeners(PlayerListener.CLOSED, null);
 	}
 
@@ -432,14 +446,24 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 				prefetch();
 			}
 			PlayerImpl.players.add(this);
-			synchronized (vlcLock) {
-				mediaPlayer.controls().start();
-			}
+			mediaPlayer.submit(new Runnable() {
+				@Override
+				public void run() {
+					synchronized (vlcLock) {
+						if (mediaPlayer != null) mediaPlayer.controls().start();
+					}
+				}
+			});
 			if (volume == -1) {
 				notifyListeners(PlayerListener.VOLUME_CHANGED, volume = 50);
-				synchronized (vlcLock) {
-					mediaPlayer.audio().setVolume(volume);
-				}
+				mediaPlayer.submit(new Runnable() {
+					@Override
+					public void run() {
+						synchronized (vlcLock) {
+							if (mediaPlayer != null) mediaPlayer.audio().setVolume(volume);
+						}
+					}
+				});
 			}
 			playing = true;
 			state = STARTED;
@@ -455,9 +479,14 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 			throw new IllegalStateException("closed");
 		}
 		if (playing) {
-			synchronized (vlcLock) {
-				mediaPlayer.controls().pause();
-			}
+			mediaPlayer.submit(new Runnable() {
+				@Override
+				public void run() {
+					synchronized (vlcLock) {
+						if (mediaPlayer != null) mediaPlayer.controls().pause();
+					}
+				}
+			});
 			if (state == STARTED)
 				state = PREFETCHED;
 			playing = false;
@@ -521,20 +550,25 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		}
 		if (released || listeners == null)
 			return;
-		try {
-			final Enumeration<PlayerListener> elements = this.listeners.elements();
-			while (elements.hasMoreElements()) {
-				elements.nextElement().playerUpdate(this, s.intern(), o);
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					final Enumeration<PlayerListener> elements = VLCPlayerImpl.this.listeners.elements();
+					while (elements.hasMoreElements()) {
+						elements.nextElement().playerUpdate(VLCPlayerImpl.this, s.intern(), o);
+					}
+				} catch (Throwable e) {
+					e.printStackTrace();
+				}
 			}
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
+		}).start();
 	}
 
 	public void setLoopCount(int p0) {
 		if (p0 == -1) {
 			synchronized (vlcLock) {
-				mediaPlayer.controls().setRepeat(true);
+				if (mediaPlayer != null) mediaPlayer.controls().setRepeat(true);
 			}
 		}
 	}
@@ -708,9 +742,16 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	public void timeChanged(MediaPlayer arg0, long time) {
 		if (stopTime != StopTimeControl.RESET && time >= stopTime / 1000L && time <= stopTime / 1000L + 1000) {
 			stoppedAtTime = true;
-			try {
-				stop();
-			} catch (MediaException ignored) {}
+			if (mediaPlayer != null) {
+				mediaPlayer.submit(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							stop();
+						} catch (MediaException ignored) {}
+					}
+				});
+			}
 		}
 	}
 
@@ -736,6 +777,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
 	public void finished(MediaPlayer mediaPlayer) {
 		this.state = PREFETCHED;
+		this.prepared = false;
 		notifyListeners(PlayerListener.END_OF_MEDIA, getMediaTime());
 	}
 
@@ -750,14 +792,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	}
 
 	protected void finalize() {
-		if (mediaPlayer == null) return;
-		try {
-			synchronized (vlcLock) {
-				mediaPlayer.release();
-				mediaPlayer = null;
-			}
-		} catch (Throwable ignored) {}
-		released = true;
+		close();
 	}
 
 }

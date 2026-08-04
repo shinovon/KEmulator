@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2025 Fyodor Ryzhov
+*/
 package emulator.ui;
 
 import emulator.Emulator;

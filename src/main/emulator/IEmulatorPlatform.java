@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024 Arman Jussupgaliyev
+*/
 package emulator;
 
 import emulator.debug.MemoryViewImage;
@@ -21,4 +24,8 @@ public interface IEmulatorPlatform {
 	boolean supportsMascotCapsule();
 
 	IGraphics3D getGraphics3D();
+
+	String getSwtLibraryName();
+
+	String[] getLwjglLibraryNames();
 }

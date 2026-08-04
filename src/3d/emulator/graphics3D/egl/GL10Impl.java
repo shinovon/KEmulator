@@ -98,8 +98,31 @@ public class GL10Impl implements GL10, GL10Ext {
 		EGL10Impl.g3d.sync(() -> GL11.glColorPointer(n, n2, n3, MemoryUtil.memAddress(buffer)));
 	}
 
-	public synchronized void glCompressedTexImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final Buffer buffer) {
-		EGL10Impl.g3d.sync(() -> GL13.glCompressedTexImage2D(n, n2, n3, n4, n5, n6, n7, MemoryUtil.memAddress(buffer)));
+	private boolean isPaletteFormat(int format) {
+		switch (format) {
+			case GL_PALETTE4_RGB8_OES:
+			case GL_PALETTE4_RGBA8_OES:
+			case GL_PALETTE4_R5_G6_B5_OES:
+			case GL_PALETTE4_RGBA4_OES:
+			case GL_PALETTE4_RGB5_A1_OES:
+			case GL_PALETTE8_RGB8_OES:
+			case GL_PALETTE8_RGBA8_OES:
+			case GL_PALETTE8_R5_G6_B5_OES:
+			case GL_PALETTE8_RGBA4_OES:
+			case GL_PALETTE8_RGB5_A1_OES:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	public synchronized void glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int n7, Buffer data) {
+		if (isPaletteFormat(internalformat)) {
+			ByteBuffer newData = PaletteTextureDecoder.decode(internalformat, (ByteBuffer) data, width, height);
+			glTexImage2D(target, level, GL_RGBA, width, height, border, GL_RGBA, GL_UNSIGNED_BYTE, newData);
+		} else {
+			EGL10Impl.g3d.sync(() -> GL13.glCompressedTexImage2D(target, level, internalformat, width, height, border, n7, MemoryUtil.memAddress(data)));
+		}
 	}
 
 	public synchronized void glCompressedTexSubImage2D(final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8, final Buffer buffer) {

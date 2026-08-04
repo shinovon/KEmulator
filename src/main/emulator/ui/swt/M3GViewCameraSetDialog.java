@@ -1,6 +1,8 @@
 package emulator.ui.swt;
 
 import emulator.UILocale;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
@@ -114,41 +116,33 @@ public final class M3GViewCameraSetDialog extends Dialog {
 		final GridData layoutData3;
 		(layoutData3 = new GridData(768)).widthHint = 80;
 		button.setLayoutData(layoutData3);
-		button.addSelectionListener(new Class80(this, shell));
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				if (anInt604 == 0) {
+					aFloat603 = Float.parseFloat(aText605.getText());
+				} else if (anInt604 == 1) {
+					aFloat606 = Float.parseFloat(aText607.getText());
+					aFloat608 = Float.parseFloat(aText609.getText());
+				} else {
+					aFloat610 = Float.parseFloat(aText611.getText());
+					aFloat612 = Float.parseFloat(aText613.getText());
+					aFloat614 = Float.parseFloat(aText615.getText());
+				}
+				shell.close();
+			}
+		});
 		final Button button2;
 		(button2 = new Button(shell, 8388616)).setText(UILocale.get("DIALOG_CANCEL", "Cancel"));
 		final GridData layoutData4;
 		(layoutData4 = new GridData(768)).widthHint = 80;
 		button2.setLayoutData(layoutData4);
-		button2.addSelectionListener(new Class81(this, shell));
+		button2.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				shell.close();
+			}
+		});
 		shell.pack();
-	}
-
-	static int method342(final M3GViewCameraSetDialog class30) {
-		return class30.anInt604;
-	}
-
-	static Text method343(final M3GViewCameraSetDialog class30) {
-		return class30.aText605;
-	}
-
-	static Text method344(final M3GViewCameraSetDialog class30) {
-		return class30.aText607;
-	}
-
-	static Text method345(final M3GViewCameraSetDialog class30) {
-		return class30.aText609;
-	}
-
-	static Text method346(final M3GViewCameraSetDialog class30) {
-		return class30.aText611;
-	}
-
-	static Text method347(final M3GViewCameraSetDialog class30) {
-		return class30.aText613;
-	}
-
-	static Text method348(final M3GViewCameraSetDialog class30) {
-		return class30.aText615;
 	}
 }

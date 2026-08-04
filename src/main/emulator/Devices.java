@@ -15,7 +15,8 @@ public final class Devices {
 	private static Hashtable aHashtable1074;
 	private static ArrayList anArrayList1075;
 	private static Properties properties;
-	private static final String[] aStringArray1077;
+	private static final String[] aStringArray1077 = new String[] { "layout", "preset" };
+	private static String defaultPreset;
 
 	public Devices() {
 		super();
@@ -24,40 +25,46 @@ public final class Devices {
 	public static void load(final String s) {
 		try {
 			final DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			InputStream resourceAsStream;
+			InputStream stream = null;
 			try {
-				resourceAsStream = Emulator.class.getResourceAsStream(s);
-			} catch (Exception ex) {
-				resourceAsStream = new FileInputStream(s);
+				stream = Emulator.class.getResourceAsStream(s);
+			} catch (Exception ignored) {}
+			if (stream == null) {
+				stream = new FileInputStream(s);
 			}
-			if (resourceAsStream == null) {
+			if (stream == null) {
 				throw new Exception("device file could not be found: " + s);
 			}
-			final Document parse = documentBuilder.parse(resourceAsStream);
-			for (int i = 0; i < Devices.aStringArray1077.length; ++i) {
-				final NodeList elementsByTagName = parse.getElementsByTagName(Devices.aStringArray1077[i]);
-				for (int j = 0; j < elementsByTagName.getLength(); ++j) {
-					final DevicePlatform e = new DevicePlatform((Element) elementsByTagName.item(j));
-					Devices.aHashtable1074.put(e.name.toLowerCase(), e);
-					if (i > 0) {
-						Devices.anArrayList1075.add(e.name);
+			try {
+				final Document parse = documentBuilder.parse(stream);
+				defaultPreset = ((Element) parse.getElementsByTagName("default").item(0)).getAttribute("value");
+				for (int i = 0; i < Devices.aStringArray1077.length; ++i) {
+					final NodeList elementsByTagName = parse.getElementsByTagName(Devices.aStringArray1077[i]);
+					for (int j = 0; j < elementsByTagName.getLength(); ++j) {
+						final DevicePlatform e = new DevicePlatform((Element) elementsByTagName.item(j));
+						Devices.aHashtable1074.put(e.name.toLowerCase(), e);
+						if (i > 0) {
+							Devices.anArrayList1075.add(e.name);
+						}
 					}
 				}
+			} finally {
+				stream.close();
 			}
-			Collections.sort((List<Comparable>) Devices.anArrayList1075);
+//			Collections.sort((List<Comparable>) Devices.anArrayList1075);
 		} catch (Exception ex2) {
 			ex2.printStackTrace();
 			Emulator.getEmulator().getLogStream().println("Failed to load XML file.");
 		}
 	}
 
-	public static boolean setPlatform(final String s) {
+	public static boolean setPreset(final String s) {
 		final DevicePlatform ane1073;
 		if ((ane1073 = (DevicePlatform) Devices.aHashtable1074.get(s.toLowerCase())) != null) {
 			Devices.curPlatform = ane1073;
 			return true;
 		}
-		Emulator.getEmulator().getLogStream().println("Not found platform: " + s);
+		Emulator.getEmulator().getLogStream().println("Not found preset: " + s);
 		return false;
 	}
 
@@ -88,6 +95,10 @@ public final class Devices {
 		}
 	}
 
+	public static String getDefaultPreset() {
+		return defaultPreset;
+	}
+
 	public static Enumeration method620() {
 		return Collections.enumeration((Collection<Object>) Devices.anArrayList1075);
 	}
@@ -96,6 +107,5 @@ public final class Devices {
 		Devices.aHashtable1074 = new Hashtable();
 		Devices.anArrayList1075 = new ArrayList();
 		Devices.properties = new Properties();
-		aStringArray1077 = new String[]{"api", "family", "device"};
 	}
 }

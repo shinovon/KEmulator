@@ -10,7 +10,7 @@
 -printmapping '.\mapping.txt'
 -overloadaggressively
 #-keeppackagenames **
--keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable,Exceptions
 #-keepparameternames
 -dontnote
 -dontwarn
@@ -44,6 +44,8 @@
 
 -keep public class ru.nnproject.kemulator.** { *; }
 
+-keep public class ru.nnproject.symbiangl.** { *; }
+
 -keep class javax.microedition.m3g.** { *; }
 
 -keep class net.rim.device.api.** { *; }
@@ -70,6 +72,7 @@
 -keep public class com.pantech.** { public protected *; }
 -keep public class com.mot.** { public protected *; }
 -keep public class mmpp.** { public protected *; }
+-keep public class com.nttdocomo.** { public protected *; }
 
 # LIBRARIES
 -keep public class club.minnced.discord.rpc.** { public protected *; }
@@ -99,13 +102,15 @@
 # EMULATOR CLASSES
 -keep class emulator.Emulator { public static *; }
 -keep class emulator.Settings { public static *; }
+-keep class emulator.AppSettings { public static *; }
 -keep class emulator.Agent { public static *; }
+-keep class emulator.Utils { public static *; }
 
 # 2D
 -keep public class emulator.graphics2D.awt.* { public protected *; }
 -keep class emulator.graphics2D.IImage { *; }
 
--keep class javazoom.jl.player.JavaSoundAudioDevice
+-keep class emulator.javazoom.jl.player.JavaSoundAudioDevice
 
 # Debug & custom
 -keep class emulator.debug.Memory { public static *; }
@@ -113,7 +118,7 @@
 -keep class emulator.debug.Profiler3D { *; }
 -keep class emulator.custom.subclass.* { *; }
 -keep class emulator.custom.CustomMethod { public *; }
--keep class emulator.custom.CustomJarResources { public protected *; }
+-keep class emulator.custom.ResourceManager { public protected *; }
 
 -keep class emulator.i { *; }
 
@@ -124,6 +129,11 @@
 -keep class emulator.graphics3D.** { public protected *; }
 -keep class emulator.graphics3D.IGraphics3D { *; }
 
+# Build system
+-keep class emulator.ui.swt.devutils.ClasspathEntry { *; }
+-keep class emulator.ui.swt.devutils.ClasspathEntryType { *; }
+-keep class emulator.ui.swt.devutils.idea.ProjectConfigGenerator  { *; }
+-keep class emulator.ui.swt.devutils.idea.ProjectGenerator { *; }
 
 # Keep - Applications. Keep all application classes, along with their 'main' methods.
 -keepclasseswithmembers public class * {
@@ -134,3 +144,12 @@
 -keepclasseswithmembers,includedescriptorclasses,allowshrinking class * {
     native <methods>;
 }
+
+# JNA
+
+-keep class * extends com.sun.jna.Library { *; }
+-keep class * extends com.sun.jna.Structure { *; }
+-keep class * extends com.sun.jna.Callback { *; }
+
+-keep interface emulator.media.mmf.* { *; }
+-keepclassmembers class emulator.media.mmf.MaDll { *** callback; *** audioPhraseCallback; }

@@ -58,29 +58,34 @@ public class MediaPlayer
 	public void setMediaPlayerListener(MediaPlayerListener paramMediaPlayerListener) {
 	}
 
-	protected void paint(Graphics paramGraphics) {
+	protected void paint(Graphics g) {
 	}
 
 	protected void showNotify() {
+		super.showNotify();
 	}
 
 	protected void hideNotify() {
+		super.hideNotify();
 	}
 
-	public final void setFullScreenMode(boolean paramBoolean) {
+	public final void setFullScreenMode(boolean b) {
+		super.setFullScreenMode(b);
 	}
 
 	public final Ticker getTicker() {
-		return null;
+		return super.getTicker();
 	}
 
 	public final String getTitle() {
-		return null;
+		return super.getTitle();
 	}
 
-	public final void setTicker(Ticker paramTicker) {
+	public final void setTicker(Ticker ticker) {
+		super.setTicker(ticker);
 	}
 
-	public final void setTitle(String paramString) {
+	public final void setTitle(String title) {
+		super.setTitle(title);
 	}
 }

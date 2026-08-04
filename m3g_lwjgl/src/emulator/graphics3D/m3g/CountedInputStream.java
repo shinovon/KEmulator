@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class CountedInputStream extends InputStream {
-	private InputStream in;
+	private InputStream stream;
 	private int counter;
 
 	public int read() throws IOException {
 		++this.counter;
-		return this.in.read();
+		return this.stream.read();
 	}
 
 	public final void resetCounter() {
@@ -21,15 +21,15 @@ public class CountedInputStream extends InputStream {
 	}
 
 	public int available() throws IOException {
-		return this.in.available();
+		return this.stream.available();
 	}
 
 	public void close() throws IOException {
-		this.in.close();
+		this.stream.close();
 	}
 
 	public CountedInputStream(InputStream var1) {
-		this.in = var1;
+		this.stream = var1;
 		this.resetCounter();
 	}
 }

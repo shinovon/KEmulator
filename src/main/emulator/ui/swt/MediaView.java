@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2025 Fyodor Ryzhov
+*/
 package emulator.ui.swt;
 
 import com.nokia.mid.sound.Sound;
@@ -222,8 +225,6 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 				return "ma3smwemu";
 			return getImplementation(ac.m_player);
 		}
-		if (player instanceof VLCPlayerImpl)
-			return "VLC";
 		if (player instanceof Sound)
 			return getImplementation(((Sound) player).m_player);
 		if (player instanceof ToneImpl || player instanceof MIDITonePlayer || player instanceof MIDIImpl)
@@ -232,6 +233,8 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 			return "Capture";
 		if (player instanceof PlayerImpl)
 			return ((PlayerImpl) player).getReadableImplementationType();
+		if (player instanceof VLCPlayerImpl)
+			return "VLC";
 		return "Unknown";
 	}
 

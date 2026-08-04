@@ -1,15 +1,16 @@
+/*
+Copyright (c) 2025 Fyodor Ryzhov
+*/
 package emulator.ui.bridge;
 
 import emulator.Emulator;
-import emulator.Settings;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import emulator.graphics2D.IImage;
 import emulator.graphics2D.awt.ImageAWT;
 import emulator.ui.CommandsMenuPosition;
 import emulator.ui.ICaret;
 import emulator.ui.IScreen;
 import emulator.ui.TargetedCommand;
-import org.omg.CORBA.Environment;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
@@ -39,6 +40,11 @@ final class BridgeOutput implements IScreen {
 		this.screenImageAwt = new ImageAWT(w, h, false, -1);
 		this.backBufferImageAwt = new ImageAWT(w, h, false, -1);
 		this.xrayScreenImageAwt = new ImageAWT(w, h, true, -1);
+	}
+
+	@Override
+	public void initScreen(int w, int h) {
+
 	}
 
 	@Override
@@ -170,7 +176,7 @@ final class BridgeOutput implements IScreen {
 	@Override
 	public void setWindowIcon(InputStream inputStream) {
 		try {
-			ImageAWT img = new ImageAWT(CustomJarResources.getBytes(inputStream));
+			ImageAWT img = new ImageAWT(ResourceManager.getBytes(inputStream));
 			int[] rgba = img.getData();
 			ByteBuffer bb = ByteBuffer.allocate(4 + rgba.length * 4);
 			bb.putShort((short) img.getWidth());
@@ -265,5 +271,9 @@ final class BridgeOutput implements IScreen {
 	public void appStarted(boolean first) {
 		if (first)
 			new Thread(new BridgeInput(bridge)).start();
+	}
+
+	public boolean isShown() {
+		return true;
 	}
 }

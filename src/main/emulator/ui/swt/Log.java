@@ -4,6 +4,7 @@ import emulator.Emulator;
 import emulator.UILocale;
 import emulator.custom.CustomMethod;
 import emulator.ui.ILogStream;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -147,7 +148,8 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 		this.logShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.logShell.setLayout(layout);
 		this.logShell.setSize(new Point(310, 254));
-		this.styledText = new StyledText(this.logShell, 2816);
+		int style = SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER;
+		this.styledText = new StyledText(this.logShell, style);
 	}
 
 	public final boolean isAttachedToParent() {
@@ -155,6 +157,7 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 	}
 
 	public final void controlMoved(final ControlEvent controlEvent) {
+		if (parentShell.isDisposed()) return;
 		if (Math.abs(this.parentShell.getLocation().x + this.parentShell.getSize().x - this.logShell.getLocation().x) < 10 && Math.abs(this.parentShell.getLocation().y - this.logShell.getLocation().y) < 20) {
 			this.logShell.setLocation(this.parentShell.getLocation().x + this.parentShell.getSize().x, this.parentShell.getLocation().y);
 			attachedToParent = true;
@@ -202,7 +205,8 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 			}
 			try {
 				class11.filePrintStream.print(s);
-			} catch (Exception ignored) {}
+			} catch (Exception ignored) {
+			}
 			if (!class11.logOpen || class11.styledText.isDisposed()) {
 				return;
 			}

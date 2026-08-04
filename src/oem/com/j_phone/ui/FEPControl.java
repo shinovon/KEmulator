@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2024-2025 Arman Jussupgaliyev
+*/
 package com.j_phone.ui;
 
 import emulator.Emulator;

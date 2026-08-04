@@ -188,8 +188,8 @@ public abstract class CustomItem extends Item {
 				n, n2, 0);
 	}
 
-	void layout(Row row) {
-		super.layout(row);
+	void _layout(Row row) {
+		super._layout(row);
 		int n = 0;
 		int w = Math.min(row.getAvailableWidth(screen.bounds[W]), this.getPreferredWidth() - 8);
 		if (hasLabel()) {
@@ -214,10 +214,34 @@ public abstract class CustomItem extends Item {
 	protected boolean callTraverse(final int n) {
 		if (screen == null) return false;
 		if (this.anIntArray429 == null) return false;
-		return this.traverse(this.getGameAction(n), super.screen.w, super.screen.h, this.anIntArray429);
+		try {
+			return this.traverse(this.getGameAction(n), super.screen.w, super.screen.h, this.anIntArray429);
+		} catch (Exception ignored) {}
+		return false;
+	}
+
+	void _defocus() {
+		super._defocus();
+		try {
+			traverseOut();
+		} catch (Exception ignored) {}
 	}
 
 	boolean isFocusable() {
 		return true;
+	}
+
+	public int getMinimumWidth() {
+		try {
+			return getMinContentWidth();
+		} catch (Exception ignored) {}
+		return 0;
+	}
+
+	public int getMinimumHeight() {
+		try {
+			return getMinContentHeight();
+		} catch (Exception ignored) {}
+		return 0;
 	}
 }

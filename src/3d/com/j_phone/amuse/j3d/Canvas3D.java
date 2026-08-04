@@ -66,7 +66,7 @@ public abstract class Canvas3D extends Canvas implements SequenceInterface {
 		render.setCenter(centerX, centerY);
 		render.setOrthographicScale(scaleX, scaleY);
 
-		if (texture != null) render.setTexture(texture.impl);
+		if (texture != null) render.setTexture(texture.getImpl());
 		if (figure != null) render.drawFigure(figure.impl);
 
 		render.release();

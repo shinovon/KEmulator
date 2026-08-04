@@ -27,8 +27,8 @@ public class Spacer extends Item {
 		throw new IllegalStateException();
 	}
 
-	void layout(Row row) {
-		super.layout(row);
+	void _layout(Row row) {
+		super._layout(row);
 		super.bounds[W] = Math.min(this.w + 4, row.getAvailableWidth(screen.bounds[W]));
 		super.bounds[H] = Math.min(this.h + 4, super.screen.bounds[H]);
 	}

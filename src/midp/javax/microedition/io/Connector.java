@@ -5,7 +5,7 @@ import com.sun.cdc.io.ConnectionBaseInterface;
 import emulator.Emulator;
 import emulator.Permission;
 import emulator.Settings;
-import emulator.sensor.SensorImpl;
+import emulator.sensor.Sensor;
 
 import javax.microedition.io.file.FileConnectionImpl;
 import javax.microedition.sensor.SensorConnection;
@@ -31,7 +31,40 @@ public class Connector {
 		return open(s, n, false);
 	}
 
-	public static Connection open(final String s, final int n, final boolean b) throws IOException {
+	public static Connection open(String s, final int n, final boolean b) throws IOException {
+		{
+			// nokia
+			int i = s.indexOf(";nokia_netid=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			i = s.indexOf(";nokia_apnid=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			i = s.indexOf(";nokia_timeout=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			// blackberry
+			i = s.indexOf(";interface=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			i = s.indexOf(";deviceside=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			//
+			i = s.indexOf(";nokia_socket");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			i = s.indexOf(";j9proxy=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+		}
 		if (s.startsWith("resource:")) {
 			return new ResourceConnectionImpl(s);
 		}
@@ -52,7 +85,7 @@ public class Connector {
 		if (s.startsWith("sensor:") && !Settings.protectedPackages.contains("javax.microedition.sensor")) {
 			final SensorInfo[] sensors;
 			if ((sensors = SensorManager.findSensors(s)).length > 0) {
-				((SensorImpl) sensors[0]).method239();
+				((Sensor) sensors[0]).open();
 				return (SensorConnection) sensors[0];
 			}
 			return null;
@@ -80,6 +113,14 @@ public class Connector {
 				Permission.checkPermission("connector.open.socket");
 				return new SocketConnectionImpl(s);
 			}
+			if (s.startsWith("datagram://:")) {
+				Permission.checkPermission("connector.open.datagramreceive");
+				return new UDPDatagramConnectionImpl(s);
+			}
+			if (s.startsWith("datagram://")) {
+				Permission.checkPermission("connector.open.datagram");
+				return new UDPDatagramConnectionImpl(s);
+			}
 			Connection openPrim = null;
 			String protocol = "";
 			if (s.indexOf(':') != -1) {
@@ -90,7 +131,10 @@ public class Connector {
 			try {
 				openPrim = ((ConnectionBaseInterface) Class.forName("com.sun.cdc.io.j2me." + protocol + ".Protocol").newInstance()).openPrim(s.substring(s.indexOf(':') + 1), n, b);
 			} catch (Exception ex) {
-				throw new ConnectionNotFoundException("unknown protocol: " + s);
+				if (ex instanceof IOException) {
+					throw (IOException) ex;
+				}
+				throw new ConnectionNotFoundException("unknown protocol: " + s, ex);
 			}
 			return openPrim;
 		}

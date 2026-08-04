@@ -19,8 +19,8 @@
 	<classpathentry kind="lib" path="lib/bridj-0.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/java-discord-rpc-2.0.1-all.jar"/>
 	<classpathentry kind="lib" path="lib/jinput.jar"/>
-	<classpathentry kind="lib" path="lib/jna-5.2.0.jar"/>
-	<classpathentry kind="lib" path="lib/jna-platform-5.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/jna-5.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/jna-platform-5.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/jutils.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl3-swt-common.jar"/>
@@ -30,7 +30,6 @@
 	<classpathentry kind="lib" path="lib/vlcj-natives-4.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/webcam-capture-0.3.12.jar"/>
 	<classpathentry kind="lib" path="lib/zip.jar"/>
-	<classpathentry kind="lib" path="home/swt-win32-x86.jar"/>
+	<classpathentry kind="lib" path="home/swt-win32-x86.jar" sourcepath="lib/org.eclipse.swt.win32.win32.x86.source_3.106.0.v20170608-0516.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
-

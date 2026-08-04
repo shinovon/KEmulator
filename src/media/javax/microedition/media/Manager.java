@@ -2,13 +2,12 @@ package javax.microedition.media;
 
 import emulator.Emulator;
 import emulator.Settings;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 import emulator.media.capture.CapturePlayerImpl;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.ToneManager;
 import emulator.media.vlc.VLCPlayerImpl;
 import uk.co.caprica.vlcj.binding.LibC;
-import uk.co.caprica.vlcj.binding.RuntimeUtil;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.factory.discovery.strategy.*;
 
@@ -47,7 +46,7 @@ public class Manager {
 	private static Vector<String> kemVideo;
 	private static Vector<String> vlcAudio;
 	private static Vector<String> vlcVideo;
-	private static int libVlcState;
+	private static int libVlcState = -2;
 
 	public Manager() {
 		super();
@@ -62,13 +61,13 @@ public class Manager {
 			requireLibVlc();
 			return new VLCPlayerImpl(inputStream, s);
 		}
-//		if ("audio/amr".equals(s) && isLibVlcSupported() && Emulator.isX64()) {
-//			return new VLCPlayerImpl(inputStream, s);
-//		}
+		if (s != null && Settings.enableVlc && isAudioContentTypeRequiresLibVlc(s)) {
+			return new VLCPlayerImpl(inputStream, s);
+		}
 		// buffer
 		boolean buf = Settings.playerBufferAll;
 		if (buf && !(inputStream instanceof ByteArrayInputStream))
-			return new PlayerImpl(new ByteArrayInputStream(CustomJarResources.getBytes(inputStream)), s);
+			return new PlayerImpl(new ByteArrayInputStream(ResourceManager.getBytes(inputStream)), s);
 		else
 			return new PlayerImpl(inputStream, s);
 	}
@@ -90,9 +89,14 @@ public class Manager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (contentType != null && contentType.startsWith("video/")) {
+		if ((contentType != null && contentType.startsWith("video/"))
+				|| s.startsWith("rtsp://") || s.startsWith("rtp://")) {
 			requireLibVlc();
-			if (s.startsWith("rtsp://") || s.startsWith("http://") || s.startsWith("https://") || s.startsWith("rtp://")) {
+			if (s.startsWith("http://") || s.startsWith("https://")) {
+				return new VLCPlayerImpl(s, contentType);
+//				return new VLCPlayerImpl(((InputConnection) Connector.open(s)).openInputStream(), contentType);
+			}
+			if (s.startsWith("rtsp://") || s.startsWith("rtp://")) {
 				return new VLCPlayerImpl(s, contentType);
 			}
 			if (s.startsWith("file:///")) {
@@ -107,7 +111,7 @@ public class Manager {
 				return new VLCPlayerImpl(s, contentType);
 			}
 			// jar resources
-			return new VLCPlayerImpl(CustomJarResources.getResourceAsStream(s), contentType);
+			return new VLCPlayerImpl(ResourceManager.getResourceAsStream(s), contentType);
 		} else if (contentType != null && contentType.startsWith("audio/")) {
 			if (s.startsWith("rtsp://") || s.startsWith("rtp://") || isAudioContentTypeRequiresLibVlc(contentType)) {
 				requireLibVlc();
@@ -122,7 +126,7 @@ public class Manager {
 			if (s.indexOf(58) != -1) {
 				return createPlayer(((InputConnection) Connector.open(s)).openInputStream(), contentType);
 			}
-			return createPlayer(CustomJarResources.getResourceAsStream(s), contentType);
+			return createPlayer(ResourceManager.getResourceAsStream(s), contentType);
 		}
 		throw new MediaException("Unknown content type");
 	}
@@ -138,7 +142,7 @@ public class Manager {
 			if (contentType.startsWith("audio/") && isAudioContentTypeSupportedForDataSource(contentType)) {
 				if (locator != null) {
 					// rtsp
-					if (locator.startsWith("rtps://") || locator.startsWith("rtp://")) {
+					if (locator.startsWith("rtsp://") || locator.startsWith("rtp://")) {
 						requireLibVlc();
 						return new VLCPlayerImpl(locator, contentType);
 					}
@@ -147,13 +151,13 @@ public class Manager {
 						return createPlayer(Connector.openInputStream(locator), contentType);
 					}
 					// jar resources
-					return createPlayer(CustomJarResources.getResourceAsStream(locator), contentType);
+					return createPlayer(ResourceManager.getResourceAsStream(locator), contentType);
 				} else {
 					// streaming datasource
 					player = new PlayerImpl(contentType, src);
 				}
 				// Videos
-			} else if (contentType.startsWith("video/") || Manager.isLibVlcSupported()) {
+			} else if (contentType.startsWith("video/") || Settings.enableVlc && (Manager._isLibVlcSupported())) {
 				requireLibVlc();
 				if (locator != null) {
 					// located
@@ -176,7 +180,8 @@ public class Manager {
 			contentType = getContentTypeFromLocation(src.getLocator());
 
 			log("getContentType(): " + contentType);
-			if (contentType != null && contentType.startsWith("video/")) {
+			if (contentType != null && (contentType.startsWith("video/")
+					|| (Settings.enableVlc && isAudioContentTypeRequiresLibVlc(contentType.toLowerCase())))) {
 				requireLibVlc();
 				player = new VLCPlayerImpl(locator, contentType, src);
 			} else {
@@ -199,8 +204,11 @@ public class Manager {
 	}
 
 	private static void requireLibVlc() throws MediaException {
-		if (!isLibVlcSupported()) {
-			throw new MediaException("LibVlc required!");
+		if (!Settings.enableVlc) {
+			throw new MediaException("LibVlc feature is disabled");
+		}
+		if (!_isLibVlcSupported()) {
+			throw new MediaException("LibVlc is required for this feature");
 		}
 	}
 
@@ -218,6 +226,7 @@ public class Manager {
 	}
 
 	private static boolean isAudioContentTypeRequiresLibVlc(String c) {
+		c = c.toLowerCase();
 		for (String s : kemAudio) {
 			if (c.equals(s)) return false;
 		}
@@ -234,7 +243,6 @@ public class Manager {
 	static {
 		// KEmulator supported types
 		kemAudio = new Vector<String>();
-		kemAudio.add("audio/mid");
 		kemAudio.add("audio/midi");
 		kemAudio.add("audio/x-midi");
 		kemAudio.add("audio/wav");
@@ -244,6 +252,10 @@ public class Manager {
 		kemAudio.add("audio/x-amr");
 		kemAudio.add("audio/mpeg");
 		kemAudio.add("audio/mp3");
+		if (!Emulator.isX64()) {
+			kemAudio.add("audio/xmmf");
+			kemAudio.add("audio/x-smaf");
+		}
 		kemVideo = new Vector<String>();
 		// Supported types with libvlc
 		vlcAudio = new Vector<String>();
@@ -283,7 +295,7 @@ public class Manager {
 		Vector<String> fullList = new Vector<String>();
 		fullList.addAll(kemAudio);
 		fullList.addAll(kemVideo);
-		boolean vlc = isLibVlcSupported();
+		boolean vlc = Settings.enableVlc && _isLibVlcSupported();
 		if (vlc) {
 			fullList.addAll(vlcAudio);
 			fullList.addAll(vlcVideo);
@@ -326,21 +338,22 @@ public class Manager {
 	private static String getContentTypeHttp(String locator) throws IOException {
 		// позаимствованно из симбиана
 		HttpConnection hc = (HttpConnection) Connector.open(locator);
-		hc.setRequestMethod("HEAD");
-		if (hc.getResponseCode() == 405) {
+		try {
+			hc.setRequestMethod("HEAD");
+			if (hc.getResponseCode() == 405) {
+				hc.close();
+				hc = null;
+				hc = (HttpConnection) Connector.open(locator);
+				hc.setRequestMethod("GET");
+			}
+			int rc = hc.getResponseCode();
+			if (rc != 200) {
+				throw new IOException("HTTP response code: " + rc);
+			}
+			return hc.getHeaderField("Content-Type");
+		} finally {
 			hc.close();
-			hc = null;
-			hc = (HttpConnection) Connector.open(locator);
-			hc.setRequestMethod("GET");
 		}
-		int rc = hc.getResponseCode();
-		if (rc != 200) {
-			throw new IOException("HTTP response code: " + rc);
-		}
-		String cntype = hc.getHeaderField("Content-Type");
-		hc.close();
-		hc = null;
-		return cntype;
 	}
 
 	public static String[] getSupportedProtocols(final String type) {
@@ -355,14 +368,17 @@ public class Manager {
 		vlc.add("rtsp");
 		vlc.add("rtp");
 		Vector<String> fullList = new Vector<String>(kem);
-		if (isLibVlcSupported()) {
+		if (Settings.enableVlc && _isLibVlcSupported()) {
 			fullList.addAll(vlc);
 		}
 		return fullList.toArray(new String[0]);
 	}
 
-	public static String getContentTypeFromURL(String url) throws IOException {
+	private static String getContentTypeFromURL(String url) throws IOException {
 		// remove query
+		if (url.contains(";")) {
+			url = url.substring(0, url.indexOf(";"));
+		}
 		if (url.contains("?")) {
 			url = url.substring(0, url.indexOf("?"));
 		}
@@ -438,10 +454,23 @@ public class Manager {
 		if (url.endsWith(".wav")) {
 			return "audio/wav";
 		}
+		if (url.endsWith(".mmf")) {
+			return "audio/mmf";
+		}
+		if (url.endsWith(".m4a")) {
+			return "audio/m4a";
+		}
 		return null;
 	}
 
-	public static boolean isLibVlcSupported() {
+	public static synchronized boolean _isLibVlcSupported() {
+		if (!Settings.enableVlc) {
+			return false;
+		}
+		if (libVlcState == -2) {
+			libVlcState = 0;
+			new Thread(Manager::checkLibVlcSupport).start();
+		}
 		try {
 			while (libVlcState == 0) {
 				Thread.sleep(5);
@@ -450,7 +479,7 @@ public class Manager {
 		return libVlcState == 1;
 	}
 
-	public static void checkLibVlcSupport() {
+	static void checkLibVlcSupport() {
 		/*
 		if(Settings.vlcDir == null) {
 			try {
@@ -469,16 +498,21 @@ public class Manager {
 			if (Settings.vlcDir != null && Settings.vlcDir.length() > 2) {
 				NativeDiscoveryStrategy win = new BaseNativeDiscoveryStrategy(new String[]{
 						"libvlc\\.dll",
-						"libvlccore\\.dll"
+						"libvlccore\\.dll",
+						"libvlc\\.so",
+						"libvlc\\.dylib"
 				}, new String[]{
 						"%s\\plugins",
-						"%s\\vlc\\plugins"
+						"%s\\vlc\\plugins",
+						"%s/plugins",
+						"%s/../plugins"
 				}) {
 
 					@Override
 					public boolean supported() {
-						// kemulator is windows only
-						return Emulator.isX64() ? RuntimeUtil.isWindows() : true;
+						// TODO
+//						return !Emulator.isX64() || RuntimeUtil.isWindows();
+						return true;
 					}
 
 					@Override
@@ -509,7 +543,7 @@ public class Manager {
 			boolean b = nd.discover();
 			libVlcState = b ? 1 : -1;
 			if (b) {
-				log("LibVlc loaded");
+				log("LibVlc loaded from " + nd.discoveredPath());
 				return;
 			}
 		} catch (Throwable e) {

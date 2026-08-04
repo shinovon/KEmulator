@@ -31,6 +31,9 @@ public final class DevicePlatform {
 			}
 		}
 		this.parent = Devices.getPlatform(element.getAttribute("parent").toLowerCase());
+		if (parent == null) {
+			this.parent = Devices.getPlatform(element.getAttribute("layout").toLowerCase());
+		}
 		DevicePlatform e = this;
 		DevicePlatform ane1203;
 		while ((ane1203 = e.parent) != null) {
@@ -74,9 +77,5 @@ public final class DevicePlatform {
 
 	public final boolean exists(final String s) {
 		return this.properties.get(s) != null;
-	}
-
-	public final boolean hasNokiaUI() {
-		return this.getInt("NOKIA_UI") == 1;
 	}
 }

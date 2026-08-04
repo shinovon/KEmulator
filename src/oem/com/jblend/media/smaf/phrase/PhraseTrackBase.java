@@ -16,73 +16,59 @@
 
 package com.jblend.media.smaf.phrase;
 
-abstract class PhraseTrackBase {
+import emulator.media.mmf.IPhraseEventRedirect;
+
+public abstract class PhraseTrackBase implements IPhraseEventRedirect {
 	public static final int NO_DATA = 1;
 	public static final int READY = 2;
 	public static final int PLAYING = 3;
 	public static final int PAUSED = 5;
 	public static final int DEFAULT_VOLUME = 100;
 	public static final int DEFAULT_PANPOT = 64;
-	private int state;
-	private boolean muted;
+	PhraseTrackListener listener;
+	int id;
 
 	PhraseTrackBase(int id) {
-		state = READY;
-	}
-
-	public void removePhrase() {
-	}
-
-	public void play() {
-		state = PLAYING;
-	}
-
-	public void play(int loop) {
-		state = PLAYING;
-	}
-
-	public void stop() {
-		state = PAUSED;
-	}
-
-	public void pause() {
-		state = PAUSED;
-	}
-
-	public void resume() {
-		state = PLAYING;
-	}
-
-	public int getState() {
-		return state;
-	}
-
-	public void setVolume(int value) {
-	}
-
-	public int getVolume() {
-		return 0;
-	}
-
-	public void setPanpot(int value) {
-	}
-
-	public int getPanpot() {
-		return 0;
-	}
-
-	public void mute(boolean mute) {
-		muted = mute;
-	}
-
-	public boolean isMute() {
-		return muted;
-	}
-
-	public int getID() {
-		return 0;
+		this.id = id;
 	}
 
 	public void setEventListener(PhraseTrackListener l) {
+		this.listener = l;
+	}
+
+	public void _redirectEvent(int event) {
+		if (listener != null) {
+			listener.eventOccurred(event);
+		}
+	}
+
+	public abstract void removePhrase();
+
+	public abstract void play();
+
+	public abstract void play(int loop);
+
+	public abstract void stop();
+
+	public abstract void pause();
+
+	public abstract void resume();
+
+	public abstract int getState();
+
+	public abstract void setVolume(int value);
+
+	public abstract int getVolume();
+
+	public abstract void setPanpot(int value);
+
+	public abstract int getPanpot();
+
+	public abstract void mute(boolean mute);
+
+	public abstract boolean isMute();
+
+	public int getID() {
+		return id;
 	}
 }

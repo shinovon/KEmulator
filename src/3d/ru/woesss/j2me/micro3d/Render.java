@@ -17,7 +17,7 @@
 package ru.woesss.j2me.micro3d;
 
 import com.mascotcapsule.micro3d.v3.Graphics3D;
-import emulator.Settings;
+import emulator.AppSettings;
 import emulator.debug.Profiler3D;
 import emulator.graphics2D.IImage;
 import emulator.graphics3D.lwjgl.Emulator3D;
@@ -64,8 +64,6 @@ public class Render {
 	private boolean backCopied;
 	private final LinkedList<RenderNode> stack = new LinkedList<RenderNode>();
 	private int flushStep;
-	private final boolean postCopy2D = !Settings.mascotNo2DMixing;
-	private final boolean preCopy2D = !Settings.mascotIgnoreBackground;
 	private IntBuffer bufHandles;
 	private int clearColor;
 	private TextureImpl targetTexture;
@@ -148,7 +146,7 @@ public class Render {
 			}
 			glClear(GL_DEPTH_BUFFER_BIT);
 
-			boolean aa = Settings.m3gAA == Settings.AA_ON;
+			boolean aa = AppSettings.m3gAA == AppSettings.AA_ON;
 
 			if (aa) {
 				GL11.glEnable(GL_POINT_SMOOTH);
@@ -247,7 +245,7 @@ public class Render {
 			glGenTextures(/*1, */bgTextureId);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, bgTextureId.get(0));
-			boolean filter = Settings.mascotBackgroundFilter;
+			boolean filter = AppSettings.mascotBackgroundFilter;
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter ? GL_LINEAR : GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter ? GL_LINEAR : GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -265,8 +263,14 @@ public class Render {
 		);
 		checkGlError("texImage2D");
 
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, bgTextureId.get(0));
+
 		final Program.Simple program = Program.simple;
 		program.use();
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		BG_VBO.rewind();
 		glVertexAttribPointer(program.aPosition, 2, GL_FLOAT, false, 4 * 4, BG_VBO);
@@ -293,7 +297,7 @@ public class Render {
 		if (!preProcess) {
 			return;
 		}
-		if (postCopy2D) {
+		if (!AppSettings.mascotNo2DMixing) {
 			targetGraphics.setColor(0);
 			targetGraphics.fillRect(gClip.x, gClip.y, gClip.width, gClip.height);
 		}
@@ -566,7 +570,7 @@ public class Render {
 				glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
 				targetTexture = null;
 			} else if (targetGraphics != null) {
-				if (postCopy2D) {
+				if (!AppSettings.mascotNo2DMixing) {
 					copy2d(false);
 				}
 				swapBuffers();
@@ -584,7 +588,7 @@ public class Render {
 		}
 		g3d.sync(() -> {
 			try {
-				if (!backCopied && preCopy2D) {
+				if (!backCopied && !AppSettings.mascotIgnoreBackground) {
 					copy2d(true);
 				}
 				flushStep = 1;
@@ -747,7 +751,7 @@ public class Render {
 					break;
 				case Graphics3D.COMMAND_TEXTURE_INDEX:
 					int tid = cmd & 0xFFFFFF;
-					if (tid > 0 && tid < 16) {
+					if (tid < 16) {
 						env.textureIdx = tid;
 					}
 					break;
@@ -1128,7 +1132,7 @@ public class Render {
 		Profiler3D.MC3D_drawFigureCallCount++;
 
 		g3d.sync(() -> {
-			if (!backCopied && preCopy2D) {
+			if (!backCopied && !AppSettings.mascotIgnoreBackground) {
 				copy2d(true);
 			}
 			try {
@@ -1174,7 +1178,7 @@ public class Render {
 				glDepthMask(true);
 				glClear(GL_DEPTH_BUFFER_BIT);
 			} finally {
-//				swapBuffers();
+				swapBuffers();
 			}
 		});
 	}
@@ -1241,7 +1245,7 @@ public class Render {
 		}
 		MathUtil.multiplyMM(MVP_TMP, node.projMatrix, node.viewMatrix);
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
+		glDepthFunc(GL_LEQUAL);
 		glDepthMask(flushStep == 1);
 		glDisable(GL_CULL_FACE);
 		applyBlending(blend);
@@ -1483,13 +1487,13 @@ public class Render {
 				}
 				glDisable(GL_BLEND);
 				glDepthMask(true);
-				glClear(GL_DEPTH_BUFFER_BIT);
 				glFlush();
 				if (targetTexture != null) {
 					glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, targetTexture.image.getRaster());
 				} else if (targetGraphics != null) {
 					swapBuffers();
 				}
+				glClear(GL_DEPTH_BUFFER_BIT);
 			} finally {
 				stack.clear();
 			}

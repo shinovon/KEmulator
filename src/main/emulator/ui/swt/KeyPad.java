@@ -3,10 +3,7 @@ package emulator.ui.swt;
 import emulator.Emulator;
 import emulator.KeyMapping;
 import emulator.UILocale;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -115,72 +112,281 @@ public final class KeyPad implements ControlListener, DisposeListener {
 		this.aShell1404.setLayout(layout);
 		this.aShell1404.setSize(new Point(259, 280));
 		(this.aButton1405 = new Button(this.aShell1404, 8388608)).setText(UILocale.get("KEYPAD_FRAME_LSK", "Left Soft Key"));
-		this.aButton1405.addMouseListener(new Class155(this));
+		KeyPad aClass161_14001 = this;
+		this.aButton1405.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1400 = aClass161_14001;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1400, 17);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1400, 17);
+			}
+		});
 		(this.aButton1428 = new Button(this.aShell1404, 8388608)).setEnabled(false);
 		this.aButton1428.setVisible(false);
 		(this.aButton1407 = new Button(this.aShell1404, 8388608)).setText(UILocale.get("KEYPAD_FRAME_RSK", "Right Soft Key"));
 		this.aButton1407.setLayoutData(layoutData6);
-		this.aButton1407.addMouseListener(new Class154(this));
+		KeyPad aClass161_13991 = this;
+		this.aButton1407.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1399 = aClass161_13991;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1399, 18);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1399, 18);
+			}
+		});
 		(this.aButton1429 = new Button(this.aShell1404, 8388608)).setEnabled(false);
 		this.aButton1429.setVisible(false);
 		(this.aButton1410 = new Button(this.aShell1404, 8388612)).setText("Up");
 		this.aButton1410.setLayoutData(layoutData5);
-		this.aButton1410.addMouseListener(new Class153(this));
+		KeyPad aClass161_13981 = this;
+		this.aButton1410.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1398 = aClass161_13981;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1398, 12);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1398, 12);
+			}
+		});
 		(this.aButton1430 = new Button(this.aShell1404, 8388608)).setEnabled(false);
 		this.aButton1430.setVisible(false);
 		(this.aButton1411 = new Button(this.method833(), 8404996)).setText("Left");
 		this.aButton1411.setLayoutData(layoutData3);
-		this.aButton1411.addMouseListener(new Class152(this));
+		KeyPad aClass161_13971 = this;
+		this.aButton1411.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1397 = aClass161_13971;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1397, 14);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1397, 14);
+			}
+		});
 		(this.aButton1409 = new Button(this.aShell1404, 8388608)).setText("Pad");
 		this.aButton1409.setLayoutData(layoutData4);
 		((Control) this.aButton1409).setFocus();
-		this.aButton1409.addMouseListener(new Class151(this));
+		KeyPad aClass161_13961 = this;
+		this.aButton1409.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1396 = aClass161_13961;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1396, 16);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1396, 16);
+			}
+		});
 		(this.aButton1412 = new Button(this.method833(), 8519684)).setText("Right");
 		this.aButton1412.setLayoutData(layoutData2);
-		this.aButton1412.addMouseListener(new Class150(this));
+		KeyPad aClass161_13951 = this;
+		this.aButton1412.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1395 = aClass161_13951;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1395, 15);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1395, 15);
+			}
+		});
 		(this.aButton1427 = new Button(this.aShell1404, 8388608)).setEnabled(false);
 		this.aButton1427.setVisible(false);
 		(this.aButton1413 = new Button(this.method833(), 8389636)).setText("Down");
 		this.aButton1413.setLayoutData(layoutData);
-		this.aButton1413.addMouseListener(new Class149(this));
+		KeyPad aClass161_13941 = this;
+		this.aButton1413.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1394 = aClass161_13941;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1394, 13);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1394, 13);
+			}
+		});
 		(this.aButton1426 = new Button(this.aShell1404, 8388608)).setEnabled(false);
 		this.aButton1426.setVisible(false);
 		(this.aButton1414 = new Button(this.aShell1404, 8388608)).setText("1");
 		this.aButton1414.setLayoutData(gridData);
-		this.aButton1414.addMouseListener(new Class148(this));
+		KeyPad aClass161_13931 = this;
+		this.aButton1414.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1393 = aClass161_13931;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1393, 1);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1393, 1);
+			}
+		});
 		(this.aButton1415 = new Button(this.aShell1404, 8388608)).setText("2 abc");
 		this.aButton1415.setLayoutData(gridData);
-		this.aButton1415.addMouseListener(new Class145(this));
+		KeyPad aClass161_13761 = this;
+		this.aButton1415.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1376 = aClass161_13761;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1376, 2);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1376, 2);
+			}
+		});
 		(this.aButton1416 = new Button(this.aShell1404, 8388608)).setText("3 def");
 		this.aButton1416.setLayoutData(gridData);
-		this.aButton1416.addMouseListener(new Class100(this));
+		KeyPad aClass161_10541 = this;
+		this.aButton1416.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1054 = aClass161_10541;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1054, 3);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1054, 3);
+			}
+		});
 		(this.aButton1417 = new Button(this.aShell1404, 8388608)).setText("4 ghi");
 		this.aButton1417.setLayoutData(gridData);
-		this.aButton1417.addMouseListener(new Class96(this));
+		KeyPad aClass161_10471 = this;
+		this.aButton1417.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1047 = aClass161_10471;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1047, 4);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1047, 4);
+			}
+		});
 		(this.aButton1418 = new Button(this.aShell1404, 8388608)).setText("5 jkl");
 		this.aButton1418.setLayoutData(gridData);
-		this.aButton1418.addMouseListener(new Class92(this));
+		KeyPad aClass161_9401 = this;
+		this.aButton1418.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_940 = aClass161_9401;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_940, 5);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_940, 5);
+			}
+		});
 		(this.aButton1419 = new Button(this.aShell1404, 8388608)).setText("6 mno");
 		this.aButton1419.setLayoutData(gridData);
-		this.aButton1419.addMouseListener(new Class120(this));
+		KeyPad aClass161_11991 = this;
+		this.aButton1419.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1199 = aClass161_11991;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1199, 6);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1199, 6);
+			}
+		});
 		(this.aButton1420 = new Button(this.aShell1404, 8388608)).setText("7 pqrs");
 		this.aButton1420.setLayoutData(gridData);
-		this.aButton1420.addMouseListener(new Class134(this));
+		KeyPad aClass161_12861 = this;
+		this.aButton1420.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1286 = aClass161_12861;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1286, 7);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1286, 7);
+			}
+		});
 		(this.aButton1421 = new Button(this.aShell1404, 8388608)).setText("8 tuv");
 		this.aButton1421.setLayoutData(gridData);
-		this.aButton1421.addMouseListener(new Class132(this));
+		KeyPad aClass161_12321 = this;
+		this.aButton1421.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1232 = aClass161_12321;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1232, 8);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1232, 8);
+			}
+		});
 		(this.aButton1422 = new Button(this.aShell1404, 8388608)).setText("9 wxyz");
 		this.aButton1422.setLayoutData(gridData);
-		this.aButton1422.addMouseListener(new Class138(this));
+		KeyPad aClass161_12971 = this;
+		this.aButton1422.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1297 = aClass161_12971;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1297, 9);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1297, 9);
+			}
+		});
 		(this.aButton1423 = new Button(this.aShell1404, 8388608)).setText("* .");
 		this.aButton1423.setLayoutData(gridData);
-		this.aButton1423.addMouseListener(new Class136(this));
+		KeyPad aClass161_12951 = this;
+		this.aButton1423.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1295 = aClass161_12951;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1295, 10);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1295, 10);
+			}
+		});
 		(this.aButton1424 = new Button(this.aShell1404, 8388608)).setText("0");
 		this.aButton1424.setLayoutData(gridData);
-		this.aButton1424.addMouseListener(new Class130(this));
+		KeyPad aClass161_12131 = this;
+		this.aButton1424.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1213 = aClass161_12131;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1213, 0);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1213, 0);
+			}
+		});
 		(this.aButton1425 = new Button(this.aShell1404, 8388608)).setText("# -+");
 		this.aButton1425.setLayoutData(gridData);
-		this.aButton1425.addMouseListener(new Class128(this));
+		KeyPad aClass161_12111 = this;
+		this.aButton1425.addMouseListener(new MouseAdapter() {
+			private final KeyPad aClass161_1211 = aClass161_12111;
+
+			public final void mouseUp(final MouseEvent mouseEvent) {
+				method837(this.aClass161_1211, 11);
+			}
+
+			public final void mouseDown(final MouseEvent mouseEvent) {
+				method840(this.aClass161_1211, 11);
+			}
+		});
 	}
 
 	private static void method832(final int n) {

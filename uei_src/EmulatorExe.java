@@ -196,7 +196,11 @@ public class EmulatorExe {
 			cmd.add("--add-opens");
 			cmd.add("java.base/java.util=ALL-UNNAMED");
 			cmd.add("--add-opens");
-			cmd.add("java.base/sun.misc=ALL-UNNAMED");
+			cmd.add("jdk.unsupported/sun.misc=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.desktop/com.sun.media.sound=ALL-UNNAMED");
+			cmd.add("--add-opens");
+			cmd.add("java.desktop/javax.sound.midi=ALL-UNNAMED");
 			if (getJavaVersionMajor() >= 17)
 				cmd.add("--enable-native-access=ALL-UNNAMED");
 		}
@@ -255,13 +259,12 @@ public class EmulatorExe {
 					cmd.add(arg);
 					continue;
 				case "-rec":
-				case "-device":
-				case "-devicefile":
 				case "-fontname":
 				case "-fontsmall":
 				case "-fontmedium":
 				case "-fontlarge":
 				case "-key":
+				case "-screen":
 					cmd.add(arg);
 					cmd.add(args[i+=1]);
 					continue;

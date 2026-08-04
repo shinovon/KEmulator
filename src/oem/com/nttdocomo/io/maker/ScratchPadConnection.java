@@ -4,7 +4,7 @@ import javax.microedition.io.*;
 import java.io.*;
 
 import emulator.*;
-import emulator.custom.CustomJarResources;
+import emulator.custom.ResourceManager;
 
 import java.util.*;
 
@@ -30,7 +30,7 @@ public class ScratchPadConnection implements StreamConnection {
 	}
 
 	public InputStream openInputStream() throws IOException {
-		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(CustomJarResources.getBytes((InputStream) new BufferedInputStream(new FileInputStream(this.b))));
+		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(ResourceManager.getBytes((InputStream) new BufferedInputStream(new FileInputStream(this.b))));
 		byteArrayInputStream.skip(64 + this.c);
 		return (InputStream) new ScratchpadInputStream((InputStream) byteArrayInputStream);
 	}
@@ -69,7 +69,7 @@ public class ScratchPadConnection implements StreamConnection {
 			final int index = nextToken.indexOf(61);
 			hashtable.put(nextToken.substring(0, index).trim(), nextToken.substring(index + 1).trim());
 		}
-		final String midletJar = Emulator.midletJar;
+		final String midletJar = Emulator.midletJarPath;
 		String string = midletJar.substring(0, midletJar.length() - 4);
 		if (int1 != 0) {
 			string += int1;

@@ -10,4 +10,8 @@ public class RecordStoreException extends Exception {
 	public RecordStoreException(final String s) {
 		super(s);
 	}
+
+	public RecordStoreException(String s, Throwable cause) {
+		super(s, cause);
+	}
 }

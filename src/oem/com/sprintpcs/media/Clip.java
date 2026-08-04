@@ -34,7 +34,7 @@ public class Clip {
 		return this.aString207;
 	}
 
-	final Player method112() {
+	final Player createPlayer() {
 		ByteArrayInputStream var1 = null;
 		Player var2 = null;
 
@@ -88,16 +88,16 @@ public class Clip {
 			var1 = "Inactive";
 			var2 = null;
 			Player var10000;
-			if (com.sprintpcs.media.Player.aClip909 == this) {
+			if (com.sprintpcs.media.Player.foregroundClip == this) {
 				var1 = "Active Clip: ";
-				var10000 = com.sprintpcs.media.Player.aPlayer907;
+				var10000 = com.sprintpcs.media.Player.foregroundClipPlayer;
 			} else {
-				if (com.sprintpcs.media.Player.aClip914 != this) {
+				if (com.sprintpcs.media.Player.backgroundClip != this) {
 					break label20;
 				}
 
 				var1 = "Background Clip: ";
-				var10000 = com.sprintpcs.media.Player.aPlayer913;
+				var10000 = com.sprintpcs.media.Player.backgroundClipPlayer;
 			}
 
 			var2 = var10000;

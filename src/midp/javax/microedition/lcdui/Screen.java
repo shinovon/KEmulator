@@ -81,7 +81,7 @@ public abstract class Screen extends Displayable {
 		}
 	}
 
-	protected void _keyScroll(int key, boolean repeat) {
+	void _keyScroll(int key, boolean repeat) {
 	}
 
 	public void _invokeKeyReleased(final int n) {
@@ -107,7 +107,7 @@ public abstract class Screen extends Displayable {
 	public void _invokePointerDragged(final int n, final int n2) {
 	}
 
-	protected abstract void _paint(final Graphics p0);
+	abstract void _paint(final Graphics p0);
 
 	public void _invokePaint(final Graphics graphics) {
 		if (_isSWT()) return;
@@ -128,7 +128,7 @@ public abstract class Screen extends Displayable {
 		graphics.setStrokeStyle(strokeStyle);
 	}
 
-	protected void _drawTitleBar(final Graphics graphics) {
+	void _drawTitleBar(final Graphics graphics) {
 		if (_isSWT()) return;
 		String title = super.title == null ? "" : super.title.trim();
 		final int n;
@@ -159,7 +159,7 @@ public abstract class Screen extends Displayable {
 		super._invokeSizeChanged(w, h, b);
 	}
 
-	protected void _drawScrollBar(final Graphics graphics) {
+	void _drawScrollBar(final Graphics graphics) {
 		LCDUIUtils.drawScrollbar(graphics, bounds[W] + 1, Screen.fontHeight4 - 1, 2, bounds[H] - 2, this.items.size(), (focusedItem != null) ? this.items.indexOf(focusedItem) : -1);
 	}
 

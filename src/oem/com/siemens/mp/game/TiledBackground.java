@@ -1,120 +1,119 @@
 /*
- *  Copyright 2020 Yury Kharchenko
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+	This file is part of FreeJ2ME.
 
+	FreeJ2ME is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	FreeJ2ME is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with FreeJ2ME.  If not, see http://www.gnu.org/licenses/
+*/
 package com.siemens.mp.game;
 
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import java.awt.*;
 
 public class TiledBackground extends GraphicObject {
-	private static final String TAG = TiledBackground.class.getName();
-	private Image pixels;
-	private byte[][] map;
+
+	private Image[] pixels;
+	private byte[] map;
 	private int widthInTiles;
 	private int heightInTiles;
-	private int posX;
-	private int posY;
-	private Rectangle frame = new Rectangle(0, 0, 8, 8);
-	private Rectangle dst = new Rectangle(0, 0, 8, 8);
+	private int posx;
+	private int posy;
 
-	public TiledBackground(byte[] tilePixels, byte[] tileMask, byte[] map,
-						   int widthInTiles, int heightInTiles) {
-		this(
-				com.siemens.mp.ui.Image.createImageFromBitmap(tilePixels, tileMask, 8, tilePixels.length),
-				null,
+	public TiledBackground(byte[] tilePixels, byte[] tileMask, byte[] map, int widthInTiles, int heightInTiles) {
+		this(com.siemens.mp.ui.Image.createImageFromBitmap(tilePixels, 8, tilePixels.length),
+				tileMask == null ? null : com.siemens.mp.ui.Image.createImageFromBitmap(tileMask, 8, tilePixels.length),
 				map,
 				widthInTiles,
 				heightInTiles
 		);
 	}
 
-	public TiledBackground(ExtendedImage tilePixels, ExtendedImage tileMask, byte[] map,
-						   int widthInTiles, int heightInTiles) {
+	public TiledBackground(ExtendedImage tilePixels, ExtendedImage tileMask, byte[] map, int widthInTiles, int heightInTiles) {
 		this(tilePixels.getImage(), tileMask == null ? null : tileMask.getImage(), map, widthInTiles, heightInTiles);
 	}
 
-	public TiledBackground(Image tilePixels, Image tileMask, byte[] map,
-						   int widthInTiles, int heightInTiles) {
-		this.map = new byte[heightInTiles][widthInTiles];
+	public TiledBackground(Image tilePixels, Image tileMask, byte[] map, int widthInTiles, int heightInTiles) {
+		if (tilePixels.getWidth() != 8 || (tileMask != null && tileMask.getWidth() != 8)) {
+			throw new IllegalArgumentException("Tile image width must be 8.");
+		}
+		if (containsTransparentColor(tilePixels) || (tileMask != null && containsTransparentColor(tileMask))) {
+			throw new IllegalArgumentException("Images must not contain transparent colors.");
+		}
+		for (byte tile : map) {
+			if ((tile & 0xFF) >= tilePixels.getHeight() / 8) {
+				throw new IllegalArgumentException("Invalid tile number in the map.");
+			}
+		}
+
+		this.map = map;
 		this.heightInTiles = heightInTiles;
 		this.widthInTiles = widthInTiles;
 
-		int idx = 0;
-		for (int i = 0; i < heightInTiles; i++) {
-			byte[] row = this.map[i];
-			for (int j = 0; j < widthInTiles; j++) {
-				row[j] = map[idx++];
-			}
+		pixels = new Image[tilePixels.getHeight() / 8 + 3];
+		pixels[0] = Image.createImage(8, 8, 0);
+		pixels[1] = Image.createImage(8, 8);
+		pixels[2] = Image.createImage(8, 8);
+		pixels[2].getGraphics().fillRect(0, 0, 8, 8);
+
+		if (tileMask != null) {
+			tilePixels = com.siemens.mp.lcdui.Image.createTransparentImageFromMask(tilePixels, tileMask);
 		}
-		// TODO mask
-		pixels = tilePixels;
+
+		for (int i = 0; i < this.pixels.length - 3; i++) {
+			Image img = Image.createImage(8, 8, 0);
+
+			img.getGraphics().drawImage(tilePixels, 0, -i * 8, 0);
+			pixels[i + 3] = img;
+		}
 	}
 
 	public void setPositionInMap(int x, int y) {
-		posX = x;
-		posY = y;
+		posx = x;
+		posy = y;
 	}
 
-	protected void paint(Graphics g, int x, int y) {
-		int ox, oy, ow, oh;
-		final Rectangle clip = new Rectangle(
-				ox = g.getClipX(),
-				oy = g.getClipY(),
-				ow = g.getClipWidth(),
-				oh = g.getClipHeight());
-		clip.x = Math.max(clip.x, x);
-		clip.y = Math.max(clip.y, y);
-		g.clipRect(clip.x, clip.y, clip.width, clip.height);
-		final int left = x - (posX % 8);
-		final int top = y - (posY % 8);
-		dst.x = left;
-		dst.y = top;
-		try {
-			for (int ty = posY / 8, tyLen = clip.height / 8 + 1 + ty; ty < tyLen; ty++) {
-				byte[] row = this.map[ty % heightInTiles];
-				for (int tx = posX / 8, txLen = clip.width / 8 + 1 + tx; tx < txLen; tx++) {
-					final int tile = row[tx % widthInTiles] & 0xff;
-					switch (tile) {
-						case 0:
-							// transparent tile
-							break;
-						case 1:
-							g.setColor(-1);
-							g.fillRect(dst.x, dst.y, dst.width, dst.height);
-							break;
-						case 2:
-							g.setColor(0);
-							g.fillRect(dst.x, dst.y, dst.width, dst.height);
-							break;
-						default:
-							frame.x = 0;
-							frame.y = (tile - 3) * 8;
-							g.drawRegion(pixels, frame.x, frame.y, dst.width, dst.height, 0, dst.x, dst.y, 0);
-					}
-					dst.x += 8;
+	protected void paint(Graphics g, int tx, int ty) {
+		g.translate(tx, ty);
+
+		int clipX = g.getClipX();
+		int clipY = g.getClipY();
+		int clipW = g.getClipWidth();
+		int clipH = g.getClipHeight();
+
+		int startX = (clipX + posx) / 8;
+		int startY = (clipY + posy) / 8;
+		int endX = (clipX + clipW + posx) / 8;
+		int endY = (clipY + clipH + posy) / 8;
+
+		if (clipX + posx < 0) startX--;
+		if (clipY + posy < 0) startY--;
+
+		for (int y = startY; y <= endY; y++) {
+			for (int x = startX; x <= endX; x++) {
+				int mapX = wrap(x, widthInTiles);
+				int mapY = wrap(y, heightInTiles);
+
+				int tile = map[mapY * widthInTiles + mapX] & 0xFF;
+
+				if (tile != 0) {
+					g.drawImage(pixels[tile], (x * 8) - posx, (y * 8) - posy, 0);
 				}
-				dst.x = left;
-				dst.y += 8;
-				dst.width = 8;
 			}
-		} catch (Throwable t) {
-			t.printStackTrace();
-		} finally {
-			g.setClip(ox, oy, ow, oh);
 		}
+		g.translate(-tx, -ty);
+	}
+
+	private static int wrap(int value, int max) {
+		int m = value % max;
+		return m < 0 ? m + max : m;
 	}
 }

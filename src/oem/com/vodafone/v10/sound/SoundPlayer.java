@@ -1,64 +1,73 @@
 /*
- * Copyright 2020 Nikita Shakarun
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+Copyright (c) 2026 Arman Jussupgaliyev
+*/
 package com.vodafone.v10.sound;
 
+import emulator.media.mmf.PhrasePlayerImpl;
+import emulator.media.mmf.PhraseTrackImpl;
+
 public class SoundPlayer {
-	private SoundTrack[] tracks = new SoundTrack[16];
+
+	private static SoundPlayer soundPlayer;
+
+	private PhrasePlayerImpl impl;
+
+	private SoundTrack[] tracks;
+
+	SoundPlayer() {
+		impl = PhrasePlayerImpl.open(true);
+		tracks = new SoundTrack[impl.getTracksCount()];
+	}
 
 	public static SoundPlayer getPlayer() {
-		return new SoundPlayer();
+		if (soundPlayer == null) soundPlayer = new SoundPlayer();
+		return soundPlayer;
 	}
 
 	public SoundTrack getTrack() {
-		for (int i = 0; i < 16; i++) {
-			if (tracks[i] == null) {
-				tracks[i] = new SoundTrack(i);
-				return tracks[i];
-			}
-		}
-		throw new IllegalStateException("no more tracks available!");
+		PhraseTrackImpl impl = this.impl.createTrack(-1);
+		SoundTrack t = tracks[impl.getID()] = new SoundTrack(impl);
+		impl.setEventListener(t);
+		return t;
 	}
 
-	public SoundTrack getTrack(int i) {
-		if (tracks[i] == null) {
-			tracks[i] = new SoundTrack(i);
+	public SoundTrack getTrack(int track) {
+		if (track < 0 || track >= tracks.length) {
+			throw new IndexOutOfBoundsException();
 		}
-		return tracks[i];
+		SoundTrack t = tracks[track];
+		if (t == null) {
+			tracks[track] = t = new SoundTrack(impl.createTrack(track));
+		}
+		return t;
 	}
 
 	public int getTrackCount() {
-		int n = 0;
-		for (int i = 0; i < 16; i++) {
-			if (tracks[i] != null) {
-				n++;
-			}
-		}
-		return n;
+		return tracks.length;
 	}
 
 	public void kill() {
-		for (int i = 0; i < 16; i++) {
-			if (tracks[i] != null) {
-				tracks[i].stop();
-			}
+		impl.kill();
+	}
+
+	public void pause() {
+		impl.pause();
+	}
+
+	public void resume() {
+		impl.resume();
+	}
+
+	public void disposeTrack(SoundTrack t) {
+		int id = t.getID();
+		if (tracks[id] == t) {
+			impl.disposeTrack(id);
+			tracks[id] = null;
 		}
 	}
 
 	public void disposePlayer() {
-
+		impl.close();
+		soundPlayer = null;
 	}
 }

@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2021 Arman Jussupgaliyev
+*/
 package ru.nnproject.kemulator.filemanagerapi;
 
 import javax.microedition.io.file.FileConnection;

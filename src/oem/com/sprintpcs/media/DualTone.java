@@ -441,8 +441,8 @@ public class DualTone {
 	public int getState() {
 		int n = -1;
 		javax.microedition.media.Player player = null;
-		if (Player.aDualTone910 == this) {
-			player = Player.aPlayer916;
+		if (Player.tone == this) {
+			player = Player.tonePlayer;
 		}
 		if (player != null && player instanceof PlayerImpl) {
 			n = player.getState();

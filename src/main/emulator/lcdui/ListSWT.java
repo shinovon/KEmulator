@@ -305,11 +305,15 @@ public class ListSWT extends SWTScreen implements IListImpl {
 //			}
 			int imgWidth = 0;
 			if (img != null) {
-				ImageData data = img.getImageData();
-				imgWidth = data.width;
-				int imgHeight = data.height;
-				if (imgWidth != 0 && imgHeight != 0) {
-					size.x += (int) ((float) (event.height * imgWidth) / imgHeight);
+				try {
+					ImageData data = img.getImageData();
+					imgWidth = data.width;
+					int imgHeight = data.height;
+					if (imgWidth != 0 && imgHeight != 0) {
+						size.x += (int) ((float) (event.height * imgWidth) / imgHeight);
+					}
+				} catch (Exception ignored) {
+					// FIXME
 				}
 			}
 			event.width = size.x + 2;
@@ -322,17 +326,21 @@ public class ListSWT extends SWTScreen implements IListImpl {
 			event.gc.setFont(item.getFont());
 			int imgWidth = 0;
 			if (img != null) {
-				ImageData data = img.getImageData();
-				imgWidth = data.width;
-				int imgHeight = data.height;
-				if (imgWidth != 0 && imgHeight != 0) {
-					int dstWidth = (int) ((float) (event.height * imgWidth) / imgHeight);
-					event.gc.drawImage(img, 0, 0, imgWidth, imgHeight,
-							event.x, event.y,
-							dstWidth, event.height);
-					imgWidth = dstWidth;
-				} else {
-					imgWidth = 0;
+				try {
+					ImageData data = img.getImageData();
+					imgWidth = data.width;
+					int imgHeight = data.height;
+					if (imgWidth != 0 && imgHeight != 0) {
+						int dstWidth = (int) ((float) (event.height * imgWidth) / imgHeight);
+						event.gc.drawImage(img, 0, 0, imgWidth, imgHeight,
+								event.x, event.y,
+								dstWidth, event.height);
+						imgWidth = dstWidth;
+					} else {
+						imgWidth = 0;
+					}
+				} catch (Exception ignored) {
+					// FIXME
 				}
 			}
 			int yOffset = 0;
@@ -402,15 +410,18 @@ public class ListSWT extends SWTScreen implements IListImpl {
 		else
 		{
 			int size = choiceImpl.size();
+
 			for(int i = 0; i < size; i++)
 			{
 				if(choiceImpl.isSelected(i))
 				{
 					swtTable.select(i);
+					swtTable.getItem(i).setChecked(true);
 				}
 				else
 				{
 					swtTable.deselect(i);
+					swtTable.getItem(i).setChecked(false);
 				}
 			}
 		}
@@ -485,7 +496,11 @@ public class ListSWT extends SWTScreen implements IListImpl {
 				int index = ((Table) se.widget).indexOf((TableItem) se.item);
 				if(index >= 0)
 				{
-					choiceImpl.setSelected(index, !isSelected(index));
+					if (type == Choice.MULTIPLE) {
+						choiceImpl.setSelected(index, ((TableItem) se.item).getChecked());
+					} else {
+						choiceImpl.setSelected(index, true);
+					}
 				}
 			}
 		}

@@ -1,7 +1,13 @@
+/*
+Copyright (c) 2025 Fyodor Ryzhov
+*/
 package emulator.ui.swt;
 
+import emulator.Settings;
 import emulator.debug.MemoryViewImage;
 import emulator.debug.MemoryViewImageType;
+import emulator.graphics2D.CopyUtils;
+import emulator.graphics2D.awt.ImageAWT;
 import org.eclipse.swt.graphics.Rectangle;
 
 import javax.microedition.lcdui.Image;
@@ -16,6 +22,8 @@ public class ImageViewItem {
 	public final MemoryViewImageType type;
 	public final boolean released;
 	public final String type2;
+	public final boolean allowCache;
+	public org.eclipse.swt.graphics.Image cache;
 	/**
 	 * Rect where image was drawn. May be null if image was not drawn.
 	 */
@@ -33,11 +41,23 @@ public class ImageViewItem {
 			} else {
 				type2 = ""; //TODO i'm not familiar with micro3d
 			}
+			allowCache = false;
+			cache = null;
 		} else {
 			source = image;
 			type = MemoryViewImageType.LCDUI;
-			type2 = image.isMutable() ? "Mutable" : "Immutable";
+			type2 = image.isMutable() ? "Mut." : "Immut.";
+			allowCache = !image.isMutable() && Settings.g2d == 1;
 		}
+	}
+
+	public boolean ensureCache() {
+//		if (allowCache) {
+//			if (cache == null)
+//				cache = new org.eclipse.swt.graphics.Image(null, CopyUtils.toSwt(((ImageAWT) drawable.getImpl()).getBufferedImage()));
+//			return true;
+//		}
+		return false;
 	}
 
 	public String getCaption() {
@@ -45,4 +65,14 @@ public class ImageViewItem {
 	}
 
 	private final static String[] m3gTypes = new String[]{"A", "L", "LA", "RGB", "RGBA"};
+
+
+	public final void finalize() {
+		SWTFrontend.syncExec(() -> {
+			if (cache != null && !cache.isDisposed()) {
+				cache.dispose();
+			}
+		});
+	}
+
 }
