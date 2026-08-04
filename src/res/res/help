@@ -1,4 +1,4 @@
-$v2.21.5 [2026.xx.xx]
+$v2.21.5 [2026.08.xx]
 Fixed crash in debug tools on Java 22+
 Fixed crash when showing empty POPUP ChoiceGroup
 Fixed handling of Graphics translation in M3G
@@ -9,6 +9,7 @@ Removed SWT 2D engine
 Added 320x480 device preset
 Added option to exclude images from objects size in Memory View
 Added custom class watcher view for Hashtable
+Added datagram support
 
 $v2.21.4 [2026.04.08]
 Improved MIDI playback on default JRE synthesizer
