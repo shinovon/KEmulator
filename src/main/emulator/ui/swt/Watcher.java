@@ -430,10 +430,16 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 
 		if (targetField != null) {
 			// not an array. Checking target type.
-			if (!ClassTypes.canSetFieldValue(targetField))
+			if (!ClassTypes.canSetFieldValue(targetField.getType()))
 				return;
 			// attempt to edit "instance" field over null instance
 			if (target == null && !Modifier.isStatic(targetField.getModifiers()))
+				return;
+		} else if (targetKey != null) {
+			if (target == null)
+				return;
+			Object value = ((Hashtable) target).get(targetKey);
+			if (value == null || !ClassTypes.canSetHashtableValue(value.getClass()))
 				return;
 		}
 
