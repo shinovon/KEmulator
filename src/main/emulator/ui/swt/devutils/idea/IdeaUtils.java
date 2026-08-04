@@ -148,7 +148,7 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 				new IdeaSetupWindows(p).open();
 			else if (Utils.macos)
 				new IdeaSetupDarwin(p).open();
-			// TODO macos? headless linux?
+			// TODO headless linux?
 		}
 	}
 

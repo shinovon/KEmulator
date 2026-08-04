@@ -27,8 +27,6 @@ public class IdeaSetupDarwin extends IdeaSetup {
 	protected Set<String> getIdeaInstallationPath() {
 		Set<String> set = new HashSet<>();
 		set.add("/Applications/IntelliJ IDEA.app/Contents/MacOS/idea");
-		//checkPath(set);
-		//checkStandardLocations(set);
 		return set;
 	}
 
@@ -53,18 +51,6 @@ public class IdeaSetupDarwin extends IdeaSetup {
 	//#endregion
 
 	//#region IDEA tools
-
-	private static void checkPath(Set<String> set) {
-		String pathEnv = System.getenv("PATH");
-		if (pathEnv == null) return;
-
-		for (String root : pathEnv.split(":")) {
-			File f = new File(root, "idea");
-			if (f.exists()) {
-				set.add(f.getAbsolutePath());
-			}
-		}
-	}
 
 	//#endregion
 }

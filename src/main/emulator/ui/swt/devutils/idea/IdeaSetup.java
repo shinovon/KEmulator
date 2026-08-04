@@ -111,12 +111,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		if (Settings.ideaJdkTablePatched) // this is an invalid state! successful patching must close the window.
 			throw new RuntimeException("Attempt to run setup when not needed.");
 
-		if (Utils.macos) {
-			new Label(shell, SWT.NONE).setText("Mac OS is not supported yet. Reach us to become a tester!");
-			shell.layout(true, true);
-			// return;
-		}
-
 		if (!Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei"))) {
 			new Label(shell, SWT.NONE).setText("UEI directory is missing in your KEmulator setup.");
 			new Label(shell, SWT.NONE).setText("It contains libraries for your IDE.");
@@ -146,17 +140,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 				}
 				if (Files.exists(Paths.get(PROGUARD_AUR_PATH_UNIX))) {
 					Settings.proguardPath = PROGUARD_AUR_PATH_UNIX;
-					refreshContent();
-					return;
-				}
-			} else if (this instanceof IdeaSetupDarwin) {
-				if (Files.exists(Paths.get("/opt/homebrew/Cellar/proguard/"))) {
-					Settings.proguardPath = "/opt/homebrew/Cellar/proguard/";
-					refreshContent();
-					return;
-				}
-				if (Files.exists(Paths.get("/usr/local/Cellar/proguard/"))) {
-					Settings.proguardPath = "/usr/local/Cellar/proguard/";
 					refreshContent();
 					return;
 				}
@@ -378,7 +361,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 					new Label(jdkSetupGroup, SWT.NONE).setText("Nothing found.");
 				}
 			}
-			// todo add jdk for macos
+			// TODO add jdk for macos
 
 			Group manualJdkSetupGroup = new Group(shell, SWT.NONE);
 			manualJdkSetupGroup.setText("Manual selection");
@@ -758,9 +741,13 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		else if (Utils.linux)
 			fd.setFilterExtensions(new String[]{"idea", "idea*.sh"});
 		else if (Utils.macos)
-			fd.setFilterExtensions(new String[]{"IntelliJ IDEA.app"});
+			fd.setFilterExtensions(new String[]{"*.app"});
 		String path = fd.open();
 		if (path == null) return;
+		if (Utils.macos) {
+			path = path + "/Contents/MacOS/idea";
+			if (!new File(path).exists()) return;
+		}
 		Settings.ideaPath = path;
 		refreshContent();
 	}
