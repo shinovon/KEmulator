@@ -64,7 +64,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 	}
 
 	public Watcher(final Object o) {
-		this(WatcherType.Instance);
+		this("java.util.Hashtable".equals(o.getClass().getName()) ? WatcherType.Hashtable : WatcherType.Instance);
 		final Instance c = new Instance(o.getClass().getName(), o);
 		c.updateFields(null);
 		this.selectableClasses.put(o.toString(), c);
@@ -129,36 +129,76 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			return;
 		}
 		String filterText = filterInput == null ? "" : filterInput.getText();
-		c.updateFields(filterText.isEmpty() ? null : filterText);
+		if (type != WatcherType.Hashtable) c.updateFields(filterText.isEmpty() ? null : filterText);
 
 		switch (type) {
-			case Static: {
-				String s = c.getCls().getName();
-				this.shell.setText(s + " (static) - " + emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
-				break;
-			}
-			case Profiler:
-				// it's already localized
-				shell.setText(classCombo.getText());
-				break;
-			case Instance: {
-				Object o = c.getInstance();
-				String s = o.getClass().getName();
-				String hash = Integer.toHexString(o.hashCode());
-				this.shell.setText(s + " (" + hash + ") - " + emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
-				break;
-			}
+		case Static: {
+			String s = c.getCls().getName();
+			this.shell.setText(s + " (static) - " + emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
+			break;
+		}
+		case Profiler:
+			// it's already localized
+			shell.setText(classCombo.getText());
+			break;
+		case Instance: {
+			Object o = c.getInstance();
+			String s = o.getClass().getName();
+			String hash = Integer.toHexString(o.hashCode());
+			this.shell.setText(s + " (" + hash + ") - " + emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
+			break;
+		}
+		case Hashtable: {
+			Object o = c.getInstance();
+			String hash = Integer.toHexString(o.hashCode());
+			this.shell.setText("Hashtable (" + hash + ") - " + emulator.UILocale.get("WATCHES_FRAME_TITLE", "Class Watcher"));
+			break;
+		}
 		}
 
 		tree.removeAll();
-		for (int i = 0; i < c.getFields().size(); ++i) {
-			final Object value = c.getFields().get(i);
+
+		if (type == WatcherType.Hashtable) {
+			Hashtable table = (Hashtable) c.getInstance();
+			if (table == null) return;
+			boolean filter = !filterText.isEmpty();
+			if (filter) {
+				filterText = filterText.toLowerCase();
+			}
+			for (Object key : table.keySet()) {
+				if (filter && !String.valueOf(key).toLowerCase().startsWith(filterText)) {
+					continue;
+				}
+				final TreeItem treeItem = new TreeItem(this.tree, 0);
+				treeItem.setText(0, String.valueOf(key));
+				treeItem.setData(key);
+				Object value = table.get(key);
+				if (value != null) {
+					treeItem.setText(2, ClassTypes.getReadableClassName(value.getClass()));
+					if (value.getClass().isArray()) {
+						new TreeItem(treeItem, 0).setText(0, "");
+					}
+				}
+			}
+			return;
+		}
+
+		Vector fields = c.getFields();
+		for (final Object value : fields) {
 			if (value instanceof Field) {
-				final Field field = (Field) c.getFields().get(i);
+				final Field field = (Field) value;
+				if (!Modifier.isStatic(field.getModifiers())) {
+					if (type == WatcherType.Static) {
+						continue;
+					}
+				} else if (type == WatcherType.Instance) {
+					continue;
+				}
 				final TreeItem treeItem = new TreeItem(this.tree, 0);
 				treeItem.setText(0, field.getName());
+				treeItem.setData(field);
 				if (this.type != WatcherType.Profiler) {
-					this.tree.getItem(i).setText(2, ClassTypes.getReadableClassName(field.getType()));
+					treeItem.setText(2, ClassTypes.getReadableClassName(field.getType()));
 					if (field.getType().isArray()) {
 						new TreeItem(treeItem, 0).setText(0, "");
 					}
@@ -166,8 +206,9 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			} else {
 				final TreeItem treeItem = new TreeItem(this.tree, 0);
 				treeItem.setText(0, (String) value);
+				treeItem.setData(value);
 				if (this.type == WatcherType.Instance) {
-					this.tree.getItem(i).setText(2, ClassTypes.getReadableClassName(c.getCls().getComponentType()));
+					treeItem.setText(2, ClassTypes.getReadableClassName(c.getCls().getComponentType()));
 					if (c.getCls().getComponentType().isArray()) {
 						new TreeItem(treeItem, 0).setText(0, "");
 					}
@@ -221,7 +262,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		}
 		final Instance c = getWatched();
 		if (item.getParentItem() == null) {
-			Object field = c.getFields().get(item.getParent().indexOf(item));
+			Object field = item.getData();
 			if (field instanceof Field) {
 				this.method301(c, (Field) field, item);
 				display.asyncExec(this);
@@ -239,7 +280,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			stack.push(parentItem);
 			parentItem = parentItem.getParentItem();
 		}
-		final Object field = c.getFields().get(parentItem.getParent().indexOf(parentItem));
+		final Object field = parentItem.getData();
 		Object o;
 		Class clazz;
 		if (field instanceof Field) {
@@ -277,8 +318,11 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		Object o;
 		Class<?> clazz;
 		if (array[0].getParentItem() == null) {
-			final Object field = c.getFields().get(array[0].getParent().indexOf(array[0]));
-			if (field instanceof Field) {
+			final Object field = array[0].getData();
+			if (type == WatcherType.Hashtable) {
+				o = ((Hashtable) c.getInstance()).get(field);
+				clazz = o.getClass();
+			} else if (field instanceof Field) {
 				o = ClassTypes.getFieldValue(c.getInstance(), (Field) field);
 				clazz = ((Field) field).getType();
 			} else {
@@ -292,7 +336,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				stack.push(parentItem);
 				parentItem = parentItem.getParentItem();
 			}
-			Object field = c.getFields().get(parentItem.getParent().indexOf(parentItem));
+			Object field = parentItem.getData();
 			if (field instanceof Field) {
 				o = ClassTypes.getFieldValue(c.getInstance(), (Field) field);
 				clazz = ((Field) field).getType().getComponentType();
@@ -325,18 +369,25 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		Object target;
 		// field will be null if we will work with an array.
 		Field targetField;
+		Object targetKey;
 		// index will contain sane value if target is array.
 		int targetIndex;
 
 		if (treeItem.getParentItem() == null) {
 			target = c.getInstance();
-			Object field = c.getFields().get(treeItem.getParent().indexOf(treeItem));
-			if (field instanceof Field) {
+			Object field = treeItem.getData();
+			if (type == WatcherType.Hashtable) {
+				targetKey = ((Hashtable) c.getInstance()).get(field);
+				targetField = null;
+				targetIndex = -2;
+			} else if (field instanceof Field) {
 				targetField = (Field) field;
 				targetIndex = -1;
+				targetKey = null;
 			} else {
-				targetField = null;
 				targetIndex = Integer.parseInt((String) field);
+				targetField = null;
+				targetKey = null;
 			}
 		} else {
 			TreeItem parentItem = treeItem;
@@ -346,7 +397,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 				parentItem = parentItem.getParentItem();
 			}
 			int n = parentItem.getParent().indexOf(parentItem);
-			Object field = c.getFields().get(n);
+			Object field = parentItem.getData();
 			Object o;
 			if (field instanceof Field) {
 				o = ClassTypes.getFieldValue(c.getInstance(), (Field) field);
@@ -370,10 +421,11 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			target = o2;
 			targetIndex = n;
 			targetField = null;
+			targetKey = null;
 		}
 
 		// somehow nothing to edit was found
-		if (target == null && targetField == null)
+		if (target == null && targetField == null && targetKey == null)
 			return;
 
 		if (targetField != null) {
@@ -389,7 +441,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		control.setText(treeItem.getText(1));
 		control.selectAll();
 		control.setFocus();
-		WatcherFieldEditorHandler handler = new WatcherFieldEditorHandler(this, treeItem, control, target, targetField, targetIndex);
+		WatcherFieldEditorHandler handler = new WatcherFieldEditorHandler(this, treeItem, control, target, targetField, targetIndex, targetKey);
 		control.addFocusListener(handler);
 		control.addKeyListener(handler);
 		this.treeEditor.setEditor(control, treeItem, 1);
@@ -508,17 +560,38 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		int n = 0;
 		boolean hex = hexDecSwitch != null && hexDecSwitch.getSelection();
 		try {
+			if (type == WatcherType.Hashtable) {
+				Hashtable table = (Hashtable) c.getInstance();
+				if (table == null) return;
+				for (TreeItem item : tree.getItems()) {
+					Object key = item.getData();
+					Object value = table.get(key);
+					item.setText(1, String.valueOf(value));
+					if (value != null) {
+						this.fillArraySubtree(value, item);
+					}
+				}
+				this.updateInProgress = false;
+				return;
+			}
 			if (Memory.getInstance().isNotInitialized(c.getCls())) {
 				this.updateInProgress = false;
 				return;
 			}
-			for (int i = 0; i < c.getFields().size(); ++i) {
-				final Object field = c.getFields().get(i);
+			Vector fields = c.getFields();
+			for (final Object field : fields) {
 				if (this.disposed) {
 					this.updateInProgress = false;
 					return;
 				}
 				if (field instanceof Field) {
+					if (!Modifier.isStatic(((Field) field).getModifiers())) {
+						if (type == WatcherType.Static) {
+							continue;
+						}
+					} else if (type == WatcherType.Instance) {
+						continue;
+					}
 					final String s = (!Modifier.isStatic(((Field) field).getModifiers()) && c.getInstance() == null) ? "" : ClassTypes.getFieldValue(c.getInstance(), (Field) field, hex);
 					final TreeItem item = this.tree.getItem(n++);
 					item.setText(1, s);
@@ -756,10 +829,9 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 					final Instance c = (Instance) selectableClasses.get(o);
 					c.updateFields(null);
 					Vector fields = c.getFields();
-					for (int i = 0; i < fields.size(); ++i) {
-						final Object f = fields.get(i);
+					for (final Object f : fields) {
 						if (f instanceof Field) {
-							final Field field = (Field) c.getFields().get(i);
+							final Field field = (Field) f;
 							Class type = field.getType();
 							ps.print(" " + field.getDeclaringClass().getName() + "> " + ClassTypes.getReadableClassName(type) + " " + field.getName());
 							try {

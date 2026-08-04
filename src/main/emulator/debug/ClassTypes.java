@@ -181,6 +181,10 @@ public final class ClassTypes {
 		}
 	}
 
+	public static void setHashtableValue(Object target, Object key, String value) {
+		// TODO
+	}
+
 	// must be synced with method above!
 	public static boolean canSetFieldValue(Field var1) {
 		if (var1.getType() == Long.TYPE) {

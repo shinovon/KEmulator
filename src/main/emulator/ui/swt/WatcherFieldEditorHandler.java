@@ -16,11 +16,12 @@ final class WatcherFieldEditorHandler extends KeyAdapter implements FocusListene
 	private final Text text;
 	private final Watcher w;
 
-	private Object targetObject;
-	private Field targetField;
-	private int targetIndex;
+	private final Object targetObject;
+	private final Field targetField;
+	private final int targetIndex;
+	private final Object targetKey;
 
-	WatcherFieldEditorHandler(final Watcher w, final TreeItem item, final Text text, Object targetObject, Field targetField, int targetIndex) {
+	WatcherFieldEditorHandler(final Watcher w, final TreeItem item, final Text text, Object targetObject, Field targetField, int targetIndex, Object targetKey) {
 		super();
 		this.w = w;
 		this.item = item;
@@ -28,6 +29,7 @@ final class WatcherFieldEditorHandler extends KeyAdapter implements FocusListene
 		this.targetObject = targetObject;
 		this.targetField = targetField;
 		this.targetIndex = targetIndex;
+		this.targetKey = targetKey;
 	}
 
 	public final void focusLost(final FocusEvent focusEvent) {
@@ -58,6 +60,8 @@ final class WatcherFieldEditorHandler extends KeyAdapter implements FocusListene
 		synchronized (w) {
 			if (targetField == null) {
 				ClassTypes.setArrayValue(targetObject, targetIndex, text.getText());
+			} else if (targetKey != null) {
+				ClassTypes.setHashtableValue(targetObject, targetKey, text.getText());
 			} else {
 				ClassTypes.setFieldValue(targetObject, targetField, text.getText());
 			}
