@@ -31,7 +31,40 @@ public class Connector {
 		return open(s, n, false);
 	}
 
-	public static Connection open(final String s, final int n, final boolean b) throws IOException {
+	public static Connection open(String s, final int n, final boolean b) throws IOException {
+		{
+			// nokia
+			int i = s.indexOf(";nokia_netid=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			i = s.indexOf(";nokia_apnid=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			i = s.indexOf(";nokia_timeout=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			// blackberry
+			i = s.indexOf(";interface=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			i = s.indexOf(";deviceside=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			//
+			i = s.indexOf(";nokia_socket");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+			i = s.indexOf(";j9proxy=");
+			if (i != -1) {
+				s = s.substring(0, i);
+			}
+		}
 		if (s.startsWith("resource:")) {
 			return new ResourceConnectionImpl(s);
 		}
