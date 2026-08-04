@@ -80,6 +80,14 @@ public class Connector {
 				Permission.checkPermission("connector.open.socket");
 				return new SocketConnectionImpl(s);
 			}
+			if (s.startsWith("datagram://:")) {
+				Permission.checkPermission("connector.open.datagramreceive");
+				return new UDPDatagramConnectionImpl(s);
+			}
+			if (s.startsWith("datagram://")) {
+				Permission.checkPermission("connector.open.datagram");
+				return new UDPDatagramConnectionImpl(s);
+			}
 			Connection openPrim = null;
 			String protocol = "";
 			if (s.indexOf(':') != -1) {
