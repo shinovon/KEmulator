@@ -71,7 +71,7 @@ final class SocketConnectionImpl implements SocketConnection
 				break;
 			}
 			case LINGER: {
-				if (value <= 0) {
+				if (value < 0) {
 					throw new IllegalArgumentException();
 				}
 				socket.setSoLinger(value != 0, value);
