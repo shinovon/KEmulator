@@ -10,6 +10,8 @@ Added 320x480 device preset
 Added option to exclude images from objects size in Memory View
 Added custom class watcher view for Hashtable
 Added datagram support
+Added MascotME as micro3d software engine
+Initial macOS support in IDEA setup
 
 $v2.21.4 [2026.04.08]
 Improved MIDI playback on default JRE synthesizer
