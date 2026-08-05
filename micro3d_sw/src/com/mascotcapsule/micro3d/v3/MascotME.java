@@ -13,33 +13,6 @@ public class MascotME {
 	// Converts horizonal fov to vertical in order to fix narrow camera when portrait mode games are launched in landscape mode.
 	static boolean horizontalFovFix;
 	
-	// Frame buffer related hacks:
-	
-	// Compatibility hack, does not affect performance.
-	// Color used to clear framebuffer when Graphics3D is bind.
-	// Can be used to reduce graphical artifacts in games that draw semitransparent geometry over 2D graphics.
-	
-	// Flag, specifying to clear framebuffer with last 2D color used on screen.
-	static final int CLEAR_WITH_LAST_USED_COLOR = -1;
-	static int fbClearColor = CLEAR_WITH_LAST_USED_COLOR;
-	
-	// Compatibility hack, does not affect performance.
-	// Uses dummy Canvas object to detect framebuffer size.
-	// Can reduce graphical artifacts in games that use viewport clipping.
-	static boolean fbSizeWorkaround = false;
-	
-	// Performance hack, high performance impact.
-	// Disables support of 2D graphics inbetween 3D geometry.
-	// Framebuffer will be drawn on screen only when Graphics3D is released (by API design 3D graphics should be drawn on each flush).
-	static boolean no2DInbetween = true;
-	// Performance hack, low performance impact.
-	// Overwrites existing 2D screen content by disabling alpha blending when framebuffer is drawn on the screen for the first time.
-	static boolean overwrite2D = false;
-	// Performance hack, medium performance impact.
-	// Disables framebuffer clearing, useful when game fully overwrites framebuffer with geometry.
-	// Please use with overwrite2D for bigger performance win.
-	static boolean doNotClear = false;
-	
 	// Clipping related hacks:
 	
 	// Performance hack, medium performance impact.

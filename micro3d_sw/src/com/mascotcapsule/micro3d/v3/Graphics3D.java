@@ -5,6 +5,7 @@
 
 package com.mascotcapsule.micro3d.v3;
 
+import emulator.AppSettings;
 import emulator.Emulator;
 
 import javax.microedition.lcdui.Graphics;
@@ -91,11 +92,8 @@ public class Graphics3D {
 	private int fbWidth, fbHeight;
 	private int clipX, clipY, clipW, clipH;
 	private int fbDrawCounter;
-	
-	private long prevStatsCheck;
-	private int framesCount;
-	private int bindAccum, figureAccum, primCmdAccum, flushAccum, releaseAccum;
-	private int bindTime, figureTime, primCmdTime, flushTime, releaseTime;
+
+	private boolean backCopied;
 	
 	private boolean disposed;
 
@@ -310,31 +308,14 @@ public class Graphics3D {
 		long startTime = System.currentTimeMillis();
 
 		boundGraphics = graphics;
-		
-		//Try to get framebuffer resolution
+
 		int clipX = graphics.getClipX() + graphics.getTranslateX();
 		int clipY = graphics.getClipY() + graphics.getTranslateY();
 		int clipW = graphics.getClipWidth();
 		int clipH = graphics.getClipHeight();
-		
-		if (!MascotME.fbSizeWorkaround) {
-			fbWidth = Math.max(clipX + clipW, 0);
-			fbHeight = Math.max(clipY + clipH, 0);
-		} else {
-			int dummyW = Emulator.getEmulator().getScreen().getWidth();
-			int dummyH = Emulator.getEmulator().getScreen().getHeight();
 
-			int clipX2 = clipW + clipX;
-			int clipY2 = clipH + clipY;
-
-			if (clipX2 == dummyH || clipY2 == dummyW) {
-				fbWidth = dummyH;
-				fbHeight = dummyW;
-			} else {
-				fbWidth = dummyW;
-				fbHeight = dummyH;
-			}
-		}
+		fbWidth = Emulator.getEmulator().getScreen().getWidth();
+		fbHeight = Emulator.getEmulator().getScreen().getHeight();
 		
 		if (frameBuffer == null || frameBuffer.length < fbWidth * fbHeight) {
 			frameBuffer = new int[fbWidth * fbHeight];
@@ -348,61 +329,26 @@ public class Graphics3D {
 				(MascotME.noToonSplitting ? 0 : TOON_SPLIT);
 		
 		fbDrawCounter = 0;
-		
-		if (!MascotME.doNotClear) {
-			int color = MascotME.fbClearColor;
-			if (color == MascotME.CLEAR_WITH_LAST_USED_COLOR) {
-				color = graphics.getColor() & 0xffffff;
-			}
-			
-			clearFB(color);
-		}
-		
-		bindAccum += (int) (System.currentTimeMillis() - startTime);
-	}
-	
-	private final void clearFB(int color) {
-		Arrays.fill(frameBuffer, 0, fbWidth * fbHeight, color);
-	}
-	
-	private final void clearFBAlpha(int clipX, int clipY, int clipW, int clipH) {
-		int[] fb = frameBuffer;
-		int fbWidth = this.fbWidth;
 
-		for (int y = clipY + clipH - 1; y >= clipY; y--) {
-			int x1 = clipX + y * fbWidth;
-			int x2 = x1 + clipW;
-			
-			while (x2 - x1 >= 16) {
-				fb[x1] &= 0xffffff;
-				fb[x1 + 1] &= 0xffffff;
-				fb[x1 + 2] &= 0xffffff;
-				fb[x1 + 3] &= 0xffffff;
-				fb[x1 + 4] &= 0xffffff;
-				fb[x1 + 5] &= 0xffffff;
-				fb[x1 + 6] &= 0xffffff;
-				fb[x1 + 7] &= 0xffffff;
-				fb[x1 + 8] &= 0xffffff;
-				fb[x1 + 9] &= 0xffffff;
-				fb[x1 + 10] &= 0xffffff;
-				fb[x1 + 11] &= 0xffffff;
-				fb[x1 + 12] &= 0xffffff;
-				fb[x1 + 13] &= 0xffffff;
-				fb[x1 + 14] &= 0xffffff;
-				fb[x1 + 15] &= 0xffffff;
-				x1 += 16;
-			}
+		backCopied = false;
+	}
 
-			for (; x1 < x2; x1++) {
-				fb[x1] &= 0xffffff;
-			}
+	private void copy2d(boolean preProcess) {
+		boundGraphics.getImage().getRGB(frameBuffer, 0, clipW, clipX, clipY, clipW, clipH);
+		if (!preProcess) {
+			return;
 		}
+		if (!AppSettings.mascotNo2DMixing) {
+			int prevColor = boundGraphics.getColor();
+			boundGraphics.setColor(0);
+			boundGraphics.fillRect(0, 0, clipW, clipH);
+			boundGraphics.setColor(prevColor);
+		}
+		backCopied = true;
 	}
 	
 	private final void drawFB(int clipX, int clipY, int clipW, int clipH) {
-		boolean alphaBlending = MascotME.overwrite2D ? (fbDrawCounter > 0) : true;
-
-		boundGraphics.drawRGB(frameBuffer, 0, fbWidth, 0, 0, fbWidth, fbHeight, alphaBlending);
+		boundGraphics.drawRGB(frameBuffer, 0, fbWidth, 0, 0, fbWidth, fbHeight, true);
 		
 		fbDrawCounter++;
 	}
@@ -411,12 +357,10 @@ public class Graphics3D {
 		if (disposed) return;
 		if (boundGraphics == null) throw new IllegalStateException();
 		
-		long startTime = System.currentTimeMillis();
-		
 		if (sortPrimCount > 0) {
 			//Clear fb alpha when necessary
-			if (!MascotME.no2DInbetween && fbDrawCounter > 0) {
-				clearFBAlpha(clipX, clipY, clipW, clipH);
+			if (!backCopied && !AppSettings.mascotIgnoreBackground) {
+				copy2d(true);
 			}
 			
 			//Render all primitives
@@ -427,22 +371,20 @@ public class Graphics3D {
 			flushPrimBufferReserved();
 			
 			//Draw fb on screen
-			if (!MascotME.no2DInbetween) {
-				int prevClipX = boundGraphics.getClipX();
-				int prevClipY = boundGraphics.getClipY();
-				int prevClipW = boundGraphics.getClipWidth();
-				int prevClipH = boundGraphics.getClipHeight();
-				boundGraphics.setClip(clipX, clipY, clipW, clipH);
-				
-				int prevTx = boundGraphics.getTranslateX();
-				int prevTy = boundGraphics.getTranslateY();
-				boundGraphics.translate(-prevTx, -prevTy);
-				
-				drawFB(clipX, clipY, clipW, clipH);
-				
-				boundGraphics.setClip(prevClipX, prevClipY, prevClipW, prevClipH);
-				boundGraphics.translate(prevTx, prevTy);
-			}
+			int prevClipX = boundGraphics.getClipX();
+			int prevClipY = boundGraphics.getClipY();
+			int prevClipW = boundGraphics.getClipWidth();
+			int prevClipH = boundGraphics.getClipHeight();
+			boundGraphics.setClip(clipX, clipY, clipW, clipH);
+
+			int prevTx = boundGraphics.getTranslateX();
+			int prevTy = boundGraphics.getTranslateY();
+			boundGraphics.translate(-prevTx, -prevTy);
+
+			drawFB(clipX, clipY, clipW, clipH);
+
+			boundGraphics.setClip(prevClipX, prevClipY, prevClipW, prevClipH);
+			boundGraphics.translate(prevTx, prevTy);
 		}
 		
 		//Unbind all used textures
@@ -453,42 +395,18 @@ public class Graphics3D {
 
 		bindTextures = 0;
 		g3dSphereTex = efxSphereTex = null;
-		
-		flushAccum += (int) (System.currentTimeMillis() - startTime);
 	}
 
 	public final void release(Graphics graphics) {
 		if (disposed) return;
 		if (graphics == null) throw new NullPointerException();
 		if (graphics != boundGraphics) throw new IllegalArgumentException();
-		
-		if (!MascotME.no2DInbetween) {
-			boundGraphics = null;
-			return;
+
+		if (!AppSettings.mascotNo2DMixing) {
+			copy2d(false);
 		}
-		
-		long startTime = System.currentTimeMillis();
-		
-		int prevClipX = graphics.getClipX();
-		int prevClipY = graphics.getClipY();
-		int prevClipW = graphics.getClipWidth();
-		int prevClipH = graphics.getClipHeight();
-		graphics.setClip(0, 0, fbWidth, fbHeight);
-				
-		int prevTx = graphics.getTranslateX();
-		int prevTy = graphics.getTranslateY();
-		graphics.translate(-prevTx, -prevTy);
-		
-		if (MascotME.no2DInbetween) {
-			drawFB(0, 0, fbWidth, fbHeight);
-		}
-		
-		graphics.setClip(prevClipX, prevClipY, prevClipW, prevClipH);
-		graphics.translate(prevTx, prevTy);
 		
 		boundGraphics = null;
-		
-		releaseAccum += (int) (System.currentTimeMillis() - startTime);
 	}
 	
 	private final void drawStatsText(String str, int x, int y, Graphics g) {
@@ -994,6 +912,9 @@ public class Graphics3D {
 			Figure figure, int x, int y,
 			FigureLayout layout, Effect3D effect
 	) {
+		if (!backCopied && !AppSettings.mascotIgnoreBackground) {
+			copy2d(true);
+		}
 		renderFigure(figure, x, y, layout, effect);
 		flush();
 	}
@@ -1007,8 +928,6 @@ public class Graphics3D {
 		if (figure == null || layout == null || effect == null) {
 			throw new NullPointerException();
 		}
-		
-		long startTime = System.currentTimeMillis();
 
 		AffineTrans viewTrans = layout.getAffineTrans();
 		setCenter(layout, x, y);
@@ -1033,8 +952,6 @@ public class Graphics3D {
 		);
 
 		submitFigurePolygons(figure, effect.sphereTexture, useBlending, useLighting, useEnvMap);
-		
-		figureAccum += (int) (System.currentTimeMillis() - startTime);
 	}
 	
 	private final void processFigureVertices(
@@ -1340,8 +1257,6 @@ public class Graphics3D {
 			throw new IllegalArgumentException();
 		}
 		if (boundGraphics == null) throw new IllegalStateException();
-		
-		long startTime = System.currentTimeMillis();
 
 		AffineTrans trans = layout.getAffineTrans();
 		setCenter(layout, x, y);
@@ -1379,8 +1294,6 @@ public class Graphics3D {
 			default:
 				throw new IllegalArgumentException();
 		}
-		
-		primCmdAccum += (int) (System.currentTimeMillis() - startTime);
 	}
 
 	public final void drawCommandList(
@@ -1389,12 +1302,9 @@ public class Graphics3D {
 			int[] commandList
 	) {
 		if (disposed) return;
-		long startTime = System.currentTimeMillis();
 		
 		Texture tex = (textures != null && textures.length > 0) ? textures[0] : null;
 		drawCommandList(textures, tex, x, y, layout, effect, commandList);
-		
-		primCmdAccum += (int) (System.currentTimeMillis() - startTime);
 	}
 
 	 public final void drawCommandList(
@@ -1403,9 +1313,7 @@ public class Graphics3D {
 			int[] commandList
 	) {
 		if (disposed) return;
-		long startTime = System.currentTimeMillis();
 		drawCommandList(null, texture, x, y, layout, effect, commandList);
-		primCmdAccum += (int) (System.currentTimeMillis() - startTime);
 	}
 	
 	private final void drawCommandList(

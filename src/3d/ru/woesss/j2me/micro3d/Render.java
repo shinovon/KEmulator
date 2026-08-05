@@ -298,8 +298,10 @@ public class Render {
 			return;
 		}
 		if (!AppSettings.mascotNo2DMixing) {
+			int prevColor = targetGraphics.getColor();
 			targetGraphics.setColor(0);
 			targetGraphics.fillRect(gClip.x, gClip.y, gClip.width, gClip.height);
+			targetGraphics.setColor(prevColor);
 		}
 		backCopied = true;
 	}
