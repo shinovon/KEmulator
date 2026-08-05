@@ -144,9 +144,11 @@ public class IdeaUtils implements SelectionListener, ModifyListener {
 			Settings.ideaJdkTablePatched = false;
 			if (Utils.linux)
 				new IdeaSetupXdgLinux(p).open();
-			else
+			else if (Utils.win)
 				new IdeaSetupWindows(p).open();
-			// TODO macos? headless linux?
+			else if (Utils.macos)
+				new IdeaSetupDarwin(p).open();
+			// TODO headless linux?
 		}
 	}
 

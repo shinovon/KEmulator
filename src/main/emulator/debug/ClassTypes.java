@@ -4,6 +4,7 @@ import emulator.Emulator;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Hashtable;
 
 public final class ClassTypes {
 
@@ -97,7 +98,7 @@ public final class ClassTypes {
 					} else if (cls == Integer.TYPE) {
 						if (var4 == 16)
 							Array.setInt(obj, index, Integer.parseUnsignedInt(value, var4));
-						else if (var4 == 10)
+						else //if (var4 == 10)
 							Array.setInt(obj, index, Integer.parseInt(value, var4));
 					} else if (cls == Short.TYPE) {
 						Array.setShort(obj, index, (short) Integer.parseInt(value, var4));
@@ -151,7 +152,7 @@ public final class ClassTypes {
 			} else if (field.getType() == Integer.TYPE) {
 				if (radix == 16 || radix == 2)
 					field.setInt(obj, Integer.parseUnsignedInt(n, radix));
-				else if (radix == 10)
+				else //if (radix == 10)
 					field.setInt(obj, Integer.parseInt(n, radix));
 			} else if (field.getType() == Short.TYPE) {
 				field.setShort(obj, (short) Integer.parseInt(n, radix));
@@ -182,27 +183,67 @@ public final class ClassTypes {
 	}
 
 	// must be synced with method above!
-	public static boolean canSetFieldValue(Field var1) {
-		if (var1.getType() == Long.TYPE) {
-			return true;
-		} else if (var1.getType() == Integer.TYPE) {
-			return true;
-		} else if (var1.getType() == Short.TYPE) {
-			return true;
-		} else if (var1.getType() == Byte.TYPE) {
-			return true;
-		} else if (var1.getType() == Boolean.TYPE) {
-			return true;
-		} else if (var1.getType() == Float.TYPE) {
-			return true;
-		} else if (var1.getType() == Double.TYPE) {
-			return true;
-		} else if (var1.getType() == Character.TYPE) {
-			return true;
-		} else if (var1.getType() == String.class) {
-			return true;
+	public static boolean canSetFieldValue(Class type) {
+		return type == Long.TYPE
+				|| type == Integer.TYPE
+				|| type == Short.TYPE
+				|| type == Byte.TYPE
+				|| type == Boolean.TYPE
+				|| type == Float.TYPE
+				|| type == Double.TYPE
+				|| type == Character.TYPE
+				|| type == String.class;
+	}
+
+	public static void setHashtableValue(Object target, Object key, String value) {
+		try {
+			Class type = target.getClass();
+			Hashtable table = (Hashtable) target;
+
+			// it isn't possible to assign primitive types to Object in cldc
+//			int radix;
+//			String n = value;
+//			if ((radix = value.startsWith("0x") ? 16 : value.startsWith("0b") ? 2 : 10) != 10) {
+//				n = value.substring(2);
+//			}
+//			if (type == Long.TYPE) {
+//				table.put(key, Long.parseLong(n, radix));
+//			} else if (type == Integer.TYPE) {
+//				if (radix == 16 || radix == 2)
+//					table.put(key, Integer.parseUnsignedInt(n, radix));
+//				else if (radix == 10)
+//					table.put(key, Integer.parseInt(n, radix));
+//			} else if (type == Short.TYPE) {
+//				table.put(key, (short) Integer.parseInt(n, radix));
+//			} else if (type == Byte.TYPE) {
+//				table.put(key, (byte) Integer.parseInt(n, radix));
+//			} else if (type == Boolean.TYPE) {
+//				boolean b = "true".indexOf(value.toLowerCase()) == 0;
+//				if (!b) {
+//					try {
+//						b = Integer.parseInt(n, radix) != 0;
+//					} catch (java.lang.NumberFormatException e) {
+//						b = false;
+//					}
+//				}
+//				table.put(key, b);
+//			} else if (type == Float.TYPE) {
+//				table.put(key,Float.parseFloat(value));
+//			} else if (type == Double.TYPE) {
+//				table.put(key,Double.parseDouble(value));
+//			} else if (type == Character.TYPE) {
+//				table.put(key,value.charAt(0));
+//			} else
+			if ("java.lang.String".equals(type.getName())) {
+				table.put(key, value);
+			}
+		} catch (Exception var4) {
+			Emulator.getEmulator().getLogStream().println(var4.toString());
 		}
-		return false;
+	}
+
+	public static boolean canSetHashtableValue(Class type) {
+		return "java.lang.String".equals(type.getName());
 	}
 
 	public static Object getFieldValue(Object var0, Field var1) {

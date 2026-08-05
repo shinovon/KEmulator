@@ -3,6 +3,7 @@ Copyright (c) 2025 Fyodor Ryzhov
 */
 package emulator.ui.swt;
 
+import emulator.Settings;
 import emulator.debug.Memory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -23,6 +24,7 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 
 	private int maxObjectsSize = 0;
 	private int objSize;
+	private int imgsSize;
 
 	private int interval = 500;
 
@@ -94,6 +96,8 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 	public void refreshStats() {
 		objSize = mv.memoryMgr.objectsSize();
 		maxObjectsSize = Math.max(maxObjectsSize, objSize);
+		imgsSize = mv.memoryMgr.totalObjectsSize("javax.microedition.lcdui.Image")
+				+ mv.memoryMgr.totalObjectsSize("javax.microedition.m3g.Image2D");
 		getDisplay().asyncExec(this);
 	}
 
@@ -101,7 +105,13 @@ public class MemoryViewControls extends Composite implements SelectionListener, 
 	public void run() {
 		long t = Runtime.getRuntime().totalMemory();
 		long f = Runtime.getRuntime().freeMemory();
-		objectsSize.setText(objSize + "B / " + maxObjectsSize + "B");
+		int s1 = objSize;
+		int s2 = maxObjectsSize;
+		if (!Settings.countImagesInObjectsSize) {
+			s1 -= imgsSize;
+			s2 -= imgsSize;
+		}
+		objectsSize.setText(s1 + " / " + s2 + " bytes");
 		totalSize.setText(((objSize + Memory.getBytecodeSize()) / 1024) + "KiB");
 		jvmSize.setText(((t - f) / 1048576) + "/" + (t / 1048576) + "MiB");
 		this.layout(true, true);

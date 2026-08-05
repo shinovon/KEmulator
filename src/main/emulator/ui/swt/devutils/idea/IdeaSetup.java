@@ -111,12 +111,6 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		if (Settings.ideaJdkTablePatched) // this is an invalid state! successful patching must close the window.
 			throw new RuntimeException("Attempt to run setup when not needed.");
 
-		if (Utils.macos) {
-			new Label(shell, SWT.NONE).setText("Mac OS is not supported yet. Reach us to become a tester!");
-			shell.layout(true, true);
-			return;
-		}
-
 		if (!Files.exists(Paths.get(Emulator.getAbsolutePath()).resolve("uei"))) {
 			new Label(shell, SWT.NONE).setText("UEI directory is missing in your KEmulator setup.");
 			new Label(shell, SWT.NONE).setText("It contains libraries for your IDE.");
@@ -367,6 +361,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 					new Label(jdkSetupGroup, SWT.NONE).setText("Nothing found.");
 				}
 			}
+			// TODO add jdk for macos
 
 			Group manualJdkSetupGroup = new Group(shell, SWT.NONE);
 			manualJdkSetupGroup.setText("Manual selection");
@@ -713,6 +708,14 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 								throw new RuntimeException();
 							}
 						}
+						if (Utils.macos) {
+							Path path = Paths.get(System.getenv("HOME") + "/Library/Caches/JetBrains/" + defaultFolderName);
+							if (Files.exists(path)) {
+								Runtime.getRuntime().exec(new String[]{"/bin/rm", "-rf", path.toAbsolutePath().toString()}).waitFor();
+							} else {
+								throw new RuntimeException();
+							}
+						}
 					} catch (Exception ignored) {
 						errorMsg("Failed to clear caches", "If your IDE behaves wrong, try do that via \"File > Invalidate caches...\" menu there. Everything else is done successfully, you may get to work.");
 					}
@@ -737,8 +740,14 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			fd.setFilterExtensions(new String[]{"idea*.exe", "idea*.bat"});
 		else if (Utils.linux)
 			fd.setFilterExtensions(new String[]{"idea", "idea*.sh"});
+		else if (Utils.macos)
+			fd.setFilterExtensions(new String[]{"*.app"});
 		String path = fd.open();
 		if (path == null) return;
+		if (Utils.macos) {
+			path = path + "/Contents/MacOS/idea";
+			if (!new File(path).exists()) return;
+		}
 		Settings.ideaPath = path;
 		refreshContent();
 	}
@@ -814,6 +823,8 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 		Path infoPath;
 		if (Settings.ideaPath.equals("/usr/bin/idea"))
 			infoPath = Paths.get("/usr/share/idea/product-info.json");
+		else if (Settings.ideaPath.equals("/Applications/IntelliJ IDEA.app/Contents/MacOS/idea"))
+			infoPath = Paths.get("/Applications/IntelliJ IDEA.app/Contents/Resources/product-info.json");
 		else
 			infoPath = Paths.get(Settings.ideaPath).getParent().getParent().resolve("product-info.json");
 		String content = String.join("", Files.readAllLines(infoPath));

@@ -232,6 +232,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button showAppSettingsBtn;
 	private Button maMidiCheck;
 	private Button passMinimizeBtn;
+	private Button countImagesSize;
 
 	public Property() {
 		super();
@@ -433,6 +434,7 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.showAppSettingsOnStart = Boolean.parseBoolean(properties.getProperty("ShowAppSettingsOnStart", "true"));
 			Settings.globalSettings = Boolean.parseBoolean(properties.getProperty("GlobalSettings", "false"));
 			Settings.storeCreatedImages = Boolean.parseBoolean(properties.getProperty("StoreCreatedImages", "false"));
+			Settings.countImagesInObjectsSize = Boolean.parseBoolean(properties.getProperty("CountImagesInObjectsSize", "false"));
 
 			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
 			Settings.wavCache = Boolean.parseBoolean(properties.getProperty("WavCache", "true"));
@@ -690,6 +692,7 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("ShowAppSettingsOnStart", String.valueOf(Settings.showAppSettingsOnStart));
 			properties.setProperty("GlobalSettings", String.valueOf(Settings.globalSettings));
 			properties.setProperty("StoreCreatedImages", String.valueOf(Settings.storeCreatedImages));
+			properties.setProperty("CountImagesInObjectsSize", String.valueOf(Settings.countImagesInObjectsSize));
 
 			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
 			properties.setProperty("WavCache", String.valueOf(Settings.wavCache));
@@ -865,6 +868,7 @@ public final class Property implements IProperty, SelectionListener {
 
 		Settings.storeCreatedImages = storeCreatedImagesBtn.getSelection();
 		Settings.showAppSettingsOnStart = showAppSettingsBtn.getSelection();
+		Settings.countImagesInObjectsSize = countImagesSize.getSelection();
 
 		if (maMidiCheck != null) Settings.maMidi = maMidiCheck.getSelection();
 
@@ -2108,6 +2112,11 @@ public final class Property implements IProperty, SelectionListener {
 		storeCreatedImagesBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		storeCreatedImagesBtn.setText("Memory View: Record created images");
 		storeCreatedImagesBtn.setSelection(Settings.storeCreatedImages);
+
+		countImagesSize = new Button(grpDebug, 32);
+		countImagesSize.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		countImagesSize.setText("Memory View: Count images in objects total size");
+		countImagesSize.setSelection(Settings.countImagesInObjectsSize);
 		
 		this.aButton714 = new Button(grpDebug, 32);
 		aButton714.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
