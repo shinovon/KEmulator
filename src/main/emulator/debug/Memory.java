@@ -284,7 +284,9 @@ public final class Memory {
 						this.collectObjects(value.getClass(), value, path.append(value, i), true);
 					}
 				}
-			} else if (o instanceof Vector) {
+				return;
+			}
+			if (o instanceof Vector) {
 				final Enumeration<Object> elements = (Enumeration<Object>) ((Vector) o).elements();
 				int index = 0;
 				while (elements.hasMoreElements()) {
