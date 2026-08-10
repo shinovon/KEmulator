@@ -328,7 +328,7 @@ public final class Memory {
 				newPath = new ReferencePath(clazz.getName(), true).append(value, fieldName, false);
 			else
 				newPath = path.append(value, fieldName, false);
-			if (!f.getType().isPrimitive() && value != null) {
+			if (!f.getType().isPrimitive() && value != null && value != o) {
 				this.collectObjects(value.getClass(), value, newPath, false);
 			}
 		}
