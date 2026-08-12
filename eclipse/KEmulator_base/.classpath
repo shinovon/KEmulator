@@ -17,7 +17,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/micro3d_stub"/>
 	<classpathentry kind="lib" path="lib/asm-all-5.2.jar"/>
 	<classpathentry kind="lib" path="lib/bridj-0.7.0.jar"/>
-	<classpathentry kind="lib" path="lib/java-discord-rpc-2.0.1-all.jar"/>
 	<classpathentry kind="lib" path="lib/jinput.jar"/>
 	<classpathentry kind="lib" path="lib/jna-5.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/jna-platform-5.7.0.jar"/>
