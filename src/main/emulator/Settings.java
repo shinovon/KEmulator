@@ -48,8 +48,6 @@ public final class Settings {
 	public static boolean infoColorHex;
 	public static boolean autoGenJad;
 
-	public static boolean rpc;
-
 	// debug
 	public static boolean recordReleasedImg;
 	public static boolean xrayOverlapScreen;

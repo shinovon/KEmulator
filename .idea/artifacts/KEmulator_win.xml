@@ -20,7 +20,6 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jutils.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/home/swt-win32-x86.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/bridj-0.7.0-win32.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/java-discord-rpc-2.0.1-win32.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/webcam-capture-0.3.12-win32.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/zip.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/asm-all-5.2.jar" path-in-jar="/" />

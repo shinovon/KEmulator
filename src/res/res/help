@@ -12,6 +12,7 @@ Added custom class watcher view for Hashtable
 Added datagram support
 Added MascotME as micro3d software engine
 Initial macOS support in IDEA setup
+Removed discord rich presence
 
 $v2.21.4 [2026.04.08]
 Improved MIDI playback on default JRE synthesizer

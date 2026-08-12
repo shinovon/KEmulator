@@ -26,7 +26,6 @@ $[Libraries]
 swt 4.20 / 4.7 (32-bit)
 asm 5.2
 lwjgl 3.3.6
-java-discord-rpc 2.0.1
 jinput 2.0.5
 jna 5.7.0
 webcam-capture 0.3.12
