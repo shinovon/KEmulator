@@ -298,28 +298,31 @@ public class Graphics
 		this.drawString(s.substring(n, n + n2), n3, n4, n5);
 	}
 
-	public void drawString(final String s, int x, int y, final int a) {
+	public void drawString(final String s, int x, int y, int a) {
 		++Profiler.drawCallCount;
 		if (s == null) {
 			throw new NullPointerException();
 		}
-		if (!method294(a, 2)) {
+		if (a == HCENTER) {
+			// undocumented nokia behavior??
+			a |= VCENTER;
+		} else if (!method294(a, 2)) {
 			throw new IllegalArgumentException();
 		}
 		final Font font = this.font;
 		final int stringWidth = font.stringWidth(s);
 		final int height = font.getHeight();
 		impl.setFont(font.getImpl());
-		if ((a & 0x8) != 0x0) {
+		if ((a & RIGHT) != 0x0) {
 			x -= stringWidth;
-		} else if ((a & 0x1) != 0x0) {
+		} else if ((a & HCENTER) != 0x0) {
 			x -= stringWidth / 2;
 		}
-		if ((a & 0x20) != 0x0) {
+		if ((a & BOTTOM) != 0x0) {
 			y -= height;
-		} else if ((a & 0x2) != 0x0) {
+		} else if ((a & VCENTER) != 0x0) {
 			y -= height / 2;
-		} else if ((a & 0x40) != 0x0) {
+		} else if ((a & BASELINE) != 0x0) {
 			y -= font.getBaselinePosition();
 		}
 		this.impl.drawString(s, x, y + font.getBaselinePosition());
