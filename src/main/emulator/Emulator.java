@@ -8,7 +8,6 @@ import emulator.graphics3D.IGraphics3D;
 import emulator.media.EmulatorMIDI;
 import emulator.media.mmf.MMFPlayer;
 import emulator.ui.IEmulatorFrontend;
-import emulator.ui.RichPresence;
 import emulator.ui.bridge.BridgeFrontend;
 import emulator.ui.swt.EmulatorScreen;
 import emulator.ui.swt.Property;
@@ -134,7 +133,6 @@ public class Emulator implements Runnable {
 	}
 
 	public static void notifyDestroyed() {
-		RichPresence.close();
 		Emulator.emulatorimpl.getProperty().saveProperties();
 		if (Settings.autoGenJad) {
 			generateJad();
@@ -558,7 +556,6 @@ public class Emulator implements Runnable {
 		System.setProperty("microedition.amms.version", "1.0");
 		System.setProperty("org.pigler.api.version", "1.4-kemulator");
 		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
-		System.setProperty("kemulator.rpc.version", "1.0");
 		System.setProperty("ru.nnproject.symbiangl", "0.2-kemulator");
 	}
 
@@ -642,7 +639,6 @@ public class Emulator implements Runnable {
 			AppSettings.init();
 
 			setupMRUList();
-			RichPresence.initRichPresence();
 
 			if (Settings.autoUpdate == 0) {
 				Settings.autoUpdate = updated ? 2 : Emulator.emulatorimpl.getScreen().showUpdateDialog(0);
@@ -708,11 +704,6 @@ public class Emulator implements Runnable {
 			Emulator.emulatorimpl.getScreen().initScreen(AppSettings.screenWidth, AppSettings.screenHeight);
 			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);
 			setProperties();
-			if (Emulator.emulatorimpl.getAppProperty("MIDlet-Name") != null) {
-				RichPresence.rpcState = (AppSettings.uei ? "Debugging " : "Running ") + Emulator.emulatorimpl.getAppProperty("MIDlet-Name");
-				RichPresence.rpcDetails = AppSettings.uei ? "UEI" : new File(midletJarPath).getName();
-				RichPresence.updatePresence();
-			}
 			if (doja) {
 				Emulator.eventQueue = new EventQueue();
 				midlet = new IApplicationMIDlet(Emulator.midletClassName.trim());

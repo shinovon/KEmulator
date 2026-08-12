@@ -1,7 +1,6 @@
 <component name="libraryTable">
   <library name="libraries">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/java-discord-rpc-2.0.1-all.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/webcam-capture-0.3.12.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jinput.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/bridj-0.7.0.jar!/" />

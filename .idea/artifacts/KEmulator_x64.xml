@@ -10,7 +10,6 @@
       <element id="module-output" name="m3g_lwjgl" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/bridj-0.7.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jinput.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/java-discord-rpc-2.0.1-all.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jutils.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/webcam-capture-0.3.12.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/asm-all-5.2.jar" path-in-jar="/" />

@@ -194,7 +194,6 @@ public final class Property implements IProperty, SelectionListener {
 	private Text aText641;
 	private Text aText643;
 	private Button aButton764;
-	private Button rpcBtn;
 	private Button antiAliasBtn;
 	private Composite mediaComp;
 	private Text vlcDirText;
@@ -439,7 +438,6 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.bypassVserv = Boolean.parseBoolean(properties.getProperty("BypassVserv", "true"));
 			Settings.wavCache = Boolean.parseBoolean(properties.getProperty("WavCache", "true"));
 
-			Settings.rpc = Boolean.parseBoolean(properties.getProperty("DiscordRichPresence", "false"));
 			Settings.uiLanguage = properties.getProperty("UILanguage", "en");
 
 			for (int i = 0; i < 5; ++i) {
@@ -697,7 +695,6 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("BypassVserv", String.valueOf(Settings.bypassVserv));
 			properties.setProperty("WavCache", String.valueOf(Settings.wavCache));
 
-			properties.setProperty("DiscordRichPresence", String.valueOf(Settings.rpc));
 			properties.setProperty("UILanguage", Settings.uiLanguage);
 
 			for (int i = 0; i < 5; ++i) {
@@ -821,7 +818,6 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.proxyUser = this.aText639.getText().trim();
 		Settings.proxyPass = this.aText641.getText();
 		Settings.proxyDomain = this.aText643.getText().trim();
-		Settings.rpc = this.rpcBtn.getSelection();
 		Settings.awtAntiAliasing = antiAliasBtn.getSelection();
 		Settings.textAntiAliasing = antiAliasTextBtn.getSelection();
 		Settings.vlcDir = vlcDirText.getText().trim();
@@ -2137,11 +2133,6 @@ public final class Property implements IProperty, SelectionListener {
 		antiAliasBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		antiAliasBtn.setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
 		antiAliasBtn.setSelection(Settings.awtAntiAliasing);
-		
-		rpcBtn = new Button(grpMisc, 32);
-		rpcBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		rpcBtn.setText(UILocale.get("OPTION_SYSTEM_DISCORD_RICHPRESENCE", "Discord Rich Presence"));
-		rpcBtn.setSelection(Settings.rpc);
 
 		passMinimizeBtn = new Button(grpMisc, 32);
 		passMinimizeBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
