@@ -49,7 +49,7 @@ public class TiledBackground extends GraphicObject {
 			throw new IllegalArgumentException("Images must not contain transparent colors.");
 		}
 		for (byte tile : map) {
-			if ((tile & 0xFF) >= tilePixels.getHeight() / 8) {
+			if ((tile & 0xFF) >= tilePixels.getHeight() / 8 + 3) {
 				throw new IllegalArgumentException("Invalid tile number in the map.");
 			}
 		}
@@ -82,8 +82,6 @@ public class TiledBackground extends GraphicObject {
 	}
 
 	protected void paint(Graphics g, int tx, int ty) {
-		g.translate(tx, ty);
-
 		int clipX = g.getClipX();
 		int clipY = g.getClipY();
 		int clipW = g.getClipWidth();
@@ -109,7 +107,6 @@ public class TiledBackground extends GraphicObject {
 				}
 			}
 		}
-		g.translate(-tx, -ty);
 	}
 
 	private static int wrap(int value, int max) {
