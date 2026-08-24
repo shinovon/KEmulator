@@ -1,4 +1,4 @@
-$v2.21.5 [2026.08.xx]
+$v2.21.5 [2026.08.13]
 Fixed crash in debug tools on Java 22+
 Fixed crash when showing empty POPUP ChoiceGroup
 Fixed handling of Graphics translation in M3G
@@ -13,6 +13,7 @@ Added datagram support
 Added MascotME as micro3d software engine
 Initial macOS support in IDEA setup
 Removed discord rich presence
+Fixed TiledBackground in Siemens API
 
 $v2.21.4 [2026.04.08]
 Improved MIDI playback on default JRE synthesizer
