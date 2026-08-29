@@ -400,9 +400,14 @@ public final class Memory {
 		addFieldsWithSupers(clazz, vector);
 		for (int i = vector.size() - 1; i >= 0; i--) {
 			Field f = vector.get(i);
-			f.setAccessible(true);
-			if (Modifier.isFinal(f.getModifiers()) && f.getType().isPrimitive() && Modifier.isStatic(f.getModifiers()))
+			try {
+				f.setAccessible(true);
+				if (Modifier.isFinal(f.getModifiers()) && f.getType().isPrimitive() && Modifier.isStatic(f.getModifiers()))
+					vector.remove(i);
+			} catch (Exception e) {
+				e.printStackTrace();
 				vector.remove(i);
+			}
 		}
 		Field[] array = new Field[vector.size()];
 		return vector.toArray(array);
