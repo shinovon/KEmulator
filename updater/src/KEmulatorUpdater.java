@@ -275,6 +275,8 @@ public class KEmulatorUpdater implements Runnable {
 			cmd.add("--add-opens");
 			cmd.add("java.base/java.io=ALL-UNNAMED");
 			cmd.add("--add-opens");
+			cmd.add("java.base/java.nio=ALL-UNNAMED");
+			cmd.add("--add-opens");
 			cmd.add("java.base/java.util=ALL-UNNAMED");
 			cmd.add("--add-opens");
 			cmd.add("jdk.unsupported/sun.misc=ALL-UNNAMED");

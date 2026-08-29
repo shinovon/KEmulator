@@ -57,6 +57,7 @@ then
     "--add-opens" "java.base/java.lang.reflect=ALL-UNNAMED"
     "--add-opens" "java.base/java.lang.ref=ALL-UNNAMED"
     "--add-opens" "java.base/java.io=ALL-UNNAMED"
+    "--add-opens" "java.base/java.nio=ALL-UNNAMED"
     "--add-opens" "java.base/java.util=ALL-UNNAMED"
     "--add-opens" "jdk.unsupported/sun.misc=ALL-UNNAMED"
     "--add-opens" "java.desktop/com.sun.media.sound=ALL-UNNAMED"
