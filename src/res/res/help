@@ -14,6 +14,8 @@ Added MascotME as micro3d software engine
 Initial macOS support in IDEA setup
 Removed discord rich presence
 Fixed TiledBackground in Siemens API
+Fixed M3G View on Java 9+
+Improved AMR support in multi-platform build
 
 $v2.21.4 [2026.04.08]
 Improved MIDI playback on default JRE synthesizer
