@@ -1,68 +1,55 @@
 package emulator.media.amr;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class AMRDecoder {
-    private static final int[] FRAME_SIZES = {
-            12, 13, 15, 17, 19, 20, 26, 31, 5, 0, 0, 0, 0, 0, 0, 0
-    };
+/**
+ * AMR-NB (narrowband) decoding front-end used by the media subsystem.
+ *
+ * <p>Since the removal of the native {@code amrdecoder} library this is backed by
+ * {@link AmrNbDecoder}, a pure Java port of opencore-amr 0.1.6, so no platform
+ * specific binaries have to be shipped or loaded anymore.</p>
+ */
+public final class AMRDecoder {
 
-    public static byte[] decode(byte[] amrData) throws IOException {
-        ByteArrayInputStream in = new ByteArrayInputStream(amrData);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+	/**
+	 * The ported decoder keeps a fair amount of static scratch state, so only one
+	 * decode may run at a time.
+	 */
+	private static final Object LOCK = new Object();
 
-        // Skip AMR header if present
-        byte[] header = new byte[6];
-        if (in.read(header) == 6 &&
-                header[0] == '#' && header[1] == '!' &&
-                header[2] == 'A' && header[3] == 'M' &&
-                header[4] == 'R' && header[5] == '\n') {
-            // Valid header, proceed
-        } else {
-            // No header, reset stream
-            in = new ByteArrayInputStream(amrData);
-        }
+	private AMRDecoder() {
+	}
 
-        long decoderState = AMRDecoderJni.initDecoder();
-        if (decoderState == 0) {
-            throw new IOException("Failed to initialize AMR decoder");
-        }
-
-        try {
-            byte[] frame = new byte[32]; // Max frame size
-            short[] pcmFrame = new short[160];
-
-            while (in.available() > 0) {
-                int toc = in.read();
-                if (toc == -1) break;
-
-                int frameType = (toc >> 3) & 0x0F;
-                int frameSize = FRAME_SIZES[frameType];
-
-                if (frameSize <= 0) continue;
-
-                int read = in.read(frame, 0, frameSize);
-                if (read != frameSize) break;
-
-                // Combine TOC and frame data
-                byte[] fullFrame = new byte[frameSize + 1];
-                fullFrame[0] = (byte) toc;
-                System.arraycopy(frame, 0, fullFrame, 1, frameSize);
-
-                AMRDecoderJni.decodeFrame(decoderState, fullFrame, pcmFrame);
-
-                // Convert PCM to byte array (little-endian)
-                for (short sample : pcmFrame) {
-                    out.write(sample & 0xFF);
-                    out.write((sample >> 8) & 0xFF);
-                }
-            }
-        } finally {
-            AMRDecoderJni.closeDecoder(decoderState);
-        }
-
-        return out.toByteArray();
-    }
+	/**
+	 * Decodes an AMR-NB stream (IETF storage format, with or without the
+	 * {@code #!AMR\n} magic) into raw 16 bit signed little-endian PCM,
+	 * 8000 Hz, mono.
+	 *
+	 * @param amrData the whole AMR file/stream contents
+	 * @return the decoded PCM data, never {@code null}
+	 * @throws IOException if the data cannot be decoded
+	 */
+	public static byte[] decode(byte[] amrData) throws IOException {
+		if (amrData == null) {
+			throw new IOException("No AMR data");
+		}
+		short[] pcm;
+		try {
+			synchronized (LOCK) {
+				pcm = new AmrNbDecoder().decodeAll(amrData);
+			}
+		} catch (RuntimeException e) {
+			throw new IOException("Failed to decode AMR data: " + e);
+		}
+		if (pcm == null || pcm.length == 0) {
+			throw new IOException("No AMR frames decoded");
+		}
+		byte[] out = new byte[pcm.length * 2];
+		for (int i = 0, j = 0; i < pcm.length; i++) {
+			short s = pcm[i];
+			out[j++] = (byte) (s & 0xFF);
+			out[j++] = (byte) ((s >> 8) & 0xFF);
+		}
+		return out;
+	}
 }
