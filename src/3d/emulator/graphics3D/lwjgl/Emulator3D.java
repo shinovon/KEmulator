@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.*;
@@ -54,7 +55,27 @@ public final class Emulator3D implements IGraphics3D {
 	private int hints;
 	private static int targetWidth;
 	private static int targetHeight;
+	/**
+	 * Size of the underlying GL drawable (glCanvas / glfw window).
+	 * <p>
+	 * This is deliberately decoupled from the target size and only ever grows.
+	 * A render target is always placed in the <b>bottom-left</b> corner of the
+	 * drawable, which is also GL's own origin, so the existing
+	 * {@code targetHeight - y - h} viewport math stays correct no matter how
+	 * much larger the drawable is.
+	 * <p>
+	 * Shrinking the drawable for every small render-to-texture target (portal
+	 * views and similar) used to resize the window several times per frame.
+	 * The resize is applied by another thread, while glViewport/glScissor/
+	 * glReadPixels use the new size immediately, so the two could disagree
+	 * within a single frame - visible as jitter and torn frames.
+	 */
+	private static int drawableWidth;
+	private static int drawableHeight;
 	private static ByteBuffer buffer;
+	/** Scratch buffers for the Image2D readback, reused between frames. */
+	private static byte[] readbackRGBA;
+	private static byte[] readbackRGB;
 	private static BufferedImage awtBufferImage;
 	private static ImageData swtBufferImage;
 	public static final PaletteData swtPalleteData = new PaletteData(-16777216, 16711680, '\uff00');
@@ -183,14 +204,6 @@ public final class Emulator3D implements IGraphics3D {
 
 		try {
 			if (targetWidth != w || targetHeight != h) {
-				if (glCanvas != null) {
-					glCanvas.getDisplay().asyncExec(() -> {
-						glCanvas.setSize(w, h);
-						glCanvas.setVisible(false);
-					});
-				} else {
-					async(() -> glfwSetWindowSize(window, w, h));
-				}
 				if (Settings.g2d == 1) {
 					awtBufferImage = new BufferedImage(w, h, 4);
 				} else {
@@ -199,6 +212,34 @@ public final class Emulator3D implements IGraphics3D {
 				buffer = BufferUtils.createByteBuffer(w * h * 4);
 				targetWidth = w;
 				targetHeight = h;
+			}
+
+			// The drawable only ever grows; a smaller target is rendered into its
+			// bottom-left corner instead of shrinking the window. In practice the
+			// full-screen frame is bound every frame, so after the first frame no
+			// render-to-texture target can trigger a resize at all.
+			//
+			// NOTE: this must stay asynchronous. bindTarget() is synchronized, and
+			// the SWT thread can call into it while painting; blocking here on the
+			// SWT thread (syncExec) while holding the monitor deadlocks the M3G
+			// thread against the UI thread.
+			if (drawableWidth < w || drawableHeight < h) {
+				final int dw = drawableWidth = Math.max(drawableWidth, w);
+				final int dh = drawableHeight = Math.max(drawableHeight, h);
+				if (glCanvas != null) {
+					if (glCanvas.getDisplay() == Display.getCurrent()) {
+						glCanvas.setSize(dw, dh);
+						glCanvas.setVisible(false);
+					} else {
+						glCanvas.getDisplay().asyncExec(() -> {
+							if (glCanvas == null || glCanvas.isDisposed()) return;
+							glCanvas.setSize(dw, dh);
+							glCanvas.setVisible(false);
+						});
+					}
+				} else {
+					async(() -> glfwSetWindowSize(window, dw, dh));
+				}
 			}
 
 			async(() -> {
@@ -294,30 +335,43 @@ public final class Emulator3D implements IGraphics3D {
 			if (this.target != null) {
 				if (this.target instanceof Image2D) {
 					Image2D var9 = (Image2D) this.target;
-					buffer.rewind();
-					GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-					byte[] var11 = new byte[width * height * 4];
-					int w = width << 2;
-					int off = var11.length - w;
+					// Read back only as much as the target actually holds. The
+					// drawable may be larger than the target, and GL reads from
+					// its bottom-left corner, which is exactly where we render.
+					int rw = Math.min(width, var9.getWidth());
+					int rh = Math.min(height, var9.getHeight());
 
-					for (int i = height; i > 0; --i) {
+					buffer.rewind();
+					GL11.glReadPixels(x, y, rw, rh, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+					int w = rw << 2;
+					int rgbaLen = w * rh;
+					if (readbackRGBA == null || readbackRGBA.length < rgbaLen)
+						readbackRGBA = new byte[rgbaLen];
+					byte[] var11 = readbackRGBA;
+					// GL returns bottom-up rows, Image2D expects top-down
+					int off = rgbaLen - w;
+
+					for (int i = rh; i > 0; --i) {
 						buffer.get(var11, off, w);
 						off -= w;
 					}
 
-					if (var9.getFormat() == 100) {
-						var9.set(x, y, var9.getWidth(), var9.getHeight(), var11);
+					if (var9.getFormat() == Image2D.RGBA) {
+						var9.set(0, 0, rw, rh, var11);
 					} else {
-						byte[] data = new byte[var9.getWidth() * var9.getHeight() * 3];
-						int var6 = var11.length - 1;
+						int rgbLen = rw * rh * 3;
+						if (readbackRGB == null || readbackRGB.length < rgbLen)
+							readbackRGB = new byte[rgbLen];
+						byte[] data = readbackRGB;
 
-						for (int var7 = data.length - 1; var7 >= 0; data[var7--] = var11[var6--]) {
-							--var6;
-							data[var7--] = var11[var6--];
-							data[var7--] = var11[var6--];
+						for (int s = 0, d = 0; d < rgbLen; s += 4) {
+							data[d++] = var11[s];
+							data[d++] = var11[s + 1];
+							data[d++] = var11[s + 2];
 						}
 
-						var9.set(x, y, var9.getWidth(), var9.getHeight(), data);
+						var9.set(0, 0, rw, rh, data);
 					}
 				} else {
 					Graphics target = (Graphics) this.target;
@@ -1383,6 +1437,9 @@ public final class Emulator3D implements IGraphics3D {
 				window = 0;
 			}
 			if (exiting) return;
+			// the drawable is (re)created below, so any cached size is stale
+			drawableWidth = 0;
+			drawableHeight = 0;
 			int mode = Settings.m3gContextMode == 0 && (Utils.win || Utils.termux) ? 2 : Settings.m3gContextMode;
 			if (!forceWindow && Settings.m3gContextMode != 3 && Emulator.getEmulator() instanceof SWTFrontend) {
 				try {
@@ -1413,8 +1470,9 @@ public final class Emulator3D implements IGraphics3D {
 						}
 
 						public void controlResized(ControlEvent controlEvent) {
-							if (targetWidth == 0 || targetHeight == 0 || glCanvas == null) return;
-							glCanvas.setSize(targetWidth, targetHeight);
+							if (drawableWidth == 0 || drawableHeight == 0) return;
+							if (glCanvas == null || glCanvas.isDisposed()) return;
+							glCanvas.setSize(drawableWidth, drawableHeight);
 							glCanvas.setVisible(false);
 						}
 					}));
