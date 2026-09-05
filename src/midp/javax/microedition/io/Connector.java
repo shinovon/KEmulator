@@ -121,6 +121,10 @@ public class Connector {
 				Permission.checkPermission("connector.open.datagram");
 				return new UDPDatagramConnectionImpl(s);
 			}
+			if (s.startsWith("ssl://")) {
+				Permission.checkPermission("connector.open.ssl");
+				return new SecureConnectionImpl(s);
+			}
 			Connection openPrim = null;
 			String protocol = "";
 			if (s.indexOf(':') != -1) {

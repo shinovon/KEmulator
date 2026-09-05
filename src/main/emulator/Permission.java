@@ -38,6 +38,7 @@ public class Permission {
 				s.equals("connector.open.sms") ||
 				s.equals("connector.open.datagram") ||
 				s.equals("connector.open.datagramreceive") ||
+				s.equals("connector.open.ssl") ||
 				s.equals("location")) {
 			return allowed;
 		} else if (s.equals("media.camera") ||
