@@ -48,7 +48,7 @@ class SocketConnectionImpl implements SocketConnection
 		}
 		switch (b) {
 			case DELAY: {
-				return socket.getTcpNoDelay() ?  1 : 0;
+				return socket.getTcpNoDelay() ? 1 : 0;
 			}
 			case LINGER: {
 				int value = socket.getSoLinger();
