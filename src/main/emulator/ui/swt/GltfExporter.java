@@ -573,9 +573,25 @@ public final class GltfExporter {
             throw new UnsupportedOperationException("Unsupported IndexBuffer type: " + ib.getClass());
         }
         TriangleStripArray tsa = (TriangleStripArray) ib;
-        int[] out = new int[tsa.getIndexCount()];
-        tsa.getIndices(out);
-        return out;
+        int count = tsa.getIndexCount();
+        int[] indices = new int[count];
+        tsa.getIndices(indices);
+
+        int resCount = 0;
+        int[] tmp = new int[count];
+        for (int i = 0; i < count; i += 3) {
+            if (indices[i + 0] == indices[i + 1]
+                    || indices[i + 1] == indices[i + 2]
+                    || indices[i + 0] == indices[i + 2]) {
+                continue;
+            }
+            tmp[resCount++] = indices[i + 0];
+            tmp[resCount++] = indices[i + 1];
+            tmp[resCount++] = indices[i + 2];
+        }
+        int[] res = new int[resCount];
+        System.arraycopy(tmp, 0, res, 0, resCount);
+        return res;
     }
 
     // ---------- materials / textures ----------
