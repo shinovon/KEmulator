@@ -1,6 +1,7 @@
 package emulator.ui.swt;
 
 import emulator.graphics3D.m3g.BoneTransform;
+
 import javax.imageio.ImageIO;
 import javax.microedition.m3g.*;
 import java.awt.image.BufferedImage;
@@ -698,11 +699,36 @@ public final class GltfExporter {
 
     private static final int GLTF_REPEAT = 10497;
     private static final int GLTF_CLAMP_TO_EDGE = 33071;
+    private static final int GLTF_NEAREST = 9728;
+    private static final int GLTF_LINEAR = 9729;
+    private static final int GLTF_NEAREST_MIPMAP_NEAREST = 9984;
+    private static final int GLTF_LINEAR_MIPMAP_NEAREST = 9985;
+    private static final int GLTF_NEAREST_MIPMAP_LINEAR = 9986;
+    private static final int GLTF_LINEAR_MIPMAP_LINEAR = 9987;
 
     private int getSampler(Texture2D tex) {
         boolean clampS = tex.getWrappingS() == Texture2D.WRAP_CLAMP;
         boolean clampT = tex.getWrappingT() == Texture2D.WRAP_CLAMP;
-        long key = (clampS ? 1 : 0) | ((clampT ? 1 : 0) << 1);
+
+        int magFilter = 0, minFilter = 0;
+        {
+            int levelFilter = tex.getLevelFilter();
+            int imageFilter = tex.getImageFilter();
+
+            if (imageFilter == Texture2D.FILTER_NEAREST) {
+                minFilter = magFilter = 0;
+
+                if (levelFilter == Texture2D.FILTER_NEAREST) minFilter = 2;
+                else if (levelFilter == Texture2D.FILTER_LINEAR) minFilter = 4;
+            } else if (imageFilter == Texture2D.FILTER_LINEAR) {
+                minFilter = magFilter = 1;
+
+                if (levelFilter == Texture2D.FILTER_NEAREST) minFilter = 3;
+                else if (levelFilter == Texture2D.FILTER_LINEAR) minFilter = 5;
+            }
+        }
+
+        long key = (clampS ? 1 : 0) | ((clampT ? 1 : 0) << 1) | (magFilter << 2) | (minFilter << 3);
 
         Integer cached = samplerCache.get(key);
         if (cached != null) return cached;
@@ -710,6 +736,28 @@ public final class GltfExporter {
         Map<String, Object> sampler = new LinkedHashMap<>();
         sampler.put("wrapS", clampS ? GLTF_CLAMP_TO_EDGE : GLTF_REPEAT);
         sampler.put("wrapT", clampT ? GLTF_CLAMP_TO_EDGE : GLTF_REPEAT);
+        sampler.put("magFilter", magFilter == 1 ? GLTF_LINEAR : GLTF_NEAREST);
+        switch (minFilter) {
+        case 0:
+            minFilter = GLTF_NEAREST;
+            break;
+        case 1:
+            minFilter = GLTF_LINEAR;
+            break;
+        case 2:
+            minFilter = GLTF_NEAREST_MIPMAP_NEAREST;
+            break;
+        case 3:
+            minFilter = GLTF_LINEAR_MIPMAP_NEAREST;
+            break;
+        case 4:
+            minFilter = GLTF_NEAREST_MIPMAP_LINEAR;
+            break;
+        case 5:
+            minFilter = GLTF_LINEAR_MIPMAP_LINEAR;
+            break;
+        }
+        sampler.put("minFilter", minFilter);
         gSamplers.add(sampler);
         int idx = gSamplers.size() - 1;
         samplerCache.put(key, idx);
