@@ -627,7 +627,7 @@ public class Emulator implements Runnable {
 				Emulator.emulatorimpl = new SWTFrontend();
 			parseLaunchArgs(args);
 			// Force m3g engine to LWJGL in x64 build
-			if (platform.isX64()) Settings.micro3d = Settings.g3d = 1;
+			if (platform.isX64()) Settings.g3d = 1;
 
 			platform.load3D();
 			Controllers.refresh(true);
