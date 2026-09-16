@@ -1,48 +1,106 @@
 package javax.bluetooth;
 
+import emulator.bluetooth.BluetoothStack;
 import javax.microedition.io.Connection;
 
+/**
+ * Full implementation of LocalDevice using LAN emulation.
+ */
 public class LocalDevice {
-	public LocalDevice() {
-		super();
-	}
 
-	public static LocalDevice getLocalDevice() throws BluetoothStateException {
-		return null;
-	}
+    private static LocalDevice instance;
+    private final BluetoothStack stack;
+    private final DiscoveryAgent discoveryAgent;
 
-	public DiscoveryAgent getDiscoveryAgent() {
-		return null;
-	}
+    public LocalDevice() {
+        try {
+            this.stack = BluetoothStack.getInstance();
+            this.discoveryAgent = new DiscoveryAgent(stack);
+        } catch (BluetoothStateException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	public String getFriendlyName() {
-		return "";
-	}
+    private LocalDevice(BluetoothStack stack) {
+        this.stack = stack;
+        this.discoveryAgent = new DiscoveryAgent(stack);
+    }
 
-	public DeviceClass getDeviceClass() {
-		return null;
-	}
+    public static LocalDevice getLocalDevice() throws BluetoothStateException {
+        synchronized (LocalDevice.class) {
+            if (instance == null) {
+                BluetoothStack stack = BluetoothStack.getInstance();
+                instance = new LocalDevice(stack);
+            }
+            return instance;
+        }
+    }
 
-	public boolean setDiscoverable(final int n) throws BluetoothStateException {
-		return false;
-	}
+    public DiscoveryAgent getDiscoveryAgent() {
+        return discoveryAgent;
+    }
 
-	public static String getProperty(final String s) {
-		return null;
-	}
+    public String getFriendlyName() {
+        return stack.getFriendlyName();
+    }
 
-	public int getDiscoverable() {
-		return 0;
-	}
+    public DeviceClass getDeviceClass() {
+        return new DeviceClass(stack.getDeviceClass());
+    }
 
-	public String getBluetoothAddress() {
-		return "";
-	}
+    public boolean setDiscoverable(final int mode) throws BluetoothStateException {
+        return stack.setDiscoverable(mode);
+    }
 
-	public ServiceRecord getRecord(final Connection connection) {
-		return null;
-	}
+    public static String getProperty(final String property) {
+        if (property == null) throw new NullPointerException();
+        try {
+            BluetoothStack stack = BluetoothStack.getInstance();
+            String val = stack.getProperty(property);
+            if (val != null) return val;
+        } catch (BluetoothStateException e) {
+            // If stack not initialized, return null for most, but api version should still work
+        }
+        // Fallback for some properties
+        if ("bluetooth.api.version".equals(property)) return "1.1.1";
+        if ("obex.api.version".equals(property)) return "1.1";
+        return null;
+    }
 
-	public void updateRecord(final ServiceRecord serviceRecord) throws ServiceRegistrationException {
-	}
+    public int getDiscoverable() {
+        return stack.getDiscoverable();
+    }
+
+    public String getBluetoothAddress() {
+        return stack.getLocalAddress();
+    }
+
+    public ServiceRecord getRecord(final Connection notifier) {
+        if (notifier == null) throw new NullPointerException();
+        return stack.getRecord(notifier);
+    }
+
+    public void updateRecord(final ServiceRecord srvRecord) throws ServiceRegistrationException {
+        if (srvRecord == null) throw new NullPointerException();
+        try {
+            stack.updateRecord(srvRecord);
+        } catch (ServiceRegistrationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceRegistrationException(e.getMessage());
+        }
+    }
+
+    /**
+     * JSR-82 1.1.1 method - not in earlier stub but part of spec.
+     */
+    public static boolean isPowerOn() {
+        try {
+            BluetoothStack stack = BluetoothStack.getInstanceIfExists();
+            if (stack == null) return true; // assume on if not initialized
+            return stack.isPowerOn();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

@@ -2,26 +2,29 @@ package com.vodafone.bluetooth;
 
 import java.io.IOException;
 
-public class LocalService
-		extends BaseService {
-	public LocalService() {
-	}
+public class LocalService extends BaseService {
 
-	public LocalService(String paramString)
-			throws NullPointerException {
-		super(null);
-	}
+    public LocalService() {
+        super();
+    }
 
-	public LocalService(String paramString1, String paramString2)
-			throws NullPointerException {
-		super(null, null);
-	}
+    public LocalService(String serviceID) throws NullPointerException {
+        super(serviceID);
+    }
 
-	public final void setServiceID(String paramString)
-			throws IllegalArgumentException, NumberFormatException, IOException {
-	}
+    public LocalService(String serviceID, String serviceName) throws NullPointerException {
+        super(serviceID, serviceName);
+    }
 
-	public final void setServiceName(String paramString)
-			throws IOException {
-	}
+    public final void setServiceID(String id) throws IllegalArgumentException, NumberFormatException, IOException {
+        if (id == null) throw new NullPointerException();
+        // Validate as UUID
+        if (id.length() < 4) throw new IllegalArgumentException("Invalid service ID");
+        this.serviceID = id;
+    }
+
+    public final void setServiceName(String name) throws IOException {
+        if (name == null) throw new NullPointerException();
+        this.serviceName = name;
+    }
 }

@@ -529,7 +529,13 @@ public class Emulator implements Runnable {
 		System.setProperty("supports.recording", "false");
 		System.setProperty("microedition.io.file.FileConnection.version", "1.0");
 		System.setProperty("microedition.pim.version", "1.0");
-		System.setProperty("bluetooth.api.version", "1.0");
+		System.setProperty("bluetooth.api.version", "1.1.1");
+		System.setProperty("obex.api.version", "1.1");
+		System.setProperty("bluetooth.master.switch", "false");
+		System.setProperty("bluetooth.connected.devices.max", "7");
+		System.setProperty("bluetooth.l2cap.receiveMTU.max", "672");
+		System.setProperty("bluetooth.sd.trans.max", "7");
+		System.setProperty("bluetooth.sd.attr.retrievable.max", "100");
 		if (System.getProperty("wireless.messaging.sms.smsc") == null) {
 			System.setProperty("wireless.messaging.sms.smsc", "+8613800010000");
 		}
