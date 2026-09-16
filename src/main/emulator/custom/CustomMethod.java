@@ -300,6 +300,10 @@ public class CustomMethod {
 			Emulator.getEventQueue().stop();
 			Emulator3D.exit();
 		} catch (Throwable ignored) {}
+		// Shutdown whichever Bluetooth backend was selected for this process.
+		try {
+			emulator.bluetooth.BluetoothBackendProvider.shutdown();
+		} catch (Throwable ignored) {}
 		if (trackWriter != null) {
 			try {
 				trackWriter.close();

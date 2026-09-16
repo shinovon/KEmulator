@@ -42,7 +42,7 @@ public final class Property implements IProperty, SelectionListener {
 			// стандартные
 			{"FileConnection (JSR 75)", "javax.microedition.io.file"},
 			{"PIM (JSR 75) (Stub)", "javax.microedition.pim"},
-			{"Bluetooth (JSR 82) (Stub)", "javax.bluetooth"},
+			{"Bluetooth (JSR 82) (LAN Emulation)", "javax.bluetooth"},
 			{"Messaging (JSR 120)", "javax.wireless.messaging"},
 			{"Media (JSR 135)", "javax.microedition.media"},
 			{"Crypto (JSR 177 SATSA)", "javax.crypto"}, // встроено в jre

@@ -125,6 +125,22 @@ public class Connector {
 				Permission.checkPermission("connector.open.ssl");
 				return new SecureConnectionImpl(s);
 			}
+			// Bluetooth emulation over LAN
+			if (!Settings.protectedPackages.contains("javax.bluetooth")) {
+				if (s.startsWith("btspp://") || s.startsWith("btl2cap://") || s.startsWith("btgoep://")) {
+					try {
+						emulator.bluetooth.BluetoothBackend backend =
+								emulator.bluetooth.BluetoothBackendProvider.getInstance();
+						if (s.contains("://localhost:")) {
+							return backend.openServerNotifier(s);
+						} else {
+							return backend.openClientConnection(s);
+						}
+					} catch (javax.bluetooth.BluetoothStateException bse) {
+						throw new IOException("Bluetooth not available: " + bse.getMessage());
+					}
+				}
+			}
 			Connection openPrim = null;
 			String protocol = "";
 			if (s.indexOf(':') != -1) {
