@@ -31,12 +31,27 @@ public final class ImageAWT implements IImage {
 		super();
 		try {
 			img = CopyUtils.toAwt(new ImageData(new ByteArrayInputStream(array)));
-		} catch (SWTException e) {
-			if (!("Invalid image".equals(e.getMessage())
-					|| "Unsupported or unrecognized format".equals(e.getMessage())))
-				throw e;
-			img = ImageIO.read(new ByteArrayInputStream(array));
-			if (img == null) throw new IOException();
+		} catch (Exception e) {
+			try {
+				img = ImageIO.read(new ByteArrayInputStream(array));
+			} catch (IOException e2) {
+				throw e2;
+			} catch (Exception e2) {
+				throw new IOException(e2);
+			}
+
+			int type = img.getType();
+			if (type != BufferedImage.TYPE_INT_ARGB && type != BufferedImage.TYPE_INT_RGB) {
+				BufferedImage newImg = new BufferedImage(img.getWidth(), img.getHeight(),
+						img.getColorModel().hasAlpha() ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
+				Graphics2D g = newImg.createGraphics();
+				try {
+					g.drawImage(img, 0, 0, null);
+				} finally {
+					g.dispose();
+				}
+				img = newImg;
+			}
 		}
 	}
 
