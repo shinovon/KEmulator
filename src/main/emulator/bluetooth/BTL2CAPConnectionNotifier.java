@@ -1,0 +1,47 @@
+package emulator.bluetooth;
+
+import javax.bluetooth.L2CAPConnection;
+import javax.bluetooth.L2CAPConnectionNotifier;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+/**
+ * Server notifier for L2CAP emulated over TCP.
+ */
+public class BTL2CAPConnectionNotifier implements L2CAPConnectionNotifier {
+
+    private final ServerSocket serverSocket;
+    private final String url;
+    private final String psm;
+    private final String serviceName;
+    private boolean closed = false;
+
+    public BTL2CAPConnectionNotifier(ServerSocket serverSocket, String url, String psm, String serviceName) {
+        this.serverSocket = serverSocket;
+        this.url = url;
+        this.psm = psm;
+        this.serviceName = serviceName;
+    }
+
+    @Override
+    public L2CAPConnection acceptAndOpen() throws IOException {
+        if (closed) throw new IOException("Notifier closed");
+        System.out.println("[BT] L2CAP notifier waiting: " + url + " port " + serverSocket.getLocalPort());
+        Socket client = serverSocket.accept();
+        System.out.println("[BT] L2CAP client connected: " + client.getInetAddress());
+        return new BTL2CAPConnection(client, BluetoothConstants.DEFAULT_MTU, BluetoothConstants.DEFAULT_MTU, url);
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (closed) return;
+        closed = true;
+        BluetoothStack stack = BluetoothStack.getInstanceIfExists();
+        if (stack != null) {
+            stack.unregisterService(this);
+        }
+        serverSocket.close();
+        System.out.println("[BT] L2CAP notifier closed: " + url);
+    }
+}

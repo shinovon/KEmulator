@@ -300,6 +300,15 @@ public class CustomMethod {
 			Emulator.getEventQueue().stop();
 			Emulator3D.exit();
 		} catch (Throwable ignored) {}
+		// Shutdown Bluetooth emulation
+		try {
+			emulator.bluetooth.BluetoothStack stack = emulator.bluetooth.BluetoothStack.getInstanceIfExists();
+			if (stack != null) {
+				stack.getDiscoveryManager().stop();
+				stack.getSdpServer().stop();
+				stack.getServiceRegistry().clear();
+			}
+		} catch (Throwable ignored) {}
 		if (trackWriter != null) {
 			try {
 				trackWriter.close();

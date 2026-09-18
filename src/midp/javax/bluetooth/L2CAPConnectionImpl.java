@@ -1,53 +1,87 @@
 package javax.bluetooth;
 
+import emulator.bluetooth.BluetoothStack;
+import emulator.bluetooth.BluetoothUtils;
+import emulator.bluetooth.BTL2CAPConnection;
 import javax.microedition.io.Connection;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
 
+/**
+ * L2CAP client connection implementation.
+ * Delegates to emulator.bluetooth.BTL2CAPConnection (TCP emulated).
+ */
 public class L2CAPConnectionImpl implements L2CAPConnection {
-	Socket socket;
-	InputStream in;
-	OutputStream out;
 
-	protected L2CAPConnectionImpl(final Socket aSocket315) throws IOException {
-		super();
-		this.socket = aSocket315;
-		this.in = aSocket315.getInputStream();
-		this.out = aSocket315.getOutputStream();
-		aSocket315.setReceiveBufferSize(672);
-		aSocket315.setSendBufferSize(672);
-	}
+    private final BTL2CAPConnection impl;
 
-	public int getTransmitMTU() throws IOException {
-		return this.socket.getSendBufferSize();
-	}
+    protected L2CAPConnectionImpl(final java.net.Socket socket, int receiveMTU, int transmitMTU, String url) throws IOException {
+        this.impl = new BTL2CAPConnection(socket, receiveMTU, transmitMTU, url);
+    }
 
-	public int getReceiveMTU() throws IOException {
-		return this.socket.getReceiveBufferSize();
-	}
+    private L2CAPConnectionImpl(BTL2CAPConnection impl) {
+        this.impl = impl;
+    }
 
-	public void send(final byte[] array) throws IOException {
-		this.out.write(array, 0, Math.min(672, array.length));
-	}
+    @Override
+    public int getTransmitMTU() throws IOException {
+        return impl.getTransmitMTU();
+    }
 
-	public int receive(final byte[] array) throws IOException {
-		return this.in.read(array, 0, Math.min(672, array.length));
-	}
+    @Override
+    public int getReceiveMTU() throws IOException {
+        return impl.getReceiveMTU();
+    }
 
-	public boolean ready() throws IOException {
-		return this.in.available() > 0;
-	}
+    @Override
+    public void send(final byte[] data) throws IOException {
+        impl.send(data);
+    }
 
-	public void close() throws IOException {
-		this.socket.close();
-	}
+    @Override
+    public int receive(final byte[] inBuf) throws IOException {
+        return impl.receive(inBuf);
+    }
 
-	public static Connection open(final String s) throws IOException {
-		final int n = s.indexOf("://") + 3;
-		final String substring = s.substring(n, s.indexOf(":", n));
-		final int index = s.indexOf(";");
-		return new L2CAPConnectionImpl(new Socket(substring, Integer.parseInt(s.substring(s.indexOf(":", n) + 1, (index < 0) ? s.length() : index))));
-	}
+    @Override
+    public boolean ready() throws IOException {
+        return impl.ready();
+    }
+
+    @Override
+    public void close() throws IOException {
+        impl.close();
+    }
+
+    public static Connection open(final String url) throws IOException {
+        // Delegate to BluetoothStack
+        try {
+            BluetoothStack stack = BluetoothStack.getInstance();
+            Connection conn = stack.openClientConnection(url);
+            if (conn instanceof L2CAPConnection) {
+                return conn;
+            }
+            if (conn instanceof BTL2CAPConnection) {
+                return new L2CAPConnectionImpl((BTL2CAPConnection) conn);
+            }
+            // If stack returns generic, try to parse as direct TCP for backward compatibility
+            BluetoothUtils.ParsedUrl parsed = BluetoothUtils.parseBtUrl(url);
+            String host = parsed.hostname;
+            int port;
+            try {
+                port = Integer.parseInt(parsed.channel);
+            } catch (NumberFormatException e) {
+                throw new IOException("Invalid L2CAP URL, channel must be PSM or port: " + url);
+            }
+            java.net.Socket socket = new java.net.Socket(host, port);
+            int recvMTU = 672;
+            int transMTU = 672;
+            String r = parsed.getParam("ReceiveMTU");
+            String t = parsed.getParam("TransmitMTU");
+            if (r != null) try { recvMTU = Integer.parseInt(r); } catch (NumberFormatException ignored) {}
+            if (t != null) try { transMTU = Integer.parseInt(t); } catch (NumberFormatException ignored) {}
+            return new L2CAPConnectionImpl(socket, recvMTU, transMTU, url);
+        } catch (BluetoothStateException e) {
+            throw new IOException("Bluetooth stack not available: " + e.getMessage());
+        }
+    }
 }
