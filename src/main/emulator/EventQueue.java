@@ -83,7 +83,7 @@ public final class EventQueue implements Runnable {
 								Emulator.getEmulator().getLogStream().println("Event thread is not responding! Is it dead locked?");
 							}
 						}
-						Displayable._fpsLimiter(false);
+						Displayable._updateFpsCounter();
 						sleep(1000);
 					}
 				} catch (InterruptedException ignored) {}
@@ -194,7 +194,7 @@ public final class EventQueue implements Runnable {
 
 	public void queueRepaint(int x, int y, int w, int h) {
 		if (AppSettings.j2lStyleFpsLimit)
-			Displayable._fpsLimiter(true);
+			Displayable._fpsLimiter();
 
 		synchronized (repaintLock) {
 			int x1 = x,
@@ -274,7 +274,7 @@ public final class EventQueue implements Runnable {
 			internalRepaint(x, y, w, h);
 		}
 		if (!AppSettings.j2lStyleFpsLimit)
-			Displayable._fpsLimiter(true);
+			Displayable._fpsLimiter();
 	}
 
 	public void notifyHidden(Displayable d) {
@@ -302,7 +302,7 @@ public final class EventQueue implements Runnable {
 								internalRepaint(x, y, w, h);
 							}
 							if (!AppSettings.j2lStyleFpsLimit)
-								Displayable._fpsLimiter(true);
+								Displayable._fpsLimiter();
 							break;
 						}
 						case EVENT_CALL: {
