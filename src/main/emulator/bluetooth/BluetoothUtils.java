@@ -127,6 +127,16 @@ public final class BluetoothUtils {
     }
 
     /**
+     * True for the loopback addresses emulator instances can be reached at on
+     * the same machine, and for a missing address. A loopback (or unknown)
+     * address must never replace an address that is known to be routable.
+     */
+    public static boolean isLoopbackAddress(String ip) {
+        if (ip == null || ip.isEmpty()) return true;
+        return ip.startsWith("127.") || "::1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip);
+    }
+
+    /**
      * Get local IP as string.
      */
     public static String getLocalIpString() {

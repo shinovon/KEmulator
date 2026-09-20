@@ -407,6 +407,15 @@ public class BluetoothStack implements BluetoothBackend {
             throw new IOException("Cannot resolve service: " + url);
         }
 
+        if (BluetoothUtils.isLoopbackAddress(ip)) {
+            // Two instances on one PC legitimately connect over loopback. For a
+            // peer that was discovered on the LAN this means the cached address
+            // was replaced by a loopback announcement, and the connection would
+            // go back to this same machine.
+            System.out.println("[BT] Warning: peer " + hostname + " resolved to loopback address " + ip
+                    + " (service port " + serviceTcpPort + ")");
+        }
+
         System.out.println("[BT] Opening client connection to " + ip + ":" + serviceTcpPort + " for " + url);
 
         // Open TCP socket.  Use a bounded connect so an offline LAN peer does

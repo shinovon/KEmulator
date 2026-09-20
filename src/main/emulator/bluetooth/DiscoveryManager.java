@@ -40,6 +40,9 @@ public class DiscoveryManager implements Runnable {
     private final Map<String, BluetoothPeer> cachedPeers = new ConcurrentHashMap<>();
     private final Set<String> preknownPeerAddresses =
             Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    // Logs every ignored "peer announced itself over loopback" event once.
+    private static final Set<String> ignoredLoopbackClaims =
+            Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
     // Inquiry state
     private volatile boolean inquiryRunning = false;
@@ -267,22 +270,64 @@ public class DiscoveryManager implements Runnable {
     }
 
     private BluetoothPeer addOrUpdatePeer(String btAddr, String friendlyName, String ip, int sdpPort, int devClass) {
+        String previousIp = null;
+        BluetoothPeer existing = cachedPeers.get(btAddr.toUpperCase());
+        if (existing != null) previousIp = existing.getIpAddress();
+
+        BluetoothPeer peer = addOrUpdatePeer(cachedPeers, btAddr, friendlyName, ip, sdpPort, devClass);
+
+        if (previousIp != null && !previousIp.equals(peer.getIpAddress())
+                && BluetoothUtils.isLoopbackAddress(ip) && !BluetoothUtils.isLoopbackAddress(previousIp)
+                && ignoredLoopbackClaims.add(btAddr.toUpperCase() + '@' + ip)) {
+            System.out.println("[BT] Ignoring loopback claim from " + ip + " for peer " + btAddr
+                    + ", keeping reachable address " + previousIp);
+        }
+        return peer;
+    }
+
+    /**
+     * Updates the peer cache and returns the stored peer.
+     *
+     * <p>Peers are learned from broadcast, multicast and from the explicit
+     * loopback probe that supports several emulator processes on one PC; the
+     * UDP source is cached instead of the self-reported address because the
+     * source is the endpoint that is demonstrably reachable.</p>
+     *
+     * <p>A loopback source, however, must never replace an address that is
+     * already routable. Emulator instances announce themselves over loopback
+     * as well, so without this guard a local instance can silently repoint a
+     * LAN peer at 127.0.0.1; the client then connects to itself instead of the
+     * opponent and the match falls apart. When the only known route really is
+     * loopback (two instances on one PC) the loopback address is kept, and a
+     * later routable announcement still upgrades it.</p>
+     *
+     * <p>Package-private and static so the address preference can be tested
+     * without a running stack.</p>
+     */
+    static BluetoothPeer addOrUpdatePeer(java.util.Map<String, BluetoothPeer> cache,
+                                         String btAddr, String friendlyName, String ip, int sdpPort, int devClass) {
         String key = btAddr.toUpperCase();
-        BluetoothPeer existing = cachedPeers.get(key);
+        BluetoothPeer existing = cache.get(key);
         if (existing != null) {
+            boolean keepKnownAddress = BluetoothUtils.isLoopbackAddress(ip)
+                    && !BluetoothUtils.isLoopbackAddress(existing.getIpAddress());
             existing.setFriendlyName(friendlyName);
-            existing.setIpAddress(ip);
-            if (sdpPort != 0) existing.setSdpPort(sdpPort);
+            if (!keepKnownAddress) {
+                existing.setIpAddress(ip);
+                if (sdpPort != 0) existing.setSdpPort(sdpPort);
+            }
             existing.setDeviceClass(devClass);
             existing.touch();
             return existing;
         } else {
             BluetoothPeer peer = new BluetoothPeer(btAddr, friendlyName, ip, sdpPort, devClass);
-            cachedPeers.put(key, peer);
+            cache.put(key, peer);
             System.out.println("[BT] Discovered peer: " + peer);
             return peer;
         }
     }
+
+
 
     private void sendResponse(String msg, InetAddress address, int port) {
         DatagramSocket responseSocket = socket;
