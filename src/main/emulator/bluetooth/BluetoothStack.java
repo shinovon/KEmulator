@@ -425,23 +425,33 @@ public class BluetoothStack implements BluetoothBackend {
         if (parsed.protocol.equals("btspp")) {
             return new BTSPPConnection(socket, url);
         } else if (parsed.protocol.equals("btl2cap")) {
-            int receiveMTU = 672;
-            int transmitMTU = 672;
-            String recvMtuStr = parsed.getParam("ReceiveMTU");
-            String transMtuStr = parsed.getParam("TransmitMTU");
-            if (recvMtuStr != null) {
-                try { receiveMTU = Integer.parseInt(recvMtuStr); } catch (NumberFormatException ignored) {}
-            }
-            if (transMtuStr != null) {
-                try { transmitMTU = Integer.parseInt(transMtuStr); } catch (NumberFormatException ignored) {}
-            }
-            return new BTL2CAPConnection(socket, receiveMTU, transmitMTU, url);
+            return new BTL2CAPConnection(socket,
+                    parseL2capMtu(parsed, "ReceiveMTU"),
+                    parseL2capMtu(parsed, "TransmitMTU"),
+                    url);
         } else if (parsed.protocol.equals("btgoep")) {
             // For GOEP, return ClientSessionImpl that wraps socket
             return new emulator.bluetooth.obex.ClientSessionImpl(socket, url);
         }
 
         throw new IOException("Unsupported protocol: " + parsed.protocol);
+    }
+
+    /**
+     * Parses an optional L2CAP MTU URL parameter. The connection constructor
+     * performs the final JSR-82 range clamp; this method only preserves the
+     * default when an application supplied a malformed value.
+     */
+    private static int parseL2capMtu(BluetoothUtils.ParsedUrl parsed, String parameterName) {
+        String value = parsed.getParam(parameterName);
+        if (value == null) {
+            return BluetoothConstants.DEFAULT_MTU;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ignored) {
+            return BluetoothConstants.DEFAULT_MTU;
+        }
     }
 
     public Connection openServerNotifier(String url) throws IOException {
@@ -466,7 +476,9 @@ public class BluetoothStack implements BluetoothBackend {
             createServiceRecord(notifier, protocol, channel, serviceName, ss, url);
             return notifier;
         } else if (protocol.equals("btl2cap")) {
-            BTL2CAPConnectionNotifier notifier = new BTL2CAPConnectionNotifier(ss, url, channel, serviceName);
+            BTL2CAPConnectionNotifier notifier = new BTL2CAPConnectionNotifier(ss, url, channel, serviceName,
+                    parseL2capMtu(parsed, "ReceiveMTU"),
+                    parseL2capMtu(parsed, "TransmitMTU"));
             createServiceRecord(notifier, protocol, channel, serviceName, ss, url);
             return notifier;
         } else if (protocol.equals("btgoep")) {
