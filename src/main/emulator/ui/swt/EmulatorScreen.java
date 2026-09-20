@@ -87,7 +87,7 @@ public final class EmulatorScreen implements
 	private ImageAWT screenImageAwt;
 	private ImageAWT backBufferImageAwt;
 	private ImageAWT xrayScreenImageAwt;
-	private static long aLong982;
+	private static long recordTicksCounter;
 	MenuItem awt2dMenuItem;
 	MenuItem swt2dMenuItem;
 
@@ -749,7 +749,7 @@ public final class EmulatorScreen implements
 		if (Settings.playingRecordedKeys) {
 			KeyRecords h = Emulator.getRobot();
 			String method698;
-			while ((method698 = h.method698(EmulatorScreen.aLong982)) != null && method698.length() > 1) {
+			while ((method698 = h.method698(EmulatorScreen.recordTicksCounter)) != null && method698.length() > 1) {
 				final char char1 = method698.charAt(0);
 				final String substring = method698.substring(1);
 				if (char1 == '0') {
@@ -762,7 +762,7 @@ public final class EmulatorScreen implements
 		} else if (Settings.enableKeyCache && !KeyMapping.keyCacheStack.empty()) {
 			final String s = (String) KeyMapping.keyCacheStack.pop();
 			if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-				Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + s);
+				Emulator.getRobot().print(EmulatorScreen.recordTicksCounter + ":" + s);
 			}
 			final char char2 = s.charAt(0);
 			final String substring2 = s.substring(1);
@@ -2089,6 +2089,7 @@ public final class EmulatorScreen implements
 		return realZoom;
 	}
 
+	private long lastStatusUpdate;
 	public void run() {
 		paintPending = false;
 		if (this.pauseState != 1) {
@@ -2109,8 +2110,14 @@ public final class EmulatorScreen implements
 			swtContent.redraw();
 		}
 		this.canvas.redraw();
-		this.updateStatus();
-		++EmulatorScreen.aLong982;
+		if (Settings.fpsCounter) {
+			long now = System.currentTimeMillis();
+			if (now - lastStatusUpdate > 500L) {
+				this.updateStatus();
+				lastStatusUpdate = now;
+			}
+		}
+		++EmulatorScreen.recordTicksCounter;
 		Emulator.getEmulator().syncValues();
 		Profiler.reset();
 		Profiler3D.reset();
@@ -2261,7 +2268,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-			Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '0' + r);
+			Emulator.getRobot().print(EmulatorScreen.recordTicksCounter + ":" + '0' + r);
 		}
 		Emulator.getEventQueue().keyPress(n);
 	}
@@ -2289,7 +2296,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-			Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + r);
+			Emulator.getRobot().print(EmulatorScreen.recordTicksCounter + ":" + '1' + r);
 		}
 		Emulator.getEventQueue().keyRelease(n);
 	}
@@ -2318,7 +2325,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-			Emulator.getRobot().print(EmulatorScreen.aLong982 + ":" + '1' + r);
+			Emulator.getRobot().print(EmulatorScreen.recordTicksCounter + ":" + '1' + r);
 		}
 		Emulator.getEventQueue().keyRelease(Integer.parseInt(r));
 	}
