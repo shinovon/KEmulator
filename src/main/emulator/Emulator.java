@@ -1069,8 +1069,13 @@ public class Emulator implements Runnable {
 			cmd.add("java.desktop/com.sun.media.sound=ALL-UNNAMED");
 			cmd.add("--add-opens");
 			cmd.add("java.desktop/javax.sound.midi=ALL-UNNAMED");
-			if (Utils.isJava17())
+			if (Utils.isJava17()) {
 				cmd.add("--enable-native-access=ALL-UNNAMED");
+				cmd.add("-XX:+UseZGC");
+			}
+		} else {
+			cmd.add("-XX:+UseG1GC");
+			cmd.add("-XX:MaxGCPauseMillis=50");
 		}
 
 		cmd.add("emulator.Emulator");

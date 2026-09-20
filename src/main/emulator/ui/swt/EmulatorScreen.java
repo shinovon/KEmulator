@@ -87,7 +87,7 @@ public final class EmulatorScreen implements
 	private ImageAWT screenImageAwt;
 	private ImageAWT backBufferImageAwt;
 	private ImageAWT xrayScreenImageAwt;
-	private static long recordTicksCounter;
+	private static long framesCount;
 	MenuItem awt2dMenuItem;
 	MenuItem swt2dMenuItem;
 
@@ -749,7 +749,7 @@ public final class EmulatorScreen implements
 		if (Settings.playingRecordedKeys) {
 			KeyRecords h = Emulator.getRobot();
 			String method698;
-			while ((method698 = h.method698(EmulatorScreen.recordTicksCounter)) != null && method698.length() > 1) {
+			while ((method698 = h.method698(EmulatorScreen.framesCount)) != null && method698.length() > 1) {
 				final char char1 = method698.charAt(0);
 				final String substring = method698.substring(1);
 				if (char1 == '0') {
@@ -762,7 +762,7 @@ public final class EmulatorScreen implements
 		} else if (Settings.enableKeyCache && !KeyMapping.keyCacheStack.empty()) {
 			final String s = (String) KeyMapping.keyCacheStack.pop();
 			if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-				Emulator.getRobot().print(EmulatorScreen.recordTicksCounter + ":" + s);
+				Emulator.getRobot().print(EmulatorScreen.framesCount + ":" + s);
 			}
 			final char char2 = s.charAt(0);
 			final String substring2 = s.substring(1);
@@ -2117,7 +2117,7 @@ public final class EmulatorScreen implements
 				lastStatusUpdate = now;
 			}
 		}
-		++EmulatorScreen.recordTicksCounter;
+		++EmulatorScreen.framesCount;
 		Emulator.getEmulator().syncValues();
 		Profiler.reset();
 		Profiler3D.reset();
@@ -2268,7 +2268,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-			Emulator.getRobot().print(EmulatorScreen.recordTicksCounter + ":" + '0' + r);
+			Emulator.getRobot().print(EmulatorScreen.framesCount + ":" + '0' + r);
 		}
 		Emulator.getEventQueue().keyPress(n);
 	}
@@ -2296,7 +2296,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-			Emulator.getRobot().print(EmulatorScreen.recordTicksCounter + ":" + '1' + r);
+			Emulator.getRobot().print(EmulatorScreen.framesCount + ":" + '1' + r);
 		}
 		Emulator.getEventQueue().keyRelease(n);
 	}
@@ -2325,7 +2325,7 @@ public final class EmulatorScreen implements
 			return;
 		}
 		if (Settings.recordKeys && !Settings.playingRecordedKeys) {
-			Emulator.getRobot().print(EmulatorScreen.recordTicksCounter + ":" + '1' + r);
+			Emulator.getRobot().print(EmulatorScreen.framesCount + ":" + '1' + r);
 		}
 		Emulator.getEventQueue().keyRelease(Integer.parseInt(r));
 	}

@@ -63,7 +63,13 @@ then
     "--add-opens" "java.desktop/com.sun.media.sound=ALL-UNNAMED"
     "--add-opens" "java.desktop/javax.sound.midi=ALL-UNNAMED"
     "--enable-native-access=ALL-UNNAMED"
+    "-XX:+UseZGC"
   )
+else
+  ARGS+=(
+      "-XX:+UseG1GC"
+      "-XX:MaxGCPauseMillis=50"
+    )
 fi
 
 if [ -z "$1" ]; then
