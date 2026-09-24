@@ -43,7 +43,7 @@ Operating system:
 - Termux / Android, GTK3 (aarch64)
 
 Graphics card:
-- OpenGL 1.3 support for M3G, 2.0 for MascotCapsule
+- OpenGL 1.3 support
 
 ## Building in IntelliJ IDEA
 
