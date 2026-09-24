@@ -1,27 +1,40 @@
 package com.vodafone.bluetooth;
 
+/**
+ * Base service for Vodafone Bluetooth.
+ */
 public class BaseService {
-	public BaseService() {
-	}
 
-	public BaseService(String paramString)
-			throws NullPointerException {
-	}
+    protected String serviceID;
+    protected String serviceName;
 
-	public BaseService(String paramString1, String paramString2)
-			throws NullPointerException {
-	}
+    public BaseService() {
+        this.serviceID = "";
+        this.serviceName = "";
+    }
 
-	public boolean matches(BaseService paramBaseService)
-			throws NullPointerException {
-		return false;
-	}
+    public BaseService(String serviceID) throws NullPointerException {
+        if (serviceID == null) throw new NullPointerException();
+        this.serviceID = serviceID;
+        this.serviceName = "";
+    }
 
-	public String getServiceID() {
-		return null;
-	}
+    public BaseService(String serviceID, String serviceName) throws NullPointerException {
+        if (serviceID == null || serviceName == null) throw new NullPointerException();
+        this.serviceID = serviceID;
+        this.serviceName = serviceName;
+    }
 
-	public String getServiceName() {
-		return null;
-	}
+    public boolean matches(BaseService other) throws NullPointerException {
+        if (other == null) throw new NullPointerException();
+        return this.serviceID.equals(other.serviceID);
+    }
+
+    public String getServiceID() {
+        return serviceID;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
 }

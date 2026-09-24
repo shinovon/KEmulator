@@ -1,47 +1,58 @@
 package javax.obex;
 
+import emulator.bluetooth.obex.HeaderSetImpl;
+
+/**
+ * Base class for OBEX server request handling.
+ * Applications should extend this and override onPut, onGet, etc.
+ */
 public class ServerRequestHandler {
-	private long connectionID;
 
-	protected ServerRequestHandler() {
-		super();
-	}
+    private long connectionID;
 
-	public final HeaderSet createHeaderSet() {
-		return null;
-	}
+    protected ServerRequestHandler() {
+        super();
+    }
 
-	public void setConnectionID(final long aLong1168) {
-		this.connectionID = aLong1168;
-	}
+    /**
+     * Creates a new HeaderSet for responses.
+     * Now returns a real implementation.
+     */
+    public final HeaderSet createHeaderSet() {
+        return new HeaderSetImpl();
+    }
 
-	public long getConnectionID() {
-		return this.connectionID;
-	}
+    public void setConnectionID(final long id) {
+        this.connectionID = id;
+    }
 
-	public int onConnect(final HeaderSet set, final HeaderSet set2) {
-		return 0;
-	}
+    public long getConnectionID() {
+        return this.connectionID;
+    }
 
-	public void onDisconnect(final HeaderSet set, final HeaderSet set2) {
-	}
+    public int onConnect(final HeaderSet request, final HeaderSet reply) {
+        return ResponseCodes.OBEX_HTTP_OK;
+    }
 
-	public int onSetPath(final HeaderSet set, final HeaderSet set2, final boolean b, final boolean b2) {
-		return 0;
-	}
+    public void onDisconnect(final HeaderSet request, final HeaderSet reply) {
+    }
 
-	public int onDelete(final HeaderSet set, final HeaderSet set2) {
-		return 0;
-	}
+    public int onSetPath(final HeaderSet request, final HeaderSet reply, final boolean backup, final boolean create) {
+        return ResponseCodes.OBEX_HTTP_OK;
+    }
 
-	public int onPut(final Operation operation) {
-		return 0;
-	}
+    public int onDelete(final HeaderSet request, final HeaderSet reply) {
+        return ResponseCodes.OBEX_HTTP_OK;
+    }
 
-	public int onGet(final Operation operation) {
-		return 0;
-	}
+    public int onPut(final Operation op) {
+        return ResponseCodes.OBEX_HTTP_OK;
+    }
 
-	public void onAuthenticationFailure(final byte[] array) {
-	}
+    public int onGet(final Operation op) {
+        return ResponseCodes.OBEX_HTTP_OK;
+    }
+
+    public void onAuthenticationFailure(final byte[] userName) {
+    }
 }
