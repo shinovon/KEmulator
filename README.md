@@ -35,11 +35,12 @@ JRE:
 - OpenJDK 17-21 (Will run on 22+, but debug tools work is not guaranteed)
 
 Operating system:
-- Windows XP - 11 (x86, x86_64, arm64)
-- Linux GTK3, glibc 2.24+ (x86, x86_64, arm64, arm32)
+- Windows XP - 11 (x86, x86_64, aarch64)
+- Linux GTK3, glibc 2.17+ (x86_64)
+- Linux GTK3, glibc 2.34+ (aarch64, armhf)
 - Mac OS X 10.13 and later (x86_64)
-- macOS 11 Big Sur (arm64)
-- Termux / Android, GTK3 (arm64)
+- macOS 11 Big Sur (aarch64)
+- Termux / Android, GTK3 (aarch64)
 
 Graphics card:
 - OpenGL 1.3 support for M3G, 2.0 for MascotCapsule
