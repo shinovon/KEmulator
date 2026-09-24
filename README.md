@@ -34,12 +34,15 @@ JRE:
 - Java 8 by Oracle
 - OpenJDK 17-21 (Will run on 22+, but debug tools work is not guaranteed)
 
-System:
+Operating system:
 - Windows XP - 11 (x86, x86_64, arm64)
 - Linux GTK3, glibc 2.24+ (x86, x86_64, arm64, arm32)
 - Mac OS X 10.13 and later (x86_64)
 - macOS 11 Big Sur (arm64)
 - Termux / Android, GTK3 (arm64)
+
+Graphics card:
+- OpenGL 1.3 support for M3G, 2.0 for MascotCapsule
 
 ## Building in IntelliJ IDEA
 
