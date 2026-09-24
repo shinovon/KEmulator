@@ -74,19 +74,21 @@ public abstract class Canvas extends Displayable {
 	protected void _paintOverlay(Graphics graphics) {
 		super._paintTicker(graphics);
 		super._paintSoftMenu(graphics);
-		ArrayList<CanvasItem> list = new ArrayList<>(nokiaCanvasItems);
-		list.sort(Comparator.comparingInt(CanvasItem::getZPosition));
-		for (CanvasItem i: list) {
-			if (!i.isVisible()) continue;
-			if (i instanceof CanvasGraphicsItem) {
-				graphics.setClip(i.getPositionX(), i.getPositionY(), i.getWidth(), i.getHeight());
-				graphics.translate(-i.getPositionX(), -i.getPositionY());
-				((CanvasGraphicsItem) i)._invokePaint(graphics);
-				graphics._reset();
-				continue;
-			}
-			if (i instanceof TextEditor) {
-				((TextEditor) i)._invokePaint(graphics);
+		if (!nokiaCanvasItems.isEmpty()) {
+			ArrayList<CanvasItem> list = new ArrayList<>(nokiaCanvasItems);
+			list.sort(Comparator.comparingInt(CanvasItem::getZPosition));
+			for (CanvasItem i : list) {
+				if (!i.isVisible()) continue;
+				if (i instanceof CanvasGraphicsItem) {
+					graphics.setClip(i.getPositionX(), i.getPositionY(), i.getWidth(), i.getHeight());
+					graphics.translate(-i.getPositionX(), -i.getPositionY());
+					((CanvasGraphicsItem) i)._invokePaint(graphics);
+					graphics._reset();
+					continue;
+				}
+				if (i instanceof TextEditor) {
+					((TextEditor) i)._invokePaint(graphics);
+				}
 			}
 		}
 		if (!fullScreen) {

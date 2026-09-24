@@ -1365,11 +1365,14 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	public void finalizeTexture(Image2D image2D) {
-		if (usedGLTextures.contains(image2D.getId()))
-			usedGLTextures.removeElement(image2D.getId());
+		int id = image2D.getId();
+		if (id == 0) return;
 
-		if (!unusedGLTextures.contains(image2D.getId()))
-			unusedGLTextures.add(image2D.getId());
+		if (usedGLTextures.contains(id))
+			usedGLTextures.removeElement(id);
+
+		if (!unusedGLTextures.contains(id))
+			unusedGLTextures.add(id);
 
 		image2D.setId(0);
 	}

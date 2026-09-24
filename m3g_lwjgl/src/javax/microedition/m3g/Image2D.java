@@ -285,7 +285,7 @@ public class Image2D extends Object3D {
 		return var1;
 	}
 
-	public void finalize() {
+	protected void finalize() {
 		// check if was binded
 		if (id == 0) return;
 		((Emulator3D) Graphics3D.getImpl()).finalizeTexture(this);
