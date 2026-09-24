@@ -16,8 +16,9 @@ Cross-platform J2ME emulator, based on decompiled KEmulator 1.0.3
 - Hardware accelerated 3D engine
 - Freely resizable window and fullscreen mode
 - Fixed keyboard controls
-- Improved lcdui implementation
+- Full lcdui implementation
 - Improved multimedia support
+- Improved text input
 - Improved debug tools (Memory View, Class Watcher, Profiler)
 - Returned M3G View from v0.9.8
 - Customizable MIDI soundfont
