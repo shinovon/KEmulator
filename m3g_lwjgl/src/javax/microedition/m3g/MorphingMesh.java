@@ -3,7 +3,7 @@ package javax.microedition.m3g;
 import emulator.graphics3D.m3g.MeshMorph;
 
 public class MorphingMesh extends Mesh {
-	private VertexBuffer[] aVertexBufferArray937;
+	private VertexBuffer[] morphTargets;
 	private float[] weights;
 	public float m_baseWeight;
 
@@ -12,7 +12,7 @@ public class MorphingMesh extends Mesh {
 		if (targets == null) {
 			throw new NullPointerException();
 		} else {
-			this.aVertexBufferArray937 = new VertexBuffer[targets.length];
+			this.morphTargets = new VertexBuffer[targets.length];
 
 			for (int i = targets.length - 1; i >= 0; --i) {
 				if (targets[i] == null) {
@@ -23,18 +23,18 @@ public class MorphingMesh extends Mesh {
 					throw new IllegalArgumentException("targets is empty");
 				}
 
-				this.aVertexBufferArray937[i] = targets[i];
-				this.addReference(this.aVertexBufferArray937[i]);
+				this.morphTargets[i] = targets[i];
+				this.addReference(this.morphTargets[i]);
 			}
 
-			this.weights = new float[this.aVertexBufferArray937.length];
+			this.weights = new float[this.morphTargets.length];
 			this.m_baseWeight = 1.0F;
 		}
 	}
 
 	public MorphingMesh(VertexBuffer base, VertexBuffer[] targets, IndexBuffer[] triangles, Appearance[] appearances) {
 		super(base, triangles, appearances);
-		this.aVertexBufferArray937 = new VertexBuffer[targets.length];
+		this.morphTargets = new VertexBuffer[targets.length];
 
 		for (int i = targets.length - 1; i >= 0; --i) {
 			if (targets[i] == null) {
@@ -45,31 +45,31 @@ public class MorphingMesh extends Mesh {
 				throw new IllegalArgumentException("targets is empty");
 			}
 
-			this.aVertexBufferArray937[i] = targets[i];
-			this.addReference(this.aVertexBufferArray937[i]);
+			this.morphTargets[i] = targets[i];
+			this.addReference(this.morphTargets[i]);
 		}
 
-		this.weights = new float[this.aVertexBufferArray937.length];
+		this.weights = new float[this.morphTargets.length];
 		this.m_baseWeight = 1.0F;
 	}
 
 	protected Object3D duplicateObject() {
 		MorphingMesh copy;
 		(copy = (MorphingMesh) super.duplicateObject()).weights = (float[]) this.weights.clone();
-		copy.aVertexBufferArray937 = (VertexBuffer[]) this.aVertexBufferArray937.clone();
+		copy.morphTargets = (VertexBuffer[]) this.morphTargets.clone();
 		return copy;
 	}
 
 	public VertexBuffer getMorphTarget(int index) {
-		if (index >= 0 && index < this.aVertexBufferArray937.length) {
-			return this.aVertexBufferArray937[index];
+		if (index >= 0 && index < this.morphTargets.length) {
+			return this.morphTargets[index];
 		} else {
 			throw new IndexOutOfBoundsException();
 		}
 	}
 
 	public int getMorphTargetCount() {
-		return this.aVertexBufferArray937.length;
+		return this.morphTargets.length;
 	}
 
 	public void setWeights(float[] weights) {

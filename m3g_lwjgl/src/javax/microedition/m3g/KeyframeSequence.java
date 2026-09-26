@@ -13,7 +13,7 @@ public class KeyframeSequence extends Object3D {
 	private int keyframeCount;
 	private int componentCount;
 	private int interpolationType;
-	private float[][] aFloatArrayArray144;
+	private float[][] keyframeValues;
 	private int[] keyframes;
 	private int validRangeFirst;
 	private int validRangeLast;
@@ -22,22 +22,22 @@ public class KeyframeSequence extends Object3D {
 	private boolean dirty;
 	private float[][] inTangent;
 	private float[][] outTangent;
-	private Quaternion[] a;
-	private Quaternion[] b;
+	private Quaternion[] squadOutControls;
+	private Quaternion[] squadInControls;
 
 	protected Object3D duplicateObject() {
 		KeyframeSequence copy;
 		(copy = (KeyframeSequence) super.duplicateObject()).keyframes = (int[]) this.keyframes.clone();
-		copy.aFloatArrayArray144 = new float[this.keyframeCount][this.componentCount];
+		copy.keyframeValues = new float[this.keyframeCount][this.componentCount];
 		int i;
 		if (this.interpolationType == 179) {
-			for (i = 0; i < this.a.length; ++i) {
-				copy.a[i] = new Quaternion(this.a[i]);
-				copy.b[i] = new Quaternion(this.b[i]);
+			for (i = 0; i < this.squadOutControls.length; ++i) {
+				copy.squadOutControls[i] = new Quaternion(this.squadOutControls[i]);
+				copy.squadInControls[i] = new Quaternion(this.squadInControls[i]);
 			}
 
 			for (i = 0; i < this.keyframeCount; ++i) {
-				copy.aFloatArrayArray144[i] = (float[]) this.aFloatArrayArray144[i].clone();
+				copy.keyframeValues[i] = (float[]) this.keyframeValues[i].clone();
 			}
 		} else if (this.interpolationType == 178) {
 			copy.inTangent = new float[this.keyframeCount][this.componentCount];
@@ -46,7 +46,7 @@ public class KeyframeSequence extends Object3D {
 			for (i = 0; i < this.keyframeCount; ++i) {
 				copy.inTangent[i] = (float[]) this.inTangent[i].clone();
 				copy.outTangent[i] = (float[]) this.outTangent[i].clone();
-				copy.aFloatArrayArray144[i] = (float[]) this.aFloatArrayArray144[i].clone();
+				copy.keyframeValues[i] = (float[]) this.keyframeValues[i].clone();
 			}
 		}
 
@@ -61,7 +61,7 @@ public class KeyframeSequence extends Object3D {
 				this.keyframeCount = numKeyframes;
 				this.componentCount = numComponents;
 				this.interpolationType = interpolation;
-				this.aFloatArrayArray144 = new float[numKeyframes][numComponents];
+				this.keyframeValues = new float[numKeyframes][numComponents];
 				this.keyframes = new int[numKeyframes];
 				this.repeatMode = CONSTANT;
 				this.validRangeFirst = 0;
@@ -72,12 +72,12 @@ public class KeyframeSequence extends Object3D {
 					this.inTangent = new float[numKeyframes][numComponents];
 					this.outTangent = new float[numKeyframes][numComponents];
 				} else if (this.interpolationType == SQUAD) {
-					this.a = new Quaternion[numKeyframes];
-					this.b = new Quaternion[numKeyframes];
+					this.squadOutControls = new Quaternion[numKeyframes];
+					this.squadInControls = new Quaternion[numKeyframes];
 
 					for (int i = 0; i < numKeyframes; ++i) {
-						this.a[i] = new Quaternion();
-						this.b[i] = new Quaternion();
+						this.squadOutControls[i] = new Quaternion();
+						this.squadInControls[i] = new Quaternion();
 					}
 				}
 			}
@@ -108,7 +108,7 @@ public class KeyframeSequence extends Object3D {
 		} else if (index >= 0 && index < this.keyframeCount) {
 			if (time >= 0 && value.length >= this.componentCount) {
 				this.keyframes[index] = time;
-				float[] keyframe = this.aFloatArrayArray144[index];
+				float[] keyframe = this.keyframeValues[index];
 				if (this.interpolationType != 177 && this.interpolationType != 179) {
 					System.arraycopy(value, 0, keyframe, 0, keyframe.length);
 				} else {
@@ -135,7 +135,7 @@ public class KeyframeSequence extends Object3D {
 				throw new IllegalArgumentException();
 			} else {
 				if (value != null) {
-					System.arraycopy(this.aFloatArrayArray144[index], 0, value, 0, this.componentCount);
+					System.arraycopy(this.keyframeValues[index], 0, value, 0, this.componentCount);
 				}
 
 				return this.keyframes[index];
@@ -200,7 +200,7 @@ public class KeyframeSequence extends Object3D {
 		} else {
 			float[] keyframe;
 			if (time < (float) this.keyframes[this.validRangeFirst]) {
-				System.arraycopy(keyframe = this.aFloatArrayArray144[this.validRangeFirst], 0, sample, 0, keyframe.length);
+				System.arraycopy(keyframe = this.keyframeValues[this.validRangeFirst], 0, sample, 0, keyframe.length);
 				if ((delta = (float) this.keyframes[this.validRangeFirst] - time) <= 2.14748365E9F) {
 					return (int) delta;
 				}
@@ -209,7 +209,7 @@ public class KeyframeSequence extends Object3D {
 			}
 
 			if (time >= (float) this.keyframes[this.validRangeLast]) {
-				System.arraycopy(keyframe = this.aFloatArrayArray144[this.validRangeLast], 0, sample, 0, keyframe.length);
+				System.arraycopy(keyframe = this.keyframeValues[this.validRangeLast], 0, sample, 0, keyframe.length);
 				return Integer.MAX_VALUE;
 			}
 		}
@@ -241,7 +241,7 @@ public class KeyframeSequence extends Object3D {
 
 					return 1;
 				} else {
-					System.arraycopy(this.aFloatArrayArray144[frame], 0, sample, 0, this.componentCount);
+					System.arraycopy(this.keyframeValues[frame], 0, sample, 0, this.componentCount);
 					return this.interpolationType != STEP ? 1 : (int) ((float) this.timeDelta(frame) - (time - (float) this.keyframes[frame]));
 				}
 			}
@@ -275,8 +275,8 @@ public class KeyframeSequence extends Object3D {
 	}
 
 	private final void linearInterp(float[] out, float weight, int indexA, int indexB) {
-		float[] frameA = this.aFloatArrayArray144[indexA];
-		float[] frameB = this.aFloatArrayArray144[indexB];
+		float[] frameA = this.keyframeValues[indexA];
+		float[] frameB = this.keyframeValues[indexB];
 
 		for (int i = 0; i < out.length; ++i) {
 			out[i] = frameA[i] + weight * (frameB[i] - frameA[i]);
@@ -285,8 +285,8 @@ public class KeyframeSequence extends Object3D {
 	}
 
 	private final void splineInterp(float[] out, float weight, int indexA, int indexB) {
-		float[] frameA = this.aFloatArrayArray144[indexA];
-		float[] frameB = this.aFloatArrayArray144[indexB];
+		float[] frameA = this.keyframeValues[indexA];
+		float[] frameB = this.keyframeValues[indexB];
 
 		for (int i = 0; i < out.length; ++i) {
 			float a = this.outTangent[indexA][i];
@@ -305,8 +305,8 @@ public class KeyframeSequence extends Object3D {
 		int frame = this.validRangeFirst;
 
 		do {
-			float[] prevValue = this.aFloatArrayArray144[this.keyframeBefore(frame)];
-			float[] nextValue = this.aFloatArrayArray144[this.keyframeAfter(frame)];
+			float[] prevValue = this.keyframeValues[this.keyframeBefore(frame)];
+			float[] nextValue = this.keyframeValues[this.keyframeAfter(frame)];
 			float inScale = this.incomingTangentScale(frame);
 			float outScale = this.outgoingTangentScale(frame);
 
@@ -322,8 +322,8 @@ public class KeyframeSequence extends Object3D {
 		if (out.length != 4) {
 			throw new Error("Invalid keyframe type");
 		} else {
-			Quaternion quatA = new Quaternion(this.aFloatArrayArray144[indexA]);
-			Quaternion quatB = new Quaternion(this.aFloatArrayArray144[indexB]);
+			Quaternion quatA = new Quaternion(this.keyframeValues[indexA]);
+			Quaternion quatB = new Quaternion(this.keyframeValues[indexB]);
 			Quaternion result;
 			(result = new Quaternion()).slerp(weight, quatA, quatB);
 			out[0] = result.x;
@@ -337,10 +337,10 @@ public class KeyframeSequence extends Object3D {
 		if (out.length != 4) {
 			throw new Error("Invalid keyframe type");
 		} else {
-			Quaternion quatA = new Quaternion(this.aFloatArrayArray144[indexA]);
-			Quaternion quatB = new Quaternion(this.aFloatArrayArray144[indexB]);
+			Quaternion quatA = new Quaternion(this.keyframeValues[indexA]);
+			Quaternion quatB = new Quaternion(this.keyframeValues[indexB]);
 			Quaternion result;
-			(result = new Quaternion()).squad(weight, quatA, this.a[indexA], this.b[indexB], quatB);
+			(result = new Quaternion()).squad(weight, quatA, this.squadOutControls[indexA], this.squadInControls[indexB], quatB);
 			out[0] = result.x;
 			out[1] = result.y;
 			out[2] = result.z;
@@ -359,10 +359,10 @@ public class KeyframeSequence extends Object3D {
 		int frame = this.validRangeFirst;
 
 		do {
-			previous.set(this.aFloatArrayArray144[this.keyframeBefore(frame)]);
-			current.set(this.aFloatArrayArray144[frame]);
-			next.set(this.aFloatArrayArray144[this.keyframeAfter(frame)]);
-			afterNext.set(this.aFloatArrayArray144[this.keyframeAfter(this.keyframeAfter(frame))]);
+			previous.set(this.keyframeValues[this.keyframeBefore(frame)]);
+			current.set(this.keyframeValues[frame]);
+			next.set(this.keyframeValues[this.keyframeAfter(frame)]);
+			afterNext.set(this.keyframeValues[this.keyframeAfter(this.keyframeAfter(frame))]);
 			tangent.logDiff(current, next);
 			tmp.logDiff(previous, current);
 			tangent.add(tmp);
@@ -373,16 +373,16 @@ public class KeyframeSequence extends Object3D {
 			scaledTangent.sub(tmp);
 			scaledTangent.mul(0.5F);
 			tmp.exp(scaledTangent);
-			this.a[frame].set(current);
-			this.a[frame].mul(tmp);
+			this.squadOutControls[frame].set(current);
+			this.squadOutControls[frame].mul(tmp);
 			scaledTangent.set(tangent);
 			scaledTangent.mul(this.incomingTangentScale(frame));
 			tmp.logDiff(previous, current);
 			tmp.sub(scaledTangent);
 			tmp.mul(0.5F);
 			tmp.exp(tmp);
-			this.b[frame].set(current);
-			this.b[frame].mul(tmp);
+			this.squadInControls[frame].set(current);
+			this.squadInControls[frame].mul(tmp);
 		} while ((frame = this.keyframeAfter(frame)) != this.validRangeFirst);
 
 	}
