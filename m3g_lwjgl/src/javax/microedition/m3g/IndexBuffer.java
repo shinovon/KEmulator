@@ -5,5 +5,5 @@ public abstract class IndexBuffer extends Object3D {
 
 	public abstract int getIndexCount();
 
-	public abstract void getIndices(int[] var1);
+	public abstract void getIndices(int[] indices);
 }

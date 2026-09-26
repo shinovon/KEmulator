@@ -7,24 +7,24 @@ public class MorphingMesh extends Mesh {
 	private float[] weights;
 	public float m_baseWeight;
 
-	public MorphingMesh(VertexBuffer var1, VertexBuffer[] var2, IndexBuffer var3, Appearance var4) {
-		super(var1, var3, var4);
-		if (var2 == null) {
+	public MorphingMesh(VertexBuffer base, VertexBuffer[] targets, IndexBuffer triangles, Appearance appearance) {
+		super(base, triangles, appearance);
+		if (targets == null) {
 			throw new NullPointerException();
 		} else {
-			this.aVertexBufferArray937 = new VertexBuffer[var2.length];
+			this.aVertexBufferArray937 = new VertexBuffer[targets.length];
 
-			for (int var5 = var2.length - 1; var5 >= 0; --var5) {
-				if (var2[var5] == null) {
+			for (int i = targets.length - 1; i >= 0; --i) {
+				if (targets[i] == null) {
 					throw new NullPointerException();
 				}
 
-				if (var2[var5].getVertexCount() == 0) {
+				if (targets[i].getVertexCount() == 0) {
 					throw new IllegalArgumentException("targets is empty");
 				}
 
-				this.aVertexBufferArray937[var5] = var2[var5];
-				this.addReference(this.aVertexBufferArray937[var5]);
+				this.aVertexBufferArray937[i] = targets[i];
+				this.addReference(this.aVertexBufferArray937[i]);
 			}
 
 			this.weights = new float[this.aVertexBufferArray937.length];
@@ -32,21 +32,21 @@ public class MorphingMesh extends Mesh {
 		}
 	}
 
-	public MorphingMesh(VertexBuffer var1, VertexBuffer[] var2, IndexBuffer[] var3, Appearance[] var4) {
-		super(var1, var3, var4);
-		this.aVertexBufferArray937 = new VertexBuffer[var2.length];
+	public MorphingMesh(VertexBuffer base, VertexBuffer[] targets, IndexBuffer[] triangles, Appearance[] appearances) {
+		super(base, triangles, appearances);
+		this.aVertexBufferArray937 = new VertexBuffer[targets.length];
 
-		for (int var5 = var2.length - 1; var5 >= 0; --var5) {
-			if (var2[var5] == null) {
+		for (int i = targets.length - 1; i >= 0; --i) {
+			if (targets[i] == null) {
 				throw new NullPointerException();
 			}
 
-			if (var2[var5].getVertexCount() == 0) {
+			if (targets[i].getVertexCount() == 0) {
 				throw new IllegalArgumentException("targets is empty");
 			}
 
-			this.aVertexBufferArray937[var5] = var2[var5];
-			this.addReference(this.aVertexBufferArray937[var5]);
+			this.aVertexBufferArray937[i] = targets[i];
+			this.addReference(this.aVertexBufferArray937[i]);
 		}
 
 		this.weights = new float[this.aVertexBufferArray937.length];
@@ -54,15 +54,15 @@ public class MorphingMesh extends Mesh {
 	}
 
 	protected Object3D duplicateObject() {
-		MorphingMesh var1;
-		(var1 = (MorphingMesh) super.duplicateObject()).weights = (float[]) this.weights.clone();
-		var1.aVertexBufferArray937 = (VertexBuffer[]) this.aVertexBufferArray937.clone();
-		return var1;
+		MorphingMesh copy;
+		(copy = (MorphingMesh) super.duplicateObject()).weights = (float[]) this.weights.clone();
+		copy.aVertexBufferArray937 = (VertexBuffer[]) this.aVertexBufferArray937.clone();
+		return copy;
 	}
 
-	public VertexBuffer getMorphTarget(int var1) {
-		if (var1 >= 0 && var1 < this.aVertexBufferArray937.length) {
-			return this.aVertexBufferArray937[var1];
+	public VertexBuffer getMorphTarget(int index) {
+		if (index >= 0 && index < this.aVertexBufferArray937.length) {
+			return this.aVertexBufferArray937[index];
 		} else {
 			throw new IndexOutOfBoundsException();
 		}
@@ -72,29 +72,29 @@ public class MorphingMesh extends Mesh {
 		return this.aVertexBufferArray937.length;
 	}
 
-	public void setWeights(float[] var1) {
-		if (var1 == null) {
+	public void setWeights(float[] weights) {
+		if (weights == null) {
 			throw new NullPointerException();
-		} else if (var1.length < this.weights.length) {
+		} else if (weights.length < this.weights.length) {
 			throw new IllegalArgumentException();
 		} else {
 			this.m_baseWeight = 1.0F;
 
-			for (int var2 = 0; var2 < this.weights.length; ++var2) {
-				this.weights[var2] = var1[var2];
-				this.m_baseWeight -= var1[var2];
+			for (int i = 0; i < this.weights.length; ++i) {
+				this.weights[i] = weights[i];
+				this.m_baseWeight -= weights[i];
 			}
 
 		}
 	}
 
-	public void getWeights(float[] var1) {
-		if (var1 == null) {
+	public void getWeights(float[] weights) {
+		if (weights == null) {
 			throw new NullPointerException();
-		} else if (var1.length < this.weights.length) {
+		} else if (weights.length < this.weights.length) {
 			throw new IllegalArgumentException();
 		} else {
-			System.arraycopy(this.weights, 0, var1, 0, this.weights.length);
+			System.arraycopy(this.weights, 0, weights, 0, this.weights.length);
 		}
 	}
 
@@ -103,12 +103,12 @@ public class MorphingMesh extends Mesh {
 			case 266:
 				this.m_baseWeight = 1.0F;
 
-				for (int var3 = 0; var3 < this.weights.length; ++var3) {
-					if (var3 < values.length) {
-						this.weights[var3] = values[var3];
-						this.m_baseWeight -= values[var3];
+				for (int i = 0; i < this.weights.length; ++i) {
+					if (i < values.length) {
+						this.weights[i] = values[i];
+						this.m_baseWeight -= values[i];
 					} else {
-						this.weights[var3] = 0.0F;
+						this.weights[i] = 0.0F;
 					}
 				}
 

@@ -15,14 +15,14 @@ public class Appearance extends Object3D {
 	}
 
 	protected Object3D duplicateObject() {
-		Appearance var1;
-		(var1 = (Appearance) super.duplicateObject()).textures = (Texture2D[]) this.textures.clone();
-		return var1;
+		Appearance copy;
+		(copy = (Appearance) super.duplicateObject()).textures = (Texture2D[]) this.textures.clone();
+		return copy;
 	}
 
-	public void setLayer(int var1) {
-		if (var1 >= -63 && var1 <= 63) {
-			this.layer = var1;
+	public void setLayer(int layer) {
+		if (layer >= -63 && layer <= 63) {
+			this.layer = layer;
 		} else {
 			throw new IndexOutOfBoundsException();
 		}
@@ -32,9 +32,9 @@ public class Appearance extends Object3D {
 		return this.layer;
 	}
 
-	public void setFog(Fog var1) {
+	public void setFog(Fog fog) {
 		this.removeReference(this.fog);
-		this.fog = var1;
+		this.fog = fog;
 		this.addReference(this.fog);
 	}
 
@@ -42,9 +42,9 @@ public class Appearance extends Object3D {
 		return this.fog;
 	}
 
-	public void setPolygonMode(PolygonMode var1) {
+	public void setPolygonMode(PolygonMode polygonMode) {
 		this.removeReference(this.polygonMode);
-		this.polygonMode = var1;
+		this.polygonMode = polygonMode;
 		this.addReference(this.polygonMode);
 	}
 
@@ -52,9 +52,9 @@ public class Appearance extends Object3D {
 		return this.polygonMode;
 	}
 
-	public void setCompositingMode(CompositingMode var1) {
+	public void setCompositingMode(CompositingMode compositingMode) {
 		this.removeReference(this.compositingMode);
-		this.compositingMode = var1;
+		this.compositingMode = compositingMode;
 		this.addReference(this.compositingMode);
 	}
 
@@ -62,27 +62,27 @@ public class Appearance extends Object3D {
 		return this.compositingMode;
 	}
 
-	public void setTexture(int var1, Texture2D var2) {
-		if (var1 >= 0 && var1 < Emulator3D.NumTextureUnits) {
-			this.removeReference(this.textures[var1]);
-			this.textures[var1] = var2;
-			this.addReference(this.textures[var1]);
+	public void setTexture(int index, Texture2D texture) {
+		if (index >= 0 && index < Emulator3D.NumTextureUnits) {
+			this.removeReference(this.textures[index]);
+			this.textures[index] = texture;
+			this.addReference(this.textures[index]);
 		} else {
 			throw new IndexOutOfBoundsException();
 		}
 	}
 
-	public Texture2D getTexture(int var1) {
-		if (var1 >= 0 && var1 < Emulator3D.NumTextureUnits) {
-			return this.textures[var1];
+	public Texture2D getTexture(int index) {
+		if (index >= 0 && index < Emulator3D.NumTextureUnits) {
+			return this.textures[index];
 		} else {
 			throw new IndexOutOfBoundsException();
 		}
 	}
 
-	public void setMaterial(Material var1) {
+	public void setMaterial(Material material) {
 		this.removeReference(this.material);
-		this.material = var1;
+		this.material = material;
 		this.addReference(this.material);
 	}
 

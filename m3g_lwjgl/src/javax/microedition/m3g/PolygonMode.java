@@ -15,9 +15,9 @@ public class PolygonMode extends Object3D {
 	private boolean localCameraLighting = false;
 	private boolean perspectiveCorrection = false;
 
-	public void setCulling(int var1) {
-		if (var1 >= 160 && var1 <= 162) {
-			this.culling = var1;
+	public void setCulling(int mode) {
+		if (mode >= 160 && mode <= 162) {
+			this.culling = mode;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -27,11 +27,11 @@ public class PolygonMode extends Object3D {
 		return this.culling;
 	}
 
-	public void setWinding(int var1) {
-		if (var1 != 169 && var1 != 168) {
+	public void setWinding(int mode) {
+		if (mode != 169 && mode != 168) {
 			throw new IllegalArgumentException();
 		} else {
-			this.winding = var1;
+			this.winding = mode;
 		}
 	}
 
@@ -39,11 +39,11 @@ public class PolygonMode extends Object3D {
 		return this.winding;
 	}
 
-	public void setShading(int var1) {
-		if (var1 != 164 && var1 != 165) {
+	public void setShading(int mode) {
+		if (mode != 164 && mode != 165) {
 			throw new IllegalArgumentException();
 		} else {
-			this.shading = var1;
+			this.shading = mode;
 		}
 	}
 
@@ -51,24 +51,24 @@ public class PolygonMode extends Object3D {
 		return this.shading;
 	}
 
-	public void setTwoSidedLightingEnable(boolean var1) {
-		this.twoSidedLighting = var1;
+	public void setTwoSidedLightingEnable(boolean enable) {
+		this.twoSidedLighting = enable;
 	}
 
 	public boolean isTwoSidedLightingEnabled() {
 		return this.twoSidedLighting;
 	}
 
-	public void setLocalCameraLightingEnable(boolean var1) {
-		this.localCameraLighting = var1;
+	public void setLocalCameraLightingEnable(boolean enable) {
+		this.localCameraLighting = enable;
 	}
 
 	public boolean isLocalCameraLightingEnabled() {
 		return this.localCameraLighting;
 	}
 
-	public void setPerspectiveCorrectionEnable(boolean var1) {
-		this.perspectiveCorrection = var1;
+	public void setPerspectiveCorrectionEnable(boolean enable) {
+		this.perspectiveCorrection = enable;
 	}
 
 	public boolean isPerspectiveCorrectionEnabled() {
