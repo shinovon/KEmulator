@@ -15,9 +15,9 @@ public class CompositingMode extends Object3D {
 	private boolean colorWrite = true;
 	private boolean alphaWrite = true;
 
-	public void setBlending(int var1) {
-		if (var1 >= 64 && var1 <= 68) {
-			this.blending = var1;
+	public void setBlending(int mode) {
+		if (mode >= 64 && mode <= 68) {
+			this.blending = mode;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -27,9 +27,9 @@ public class CompositingMode extends Object3D {
 		return this.blending;
 	}
 
-	public void setAlphaThreshold(float var1) {
-		if (var1 >= 0.0F && var1 <= 1.0F) {
-			this.alphaThreshold = var1;
+	public void setAlphaThreshold(float threshold) {
+		if (threshold >= 0.0F && threshold <= 1.0F) {
+			this.alphaThreshold = threshold;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -39,41 +39,41 @@ public class CompositingMode extends Object3D {
 		return this.alphaThreshold;
 	}
 
-	public void setAlphaWriteEnable(boolean var1) {
-		this.alphaWrite = var1;
+	public void setAlphaWriteEnable(boolean enable) {
+		this.alphaWrite = enable;
 	}
 
 	public boolean isAlphaWriteEnabled() {
 		return this.alphaWrite;
 	}
 
-	public void setColorWriteEnable(boolean var1) {
-		this.colorWrite = var1;
+	public void setColorWriteEnable(boolean enable) {
+		this.colorWrite = enable;
 	}
 
 	public boolean isColorWriteEnabled() {
 		return this.colorWrite;
 	}
 
-	public void setDepthWriteEnable(boolean var1) {
-		this.depthWrite = var1;
+	public void setDepthWriteEnable(boolean enable) {
+		this.depthWrite = enable;
 	}
 
 	public boolean isDepthWriteEnabled() {
 		return this.depthWrite;
 	}
 
-	public void setDepthTestEnable(boolean var1) {
-		this.depthTest = var1;
+	public void setDepthTestEnable(boolean enable) {
+		this.depthTest = enable;
 	}
 
 	public boolean isDepthTestEnabled() {
 		return this.depthTest;
 	}
 
-	public void setDepthOffset(float var1, float var2) {
-		this.depthOffsetFactor = var1;
-		this.depthOffsetUnits = var2;
+	public void setDepthOffset(float factor, float units) {
+		this.depthOffsetFactor = factor;
+		this.depthOffsetUnits = units;
 	}
 
 	public float getDepthOffsetFactor() {

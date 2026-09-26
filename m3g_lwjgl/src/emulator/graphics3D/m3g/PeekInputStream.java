@@ -13,14 +13,14 @@ public final class PeekInputStream extends InputStream {
 		if (this.counter < this.buffered) {
 			return this.peekBuffer[this.counter++];
 		} else {
-			int var1 = this.stream.read();
+			int value = this.stream.read();
 			if (this.buffered < this.peekBuffer.length) {
-				this.peekBuffer[this.buffered] = var1;
+				this.peekBuffer[this.buffered] = value;
 				++this.buffered;
 			}
 
 			++this.counter;
-			return var1;
+			return value;
 		}
 	}
 
@@ -40,8 +40,8 @@ public final class PeekInputStream extends InputStream {
 		}
 	}
 
-	public PeekInputStream(InputStream var1, int var2) {
-		this.stream = var1;
-		this.peekBuffer = new int[var2];
+	public PeekInputStream(InputStream stream, int bufferSize) {
+		this.stream = stream;
+		this.peekBuffer = new int[bufferSize];
 	}
 }

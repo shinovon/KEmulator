@@ -28,21 +28,21 @@ public abstract class Node extends Transformable {
 		this.boneFlag = false;
 	}
 
-	public void setRenderingEnable(boolean var1) {
-		this.renderingEnable = var1;
+	public void setRenderingEnable(boolean enable) {
+		this.renderingEnable = enable;
 	}
 
-	public void setPickingEnable(boolean var1) {
-		this.pickingEnable = var1;
+	public void setPickingEnable(boolean enable) {
+		this.pickingEnable = enable;
 	}
 
-	public void setScope(int var1) {
-		this.scope = var1;
+	public void setScope(int scope) {
+		this.scope = scope;
 	}
 
-	public void setAlphaFactor(float var1) {
-		if (var1 >= 0.0F && var1 <= 1.0F) {
-			this.alphaFactor = var1;
+	public void setAlphaFactor(float alphaFactor) {
+		if (alphaFactor >= 0.0F && alphaFactor <= 1.0F) {
+			this.alphaFactor = alphaFactor;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -107,7 +107,6 @@ public abstract class Node extends Transformable {
 				rootTarget = rootTarget.parent;
 			}
 
-//                var3.getImpl_().method445();
 			transTarget.getImpl_().invert();
 			transTarget.postMultiply(transThis);
 			transform.set(transTarget);
@@ -127,37 +126,37 @@ public abstract class Node extends Transformable {
 		return depth;
 	}
 
-	protected boolean isParentOf(Node var1) {
-		Node var10000 = var1;
+	protected boolean isParentOf(Node node) {
+		Node next = node;
 
 		while (true) {
-			Node var2 = var10000;
-			if (var10000 == null) {
+			Node current = next;
+			if (next == null) {
 				return false;
 			}
 
-			if (this.equals(var2)) {
+			if (this.equals(current)) {
 				return true;
 			}
 
-			var10000 = var2.getParent();
+			next = current.getParent();
 		}
 	}
 
-	protected boolean isDescendantOf(Node var1) {
-		Node var10000 = this.parent;
+	protected boolean isDescendantOf(Node ancestor) {
+		Node next = this.parent;
 
 		while (true) {
-			Node var2 = var10000;
-			if (var10000 == null) {
+			Node current = next;
+			if (next == null) {
 				return false;
 			}
 
-			if (var1.equals(var2)) {
+			if (ancestor.equals(current)) {
 				return true;
 			}
 
-			var10000 = var2.getParent();
+			next = current.getParent();
 		}
 	}
 
@@ -173,57 +172,57 @@ public abstract class Node extends Transformable {
 		computeAlignment(reference, (Vector4f) null, (Vector4f) null, (Vector4f) null, (Vector4f) null);
 	}
 
-	protected void computeAlignment(Node var1, Vector4f var2, Vector4f var3, Vector4f var4, Vector4f var5) {
-		Node var6 = this.getRoot();
-		if (this.zRef != null && (this.zRef.isDescendantOf(this) || this.zRef.getRoot() != var6)) {
+	protected void computeAlignment(Node reference, Vector4f origin, Vector4f xAxis, Vector4f yAxis, Vector4f zAxis) {
+		Node root = this.getRoot();
+		if (this.zRef != null && (this.zRef.isDescendantOf(this) || this.zRef.getRoot() != root)) {
 			throw new IllegalStateException();
-		} else if (this.yRef == null || !this.yRef.isDescendantOf(this) && this.yRef.getRoot() == var6) {
-			Transform var7 = new Transform();
-			Transform var8 = new Transform();
-			Vector4f var9 = new Vector4f();
-			Quaternion var10 = new Quaternion(0.0F, 0.0F, 0.0F, 1.0F);
-			float[] var11 = new float[3];
-			this.getTranslation(var11);
+		} else if (this.yRef == null || !this.yRef.isDescendantOf(this) && this.yRef.getRoot() == root) {
+			Transform targetTransform = new Transform();
+			Transform tmpTransform = new Transform();
+			Vector4f targetVector = new Vector4f();
+			Quaternion alignRotation = new Quaternion(0.0F, 0.0F, 0.0F, 1.0F);
+			float[] localTranslation = new float[3];
+			this.getTranslation(localTranslation);
 			if (this.zTarget != 144) {
-				if (this.zRef == null && var1 == this) {
+				if (this.zRef == null && reference == this) {
 					throw new IllegalStateException();
 				}
 
-				(this.zRef == null ? var1 : this.zRef).getTransformTo(this.parent, var7);
-				var8.postTranslate(-var11[0], -var11[1], -var11[2]);
-				var7.preMultiply(var8);
-				transformTarget(this.zTarget, var7, var2, var3, var4, var5, var9);
-				var9.w = 0.0F;
-				var10.setRotation(Vector4f.Z_AXIS, var9, (Vector4f) null);
+				(this.zRef == null ? reference : this.zRef).getTransformTo(this.parent, targetTransform);
+				tmpTransform.postTranslate(-localTranslation[0], -localTranslation[1], -localTranslation[2]);
+				targetTransform.preMultiply(tmpTransform);
+				transformTarget(this.zTarget, targetTransform, origin, xAxis, yAxis, zAxis, targetVector);
+				targetVector.w = 0.0F;
+				alignRotation.setRotation(Vector4f.Z_AXIS, targetVector, (Vector4f) null);
 			}
 
 			if (this.yTarget != 144) {
-				if (this.yRef == null && var1 == this) {
+				if (this.yRef == null && reference == this) {
 					throw new IllegalStateException();
 				}
 
-				(this.yRef == null ? var1 : this.yRef).getTransformTo(this.parent, var7);
-				var8.postTranslate(-var11[0], -var11[1], -var11[2]);
-				var7.preMultiply(var8);
+				(this.yRef == null ? reference : this.yRef).getTransformTo(this.parent, targetTransform);
+				tmpTransform.postTranslate(-localTranslation[0], -localTranslation[1], -localTranslation[2]);
+				targetTransform.preMultiply(tmpTransform);
 				if (this.zTarget != 144) {
-					var8.setIdentity();
-					var8.postRotateQuat(var10.x, var10.y, var10.z, -var10.w);
-					var7.preMultiply(var8);
+					tmpTransform.setIdentity();
+					tmpTransform.postRotateQuat(alignRotation.x, alignRotation.y, alignRotation.z, -alignRotation.w);
+					targetTransform.preMultiply(tmpTransform);
 				}
 
-				transformTarget(this.yTarget, var7, var2, var3, var4, var5, var9);
-				var9.w = 0.0F;
+				transformTarget(this.yTarget, targetTransform, origin, xAxis, yAxis, zAxis, targetVector);
+				targetVector.w = 0.0F;
 				if (this.zTarget != 144) {
-					Quaternion var13;
-					(var13 = new Quaternion()).setRotation(Vector4f.Y_AXIS, var9, Vector4f.Z_AXIS);
-					var10.mul(var13);
+					Quaternion yRotation;
+					(yRotation = new Quaternion()).setRotation(Vector4f.Y_AXIS, targetVector, Vector4f.Z_AXIS);
+					alignRotation.mul(yRotation);
 				} else {
-					var10.setRotation(Vector4f.Y_AXIS, var9, (Vector4f) null);
+					alignRotation.setRotation(Vector4f.Y_AXIS, targetVector, (Vector4f) null);
 				}
 			}
 
 			if (this.zTarget != 144 || this.yTarget != 144) {
-				super.rotation.set(var10);
+				super.rotation.set(alignRotation);
 			}
 
 		} else {
@@ -231,22 +230,22 @@ public abstract class Node extends Transformable {
 		}
 	}
 
-	private static void transformTarget(int var0, Transform var1, Vector4f var2, Vector4f var3, Vector4f var4, Vector4f var5, Vector4f var6) {
-		switch (var0) {
+	private static void transformTarget(int target, Transform transform, Vector4f origin, Vector4f xAxis, Vector4f yAxis, Vector4f zAxis, Vector4f result) {
+		switch (target) {
 			case 145:
-				var6.set(var2 == null ? Vector4f.ORIGIN : var2);
+				result.set(origin == null ? Vector4f.ORIGIN : origin);
 				break;
 			case 146:
-				var6.set(var3 == null ? Vector4f.X_AXIS : var3);
+				result.set(xAxis == null ? Vector4f.X_AXIS : xAxis);
 				break;
 			case 147:
-				var6.set(var4 == null ? Vector4f.Y_AXIS : var4);
+				result.set(yAxis == null ? Vector4f.Y_AXIS : yAxis);
 				break;
 			case 148:
-				var6.set(var5 == null ? Vector4f.Z_AXIS : var5);
+				result.set(zAxis == null ? Vector4f.Z_AXIS : zAxis);
 		}
 
-		var1.getImpl_().transform(var6);
+		transform.getImpl_().transform(result);
 	}
 
 	public void setAlignment(Node zRef, int zTarget, Node yRef, int yTarget) {
@@ -266,11 +265,11 @@ public abstract class Node extends Transformable {
 		this.yRef = yRef;
 	}
 
-	public int getAlignmentTarget(int var1) {
-		if (var1 != 148 && var1 != 147) {
+	public int getAlignmentTarget(int axis) {
+		if (axis != 148 && axis != 147) {
 			throw new IllegalArgumentException("axis != Z_AXIS && axis != Y_AXIS");
 		} else {
-			return var1 == 148 ? this.zTarget : this.yTarget;
+			return axis == 148 ? this.zTarget : this.yTarget;
 		}
 	}
 
@@ -309,46 +308,46 @@ public abstract class Node extends Transformable {
 		}
 	}
 
-    /*protected boolean isPickable(Node var1) {
-        Node var10000 = this;
+    /*protected boolean isPickable(Node stopNode) {
+        Node next = this;
 
         while (true) {
-            Node var2 = var10000;
-            if (var10000 == null) {
+            Node current = next;
+            if (next == null) {
                 break;
             }
 
-            if (!var2.pickingEnable) {
+            if (!current.pickingEnable) {
                 return false;
             }
 
-            if (var2 == var1) {
+            if (current == stopNode) {
                 break;
             }
 
-            var10000 = var2.parent;
+            next = current.parent;
         }
 
         return true;
     }*/
 
-	protected abstract boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4);
+	protected abstract boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform);
 
 	protected void enableBoneFlag() {
 		this.boneFlag = true;
 	}
 
 	protected void setSkinnedMeshBone() {
-		Node var10000 = this;
+		Node next = this;
 
 		while (true) {
-			Node var1 = var10000;
-			if (var10000 == null || var1 instanceof SkinnedMesh) {
+			Node current = next;
+			if (next == null || current instanceof SkinnedMesh) {
 				return;
 			}
 
-			var1.enableBoneFlag();
-			var10000 = var1.getParent();
+			current.enableBoneFlag();
+			next = current.getParent();
 		}
 	}
 
@@ -357,18 +356,18 @@ public abstract class Node extends Transformable {
 	}
 
 	protected void updateAlignReferences() {
-		Node var1;
+		Node duplicatedRef;
 		if (this.zTarget != 144) {
-			var1 = this.zRef.m_duplicatedNode;
-			if (this.zRef != null && var1 != null && var1.isDescendantOf(this.m_duplicatedNode.getRoot())) {
-				this.m_duplicatedNode.zRef = var1;
+			duplicatedRef = this.zRef.m_duplicatedNode;
+			if (this.zRef != null && duplicatedRef != null && duplicatedRef.isDescendantOf(this.m_duplicatedNode.getRoot())) {
+				this.m_duplicatedNode.zRef = duplicatedRef;
 			}
 		}
 
 		if (this.yTarget != 144) {
-			var1 = this.yRef.m_duplicatedNode;
-			if (this.yRef != null && var1 != null && var1.isDescendantOf(this.m_duplicatedNode.getRoot())) {
-				this.m_duplicatedNode.yRef = var1;
+			duplicatedRef = this.yRef.m_duplicatedNode;
+			if (this.yRef != null && duplicatedRef != null && duplicatedRef.isDescendantOf(this.m_duplicatedNode.getRoot())) {
+				this.m_duplicatedNode.yRef = duplicatedRef;
 			}
 		}
 
@@ -379,9 +378,9 @@ public abstract class Node extends Transformable {
 	}
 
 	protected Object3D duplicateObject() {
-		Node var1;
-		(var1 = (Node) super.duplicateObject()).parent = null;
-		this.m_duplicatedNode = var1;
-		return var1;
+		Node copy;
+		(copy = (Node) super.duplicateObject()).parent = null;
+		this.m_duplicatedNode = copy;
+		return copy;
 	}
 }

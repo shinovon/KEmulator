@@ -11,11 +11,11 @@ public class Fog extends Object3D {
 	private float far = 1.0F;
 	private int color = 0;
 
-	public void setMode(int var1) {
-		if (var1 != 80 && var1 != 81) {
+	public void setMode(int mode) {
+		if (mode != 80 && mode != 81) {
 			throw new IllegalArgumentException();
 		} else {
-			this.mode = var1;
+			this.mode = mode;
 		}
 	}
 
@@ -23,9 +23,9 @@ public class Fog extends Object3D {
 		return this.mode;
 	}
 
-	public void setLinear(float var1, float var2) {
-		this.near = var1;
-		this.far = var2;
+	public void setLinear(float near, float far) {
+		this.near = near;
+		this.far = far;
 	}
 
 	public float getNearDistance() {
@@ -36,11 +36,11 @@ public class Fog extends Object3D {
 		return this.far;
 	}
 
-	public void setDensity(float var1) {
-		if (var1 < 0.0F) {
+	public void setDensity(float density) {
+		if (density < 0.0F) {
 			throw new IllegalArgumentException();
 		} else {
-			this.density = var1;
+			this.density = density;
 		}
 	}
 
@@ -48,18 +48,18 @@ public class Fog extends Object3D {
 		return this.density;
 	}
 
-	public void setColor(int var1) {
-		this.color = var1;
+	public void setColor(int RGB) {
+		this.color = RGB;
 	}
 
 	public int getColor() {
 		return this.color;
 	}
 
-	protected void updateProperty(int var1, float[] var2) {
-		switch (var1) {
+	protected void updateProperty(int property, float[] value) {
+		switch (property) {
 			case 258:
-				this.color = G3DUtils.getIntColor(var2);
+				this.color = G3DUtils.getIntColor(value);
 				return;
 			case 259:
 			case 261:
@@ -68,16 +68,16 @@ public class Fog extends Object3D {
 			case 265:
 			case 266:
 			default:
-				super.updateProperty(var1, var2);
+				super.updateProperty(property, value);
 				return;
 			case 260:
-				this.density = G3DUtils.limitPositive(var2[0]);
+				this.density = G3DUtils.limitPositive(value[0]);
 				return;
 			case 263:
-				this.far = var2[0];
+				this.far = value[0];
 				return;
 			case 267:
-				this.near = var2[0];
+				this.near = value[0];
 		}
 	}
 }

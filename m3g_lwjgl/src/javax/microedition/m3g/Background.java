@@ -20,42 +20,42 @@ public class Background extends Object3D {
 		this.imageModeX = this.imageModeY = 32;
 	}
 
-	public void setColorClearEnable(boolean var1) {
-		this.colorClear = var1;
+	public void setColorClearEnable(boolean enable) {
+		this.colorClear = enable;
 	}
 
 	public boolean isColorClearEnabled() {
 		return this.colorClear;
 	}
 
-	public void setDepthClearEnable(boolean var1) {
-		this.depthClear = var1;
+	public void setDepthClearEnable(boolean enable) {
+		this.depthClear = enable;
 	}
 
 	public boolean isDepthClearEnabled() {
 		return this.depthClear;
 	}
 
-	public void setColor(int var1) {
-		this.color = var1;
+	public void setColor(int ARGB) {
+		this.color = ARGB;
 	}
 
 	public int getColor() {
 		return this.color;
 	}
 
-	public void setImage(Image2D var1) {
-		if (var1 != null && var1.getFormat() != 99 && var1.getFormat() != 100) {
+	public void setImage(Image2D image) {
+		if (image != null && image.getFormat() != 99 && image.getFormat() != 100) {
 			throw new IllegalArgumentException();
 		} else {
 			this.removeReference(this.image);
-			this.image = var1;
+			this.image = image;
 			this.addReference(this.image);
-			if (var1 != null) {
+			if (image != null) {
 				this.cropX = 0;
 				this.cropY = 0;
-				this.cropWidth = var1.getWidth();
-				this.cropHeight = var1.getHeight();
+				this.cropWidth = image.getWidth();
+				this.cropHeight = image.getHeight();
 			}
 
 		}
@@ -65,14 +65,14 @@ public class Background extends Object3D {
 		return this.image;
 	}
 
-	public void setImageMode(int var1, int var2) {
-		if (var1 != 32 && var1 != 33) {
+	public void setImageMode(int modeX, int modeY) {
+		if (modeX != 32 && modeX != 33) {
 			throw new IllegalArgumentException();
-		} else if (var2 != 32 && var2 != 33) {
+		} else if (modeY != 32 && modeY != 33) {
 			throw new IllegalArgumentException();
 		} else {
-			this.imageModeX = var1;
-			this.imageModeY = var2;
+			this.imageModeX = modeX;
+			this.imageModeY = modeY;
 		}
 	}
 
@@ -84,12 +84,12 @@ public class Background extends Object3D {
 		return this.imageModeY;
 	}
 
-	public void setCrop(int var1, int var2, int var3, int var4) {
-		if (var3 >= 0 && var4 >= 0) {
-			this.cropX = var1;
-			this.cropY = var2;
-			this.cropWidth = var3;
-			this.cropHeight = var4;
+	public void setCrop(int cropX, int cropY, int width, int height) {
+		if (width >= 0 && height >= 0) {
+			this.cropX = cropX;
+			this.cropY = cropY;
+			this.cropWidth = width;
+			this.cropHeight = height;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -111,24 +111,24 @@ public class Background extends Object3D {
 		return this.cropHeight;
 	}
 
-	protected void updateProperty(int var1, float[] var2) {
-		switch (var1) {
+	protected void updateProperty(int property, float[] value) {
+		switch (property) {
 			case 256:
-				this.color = this.color & 16777215 | G3DUtils.getIntColor(var2) & -16777216;
+				this.color = this.color & 16777215 | G3DUtils.getIntColor(value) & -16777216;
 				return;
 			case 257:
 			default:
-				super.updateProperty(var1, var2);
+				super.updateProperty(property, value);
 				break;
 			case 258:
-				this.color = this.color & -16777216 | G3DUtils.getIntColor(var2) & 16777215;
+				this.color = this.color & -16777216 | G3DUtils.getIntColor(value) & 16777215;
 				return;
 			case 259:
-				this.cropX = G3DUtils.round(var2[0]);
-				this.cropY = G3DUtils.round(var2[1]);
-				if (var2.length > 2) {
-					this.cropWidth = Math.max(G3DUtils.round(var2[2]), 0);
-					this.cropHeight = Math.max(G3DUtils.round(var2[3]), 0);
+				this.cropX = G3DUtils.round(value[0]);
+				this.cropY = G3DUtils.round(value[1]);
+				if (value.length > 2) {
+					this.cropWidth = Math.max(G3DUtils.round(value[2]), 0);
+					this.cropHeight = Math.max(G3DUtils.round(value[3]), 0);
 					return;
 				}
 		}

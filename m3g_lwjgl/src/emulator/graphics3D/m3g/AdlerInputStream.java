@@ -8,22 +8,22 @@ public final class AdlerInputStream extends CountedInputStream {
 	private int s2 = 0;
 
 	public final int read() throws IOException {
-		int var1;
-		int var2;
-		if ((var2 = var1 = super.read()) < 0) {
-			var2 += 256;
+		int value;
+		int unsignedValue;
+		if ((unsignedValue = value = super.read()) < 0) {
+			unsignedValue += 256;
 		}
 
-		this.s1 = (this.s1 + var2) % '\ufff1';
+		this.s1 = (this.s1 + unsignedValue) % '\ufff1';
 		this.s2 = (this.s2 + this.s1) % '\ufff1';
-		return var1;
+		return value;
 	}
 
 	public final long getChecksum() {
 		return ((long) this.s2 << 16) + (long) this.s1;
 	}
 
-	public AdlerInputStream(InputStream var1) {
-		super(var1);
+	public AdlerInputStream(InputStream in) {
+		super(in);
 	}
 }

@@ -167,8 +167,8 @@ public class Group extends Node {
 	protected void updateAlignReferences() {
 		super.updateAlignReferences();
 
-		for (int var1 = 0; var1 < this.children.size(); ++var1) {
-			((Node) this.children.get(var1)).updateAlignReferences();
+		for (int i = 0; i < this.children.size(); ++i) {
+			((Node) this.children.get(i)).updateAlignReferences();
 		}
 
 	}
@@ -176,8 +176,8 @@ public class Group extends Node {
 	protected void clearAlignReferences() {
 		super.clearAlignReferences();
 
-		for (int var1 = 0; var1 < this.children.size(); ++var1) {
-			((Node) this.children.get(var1)).clearAlignReferences();
+		for (int i = 0; i < this.children.size(); ++i) {
+			((Node) this.children.get(i)).clearAlignReferences();
 		}
 
 	}

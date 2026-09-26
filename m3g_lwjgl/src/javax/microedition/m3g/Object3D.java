@@ -9,88 +9,88 @@ public abstract class Object3D implements Cloneable {
 	Vector references = new Vector();
 
 	public final int animate(int time) {
-		int var2 = this.animation(time);
+		int validity = this.animation(time);
 
 		for (Object reference : this.references) {
-			var2 = Math.min(var2, ((Object3D) reference).animate(time));
+			validity = Math.min(validity, ((Object3D) reference).animate(time));
 		}
 
-		return var2;
+		return validity;
 	}
 
 	protected final int animation(int time) {
-		int var2 = Integer.MAX_VALUE;
-		int var3 = 0;
+		int validity = Integer.MAX_VALUE;
+		int trackIndex = 0;
 
-		while (var3 < this.animationTracks.size()) {
-			AnimationTrack var4;
-			int var5 = (var4 = (AnimationTrack) this.animationTracks.elementAt(var3)).getTargetProperty();
-			float[] var6 = new float[var4.getKeyframeSequence().getComponentCount()];
-			float[] var7 = new float[2];
-			float var8 = 0.0F;
+		while (trackIndex < this.animationTracks.size()) {
+			AnimationTrack track;
+			int property = (track = (AnimationTrack) this.animationTracks.elementAt(trackIndex)).getTargetProperty();
+			float[] value = new float[track.getKeyframeSequence().getComponentCount()];
+			float[] contribution = new float[2];
+			float weightSum = 0.0F;
 
 			do {
-				var4.getContribution(time, var6, var7);
-				var8 += var7[0];
-				var2 = Math.min(var2, (int) var7[1]);
-				++var3;
-			} while (var3 != this.animationTracks.size() && (var4 = (AnimationTrack) this.animationTracks.elementAt(var3)).getTargetProperty() == var5);
+				track.getContribution(time, value, contribution);
+				weightSum += contribution[0];
+				validity = Math.min(validity, (int) contribution[1]);
+				++trackIndex;
+			} while (trackIndex != this.animationTracks.size() && (track = (AnimationTrack) this.animationTracks.elementAt(trackIndex)).getTargetProperty() == property);
 
-			if (var8 > 0.0F) {
-				this.updateProperty(var5, var6);
+			if (weightSum > 0.0F) {
+				this.updateProperty(property, value);
 			}
 		}
 
-		return var2;
+		return validity;
 	}
 
-	protected void updateProperty(int var1, float[] var2) {
+	protected void updateProperty(int property, float[] value) {
 		throw new Error("Invalid animation target property!");
 	}
 
 	public final Object3D duplicate() {
-		Object3D var1 = this.duplicateObject();
+		Object3D copy = this.duplicateObject();
 		if (this instanceof Node) {
-			Node var2;
-			(var2 = (Node) this).updateAlignReferences();
-			var2.clearAlignReferences();
+			Node node;
+			(node = (Node) this).updateAlignReferences();
+			node.clearAlignReferences();
 		}
 
-		return var1;
+		return copy;
 	}
 
 	protected Object3D duplicateObject() {
-		Object3D var1 = null;
+		Object3D copy = null;
 
 		try {
-			(var1 = (Object3D) this.clone()).references = (Vector) this.references.clone();
-			var1.animationTracks = (Vector) this.animationTracks.clone();
+			(copy = (Object3D) this.clone()).references = (Vector) this.references.clone();
+			copy.animationTracks = (Vector) this.animationTracks.clone();
 		} catch (Exception ignored) {}
 
-		return var1;
+		return copy;
 	}
 
-	public Object3D find(int var1) {
-		if (this.userID == var1) {
+	public Object3D find(int userID) {
+		if (this.userID == userID) {
 			return this;
 		} else {
-			Object3D var2 = null;
+			Object3D found = null;
 
-			for (int var3 = 0; var3 < this.references.size() && (var2 = ((Object3D) this.references.get(var3)).find(var1)) == null; ++var3) {
+			for (int i = 0; i < this.references.size() && (found = ((Object3D) this.references.get(i)).find(userID)) == null; ++i) {
 				;
 			}
 
-			return var2;
+			return found;
 		}
 	}
 
-	public int getReferences(Object3D[] var1) {
-		if (var1 != null && var1.length < this.getReferences((Object3D[]) null)) {
+	public int getReferences(Object3D[] references) {
+		if (references != null && references.length < this.getReferences((Object3D[]) null)) {
 			throw new IllegalArgumentException();
 		} else {
-			if (var1 != null) {
-				for (int var2 = 0; var2 < this.references.size(); ++var2) {
-					var1[var2] = (Object3D) this.references.get(var2);
+			if (references != null) {
+				for (int i = 0; i < this.references.size(); ++i) {
+					references[i] = (Object3D) this.references.get(i);
 				}
 			}
 
@@ -98,61 +98,61 @@ public abstract class Object3D implements Cloneable {
 		}
 	}
 
-	public void setUserID(int var1) {
-		this.userID = var1;
+	public void setUserID(int userID) {
+		this.userID = userID;
 	}
 
 	public int getUserID() {
 		return this.userID;
 	}
 
-	public void setUserObject(Object var1) {
-		this.userObject = var1;
+	public void setUserObject(Object userObject) {
+		this.userObject = userObject;
 	}
 
 	public Object getUserObject() {
 		return this.userObject;
 	}
 
-	public void addAnimationTrack(AnimationTrack var1) {
-		if (var1 == null) {
+	public void addAnimationTrack(AnimationTrack track) {
+		if (track == null) {
 			throw new NullPointerException();
-		} else if (!this.animationTracks.contains(var1) && var1.checkCompatible(this)) {
-			int var2 = var1.getKeyframeSequence().getComponentCount();
-			int var3 = var1.getTargetProperty();
+		} else if (!this.animationTracks.contains(track) && track.checkCompatible(this)) {
+			int componentCount = track.getKeyframeSequence().getComponentCount();
+			int property = track.getTargetProperty();
 
-			for (int var4 = 0; var4 < this.animationTracks.size(); ++var4) {
-				AnimationTrack var5;
-				if ((var5 = (AnimationTrack) this.animationTracks.get(var4)).getTargetProperty() > var3) {
-					this.animationTracks.insertElementAt(var1, var4);
-					this.addReference(var1);
+			for (int i = 0; i < this.animationTracks.size(); ++i) {
+				AnimationTrack existing;
+				if ((existing = (AnimationTrack) this.animationTracks.get(i)).getTargetProperty() > property) {
+					this.animationTracks.insertElementAt(track, i);
+					this.addReference(track);
 					return;
 				}
 
-				if (var5.getTargetProperty() == var3 && var5.getKeyframeSequence().getComponentCount() != var2) {
+				if (existing.getTargetProperty() == property && existing.getKeyframeSequence().getComponentCount() != componentCount) {
 					throw new IllegalArgumentException();
 				}
 			}
 
-			this.animationTracks.addElement(var1);
-			this.addReference(var1);
+			this.animationTracks.addElement(track);
+			this.addReference(track);
 		} else {
 			throw new IllegalArgumentException();
 		}
 	}
 
-	public AnimationTrack getAnimationTrack(int var1) {
-		if (var1 >= 0 && var1 < this.animationTracks.size()) {
-			return (AnimationTrack) this.animationTracks.elementAt(var1);
+	public AnimationTrack getAnimationTrack(int index) {
+		if (index >= 0 && index < this.animationTracks.size()) {
+			return (AnimationTrack) this.animationTracks.elementAt(index);
 		} else {
 			throw new IndexOutOfBoundsException();
 		}
 	}
 
-	public void removeAnimationTrack(AnimationTrack var1) {
-		if (this.animationTracks.contains(var1)) {
-			this.animationTracks.remove(var1);
-			this.removeReference(var1);
+	public void removeAnimationTrack(AnimationTrack track) {
+		if (this.animationTracks.contains(track)) {
+			this.animationTracks.remove(track);
+			this.removeReference(track);
 		}
 
 	}
@@ -161,15 +161,15 @@ public abstract class Object3D implements Cloneable {
 		return this.animationTracks.size();
 	}
 
-	protected void addReference(Object3D var1) {
-		if (var1 != null) {
-			this.references.add(var1);
+	protected void addReference(Object3D reference) {
+		if (reference != null) {
+			this.references.add(reference);
 		}
 	}
 
-	protected void removeReference(Object3D var1) {
-		if (var1 != null) {
-			this.references.remove(var1);
+	protected void removeReference(Object3D reference) {
+		if (reference != null) {
+			this.references.remove(reference);
 		}
 	}
 }

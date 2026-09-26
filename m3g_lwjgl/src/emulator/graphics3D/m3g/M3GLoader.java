@@ -33,34 +33,34 @@ public final class M3GLoader {
 	private boolean containedExternalLinks;
 	private boolean externalLinks;
 
-	public static Object3D[] load(String var0) throws IOException {
-		if (var0 == null) {
+	public static Object3D[] load(String name) throws IOException {
+		if (name == null) {
 			throw new NullPointerException();
 		} else {
 			try {
-				return (new M3GLoader()).loadFromString(var0);
-			} catch (SecurityException var2) {
-				throw var2;
-			} catch (IOException var3) {
-				throw var3;
-			} catch (Exception var4) {
-				throw new IOException(var4);
+				return (new M3GLoader()).loadFromString(name);
+			} catch (SecurityException e) {
+				throw e;
+			} catch (IOException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new IOException(e);
 			}
 		}
 	}
 
-	public static Object3D[] load(byte[] var0, int var1) throws IOException {
-		if (var0 == null) {
+	public static Object3D[] load(byte[] data, int offset) throws IOException {
+		if (data == null) {
 			throw new NullPointerException();
 		} else {
 			try {
-				return (new M3GLoader()).loadFromByteArray(var0, var1);
-			} catch (SecurityException var3) {
-				throw var3;
-			} catch (IOException var4) {
-				throw var4;
-			} catch (Exception var5) {
-				throw new IOException(var5);
+				return (new M3GLoader()).loadFromByteArray(data, offset);
+			} catch (SecurityException e) {
+				throw e;
+			} catch (IOException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new IOException(e);
 			}
 		}
 	}
@@ -68,78 +68,78 @@ public final class M3GLoader {
 	private M3GLoader() {
 	}
 
-	private M3GLoader(Vector var1, String var2) {
-		this.parentResourceName = var2;
-		this.fileHistory = var1;
+	private M3GLoader(Vector fileHistory, String parentResourceName) {
+		this.parentResourceName = parentResourceName;
+		this.fileHistory = fileHistory;
 	}
 
-	private Object3D[] loadFromString(String var1) throws IOException {
-		if (var1 == null) {
+	private Object3D[] loadFromString(String name) throws IOException {
+		if (name == null) {
 			throw new NullPointerException();
-		} else if (this.inFileHistory(var1)) {
+		} else if (this.inFileHistory(name)) {
 			throw new IOException("Reference loop detected.");
 		} else {
-			this.resourceName = var1;
-			this.fileHistory.addElement(var1);
-			PeekInputStream var2;
-			int var3 = getFileType(var2 = new PeekInputStream(this.getInputStream(var1), 12));
-			var2.rewind();
-			Object3D[] var4 = this.loadStream(var2, var3);
-			this.fileHistory.removeElement(var1);
-			return var4;
+			this.resourceName = name;
+			this.fileHistory.addElement(name);
+			PeekInputStream stream;
+			int fileType = getFileType(stream = new PeekInputStream(this.getInputStream(name), 12));
+			stream.rewind();
+			Object3D[] objects = this.loadStream(stream, fileType);
+			this.fileHistory.removeElement(name);
+			return objects;
 		}
 	}
 
-	private Object3D[] loadFromByteArray(byte[] var1, int var2) throws IOException {
-		if (var1 == null) {
+	private Object3D[] loadFromByteArray(byte[] data, int offset) throws IOException {
+		if (data == null) {
 			throw new NullPointerException("Resource byte array is null.");
 		} else {
-			int var3 = getInnerFileType(var1, var2);
-			ByteArrayInputStream var4 = new ByteArrayInputStream(var1, var2, var1.length - var2);
-			return this.loadStream(var4, var3);
+			int fileType = getInnerFileType(data, offset);
+			ByteArrayInputStream stream = new ByteArrayInputStream(data, offset, data.length - offset);
+			return this.loadStream(stream, fileType);
 		}
 	}
 
-	private Object3D[] loadStream(InputStream var1, int var2) throws IOException {
-		if (var2 == 1) {
-			return this.loadM3G(var1);
-		} else if (var2 == 2) {
-			return loadPNG(var1);
+	private Object3D[] loadStream(InputStream in, int fileType) throws IOException {
+		if (fileType == 1) {
+			return this.loadM3G(in);
+		} else if (fileType == 2) {
+			return loadPNG(in);
 		} else {
 			throw new IOException("File not recognized.");
 		}
 	}
 
-	private static Object3D[] loadPNG(InputStream var0) throws IOException {
-		return new Object3D[]{new Image2D(100, Image.createImage(var0))};
+	private static Object3D[] loadPNG(InputStream in) throws IOException {
+		return new Object3D[]{new Image2D(100, Image.createImage(in))};
 	}
 
-	private Object3D[] loadM3G(InputStream paramInputStream)
+	private Object3D[] loadM3G(InputStream in)
 			throws IOException {
-		paramInputStream.skip(M3G_MAGIC_NUMBER.length);
-		while (loadSection(paramInputStream)) {
+		in.skip(M3G_MAGIC_NUMBER.length);
+		while (loadSection(in)) {
 			this.currentSection += 1;
 		}
 		return getUnreferencedObjects();
 	}
 
-	private boolean loadSection(InputStream var1) throws IOException {
+	private boolean loadSection(InputStream in) throws IOException {
 		if (this.currentSection > 1 && this.externalLinks && !this.containedExternalLinks) {
 			throw new IOException("No external sections (" + this.resourceName + ").");
 		} else {
 			AdlerInputStream ais;
 			int compression;
-			if ((compression = readByte(ais = new AdlerInputStream(var1))) == -1) {
+			if ((compression = readByte(ais = new AdlerInputStream(in))) == -1) {
 				return false;
 			} else if (this.currentSection == 0 && compression != 0) {
 				throw new IOException("Compressed header (" + this.resourceName + ").");
 			} else {
-				long var5 = readUInt32LE(ais);
-				long var7 = readUInt32LE(ais);
-				Object var9 = null;
+				long sectionLength = readUInt32LE(ais);
+				long uncompressedLength = readUInt32LE(ais);
+				Object sectionStream = null;
 				if (compression == 0) {
-					var9 = ais;
-					if (var7 != var5 - 13L) {
+					sectionStream = ais;
+					if (uncompressedLength != sectionLength - 13L) {
 						Emulator.getEmulator().getLogStream().println("M3GLoader: Section length mismatch!!!");
 						return false;
 					}
@@ -149,26 +149,26 @@ public final class M3GLoader {
 						return false;
 					}
 
-					byte[] var10 = new byte[(int) var5 - 13];
-					ais.read(var10);
-					byte[] var11 = new byte[(int) var7];
-					inflate(var10, var11);
-					var9 = new CountedInputStream(new ByteArrayInputStream(var11));
+					byte[] compressed = new byte[(int) sectionLength - 13];
+					ais.read(compressed);
+					byte[] uncompressed = new byte[(int) uncompressedLength];
+					inflate(compressed, uncompressed);
+					sectionStream = new CountedInputStream(new ByteArrayInputStream(uncompressed));
 				}
 
-				((CountedInputStream) var9).resetCounter();
+				((CountedInputStream) sectionStream).resetCounter();
 
-				while ((long) ((CountedInputStream) var9).getCounter() < var7) {
-					this.addLoaded(this.loadObject((CountedInputStream) var9));
+				while ((long) ((CountedInputStream) sectionStream).getCounter() < uncompressedLength) {
+					this.addLoaded(this.loadObject((CountedInputStream) sectionStream));
 				}
 
-				if ((long) ((CountedInputStream) var9).getCounter() != var7) {
+				if ((long) ((CountedInputStream) sectionStream).getCounter() != uncompressedLength) {
 					Emulator.getEmulator().getLogStream().println("M3GLoader: Section length mismatch!!!");
 					return false;
 				} else {
-					long var12 = ais.getChecksum();
-					long var14 = readUInt32LE(ais);
-					if (var12 != var14) {
+					long checksum = ais.getChecksum();
+					long expectedChecksum = readUInt32LE(ais);
+					if (checksum != expectedChecksum) {
 						throw new IOException("Checksum is wrong (" + this.resourceName + ").");
 					} else {
 						return true;
@@ -178,84 +178,84 @@ public final class M3GLoader {
 		}
 	}
 
-	private Object3D loadObject(CountedInputStream var1) throws IOException {
-		int var2 = readByte(var1);
-		long var3 = readUInt32LE(var1);
-		long var5 = (long) var1.getCounter() + var3;
+	private Object3D loadObject(CountedInputStream in) throws IOException {
+		int objectType = readByte(in);
+		long length = readUInt32LE(in);
+		long endPosition = (long) in.getCounter() + length;
 		Object object = null;
-		switch (var2) {
+		switch (objectType) {
 			case 0:
 				if (this.currentSection != 0) {
 					throw new IOException("Header in wrong section (" + this.resourceName + ").");
 				}
 
-				this.readHeader(var1);
+				this.readHeader(in);
 				break;
 			case 1:
-				object = this.readAnimationController(var1);
+				object = this.readAnimationController(in);
 				break;
 			case 2:
-				object = this.readAnimationTrack(var1);
+				object = this.readAnimationTrack(in);
 				break;
 			case 3:
-				object = this.readAppearance(var1);
+				object = this.readAppearance(in);
 				break;
 			case 4:
-				object = this.readBackground(var1);
+				object = this.readBackground(in);
 				break;
 			case 5:
-				object = this.readCamera(var1);
+				object = this.readCamera(in);
 				break;
 			case 6:
-				object = this.readCompositingMode(var1);
+				object = this.readCompositingMode(in);
 				break;
 			case 7:
-				object = this.readFog(var1);
+				object = this.readFog(in);
 				break;
 			case 8:
-				object = this.readPolygonMode(var1);
+				object = this.readPolygonMode(in);
 				break;
 			case 9:
-				object = this.readGroup(var1);
+				object = this.readGroup(in);
 				break;
 			case 10:
-				object = this.readImage2D(var1);
+				object = this.readImage2D(in);
 				break;
 			case 11:
-				object = this.readTriangleStripArray(var1);
+				object = this.readTriangleStripArray(in);
 				break;
 			case 12:
-				object = this.readLight(var1);
+				object = this.readLight(in);
 				break;
 			case 13:
-				object = this.readMaterial(var1);
+				object = this.readMaterial(in);
 				break;
 			case 14:
-				object = this.readMesh(var1);
+				object = this.readMesh(in);
 				break;
 			case 15:
-				object = this.readMorphingMesh(var1);
+				object = this.readMorphingMesh(in);
 				break;
 			case 16:
-				object = this.readSkinnedMesh(var1);
+				object = this.readSkinnedMesh(in);
 				break;
 			case 17:
-				object = this.readTexture2D(var1);
+				object = this.readTexture2D(in);
 				break;
 			case 18:
-				object = this.readSprite(var1);
+				object = this.readSprite(in);
 				break;
 			case 19:
-				object = this.readKeyframeSequence(var1);
+				object = this.readKeyframeSequence(in);
 				break;
 			case 20:
-				object = this.readVertexArray(var1);
+				object = this.readVertexArray(in);
 				break;
 			case 21:
-				object = this.readVertexBuffer(var1);
+				object = this.readVertexBuffer(in);
 				break;
 			case 22:
-				object = this.readWorld(var1);
+				object = this.readWorld(in);
 				break;
 			case 255:
 				if (this.currentSection != 1) {
@@ -266,15 +266,15 @@ public final class M3GLoader {
 					throw new IOException("External links in self contained file (" + this.resourceName + ").");
 				}
 
-				String var8 = readString(var1);
+				String uri = readString(in);
 				this.containedExternalLinks = true;
-				object = (new M3GLoader(this.fileHistory, this.resourceName)).loadFromString(var8)[0];
+				object = (new M3GLoader(this.fileHistory, this.resourceName)).loadFromString(uri)[0];
 				break;
 			default:
-				throw new IOException("Unrecognized object type " + var2 + " (" + this.resourceName + ").");
+				throw new IOException("Unrecognized object type " + objectType + " (" + this.resourceName + ").");
 		}
 
-		if (var5 != (long) var1.getCounter()) {
+		if (endPosition != (long) in.getCounter()) {
 			throw new IOException("Object length mismatch (" + this.resourceName + ").");
 		} else {
 			this.addAnimTracks((Object3D) object);
@@ -282,129 +282,129 @@ public final class M3GLoader {
 		}
 	}
 
-	private void addLoaded(Object3D var1) {
-		if (var1 != null) {
-			this.loadedObjects.addElement(var1);
+	private void addLoaded(Object3D object) {
+		if (object != null) {
+			this.loadedObjects.addElement(object);
 			this.loadedObjectsRef.addElement(NOT_REFERENCED);
 		}
 
 	}
 
-	private Object3D getLoaded(int var1) {
-		if (var1 == 0) {
+	private Object3D getLoaded(int index) {
+		if (index == 0) {
 			return null;
-		} else if (var1 >= 2 && var1 - 2 < this.loadedObjects.size()) {
-			this.loadedObjectsRef.setElementAt(REFERENCED, var1 - 2);
-			return (Object3D) this.loadedObjects.elementAt(var1 - 2);
+		} else if (index >= 2 && index - 2 < this.loadedObjects.size()) {
+			this.loadedObjectsRef.setElementAt(REFERENCED, index - 2);
+			return (Object3D) this.loadedObjects.elementAt(index - 2);
 		} else {
 			throw new IllegalArgumentException("Invalid reference index (" + this.resourceName + ").");
 		}
 	}
 
 	private Object3D[] getUnreferencedObjects() {
-		Vector var1 = new Vector();
+		Vector unreferenced = new Vector();
 
-		for (int var2 = 0; var2 < this.loadedObjects.size(); ++var2) {
-			if (this.loadedObjectsRef.elementAt(var2) == NOT_REFERENCED) {
-				var1.addElement(this.loadedObjects.elementAt(var2));
+		for (int i = 0; i < this.loadedObjects.size(); ++i) {
+			if (this.loadedObjectsRef.elementAt(i) == NOT_REFERENCED) {
+				unreferenced.addElement(this.loadedObjects.elementAt(i));
 			}
 		}
 
-		Object3D[] var4 = new Object3D[var1.size()];
+		Object3D[] result = new Object3D[unreferenced.size()];
 
-		for (int var3 = 0; var3 < var1.size(); ++var3) {
-			var4[var3] = (Object3D) var1.elementAt(var3);
+		for (int i = 0; i < unreferenced.size(); ++i) {
+			result[i] = (Object3D) unreferenced.elementAt(i);
 		}
 
-		return var4;
+		return result;
 	}
 
-	private void readHeader(InputStream paramInputStream)
+	private void readHeader(InputStream in)
 			throws IOException {
-		byte[] arrayOfByte = new byte[2];
-		paramInputStream.read(arrayOfByte);
-		this.externalLinks = readBit(paramInputStream);
-		readUInt32LE(paramInputStream);
-		readUInt32LE(paramInputStream);
-		if ((arrayOfByte[0] != 1) || (arrayOfByte[1] != 0)) {
+		byte[] version = new byte[2];
+		in.read(version);
+		this.externalLinks = readBit(in);
+		readUInt32LE(in);
+		readUInt32LE(in);
+		if ((version[0] != 1) || (version[1] != 0)) {
 			throw new IOException("Invalid file version (" + this.resourceName + ").");
 		}
-		readString(paramInputStream);
+		readString(in);
 	}
 
-	private void readObject3DData(Object3D var1, InputStream var2) throws IOException {
-		var1.setUserID( (int)readUInt32LE(var2) );
-		long var3 = readUInt32LE(var2);
+	private void readObject3DData(Object3D object, InputStream in) throws IOException {
+		object.setUserID( (int)readUInt32LE(in) );
+		long trackCount = readUInt32LE(in);
 		this.animTracks = new Vector();
 
-		while (var3-- > 0L) {
-			AnimationTrack var5;
-			if ((var5 = (AnimationTrack) this.readReference(var2)) == null) {
+		while (trackCount-- > 0L) {
+			AnimationTrack track;
+			if ((track = (AnimationTrack) this.readReference(in)) == null) {
 				throw new NullPointerException();
 			}
 
-			this.animTracks.addElement(var5);
+			this.animTracks.addElement(track);
 		}
 
-		long var6 = readUInt32LE(var2);
+		long userParameterCount = readUInt32LE(in);
 
-		if (var6 != 0) {
-			Hashtable var10 = new Hashtable();
-			while (var6-- > 0L) {
-				int var8 = (int) readUInt32LE(var2);
-				byte[] var9 = new byte[(int) readUInt32LE(var2)];
-				var2.read(var9);
-				var10.put(new Integer(var8), var9);
+		if (userParameterCount != 0) {
+			Hashtable userParameters = new Hashtable();
+			while (userParameterCount-- > 0L) {
+				int parameterId = (int) readUInt32LE(in);
+				byte[] parameterValue = new byte[(int) readUInt32LE(in)];
+				in.read(parameterValue);
+				userParameters.put(new Integer(parameterId), parameterValue);
 			}
 
-			var1.setUserObject(var10);
+			object.setUserObject(userParameters);
 		}
 	}
 
-	private void readTransformableData(Transformable var1, InputStream var2) throws IOException {
-		this.readObject3DData(var1, var2);
-		if (readBit(var2)) {
-			var1.setTranslation(readFloat32LE(var2), readFloat32LE(var2), readFloat32LE(var2));
-			var1.setScale(readFloat32LE(var2), readFloat32LE(var2), readFloat32LE(var2));
-			var1.setOrientation(readFloat32LE(var2), readFloat32LE(var2), readFloat32LE(var2), readFloat32LE(var2));
+	private void readTransformableData(Transformable transformable, InputStream in) throws IOException {
+		this.readObject3DData(transformable, in);
+		if (readBit(in)) {
+			transformable.setTranslation(readFloat32LE(in), readFloat32LE(in), readFloat32LE(in));
+			transformable.setScale(readFloat32LE(in), readFloat32LE(in), readFloat32LE(in));
+			transformable.setOrientation(readFloat32LE(in), readFloat32LE(in), readFloat32LE(in), readFloat32LE(in));
 		}
 
-		if (readBit(var2)) {
-			var1.setTransform(readTransform(var2));
-		}
-
-	}
-
-	private void readNodeData(Node var1, InputStream var2) throws IOException {
-		this.readTransformableData(var1, var2);
-		var1.setRenderingEnable(readBit(var2));
-		var1.setPickingEnable(readBit(var2));
-		var1.setAlphaFactor((float) readByte(var2) / 255.0F);
-		var1.setScope((int) readUInt32LE(var2));
-		if (readBit(var2)) {
-			int var3 = readByte(var2);
-			int var4 = readByte(var2);
-			int var5 = (int) readUInt32LE(var2);
-			int var6 = (int) readUInt32LE(var2);
-			var1.setAlignment((Node) this.getLoaded(var5), var3, (Node) this.getLoaded(var6), var4);
+		if (readBit(in)) {
+			transformable.setTransform(readTransform(in));
 		}
 
 	}
 
-	private void readGroupData(Group var1, InputStream var2) throws IOException {
-		this.readNodeData(var1, var2);
-		int var3 = (int) readUInt32LE(var2);
-
-		while (var3-- > 0) {
-			var1.addChild((Node) this.readReference(var2));
+	private void readNodeData(Node node, InputStream in) throws IOException {
+		this.readTransformableData(node, in);
+		node.setRenderingEnable(readBit(in));
+		node.setPickingEnable(readBit(in));
+		node.setAlphaFactor((float) readByte(in) / 255.0F);
+		node.setScope((int) readUInt32LE(in));
+		if (readBit(in)) {
+			int zTarget = readByte(in);
+			int yTarget = readByte(in);
+			int zReference = (int) readUInt32LE(in);
+			int yReference = (int) readUInt32LE(in);
+			node.setAlignment((Node) this.getLoaded(zReference), zTarget, (Node) this.getLoaded(yReference), yTarget);
 		}
 
 	}
 
-	private void addAnimTracks(Object3D var1) {
-		if (this.animTracks != null && var1 != null) {
-			for (int var2 = 0; var2 < this.animTracks.size(); ++var2) {
-				var1.addAnimationTrack((AnimationTrack) this.animTracks.elementAt(var2));
+	private void readGroupData(Group group, InputStream in) throws IOException {
+		this.readNodeData(group, in);
+		int childCount = (int) readUInt32LE(in);
+
+		while (childCount-- > 0) {
+			group.addChild((Node) this.readReference(in));
+		}
+
+	}
+
+	private void addAnimTracks(Object3D object) {
+		if (this.animTracks != null && object != null) {
+			for (int i = 0; i < this.animTracks.size(); ++i) {
+				object.addAnimationTrack((AnimationTrack) this.animTracks.elementAt(i));
 			}
 
 			this.animTracks = null;
@@ -412,628 +412,628 @@ public final class M3GLoader {
 
 	}
 
-	private AnimationController readAnimationController(InputStream var1) throws IOException {
-		AnimationController var2 = new AnimationController();
-		this.readObject3DData(var2, var1);
-		float var3 = readFloat32LE(var1);
-		float var4 = readFloat32LE(var1);
-		var2.setActiveInterval(readInt32LE(var1), readInt32LE(var1));
-		float var5 = readFloat32LE(var1);
-		int var6 = readInt32LE(var1);
-		var2.setPosition(var5, var6);
-		var2.setSpeed(var3, var6);
-		var2.setWeight(var4);
-		return var2;
+	private AnimationController readAnimationController(InputStream in) throws IOException {
+		AnimationController controller = new AnimationController();
+		this.readObject3DData(controller, in);
+		float speed = readFloat32LE(in);
+		float weight = readFloat32LE(in);
+		controller.setActiveInterval(readInt32LE(in), readInt32LE(in));
+		float sequenceTime = readFloat32LE(in);
+		int referenceWorldTime = readInt32LE(in);
+		controller.setPosition(sequenceTime, referenceWorldTime);
+		controller.setSpeed(speed, referenceWorldTime);
+		controller.setWeight(weight);
+		return controller;
 	}
 
-	private AnimationTrack readAnimationTrack(InputStream var1) throws IOException {
-		AnimationController var2 = new AnimationController();
-		this.readObject3DData(var2, var1);
-		KeyframeSequence var3 = (KeyframeSequence) this.readReference(var1);
-		AnimationController var4 = (AnimationController) this.readReference(var1);
-		int var5 = (int) readUInt32LE(var1);
-		AnimationTrack var6 = new AnimationTrack(var3, var5);
-		copyObject3D(var2, var6);
-		var6.setController(var4);
-		return var6;
+	private AnimationTrack readAnimationTrack(InputStream in) throws IOException {
+		AnimationController objectData = new AnimationController();
+		this.readObject3DData(objectData, in);
+		KeyframeSequence sequence = (KeyframeSequence) this.readReference(in);
+		AnimationController controller = (AnimationController) this.readReference(in);
+		int property = (int) readUInt32LE(in);
+		AnimationTrack track = new AnimationTrack(sequence, property);
+		copyObject3D(objectData, track);
+		track.setController(controller);
+		return track;
 	}
 
-	private Appearance readAppearance(InputStream var1) throws IOException {
-		Appearance var2 = new Appearance();
-		this.readObject3DData(var2, var1);
-		var2.setLayer(readByte(var1));
-		var2.setCompositingMode((CompositingMode) this.readReference(var1));
-		var2.setFog((Fog) this.readReference(var1));
-		var2.setPolygonMode((PolygonMode) this.readReference(var1));
-		var2.setMaterial((Material) this.readReference(var1));
-		int var3 = (int) readUInt32LE(var1);
+	private Appearance readAppearance(InputStream in) throws IOException {
+		Appearance appearance = new Appearance();
+		this.readObject3DData(appearance, in);
+		appearance.setLayer(readByte(in));
+		appearance.setCompositingMode((CompositingMode) this.readReference(in));
+		appearance.setFog((Fog) this.readReference(in));
+		appearance.setPolygonMode((PolygonMode) this.readReference(in));
+		appearance.setMaterial((Material) this.readReference(in));
+		int textureCount = (int) readUInt32LE(in);
 
-		for (int var4 = 0; var4 < var3; ++var4) {
-			Texture2D var5;
-			if ((var5 = (Texture2D) this.readReference(var1)) == null) {
+		for (int i = 0; i < textureCount; ++i) {
+			Texture2D texture;
+			if ((texture = (Texture2D) this.readReference(in)) == null) {
 				throw new IOException("Null texture reference");
 			}
 
-			var2.setTexture(var4, var5);
+			appearance.setTexture(i, texture);
 		}
 
-		return var2;
+		return appearance;
 	}
 
-	private Background readBackground(InputStream var1) throws IOException {
-		Background var2 = new Background();
-		this.readObject3DData(var2, var1);
-		var2.setColor(readRGBA(var1));
-		Image2D var3 = (Image2D) this.readReference(var1);
-		var2.setImage(var3);
-		var2.setImageMode(readByte(var1), readByte(var1));
-		var2.setCrop(readInt32LE(var1), readInt32LE(var1), readInt32LE(var1), readInt32LE(var1));
-		var2.setDepthClearEnable(readBit(var1));
-		var2.setColorClearEnable(readBit(var1));
-		return var2;
+	private Background readBackground(InputStream in) throws IOException {
+		Background background = new Background();
+		this.readObject3DData(background, in);
+		background.setColor(readRGBA(in));
+		Image2D image = (Image2D) this.readReference(in);
+		background.setImage(image);
+		background.setImageMode(readByte(in), readByte(in));
+		background.setCrop(readInt32LE(in), readInt32LE(in), readInt32LE(in), readInt32LE(in));
+		background.setDepthClearEnable(readBit(in));
+		background.setColorClearEnable(readBit(in));
+		return background;
 	}
 
-	private Camera readCamera(InputStream var1) throws IOException {
-		Camera var2 = new Camera();
-		this.readNodeData(var2, var1);
-		int var3;
-		if ((var3 = readByte(var1)) == 48) {
-			var2.setGeneric(readTransform(var1));
-		} else if (var3 == 50) {
-			var2.setPerspective(readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1));
+	private Camera readCamera(InputStream in) throws IOException {
+		Camera camera = new Camera();
+		this.readNodeData(camera, in);
+		int projectionType;
+		if ((projectionType = readByte(in)) == 48) {
+			camera.setGeneric(readTransform(in));
+		} else if (projectionType == 50) {
+			camera.setPerspective(readFloat32LE(in), readFloat32LE(in), readFloat32LE(in), readFloat32LE(in));
 		} else {
-			if (var3 != 49) {
-				throw new IOException("Projection type not recognized: " + var3 + "(" + this.resourceName + ").");
+			if (projectionType != 49) {
+				throw new IOException("Projection type not recognized: " + projectionType + "(" + this.resourceName + ").");
 			}
 
-			var2.setParallel(readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1));
+			camera.setParallel(readFloat32LE(in), readFloat32LE(in), readFloat32LE(in), readFloat32LE(in));
 		}
 
-		return var2;
+		return camera;
 	}
 
-	private CompositingMode readCompositingMode(InputStream var1) throws IOException {
-		CompositingMode var2 = new CompositingMode();
-		this.readObject3DData(var2, var1);
-		var2.setDepthTestEnable(readBit(var1));
-		var2.setDepthWriteEnable(readBit(var1));
-		var2.setColorWriteEnable(readBit(var1));
-		var2.setAlphaWriteEnable(readBit(var1));
-		var2.setBlending(readByte(var1));
-		var2.setAlphaThreshold((float) readByte(var1) / 255.0F);
-		var2.setDepthOffset(readFloat32LE(var1), readFloat32LE(var1));
-		return var2;
+	private CompositingMode readCompositingMode(InputStream in) throws IOException {
+		CompositingMode compositingMode = new CompositingMode();
+		this.readObject3DData(compositingMode, in);
+		compositingMode.setDepthTestEnable(readBit(in));
+		compositingMode.setDepthWriteEnable(readBit(in));
+		compositingMode.setColorWriteEnable(readBit(in));
+		compositingMode.setAlphaWriteEnable(readBit(in));
+		compositingMode.setBlending(readByte(in));
+		compositingMode.setAlphaThreshold((float) readByte(in) / 255.0F);
+		compositingMode.setDepthOffset(readFloat32LE(in), readFloat32LE(in));
+		return compositingMode;
 	}
 
-	private Fog readFog(InputStream var1) throws IOException {
-		Fog var2 = new Fog();
-		this.readObject3DData(var2, var1);
-		var2.setColor(readRGB(var1));
-		var2.setMode(readByte(var1));
-		if (var2.getMode() == 80) {
-			var2.setDensity(readFloat32LE(var1));
-		} else if (var2.getMode() == 81) {
-			var2.setLinear(readFloat32LE(var1), readFloat32LE(var1));
+	private Fog readFog(InputStream in) throws IOException {
+		Fog fog = new Fog();
+		this.readObject3DData(fog, in);
+		fog.setColor(readRGB(in));
+		fog.setMode(readByte(in));
+		if (fog.getMode() == 80) {
+			fog.setDensity(readFloat32LE(in));
+		} else if (fog.getMode() == 81) {
+			fog.setLinear(readFloat32LE(in), readFloat32LE(in));
 		}
 
-		return var2;
+		return fog;
 	}
 
-	private Group readGroup(InputStream var1) throws IOException {
-		Group var2 = new Group();
-		this.readGroupData(var2, var1);
-		return var2;
+	private Group readGroup(InputStream in) throws IOException {
+		Group group = new Group();
+		this.readGroupData(group, in);
+		return group;
 	}
 
-	private Image2D readImage2D(InputStream var1) throws IOException {
-		AnimationController var2 = new AnimationController();
-		this.readObject3DData(var2, var1);
-		int var3 = readByte(var1);
-		boolean var4 = readBit(var1);
-		int var5 = (int) readUInt32LE(var1);
-		int var6 = (int) readUInt32LE(var1);
-		Image2D var7 = null;
-		Image2D var10000;
-		if (var4) {
-			var10000 = new Image2D(var3, var5, var6);
+	private Image2D readImage2D(InputStream in) throws IOException {
+		AnimationController objectData = new AnimationController();
+		this.readObject3DData(objectData, in);
+		int format = readByte(in);
+		boolean isMutable = readBit(in);
+		int width = (int) readUInt32LE(in);
+		int height = (int) readUInt32LE(in);
+		Image2D image = null;
+		Image2D createdImage;
+		if (isMutable) {
+			createdImage = new Image2D(format, width, height);
 		} else {
-			byte[] var8 = new byte[(int) readUInt32LE(var1)];
-			if (var8.length > 0) {
-				var1.read(var8);
+			byte[] palette = new byte[(int) readUInt32LE(in)];
+			if (palette.length > 0) {
+				in.read(palette);
 			}
 
-			byte[] var9 = new byte[(int) readUInt32LE(var1)];
-			var1.read(var9);
-			var10000 = var8.length != 0 ? new Image2D(var3, var5, var6, var9, var8) : new Image2D(var3, var5, var6, var9);
+			byte[] pixels = new byte[(int) readUInt32LE(in)];
+			in.read(pixels);
+			createdImage = palette.length != 0 ? new Image2D(format, width, height, pixels, palette) : new Image2D(format, width, height, pixels);
 		}
 
-		var7 = var10000;
-		copyObject3D(var2, var7);
-		return var7;
+		image = createdImage;
+		copyObject3D(objectData, image);
+		return image;
 	}
 
-	private KeyframeSequence readKeyframeSequence(InputStream var1) throws IOException {
-		AnimationController var2 = new AnimationController();
-		this.readObject3DData(var2, var1);
-		int var3 = readByte(var1);
-		int var4 = readByte(var1);
-		int var5 = readByte(var1);
-		int var6 = (int) readUInt32LE(var1);
-		int var7 = (int) readUInt32LE(var1);
-		int var8 = (int) readUInt32LE(var1);
-		int var9 = (int) readUInt32LE(var1);
-		int var10 = (int) readUInt32LE(var1);
-		KeyframeSequence var11 = new KeyframeSequence(var10, var9, var3);
-		copyObject3D(var2, var11);
-		var11.setRepeatMode(var4);
-		var11.setDuration(var6);
-		var11.setValidRange(var7, var8);
-		float[] var12 = new float[var9];
-		int var15;
-		if (var5 == 0) {
-			for (int var13 = 0; var13 < var10; ++var13) {
-				int var14 = readInt32LE(var1);
+	private KeyframeSequence readKeyframeSequence(InputStream in) throws IOException {
+		AnimationController objectData = new AnimationController();
+		this.readObject3DData(objectData, in);
+		int interpolation = readByte(in);
+		int repeatMode = readByte(in);
+		int encoding = readByte(in);
+		int duration = (int) readUInt32LE(in);
+		int validRangeFirst = (int) readUInt32LE(in);
+		int validRangeLast = (int) readUInt32LE(in);
+		int componentCount = (int) readUInt32LE(in);
+		int keyframeCount = (int) readUInt32LE(in);
+		KeyframeSequence sequence = new KeyframeSequence(keyframeCount, componentCount, interpolation);
+		copyObject3D(objectData, sequence);
+		sequence.setRepeatMode(repeatMode);
+		sequence.setDuration(duration);
+		sequence.setValidRange(validRangeFirst, validRangeLast);
+		float[] keyframeValue = new float[componentCount];
+		int index;
+		if (encoding == 0) {
+			for (int keyframe = 0; keyframe < keyframeCount; ++keyframe) {
+				int time = readInt32LE(in);
 
-				for (var15 = 0; var15 < var9; ++var15) {
-					var12[var15] = readFloat32LE(var1);
+				for (index = 0; index < componentCount; ++index) {
+					keyframeValue[index] = readFloat32LE(in);
 				}
 
-				var11.setKeyframe(var13, var14, var12);
+				sequence.setKeyframe(keyframe, time, keyframeValue);
 			}
 		} else {
-			if (var5 != 1 && var5 != 2) {
-				throw new IOException("Encoding not recognized: " + var5 + "(" + this.resourceName + ").");
+			if (encoding != 1 && encoding != 2) {
+				throw new IOException("Encoding not recognized: " + encoding + "(" + this.resourceName + ").");
 			}
 
-			float[] var19 = new float[var9];
-			float[] var20 = new float[var9];
+			float[] vectorBias = new float[componentCount];
+			float[] vectorScale = new float[componentCount];
 
-			for (var15 = 0; var15 < var9; ++var15) {
-				var19[var15] = readFloat32LE(var1);
+			for (index = 0; index < componentCount; ++index) {
+				vectorBias[index] = readFloat32LE(in);
 			}
 
-			for (var15 = 0; var15 < var9; ++var15) {
-				var20[var15] = readFloat32LE(var1);
+			for (index = 0; index < componentCount; ++index) {
+				vectorScale[index] = readFloat32LE(in);
 			}
 
-			for (var15 = 0; var15 < var10; ++var15) {
-				int var16 = readInt32LE(var1);
-				int var17;
-				int var18;
-				if (var5 == 1) {
-					for (var17 = 0; var17 < var9; ++var17) {
-						var18 = readByte(var1);
-						var12[var17] = var19[var17] + var20[var17] * (float) var18 / 255.0F;
+			for (index = 0; index < keyframeCount; ++index) {
+				int time = readInt32LE(in);
+				int component;
+				int encodedValue;
+				if (encoding == 1) {
+					for (component = 0; component < componentCount; ++component) {
+						encodedValue = readByte(in);
+						keyframeValue[component] = vectorBias[component] + vectorScale[component] * (float) encodedValue / 255.0F;
 					}
 				} else {
-					for (var17 = 0; var17 < var9; ++var17) {
-						var18 = readInt16LE(var1);
-						var12[var17] = var19[var17] + var20[var17] * (float) var18 / 65535.0F;
+					for (component = 0; component < componentCount; ++component) {
+						encodedValue = readInt16LE(in);
+						keyframeValue[component] = vectorBias[component] + vectorScale[component] * (float) encodedValue / 65535.0F;
 					}
 				}
 
-				var11.setKeyframe(var15, var16, var12);
+				sequence.setKeyframe(index, time, keyframeValue);
 			}
 		}
 
-		return var11;
+		return sequence;
 	}
 
-	private Light readLight(InputStream var1) throws IOException {
-		Light var2 = new Light();
-		this.readNodeData(var2, var1);
-		var2.setAttenuation(readFloat32LE(var1), readFloat32LE(var1), readFloat32LE(var1));
-		var2.setColor(readRGB(var1));
-		var2.setMode(readByte(var1));
-		var2.setIntensity(readFloat32LE(var1));
-		var2.setSpotAngle(readFloat32LE(var1));
-		var2.setSpotExponent(readFloat32LE(var1));
-		return var2;
+	private Light readLight(InputStream in) throws IOException {
+		Light light = new Light();
+		this.readNodeData(light, in);
+		light.setAttenuation(readFloat32LE(in), readFloat32LE(in), readFloat32LE(in));
+		light.setColor(readRGB(in));
+		light.setMode(readByte(in));
+		light.setIntensity(readFloat32LE(in));
+		light.setSpotAngle(readFloat32LE(in));
+		light.setSpotExponent(readFloat32LE(in));
+		return light;
 	}
 
-	private Material readMaterial(InputStream var1) throws IOException {
-		Material var2 = new Material();
-		this.readObject3DData(var2, var1);
-		var2.setColor(1024, readRGB(var1)); //AMBIENT
-		var2.setColor(2048, readRGBA(var1)); //DIFFUSE
-		var2.setColor(4096, readRGB(var1)); //EMISSIVE
-		var2.setColor(8192, readRGB(var1)); //SPECULAR
-		var2.setShininess(readFloat32LE(var1));
-		var2.setVertexColorTrackingEnable(readBit(var1));
-		return var2;
+	private Material readMaterial(InputStream in) throws IOException {
+		Material material = new Material();
+		this.readObject3DData(material, in);
+		material.setColor(1024, readRGB(in)); //AMBIENT
+		material.setColor(2048, readRGBA(in)); //DIFFUSE
+		material.setColor(4096, readRGB(in)); //EMISSIVE
+		material.setColor(8192, readRGB(in)); //SPECULAR
+		material.setShininess(readFloat32LE(in));
+		material.setVertexColorTrackingEnable(readBit(in));
+		return material;
 	}
 
-	private Mesh readMesh(InputStream var1) throws IOException {
-		Group var2 = new Group();
-		this.readNodeData(var2, var1);
-		VertexBuffer var3 = (VertexBuffer) this.readReference(var1);
-		int var4;
-		IndexBuffer[] var5 = new IndexBuffer[var4 = (int) readUInt32LE(var1)];
-		Appearance[] var6 = new Appearance[var4];
+	private Mesh readMesh(InputStream in) throws IOException {
+		Group nodeData = new Group();
+		this.readNodeData(nodeData, in);
+		VertexBuffer vertexBuffer = (VertexBuffer) this.readReference(in);
+		int submeshCount;
+		IndexBuffer[] submeshes = new IndexBuffer[submeshCount = (int) readUInt32LE(in)];
+		Appearance[] appearances = new Appearance[submeshCount];
 
-		for (int var7 = 0; var7 < var4; ++var7) {
-			var5[var7] = (IndexBuffer) this.readReference(var1);
-			var6[var7] = (Appearance) this.readReference(var1);
+		for (int i = 0; i < submeshCount; ++i) {
+			submeshes[i] = (IndexBuffer) this.readReference(in);
+			appearances[i] = (Appearance) this.readReference(in);
 		}
 
-		Mesh var8 = new Mesh(var3, var5, var6);
-		copyNode(var2, var8);
-		return var8;
+		Mesh mesh = new Mesh(vertexBuffer, submeshes, appearances);
+		copyNode(nodeData, mesh);
+		return mesh;
 	}
 
-	private MorphingMesh readMorphingMesh(InputStream var1) throws IOException {
-		Mesh var2 = this.readMesh(var1);
-		int var3;
-		VertexBuffer[] var4 = new VertexBuffer[var3 = (int) readUInt32LE(var1)];
-		float[] var5 = new float[var3];
+	private MorphingMesh readMorphingMesh(InputStream in) throws IOException {
+		Mesh mesh = this.readMesh(in);
+		int targetCount;
+		VertexBuffer[] targets = new VertexBuffer[targetCount = (int) readUInt32LE(in)];
+		float[] weights = new float[targetCount];
 
-		int var6;
-		for (var6 = 0; var6 < var3; ++var6) {
-			var4[var6] = (VertexBuffer) this.readReference(var1);
-			var5[var6] = readFloat32LE(var1);
+		for (int i = 0; i < targetCount; ++i) {
+			targets[i] = (VertexBuffer) this.readReference(in);
+			weights[i] = readFloat32LE(in);
 		}
 
-		IndexBuffer[] var7 = new IndexBuffer[var6 = var2.getSubmeshCount()];
-		Appearance[] var8 = new Appearance[var6];
+		int submeshCount;
+		IndexBuffer[] submeshes = new IndexBuffer[submeshCount = mesh.getSubmeshCount()];
+		Appearance[] appearances = new Appearance[submeshCount];
 
-		for (int var9 = 0; var9 < var6; ++var9) {
-			var7[var9] = var2.getIndexBuffer(var9);
-			var8[var9] = var2.getAppearance(var9);
+		for (int i = 0; i < submeshCount; ++i) {
+			submeshes[i] = mesh.getIndexBuffer(i);
+			appearances[i] = mesh.getAppearance(i);
 		}
 
-		MorphingMesh var10 = new MorphingMesh(var2.getVertexBuffer(), var4, var7, var8);
-		copyMesh(var2, var10);
-		var10.setWeights(var5);
-		return var10;
+		MorphingMesh morphingMesh = new MorphingMesh(mesh.getVertexBuffer(), targets, submeshes, appearances);
+		copyMesh(mesh, morphingMesh);
+		morphingMesh.setWeights(weights);
+		return morphingMesh;
 	}
 
-	private PolygonMode readPolygonMode(InputStream var1) throws IOException {
-		PolygonMode var2 = new PolygonMode();
-		this.readObject3DData(var2, var1);
-		var2.setCulling(readByte(var1));
-		var2.setShading(readByte(var1));
-		var2.setWinding(readByte(var1));
-		var2.setTwoSidedLightingEnable(readBit(var1));
-		var2.setLocalCameraLightingEnable(readBit(var1));
-		var2.setPerspectiveCorrectionEnable(readBit(var1));
-		return var2;
+	private PolygonMode readPolygonMode(InputStream in) throws IOException {
+		PolygonMode polygonMode = new PolygonMode();
+		this.readObject3DData(polygonMode, in);
+		polygonMode.setCulling(readByte(in));
+		polygonMode.setShading(readByte(in));
+		polygonMode.setWinding(readByte(in));
+		polygonMode.setTwoSidedLightingEnable(readBit(in));
+		polygonMode.setLocalCameraLightingEnable(readBit(in));
+		polygonMode.setPerspectiveCorrectionEnable(readBit(in));
+		return polygonMode;
 	}
 
-	private SkinnedMesh readSkinnedMesh(InputStream var1) throws IOException {
-		Mesh var2 = this.readMesh(var1);
-		Group var3 = (Group) this.readReference(var1);
-		int var4;
-		IndexBuffer[] var5 = new IndexBuffer[var4 = var2.getSubmeshCount()];
-		Appearance[] var6 = new Appearance[var4];
+	private SkinnedMesh readSkinnedMesh(InputStream in) throws IOException {
+		Mesh mesh = this.readMesh(in);
+		Group skeleton = (Group) this.readReference(in);
+		int submeshCount;
+		IndexBuffer[] submeshes = new IndexBuffer[submeshCount = mesh.getSubmeshCount()];
+		Appearance[] appearances = new Appearance[submeshCount];
 
-		for (int var7 = 0; var7 < var4; ++var7) {
-			var5[var7] = var2.getIndexBuffer(var7);
-			var6[var7] = var2.getAppearance(var7);
+		for (int i = 0; i < submeshCount; ++i) {
+			submeshes[i] = mesh.getIndexBuffer(i);
+			appearances[i] = mesh.getAppearance(i);
 		}
 
-		SkinnedMesh var13 = new SkinnedMesh(var2.getVertexBuffer(), var5, var6, var3);
-		copyMesh(var2, var13);
-		int var8 = (int) readUInt32LE(var1);
+		SkinnedMesh skinnedMesh = new SkinnedMesh(mesh.getVertexBuffer(), submeshes, appearances, skeleton);
+		copyMesh(mesh, skinnedMesh);
+		int boneCount = (int) readUInt32LE(in);
 
-		while (var8-- > 0) {
-			Node var9 = (Node) this.readReference(var1);
-			int var10 = (int) readUInt32LE(var1);
-			int var11 = (int) readUInt32LE(var1);
-			int var12 = readInt32LE(var1);
-			var13.addTransform(var9, var12, var10, var11);
+		while (boneCount-- > 0) {
+			Node bone = (Node) this.readReference(in);
+			int firstVertex = (int) readUInt32LE(in);
+			int vertexCount = (int) readUInt32LE(in);
+			int weight = readInt32LE(in);
+			skinnedMesh.addTransform(bone, weight, firstVertex, vertexCount);
 		}
 
-		return var13;
+		return skinnedMesh;
 	}
 
-	private Sprite3D readSprite(InputStream var1) throws IOException {
-		Group var2 = new Group();
-		this.readNodeData(var2, var1);
-		Image2D var3 = (Image2D) this.readReference(var1);
-		Appearance var4 = (Appearance) this.readReference(var1);
-		boolean var5 = readBit(var1);
-		Sprite3D var6 = new Sprite3D(var5, var3, var4);
-		copyNode(var2, var6);
-		var6.setCrop(readInt32LE(var1), readInt32LE(var1), readInt32LE(var1), readInt32LE(var1));
-		return var6;
+	private Sprite3D readSprite(InputStream in) throws IOException {
+		Group nodeData = new Group();
+		this.readNodeData(nodeData, in);
+		Image2D image = (Image2D) this.readReference(in);
+		Appearance appearance = (Appearance) this.readReference(in);
+		boolean scaled = readBit(in);
+		Sprite3D sprite = new Sprite3D(scaled, image, appearance);
+		copyNode(nodeData, sprite);
+		sprite.setCrop(readInt32LE(in), readInt32LE(in), readInt32LE(in), readInt32LE(in));
+		return sprite;
 	}
 
-	private Texture2D readTexture2D(InputStream var1) throws IOException {
-		Group var2 = new Group();
-		this.readTransformableData(var2, var1);
-		Texture2D var3 = new Texture2D((Image2D) this.readReference(var1));
-		copyTransformable(var2, var3);
-		var3.setBlendColor(readRGB(var1));
-		var3.setBlending(readByte(var1));
-		var3.setWrapping(readByte(var1), readByte(var1));
-		var3.setFiltering(readByte(var1), readByte(var1));
-		return var3;
+	private Texture2D readTexture2D(InputStream in) throws IOException {
+		Group transformableData = new Group();
+		this.readTransformableData(transformableData, in);
+		Texture2D texture = new Texture2D((Image2D) this.readReference(in));
+		copyTransformable(transformableData, texture);
+		texture.setBlendColor(readRGB(in));
+		texture.setBlending(readByte(in));
+		texture.setWrapping(readByte(in), readByte(in));
+		texture.setFiltering(readByte(in), readByte(in));
+		return texture;
 	}
 
-	private TriangleStripArray readTriangleStripArray(InputStream var1) throws IOException {
-		AnimationController var2;
-		int var3;
-		int var4;
-		int[] var5;
-		var2 = new AnimationController();
-		this.readObject3DData(var2, var1);
-		var3 = readByte(var1);
-		var4 = 0;
-		var5 = null;
-		int var6;
+	private TriangleStripArray readTriangleStripArray(InputStream in) throws IOException {
+		AnimationController objectData;
+		int encoding;
+		int firstIndex;
+		int[] indices;
+		objectData = new AnimationController();
+		this.readObject3DData(objectData, in);
+		encoding = readByte(in);
+		firstIndex = 0;
+		indices = null;
+		int index;
 		label54:
-		switch (var3) {
+		switch (encoding) {
 			case 0:
-				var4 = (int) readUInt32LE(var1);
+				firstIndex = (int) readUInt32LE(in);
 				break;
 			case 1:
-				var4 = readByte(var1);
+				firstIndex = readByte(in);
 				break;
 			case 2:
-				var4 = readInt16LE(var1);
+				firstIndex = readInt16LE(in);
 				break;
 			case 128:
-				var5 = new int[(int) readUInt32LE(var1)];
-				var6 = 0;
+				indices = new int[(int) readUInt32LE(in)];
+				index = 0;
 
 				while (true) {
-					if (var6 >= var5.length) {
+					if (index >= indices.length) {
 						break label54;
 					}
 
-					var5[var6] = (int) readUInt32LE(var1);
-					++var6;
+					indices[index] = (int) readUInt32LE(in);
+					++index;
 				}
 			case 129:
-				var5 = new int[(int) readUInt32LE(var1)];
-				var6 = 0;
+				indices = new int[(int) readUInt32LE(in)];
+				index = 0;
 
 				while (true) {
-					if (var6 >= var5.length) {
+					if (index >= indices.length) {
 						break label54;
 					}
 
-					var5[var6] = readByte(var1);
-					++var6;
+					indices[index] = readByte(in);
+					++index;
 				}
 			case 130:
-				var5 = new int[(int) readUInt32LE(var1)];
-				var6 = 0;
+				indices = new int[(int) readUInt32LE(in)];
+				index = 0;
 
 				while (true) {
-					if (var6 >= var5.length) {
+					if (index >= indices.length) {
 						break label54;
 					}
 
-					var5[var6] = readInt16LE(var1);
-					++var6;
+					indices[index] = readInt16LE(in);
+					++index;
 				}
 			default:
 				throw new IllegalArgumentException("Invalid TriangleStripArray encoding (" + this.resourceName + ").");
 		}
 
-		int[] var9 = new int[(int) readUInt32LE(var1)];
+		int[] stripLengths = new int[(int) readUInt32LE(in)];
 
-		for (int var7 = 0; var7 < var9.length; ++var7) {
-			var9[var7] = (int) readUInt32LE(var1);
+		for (int i = 0; i < stripLengths.length; ++i) {
+			stripLengths[i] = (int) readUInt32LE(in);
 		}
 
-		TriangleStripArray var8 = null;
-		var8 = var3 != 0 && var3 != 1 && var3 != 2 ? new TriangleStripArray(var5, var9) : new TriangleStripArray(var4, var9);
-		copyObject3D(var2, var8);
-		return var8;
+		TriangleStripArray triangleStripArray = null;
+		triangleStripArray = encoding != 0 && encoding != 1 && encoding != 2 ? new TriangleStripArray(indices, stripLengths) : new TriangleStripArray(firstIndex, stripLengths);
+		copyObject3D(objectData, triangleStripArray);
+		return triangleStripArray;
 	}
 
-	private VertexArray readVertexArray(InputStream var1) throws IOException {
-		AnimationController var2 = new AnimationController();
-		this.readObject3DData(var2, var1);
-		int var3 = readByte(var1);
-		int var4 = readByte(var1);
-		int var5 = readByte(var1);
-		int var6 = readInt16LE(var1);
-		if (var5 != 0 && var5 != 1) {
+	private VertexArray readVertexArray(InputStream in) throws IOException {
+		AnimationController objectData = new AnimationController();
+		this.readObject3DData(objectData, in);
+		int componentSize = readByte(in);
+		int componentCount = readByte(in);
+		int encoding = readByte(in);
+		int vertexCount = readInt16LE(in);
+		if (encoding != 0 && encoding != 1) {
 			throw new IllegalArgumentException("Invalid VertexArray encoding (" + this.resourceName + ").");
 		} else {
-			VertexArray var7 = new VertexArray(var6, var4, var3);
-			int[] var8 = new int[var4];
-			int var10;
-			int var11;
-			if (var3 == 1) {
-				byte[] var9 = new byte[var4];
-				if (var5 == 0) {
-					for (var10 = 0; var10 < var6; ++var10) {
-						for (var11 = 0; var11 < var4; ++var11) {
-							var9[var11] = (byte) readByte(var1);
+			VertexArray vertexArray = new VertexArray(vertexCount, componentCount, componentSize);
+			int[] accumulator = new int[componentCount];
+			int vertex;
+			int component;
+			if (componentSize == 1) {
+				byte[] byteValues = new byte[componentCount];
+				if (encoding == 0) {
+					for (vertex = 0; vertex < vertexCount; ++vertex) {
+						for (component = 0; component < componentCount; ++component) {
+							byteValues[component] = (byte) readByte(in);
 						}
 
-						var7.set(var10, 1, var9);
+						vertexArray.set(vertex, 1, byteValues);
 					}
 				} else {
-					for (var10 = 0; var10 < var6; ++var10) {
-						for (var11 = 0; var11 < var4; ++var11) {
-							var8[var11] += (byte) readByte(var1);
-							var9[var11] = (byte) var8[var11];
+					for (vertex = 0; vertex < vertexCount; ++vertex) {
+						for (component = 0; component < componentCount; ++component) {
+							accumulator[component] += (byte) readByte(in);
+							byteValues[component] = (byte) accumulator[component];
 						}
 
-						var7.set(var10, 1, var9);
+						vertexArray.set(vertex, 1, byteValues);
 					}
 				}
 			} else {
-				short[] var12 = new short[var4];
-				if (var5 == 0) {
-					for (var10 = 0; var10 < var6; ++var10) {
-						for (var11 = 0; var11 < var4; ++var11) {
-							var12[var11] = (short) readInt16LE(var1);
+				short[] shortValues = new short[componentCount];
+				if (encoding == 0) {
+					for (vertex = 0; vertex < vertexCount; ++vertex) {
+						for (component = 0; component < componentCount; ++component) {
+							shortValues[component] = (short) readInt16LE(in);
 						}
 
-						var7.set(var10, 1, var12);
+						vertexArray.set(vertex, 1, shortValues);
 					}
 				} else {
-					for (var10 = 0; var10 < var6; ++var10) {
-						for (var11 = 0; var11 < var4; ++var11) {
-							var8[var11] += (short) readInt16LE(var1);
-							var12[var11] = (short) var8[var11];
+					for (vertex = 0; vertex < vertexCount; ++vertex) {
+						for (component = 0; component < componentCount; ++component) {
+							accumulator[component] += (short) readInt16LE(in);
+							shortValues[component] = (short) accumulator[component];
 						}
 
-						var7.set(var10, 1, var12);
+						vertexArray.set(vertex, 1, shortValues);
 					}
 				}
 			}
 
-			copyObject3D(var2, var7);
-			return var7;
+			copyObject3D(objectData, vertexArray);
+			return vertexArray;
 		}
 	}
 
-	private VertexBuffer readVertexBuffer(InputStream var1) throws IOException {
-		VertexBuffer var2 = new VertexBuffer();
-		this.readObject3DData(var2, var1);
-		var2.setDefaultColor(readRGBA(var1));
-		VertexArray var3 = (VertexArray) this.readReference(var1);
-		float[] var4 = new float[3];
+	private VertexBuffer readVertexBuffer(InputStream in) throws IOException {
+		VertexBuffer vertexBuffer = new VertexBuffer();
+		this.readObject3DData(vertexBuffer, in);
+		vertexBuffer.setDefaultColor(readRGBA(in));
+		VertexArray positions = (VertexArray) this.readReference(in);
+		float[] bias = new float[3];
 
-		for (int var5 = 0; var5 < 3; ++var5) {
-			var4[var5] = readFloat32LE(var1);
+		for (int i = 0; i < 3; ++i) {
+			bias[i] = readFloat32LE(in);
 		}
 
-		float var13 = readFloat32LE(var1);
-		if (var3 != null) {
-			var2.setPositions(var3, var13, var4);
+		float positionScale = readFloat32LE(in);
+		if (positions != null) {
+			vertexBuffer.setPositions(positions, positionScale, bias);
 		}
 
-		VertexArray var6;
-		if ((var6 = (VertexArray) this.readReference(var1)) != null) {
-			var2.setNormals(var6);
+		VertexArray normals;
+		if ((normals = (VertexArray) this.readReference(in)) != null) {
+			vertexBuffer.setNormals(normals);
 		}
 
-		VertexArray var7;
-		if ((var7 = (VertexArray) this.readReference(var1)) != null) {
-			var2.setColors(var7);
+		VertexArray colors;
+		if ((colors = (VertexArray) this.readReference(in)) != null) {
+			vertexBuffer.setColors(colors);
 		}
 
-		int var8 = (int) readUInt32LE(var1);
+		int texCoordArrayCount = (int) readUInt32LE(in);
 
-		for (int var9 = 0; var9 < var8; ++var9) {
-			VertexArray var10;
-			if ((var10 = (VertexArray) this.readReference(var1)) == null) {
+		for (int unit = 0; unit < texCoordArrayCount; ++unit) {
+			VertexArray texCoords;
+			if ((texCoords = (VertexArray) this.readReference(in)) == null) {
 				throw new IOException("Null texture vertex array");
 			}
 
-			for (int var11 = 0; var11 < 3; ++var11) {
-				var4[var11] = readFloat32LE(var1);
+			for (int i = 0; i < 3; ++i) {
+				bias[i] = readFloat32LE(in);
 			}
 
-			float var12 = readFloat32LE(var1);
-			var2.setTexCoords(var9, var10, var12, var4);
+			float texCoordScale = readFloat32LE(in);
+			vertexBuffer.setTexCoords(unit, texCoords, texCoordScale, bias);
 		}
 
-		return var2;
+		return vertexBuffer;
 	}
 
-	private World readWorld(InputStream var1) throws IOException {
-		World var2 = new World();
-		this.readGroupData(var2, var1);
-		Camera var3;
-		if ((var3 = (Camera) this.readReference(var1)) != null) {
-			var2.setActiveCamera(var3);
+	private World readWorld(InputStream in) throws IOException {
+		World world = new World();
+		this.readGroupData(world, in);
+		Camera camera;
+		if ((camera = (Camera) this.readReference(in)) != null) {
+			world.setActiveCamera(camera);
 		}
 
-		var2.setBackground((Background) this.readReference(var1));
-		return var2;
+		world.setBackground((Background) this.readReference(in));
+		return world;
 	}
 
-	private Object3D readReference(InputStream var1) throws IOException {
-		return this.getLoaded((int) readUInt32LE(var1));
+	private Object3D readReference(InputStream in) throws IOException {
+		return this.getLoaded((int) readUInt32LE(in));
 	}
 
-	private static final Transform readTransform(InputStream var0) throws IOException {
-		Transform var1 = new Transform();
-		float[] var2 = new float[16];
+	private static final Transform readTransform(InputStream in) throws IOException {
+		Transform transform = new Transform();
+		float[] matrix = new float[16];
 
-		for (int var3 = 0; var3 < 16; ++var3) {
-			var2[var3] = readFloat32LE(var0);
+		for (int i = 0; i < 16; ++i) {
+			matrix[i] = readFloat32LE(in);
 		}
 
-		var1.set(var2);
-		return var1;
+		transform.set(matrix);
+		return transform;
 	}
 
-	private static final int readByte(InputStream var0) throws IOException {
-		return var0.read();
+	private static final int readByte(InputStream in) throws IOException {
+		return in.read();
 	}
 
-	private static boolean readBit(InputStream var0) throws IOException {
-		int var1;
-		if ((var1 = var0.read()) == 0) {
+	private static boolean readBit(InputStream in) throws IOException {
+		int value;
+		if ((value = in.read()) == 0) {
 			return false;
-		} else if (var1 != 1) {
+		} else if (value != 1) {
 			throw new IOException("Malformed boolean.");
 		} else {
 			return true;
 		}
 	}
 
-	private static int readInt16LE(InputStream var0) throws IOException {
-		return var0.read() + (var0.read() << 8);
+	private static int readInt16LE(InputStream in) throws IOException {
+		return in.read() + (in.read() << 8);
 	}
 
-	private static final int readInt32LE(InputStream var0) throws IOException {
-		return var0.read() + (var0.read() << 8) + (var0.read() << 16) + (var0.read() << 24);
+	private static final int readInt32LE(InputStream in) throws IOException {
+		return in.read() + (in.read() << 8) + (in.read() << 16) + (in.read() << 24);
 	}
 
-	private static final long readUInt32LE(InputStream var0) throws IOException {
-		return (long) var0.read() + ((long) var0.read() << 8) + ((long) var0.read() << 16) + ((long) var0.read() << 24);
+	private static final long readUInt32LE(InputStream in) throws IOException {
+		return (long) in.read() + ((long) in.read() << 8) + ((long) in.read() << 16) + ((long) in.read() << 24);
 	}
 
-	private static final float readFloat32LE(InputStream var0) throws IOException {
-		int var1;
-		if (((var1 = readInt32LE(var0)) & 0x7f800000) != 0x7f800000 && var1 != Integer.MIN_VALUE && ((var1 & 0x7fffff) == 0 || (var1 & 0x7f800000) != 0)) {
-			return Float.intBitsToFloat(var1);
+	private static final float readFloat32LE(InputStream in) throws IOException {
+		int bits;
+		if (((bits = readInt32LE(in)) & 0x7f800000) != 0x7f800000 && bits != Integer.MIN_VALUE && ((bits & 0x7fffff) == 0 || (bits & 0x7f800000) != 0)) {
+			return Float.intBitsToFloat(bits);
 		} else {
 			throw new IOException("Malformed float.");
 		}
 	}
 
-	private static int readRGBA(InputStream var0) throws IOException {
-		return (var0.read() << 16) + (var0.read() << 8) + var0.read() + (var0.read() << 24);
+	private static int readRGBA(InputStream in) throws IOException {
+		return (in.read() << 16) + (in.read() << 8) + in.read() + (in.read() << 24);
 	}
 
-	private static int readRGB(InputStream var0) throws IOException {
-		return (var0.read() << 16) + (var0.read() << 8) + var0.read();
+	private static int readRGB(InputStream in) throws IOException {
+		return (in.read() << 16) + (in.read() << 8) + in.read();
 	}
 
-	private static String readString(InputStream var0) throws IOException {
-		StringBuffer var1 = new StringBuffer();
+	private static String readString(InputStream in) throws IOException {
+		StringBuffer buffer = new StringBuffer();
 
-		int var2;
-		for (InputStream var10000 = var0; (var2 = var10000.read()) != 0; var10000 = var0) {
-			if ((var2 & 128) == 0) {
-				var1.append((char) (var2 & 255));
+		int firstByte;
+		for (InputStream stream = in; (firstByte = stream.read()) != 0; stream = in) {
+			if ((firstByte & 128) == 0) {
+				buffer.append((char) (firstByte & 255));
 			} else {
-				int var3;
-				if ((var2 & 224) == 192) {
-					if (((var3 = var0.read()) & 192) != 128) {
+				int secondByte;
+				if ((firstByte & 224) == 192) {
+					if (((secondByte = in.read()) & 192) != 128) {
 						throw new IOException("Invalid UTF-8 string.");
 					}
 
-					var1.append((char) ((var2 & 31) << 6 | var3 & 63));
+					buffer.append((char) ((firstByte & 31) << 6 | secondByte & 63));
 				} else {
-					if ((var2 & 240) != 224) {
+					if ((firstByte & 240) != 224) {
 						throw new IOException("Invalid UTF-8 string.");
 					}
 
-					var3 = var0.read();
-					int var4 = var0.read();
-					if ((var3 & 192) != 128 || (var4 & 192) != 128) {
+					secondByte = in.read();
+					int thirdByte = in.read();
+					if ((secondByte & 192) != 128 || (thirdByte & 192) != 128) {
 						throw new IOException("Invalid UTF-8 string.");
 					}
 
-					var1.append((char) ((var2 & 15) << 12 | (var3 & 63) << 6 | var4 & 63));
+					buffer.append((char) ((firstByte & 15) << 12 | (secondByte & 63) << 6 | thirdByte & 63));
 				}
 			}
 		}
 
-		return var1.toString();
+		return buffer.toString();
 	}
 
 	private static int getInnerFileType(byte[] file, int offset) {
@@ -1063,15 +1063,15 @@ public final class M3GLoader {
 		}
 	}
 
-	private static int getFileType(InputStream var0) throws IOException {
-		byte[] var1 = new byte[12];
-		var0.read(var1);
-		return getInnerFileType(var1, 0);
+	private static int getFileType(InputStream in) throws IOException {
+		byte[] header = new byte[12];
+		in.read(header);
+		return getInnerFileType(header, 0);
 	}
 
-	private boolean inFileHistory(String var1) {
-		for (int var2 = 0; var2 < this.fileHistory.size(); ++var2) {
-			if (((String) this.fileHistory.elementAt(var2)).equals(var1)) {
+	private boolean inFileHistory(String name) {
+		for (int i = 0; i < this.fileHistory.size(); ++i) {
+			if (((String) this.fileHistory.elementAt(i)).equals(name)) {
 				return true;
 			}
 		}
@@ -1079,67 +1079,67 @@ public final class M3GLoader {
 		return false;
 	}
 
-	private static InputStream getHttpInputStream(String var0) throws IOException {
-		InputConnection var1;
-		HttpConnection var2;
-		String var3;
-		if ((var1 = (InputConnection) Connector.open(var0)) instanceof HttpConnection && (var3 = (var2 = (HttpConnection) var1).getHeaderField("Content-Type")) != null && !var3.equals("application/m3g") && !var3.equals("image/png")) {
-			throw new IOException("Wrong MIME type: " + var3);
+	private static InputStream getHttpInputStream(String url) throws IOException {
+		InputConnection connection;
+		HttpConnection httpConnection;
+		String contentType;
+		if ((connection = (InputConnection) Connector.open(url)) instanceof HttpConnection && (contentType = (httpConnection = (HttpConnection) connection).getHeaderField("Content-Type")) != null && !contentType.equals("application/m3g") && !contentType.equals("image/png")) {
+			throw new IOException("Wrong MIME type: " + contentType);
 		} else {
-			return var1.openInputStream();
+			return connection.openInputStream();
 		}
 	}
 
-	private InputStream getInputStream(String var1) throws IOException {
-		if (var1.indexOf(58) != -1) {
-			return getHttpInputStream(var1);
-		} else if (var1.charAt(0) == 47) {
-			return ResourceManager.getResourceAsStream(var1);
+	private InputStream getInputStream(String name) throws IOException {
+		if (name.indexOf(58) != -1) {
+			return getHttpInputStream(name);
+		} else if (name.charAt(0) == 47) {
+			return ResourceManager.getResourceAsStream(name);
 		} else if (this.parentResourceName == null) {
 			throw new IOException("Relative URI.");
 		} else {
-			String var2;
-			return (var2 = this.parentResourceName.substring(0, this.parentResourceName.lastIndexOf(47) + 1) + var1).charAt(0) == 47 ? ResourceManager.getResourceAsStream(var2) : getHttpInputStream(var2);
+			String absoluteName;
+			return (absoluteName = this.parentResourceName.substring(0, this.parentResourceName.lastIndexOf(47) + 1) + name).charAt(0) == 47 ? ResourceManager.getResourceAsStream(absoluteName) : getHttpInputStream(absoluteName);
 		}
 	}
 
-	private static void copyObject3D(Object3D var0, Object3D var1) {
-		var1.setUserObject(var0.getUserObject());
-		var1.setUserID(var0.getUserID());
+	private static void copyObject3D(Object3D source, Object3D target) {
+		target.setUserObject(source.getUserObject());
+		target.setUserID(source.getUserID());
 	}
 
-	private static void copyNode(Node var0, Node var1) {
-		copyTransformable(var0, var1);
-		var1.setAlphaFactor(var0.getAlphaFactor());
-		var1.setScope(var0.getScope());
-		var1.setPickingEnable(var0.isPickingEnabled());
-		var1.setRenderingEnable(var0.isRenderingEnabled());
+	private static void copyNode(Node source, Node target) {
+		copyTransformable(source, target);
+		target.setAlphaFactor(source.getAlphaFactor());
+		target.setScope(source.getScope());
+		target.setPickingEnable(source.isPickingEnabled());
+		target.setRenderingEnable(source.isRenderingEnabled());
 	}
 
-	private static void copyTransformable(Transformable var0, Transformable var1) {
-		copyObject3D(var0, var1);
-		float[] var2 = new float[4];
-		Transform var3 = new Transform();
-		var0.getTranslation(var2);
-		var1.setTranslation(var2[0], var2[1], var2[2]);
-		var0.getScale(var2);
-		var1.setScale(var2[0], var2[1], var2[2]);
-		var0.getOrientation(var2);
-		var1.setOrientation(var2[0], var2[1], var2[2], var2[3]);
-		var0.getTransform(var3);
-		var1.setTransform(var3);
+	private static void copyTransformable(Transformable source, Transformable target) {
+		copyObject3D(source, target);
+		float[] values = new float[4];
+		Transform transform = new Transform();
+		source.getTranslation(values);
+		target.setTranslation(values[0], values[1], values[2]);
+		source.getScale(values);
+		target.setScale(values[0], values[1], values[2]);
+		source.getOrientation(values);
+		target.setOrientation(values[0], values[1], values[2], values[3]);
+		source.getTransform(transform);
+		target.setTransform(transform);
 	}
 
-	private static void copyMesh(Mesh var0, Mesh var1) {
-		copyNode(var0, var1);
+	private static void copyMesh(Mesh source, Mesh target) {
+		copyNode(source, target);
 	}
 
-	private static void inflate(byte[] var0, byte[] var1) {
+	private static void inflate(byte[] compressed, byte[] uncompressed) {
 		try {
-			Inflater var2 = new Inflater(false);
-			var2.setInput(var0);
-			var2.inflate(var1);
-			var2.end();
+			Inflater inflater = new Inflater(false);
+			inflater.setInput(compressed);
+			inflater.inflate(uncompressed);
+			inflater.end();
 		} catch (Exception e) {
 			Emulator.getEmulator().getLogStream().println("m3g unzip error");
 		}
