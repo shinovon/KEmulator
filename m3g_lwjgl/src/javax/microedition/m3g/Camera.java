@@ -11,10 +11,10 @@ public class Camera extends Node {
 	private float[] projection = new float[4];
 
 	protected Object3D duplicateObject() {
-		Camera var1;
-		(var1 = (Camera) super.duplicateObject()).generic = new Transform(this.generic);
-		var1.projection = (float[]) this.projection.clone();
-		return var1;
+		Camera copy;
+		(copy = (Camera) super.duplicateObject()).generic = new Transform(this.generic);
+		copy.projection = (float[]) this.projection.clone();
+		return copy;
 	}
 
 	public Camera() {
@@ -24,85 +24,85 @@ public class Camera extends Node {
 		this.projection[3] = 1.0F;
 	}
 
-	public void setParallel(float var1, float var2, float var3, float var4) {
-		if (var1 > 0.0F && var2 > 0.0F) {
-			this.projection[0] = var1;
-			this.projection[1] = var2;
-			this.projection[2] = var3;
-			this.projection[3] = var4;
+	public void setParallel(float height, float aspectRatio, float near, float far) {
+		if (height > 0.0F && aspectRatio > 0.0F) {
+			this.projection[0] = height;
+			this.projection[1] = aspectRatio;
+			this.projection[2] = near;
+			this.projection[3] = far;
 			this.projectionType = 49;
 		} else {
 			throw new IllegalArgumentException();
 		}
 	}
 
-	public void setPerspective(float var1, float var2, float var3, float var4) {
-		if (var1 > 0.0F && var1 < 180.0F && var2 > 0.0F && var3 > 0.0F && var4 > 0.0F) {
-			this.projection[0] = var1;
-			this.projection[1] = var2;
-			this.projection[2] = var3;
-			this.projection[3] = var4;
+	public void setPerspective(float fovy, float aspectRatio, float near, float far) {
+		if (fovy > 0.0F && fovy < 180.0F && aspectRatio > 0.0F && near > 0.0F && far > 0.0F) {
+			this.projection[0] = fovy;
+			this.projection[1] = aspectRatio;
+			this.projection[2] = near;
+			this.projection[3] = far;
 			this.projectionType = 50;
 		} else {
 			throw new IllegalArgumentException();
 		}
 	}
 
-	public void setGeneric(Transform var1) {
-		if (var1 == null) {
+	public void setGeneric(Transform transform) {
+		if (transform == null) {
 			throw new NullPointerException();
 		} else {
-			this.generic.set(var1);
+			this.generic.set(transform);
 			this.projectionType = 48;
 		}
 	}
 
-	public int getProjection(Transform var1) {
-		if (var1 != null) {
-			float var2;
-			float var3;
-			float var4;
-			float[] var5;
+	public int getProjection(Transform transform) {
+		if (transform != null) {
+			float height;
+			float width;
+			float depth;
+			float[] matrix;
 			if (this.projectionType == 49) {
-				var2 = this.projection[0];
-				var3 = this.projection[1] * var2;
-				if ((var4 = this.projection[3] - this.projection[2]) == 0.0F) {
+				height = this.projection[0];
+				width = this.projection[1] * height;
+				if ((depth = this.projection[3] - this.projection[2]) == 0.0F) {
 					throw new ArithmeticException("near == far");
 				}
 
-				(var5 = new float[16])[0] = 2.0F / var3;
-				var5[5] = 2.0F / var2;
-				var5[10] = -2.0F / var4;
-				var5[11] = -(this.projection[2] + this.projection[3]) / var4;
-				var5[15] = 1.0F;
-				var1.set(var5);
+				(matrix = new float[16])[0] = 2.0F / width;
+				matrix[5] = 2.0F / height;
+				matrix[10] = -2.0F / depth;
+				matrix[11] = -(this.projection[2] + this.projection[3]) / depth;
+				matrix[15] = 1.0F;
+				transform.set(matrix);
 			} else if (this.projectionType == 50) {
-				var2 = (float) Math.tan(Math.toRadians((double) (this.projection[0] / 2.0F)));
-				var3 = this.projection[1] * var2;
-				if ((var4 = this.projection[3] - this.projection[2]) == 0.0F) {
+				height = (float) Math.tan(Math.toRadians((double) (this.projection[0] / 2.0F)));
+				width = this.projection[1] * height;
+				if ((depth = this.projection[3] - this.projection[2]) == 0.0F) {
 					throw new ArithmeticException("near == far");
 				}
 
-				(var5 = new float[16])[0] = 1.0F / var3;
-				var5[5] = 1.0F / var2;
-				var5[10] = -(this.projection[2] + this.projection[3]) / var4;
-				var5[11] = -2.0F * this.projection[2] * this.projection[3] / var4;
-				var5[14] = -1.0F;
-				var1.set(var5);
+				(matrix = new float[16])[0] = 1.0F / width;
+				matrix[5] = 1.0F / height;
+				matrix[10] = -(this.projection[2] + this.projection[3]) / depth;
+				matrix[11] = -2.0F * this.projection[2] * this.projection[3] / depth;
+				matrix[14] = -1.0F;
+				transform.set(matrix);
 			} else {
-				var1.set(this.generic);
+				transform.set(this.generic);
 			}
 		}
 
 		return this.projectionType;
 	}
 
-	public int getProjection(float[] var1) {
-		if (var1 != null && var1.length < 4) {
+	public int getProjection(float[] params) {
+		if (params != null && params.length < 4) {
 			throw new IllegalArgumentException();
 		} else {
-			if (var1 != null && this.projectionType != 48) {
-				System.arraycopy(this.projection, 0, var1, 0, 4);
+			if (params != null && this.projectionType != 48) {
+				System.arraycopy(this.projection, 0, params, 0, 4);
 			}
 
 			return this.projectionType;
@@ -131,7 +131,7 @@ public class Camera extends Node {
 		super.updateProperty(property, values);
 	}
 
-	protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
+	protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform) {
 		return false;
 	}
 }

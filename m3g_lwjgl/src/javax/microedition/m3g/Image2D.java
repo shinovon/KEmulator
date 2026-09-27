@@ -22,61 +22,61 @@ public class Image2D extends Object3D {
 //	private ByteBuffer buffer;
 //	private int size;
 
-	public Image2D(int var1, Object var2) {
-		if (var2 == null) {
+	public Image2D(int format, Object image) {
+		if (image == null) {
 			throw new NullPointerException();
-		} else if (!checkType(var1)) {
+		} else if (!checkType(format)) {
 			throw new IllegalArgumentException();
-		} else if (var2 instanceof Image) {
-			Image var3 = (Image) var2;
-			this.width = var3.getWidth();
-			this.height = var3.getHeight();
+		} else if (image instanceof Image) {
+			Image lcduiImage = (Image) image;
+			this.width = lcduiImage.getWidth();
+			this.height = lcduiImage.getHeight();
 			this.mutable = false;
-			this.type = var1;
-			this.imageData = convert(var1, var3._getImpl().getData(), var3.isMutable());
+			this.type = format;
+			this.imageData = convert(format, lcduiImage._getImpl().getData(), lcduiImage.isMutable());
 //			allocateBuffer(imageData.length);
 		} else {
 			throw new IllegalArgumentException();
 		}
 	}
 
-	public Image2D(int var1, int var2, int var3, byte[] var4) {
-		if (var4 == null) {
+	public Image2D(int format, int width, int height, byte[] image) {
+		if (image == null) {
 			throw new NullPointerException();
-		} else if (var2 > 0 && var3 > 0 && checkType(var1)) {
-			int var5 = var2 * var3 * bytesPerPixel(var1);
-			if (var4.length < var5) {
+		} else if (width > 0 && height > 0 && checkType(format)) {
+			int size = width * height * bytesPerPixel(format);
+			if (image.length < size) {
 				throw new IllegalArgumentException();
 			} else {
-				this.width = var2;
-				this.height = var3;
+				this.width = width;
+				this.height = height;
 				this.mutable = false;
-				this.type = var1;
-				this.imageData = new byte[var5];
-				System.arraycopy(var4, 0, this.imageData, 0, var5);
-//				allocateBuffer(var5);
+				this.type = format;
+				this.imageData = new byte[size];
+				System.arraycopy(image, 0, this.imageData, 0, size);
+//				allocateBuffer(size);
 			}
 		} else {
 			throw new IllegalArgumentException();
 		}
 	}
 
-	public Image2D(int var1, int var2, int var3, byte[] var4, byte[] var5) {
-		if (var4 != null && var5 != null) {
-			int var6 = var2 * var3;
-			if (var2 > 0 && var3 > 0 && checkType(var1) && var4.length >= var6) {
-				int var7 = bytesPerPixel(var1);
-				if (var5.length < 256 * var7 && var5.length % var7 != 0) {
+	public Image2D(int format, int width, int height, byte[] pixels, byte[] palette) {
+		if (pixels != null && palette != null) {
+			int pixelCount = width * height;
+			if (width > 0 && height > 0 && checkType(format) && pixels.length >= pixelCount) {
+				int bytesPerPixel = bytesPerPixel(format);
+				if (palette.length < 256 * bytesPerPixel && palette.length % bytesPerPixel != 0) {
 					throw new IllegalArgumentException();
 				} else {
-					this.width = var2;
-					this.height = var3;
+					this.width = width;
+					this.height = height;
 					this.mutable = false;
-					this.type = var1;
-					this.imageData = new byte[var6 * var7];
+					this.type = format;
+					this.imageData = new byte[pixelCount * bytesPerPixel];
 
-					for (int var8 = 0; var8 < var6; ++var8) {
-						System.arraycopy(var5, (var4[var8] & 255) * var7, this.imageData, var8 * var7, var7);
+					for (int i = 0; i < pixelCount; ++i) {
+						System.arraycopy(palette, (pixels[i] & 255) * bytesPerPixel, this.imageData, i * bytesPerPixel, bytesPerPixel);
 					}
 //					allocateBuffer(imageData.length);
 				}
@@ -88,25 +88,25 @@ public class Image2D extends Object3D {
 		}
 	}
 
-	public Image2D(int var1, int var2, int var3) {
-		if (var2 > 0 && var3 > 0 && checkType(var1)) {
-			this.width = var2;
-			this.height = var3;
+	public Image2D(int format, int width, int height) {
+		if (width > 0 && height > 0 && checkType(format)) {
+			this.width = width;
+			this.height = height;
 			this.mutable = true;
-			this.type = var1;
-			int var4 = var2 * bytesPerPixel(var1);
-			this.imageData = new byte[var4 * var3];
-			int var5;
-			if (tmp == null || tmp.length < var4) {
-				tmp = new byte[var4];
+			this.type = format;
+			int rowSize = width * bytesPerPixel(format);
+			this.imageData = new byte[rowSize * height];
+			int i;
+			if (tmp == null || tmp.length < rowSize) {
+				tmp = new byte[rowSize];
 
-				for (var5 = var4 - 1; var5 >= 0; --var5) {
-					tmp[var5] = -1;
+				for (i = rowSize - 1; i >= 0; --i) {
+					tmp[i] = -1;
 				}
 			}
 
-			for (var5 = 0; var5 < var3; ++var5) {
-				System.arraycopy(tmp, 0, this.imageData, var5 * var4, var4);
+			for (i = 0; i < height; ++i) {
+				System.arraycopy(tmp, 0, this.imageData, i * rowSize, rowSize);
 			}
 //			allocateBuffer(imageData.length);
 		} else {
@@ -114,16 +114,16 @@ public class Image2D extends Object3D {
 		}
 	}
 
-	public void set(int var1, int var2, int var3, int var4, byte[] var5) {
-		if (var5 == null) {
+	public void set(int x, int y, int width, int height, byte[] image) {
+		if (image == null) {
 			throw new NullPointerException();
-		} else if (this.mutable && var1 >= 0 && var2 >= 0 && var3 > 0 && var4 > 0 && var1 + var3 <= this.width && var2 + var4 <= this.height) {
-			int var6 = this.getBitsPerColor();
-			if (var5.length < var3 * var4 * var6) {
+		} else if (this.mutable && x >= 0 && y >= 0 && width > 0 && height > 0 && x + width <= this.width && y + height <= this.height) {
+			int bytesPerPixel = this.getBitsPerColor();
+			if (image.length < width * height * bytesPerPixel) {
 				throw new IllegalArgumentException();
 			} else {
-				for (int var7 = 0; var7 < var4; ++var7) {
-					System.arraycopy(var5, var7 * var3 * var6, this.imageData, ((var2 + var7) * this.width + var1) * var6, var3 * var6);
+				for (int row = 0; row < height; ++row) {
+					System.arraycopy(image, row * width * bytesPerPixel, this.imageData, ((y + row) * this.width + x) * bytesPerPixel, width * bytesPerPixel);
 				}
 				((Emulator3D) Graphics3D.getImpl()).invalidateTexture(this);
 			}
@@ -168,8 +168,8 @@ public class Image2D extends Object3D {
 		}
 	}
 
-	private static boolean checkType(int var0) {
-		return var0 >= 96 && var0 <= 100;
+	private static boolean checkType(int format) {
+		return format >= 96 && format <= 100;
 	}
 
 	public final byte[] getImageData() {
@@ -182,107 +182,107 @@ public class Image2D extends Object3D {
 	}
 
 	private static byte[] convert(int type, int[] data, boolean mutable) {
-		byte[] var3 = null;
-		int var4 = data.length;
-		int var5;
+		byte[] result = null;
+		int pixelCount = data.length;
+		int i;
 		if (mutable) {
 			switch (type) {
 				case 96:
 				case 97:
-					var3 = new byte[var4];
+					result = new byte[pixelCount];
 
-					for (var5 = var4 - 1; var5 >= 0; --var5) {
-						var3[var5] = (byte) (((data[var5] >> 16 & 255) + (data[var5] >> 8 & 255) + (data[var5] & 255)) / 3 & 255);
+					for (i = pixelCount - 1; i >= 0; --i) {
+						result[i] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
 					}
 
-					return var3;
+					return result;
 				case 98:
-					var3 = new byte[var4 * 2];
+					result = new byte[pixelCount * 2];
 
-					for (var5 = var4 - 1; var5 >= 0; --var5) {
-						var3[var5 * 2] = (byte) (((data[var5] >> 16 & 255) + (data[var5] >> 8 & 255) + (data[var5] & 255)) / 3 & 255);
-						var3[var5 * 2 + 1] = -1;
+					for (i = pixelCount - 1; i >= 0; --i) {
+						result[i * 2] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
+						result[i * 2 + 1] = -1;
 					}
 
-					return var3;
+					return result;
 				case 99:
-					var3 = new byte[var4 * 3];
+					result = new byte[pixelCount * 3];
 
-					for (var5 = var4 - 1; var5 >= 0; --var5) {
-						var3[var5 * 3] = (byte) (data[var5] >> 16 & 255);
-						var3[var5 * 3 + 1] = (byte) (data[var5] >> 8 & 255);
-						var3[var5 * 3 + 2] = (byte) (data[var5] & 255);
+					for (i = pixelCount - 1; i >= 0; --i) {
+						result[i * 3] = (byte) (data[i] >> 16 & 255);
+						result[i * 3 + 1] = (byte) (data[i] >> 8 & 255);
+						result[i * 3 + 2] = (byte) (data[i] & 255);
 					}
 
-					return var3;
+					return result;
 				case 100:
-					var3 = new byte[var4 * 4];
+					result = new byte[pixelCount * 4];
 
-					for (var5 = var4 - 1; var5 >= 0; --var5) {
-						var3[var5 * 4] = (byte) (data[var5] >> 16 & 255);
-						var3[var5 * 4 + 1] = (byte) (data[var5] >> 8 & 255);
-						var3[var5 * 4 + 2] = (byte) (data[var5] & 255);
-						var3[var5 * 4 + 3] = -1;
+					for (i = pixelCount - 1; i >= 0; --i) {
+						result[i * 4] = (byte) (data[i] >> 16 & 255);
+						result[i * 4 + 1] = (byte) (data[i] >> 8 & 255);
+						result[i * 4 + 2] = (byte) (data[i] & 255);
+						result[i * 4 + 3] = -1;
 					}
 			}
 		} else {
 			switch (type) {
 				case 96:
-					var3 = new byte[var4];
+					result = new byte[pixelCount];
 
-					for (var5 = var4 - 1; var5 >= 0; --var5) {
-						var3[var5] = (byte) (data[var5] >> 24 & 255);
+					for (i = pixelCount - 1; i >= 0; --i) {
+						result[i] = (byte) (data[i] >> 24 & 255);
 					}
 
-					return var3;
+					return result;
 				case 97:
-					var3 = new byte[var4];
+					result = new byte[pixelCount];
 
-					for (var5 = var4 - 1; var5 >= 0; --var5) {
-						var3[var5] = (byte) (((data[var5] >> 16 & 255) + (data[var5] >> 8 & 255) + (data[var5] & 255)) / 3 & 255);
+					for (i = pixelCount - 1; i >= 0; --i) {
+						result[i] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
 					}
 
-					return var3;
+					return result;
 				case 98:
-					var3 = new byte[var4 * 2];
+					result = new byte[pixelCount * 2];
 
-					for (var5 = var4 - 1; var5 >= 0; --var5) {
-						var3[var5 * 2] = (byte) (((data[var5] >> 16 & 255) + (data[var5] >> 8 & 255) + (data[var5] & 255)) / 3 & 255);
-						var3[var5 * 2 + 1] = (byte) (data[var5] >> 24 & 255);
+					for (i = pixelCount - 1; i >= 0; --i) {
+						result[i * 2] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
+						result[i * 2 + 1] = (byte) (data[i] >> 24 & 255);
 					}
 
-					return var3;
+					return result;
 				case 99:
-					var3 = new byte[var4 * 3];
+					result = new byte[pixelCount * 3];
 
-					for (var5 = var4 - 1; var5 >= 0; --var5) {
-						var3[var5 * 3] = (byte) (data[var5] >> 16 & 255);
-						var3[var5 * 3 + 1] = (byte) (data[var5] >> 8 & 255);
-						var3[var5 * 3 + 2] = (byte) (data[var5] & 255);
+					for (i = pixelCount - 1; i >= 0; --i) {
+						result[i * 3] = (byte) (data[i] >> 16 & 255);
+						result[i * 3 + 1] = (byte) (data[i] >> 8 & 255);
+						result[i * 3 + 2] = (byte) (data[i] & 255);
 					}
 
-					return var3;
+					return result;
 				case 100:
-					var3 = new byte[var4 * 4];
+					result = new byte[pixelCount * 4];
 
-					for (var5 = var4 - 1; var5 >= 0; --var5) {
-						var3[var5 * 4] = (byte) (data[var5] >> 16 & 255);
-						var3[var5 * 4 + 1] = (byte) (data[var5] >> 8 & 255);
-						var3[var5 * 4 + 2] = (byte) (data[var5] & 255);
-						var3[var5 * 4 + 3] = (byte) (data[var5] >> 24 & 255);
+					for (i = pixelCount - 1; i >= 0; --i) {
+						result[i * 4] = (byte) (data[i] >> 16 & 255);
+						result[i * 4 + 1] = (byte) (data[i] >> 8 & 255);
+						result[i * 4 + 2] = (byte) (data[i] & 255);
+						result[i * 4 + 3] = (byte) (data[i] >> 24 & 255);
 					}
 			}
 		}
 
-		return var3;
+		return result;
 	}
 
 	protected Object3D duplicateObject() {
-		Image2D var1 = (Image2D) super.duplicateObject();
-		var1.imageData = (byte[]) this.imageData.clone();
-//		var1.imageData = getImageData();
-//		var1.allocateBuffer(size);
-		return var1;
+		Image2D copy = (Image2D) super.duplicateObject();
+		copy.imageData = (byte[]) this.imageData.clone();
+//		copy.imageData = getImageData();
+//		copy.allocateBuffer(size);
+		return copy;
 	}
 
 	protected void finalize() {
@@ -331,22 +331,22 @@ public class Image2D extends Object3D {
 		int l = data.length;
 //		if (buffer != null) {
 //			buffer.position(buffer.capacity() - (l * 3));
-//			for (int var5 = l - 1; var5 >= 0; --var5) {
-//				buffer.put((byte) (data[var5] >> 16 & 255));
-//				buffer.put((byte) (data[var5] >> 8 & 255));
-//				buffer.put((byte) (data[var5] & 255));
+//			for (int i = l - 1; i >= 0; --i) {
+//				buffer.put((byte) (data[i] >> 16 & 255));
+//				buffer.put((byte) (data[i] >> 8 & 255));
+//				buffer.put((byte) (data[i] & 255));
 //			}
 //			((Emulator3D) Graphics3D.getImpl()).invalidateTexture(this);
 //			return;
 //		}
 		if (imageData == null || imageData.length != l * 3)
 			imageData = new byte[l * 3];
-		byte[] var3 = imageData;
+		byte[] pixels = imageData;
 
-		for (int var5 = l - 1; var5 >= 0; --var5) {
-			var3[var5 * 3] = (byte) (data[var5] >> 16 & 255);
-			var3[var5 * 3 + 1] = (byte) (data[var5] >> 8 & 255);
-			var3[var5 * 3 + 2] = (byte) (data[var5] & 255);
+		for (int i = l - 1; i >= 0; --i) {
+			pixels[i * 3] = (byte) (data[i] >> 16 & 255);
+			pixels[i * 3 + 1] = (byte) (data[i] >> 8 & 255);
+			pixels[i * 3 + 2] = (byte) (data[i] & 255);
 		}
 //		allocateBuffer(imageData.length);
 		((Emulator3D) Graphics3D.getImpl()).invalidateTexture(this);

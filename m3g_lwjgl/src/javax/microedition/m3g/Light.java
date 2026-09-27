@@ -16,9 +16,9 @@ public class Light extends Node {
 	private float spotAngle = 45.0F;
 	private float spotExponent = 0.0F;
 
-	public void setMode(int var1) {
-		if (var1 >= 128 && var1 <= 131) {
-			this.mode = var1;
+	public void setMode(int mode) {
+		if (mode >= 128 && mode <= 131) {
+			this.mode = mode;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -28,25 +28,25 @@ public class Light extends Node {
 		return this.mode;
 	}
 
-	public void setIntensity(float var1) {
-		this.intensity = var1;
+	public void setIntensity(float intensity) {
+		this.intensity = intensity;
 	}
 
 	public float getIntensity() {
 		return this.intensity;
 	}
 
-	public void setColor(int var1) {
-		this.color = var1;
+	public void setColor(int RGB) {
+		this.color = RGB;
 	}
 
 	public int getColor() {
 		return this.color;
 	}
 
-	public void setSpotAngle(float var1) {
-		if (var1 >= 0.0F && var1 <= 90.0F) {
-			this.spotAngle = var1;
+	public void setSpotAngle(float angle) {
+		if (angle >= 0.0F && angle <= 90.0F) {
+			this.spotAngle = angle;
 		} else {
 			throw new IllegalArgumentException("angle is not in [0, 90]");
 		}
@@ -56,9 +56,9 @@ public class Light extends Node {
 		return this.spotAngle;
 	}
 
-	public void setSpotExponent(float var1) {
-		if (var1 >= 0.0F && var1 <= 128.0F) {
-			this.spotExponent = var1;
+	public void setSpotExponent(float exponent) {
+		if (exponent >= 0.0F && exponent <= 128.0F) {
+			this.spotExponent = exponent;
 		} else {
 			throw new IllegalArgumentException("exponent is not in [0, 128]");
 		}
@@ -68,14 +68,14 @@ public class Light extends Node {
 		return this.spotExponent;
 	}
 
-	public void setAttenuation(float var1, float var2, float var3) {
-		if (var1 >= 0.0F && var2 >= 0.0F && var3 >= 0.0F) {
-			if (var1 == 0.0F && var2 == 0.0F && var3 == 0.0F) {
+	public void setAttenuation(float constant, float linear, float quadratic) {
+		if (constant >= 0.0F && linear >= 0.0F && quadratic >= 0.0F) {
+			if (constant == 0.0F && linear == 0.0F && quadratic == 0.0F) {
 				throw new IllegalArgumentException("all of the parameter values are zero");
 			} else {
-				this.constantAttenuation = var1;
-				this.linearAttenuation = var2;
-				this.quadraticAttenuation = var3;
+				this.constantAttenuation = constant;
+				this.linearAttenuation = linear;
+				this.quadraticAttenuation = quadratic;
 			}
 		} else {
 			throw new IllegalArgumentException("any of the parameter values are negative");
@@ -113,7 +113,7 @@ public class Light extends Node {
 		}
 	}
 
-	protected boolean rayIntersect(int var1, float[] var2, RayIntersection var3, Transform var4) {
+	protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform) {
 		return false;
 	}
 }

@@ -22,8 +22,8 @@ public class Texture2D extends Transformable {
 	private int blending;
 	private int blendColor;
 
-	public Texture2D(Image2D var1) {
-		this.setImage(var1);
+	public Texture2D(Image2D image) {
+		this.setImage(image);
 		this.wrappingS = 241;
 		this.wrappingT = 241;
 		this.levelFilter = 208;
@@ -32,20 +32,20 @@ public class Texture2D extends Transformable {
 		this.blendColor = 0;
 	}
 
-	private static boolean isPow2(int var0) {
-		return (var0 & var0 - 1) == 0;
+	private static boolean isPow2(int value) {
+		return (value & value - 1) == 0;
 	}
 
-	public void setImage(Image2D var1) {
-		if (var1 == null) {
+	public void setImage(Image2D image) {
+		if (image == null) {
 			throw new NullPointerException();
 		} else {
-			int var2 = var1.getWidth();
-			int var3 = var1.getHeight();
-			if (isPow2(var2) && isPow2(var3)) {
-				if (var2 <= Emulator3D.MaxTextureDimension && var3 <= Emulator3D.MaxTextureDimension) {
+			int width = image.getWidth();
+			int height = image.getHeight();
+			if (isPow2(width) && isPow2(height)) {
+				if (width <= Emulator3D.MaxTextureDimension && height <= Emulator3D.MaxTextureDimension) {
 					this.removeReference(this.image);
-					this.image = var1;
+					this.image = image;
 					this.addReference(this.image);
 				} else {
 					throw new IllegalArgumentException("the width or height of image exceeds the MaxTextureDimension :" + Emulator3D.MaxTextureDimension);
@@ -60,14 +60,14 @@ public class Texture2D extends Transformable {
 		return this.image;
 	}
 
-	public void setFiltering(int var1, int var2) {
-		if (var1 != 208 && var1 != 209 && var1 != 210) {
+	public void setFiltering(int levelFilter, int imageFilter) {
+		if (levelFilter != 208 && levelFilter != 209 && levelFilter != 210) {
 			throw new IllegalArgumentException();
-		} else if (var2 != 209 && var2 != 210) {
+		} else if (imageFilter != 209 && imageFilter != 210) {
 			throw new IllegalArgumentException();
 		} else {
-			this.levelFilter = var1;
-			this.imageFilter = var2;
+			this.levelFilter = levelFilter;
+			this.imageFilter = imageFilter;
 		}
 	}
 
@@ -79,14 +79,14 @@ public class Texture2D extends Transformable {
 		return this.imageFilter;
 	}
 
-	public void setWrapping(int var1, int var2) {
-		if (var1 != 240 && var1 != 241) {
+	public void setWrapping(int wrapS, int wrapT) {
+		if (wrapS != 240 && wrapS != 241) {
 			throw new IllegalArgumentException();
-		} else if (var2 != 240 && var2 != 241) {
+		} else if (wrapT != 240 && wrapT != 241) {
 			throw new IllegalArgumentException();
 		} else {
-			this.wrappingS = var1;
-			this.wrappingT = var2;
+			this.wrappingS = wrapS;
+			this.wrappingT = wrapT;
 		}
 	}
 
@@ -98,9 +98,9 @@ public class Texture2D extends Transformable {
 		return this.wrappingT;
 	}
 
-	public void setBlending(int var1) {
-		if (var1 >= 224 && var1 <= 228) {
-			this.blending = var1;
+	public void setBlending(int func) {
+		if (func >= 224 && func <= 228) {
+			this.blending = func;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -110,8 +110,8 @@ public class Texture2D extends Transformable {
 		return this.blending;
 	}
 
-	public void setBlendColor(int var1) {
-		this.blendColor = var1;
+	public void setBlendColor(int RGB) {
+		this.blendColor = RGB;
 	}
 
 	public int getBlendColor() {

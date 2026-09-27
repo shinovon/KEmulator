@@ -9,12 +9,12 @@ public class Transform {
 		this.impl = new Transform3D();
 	}
 
-	public Transform(Transform var1) {
-		if (var1 == null) {
+	public Transform(Transform transform) {
+		if (transform == null) {
 			throw new NullPointerException();
 		} else {
 			this.impl = new Transform3D();
-			this.impl.set(var1.impl);
+			this.impl.set(transform.impl);
 		}
 	}
 
@@ -30,31 +30,31 @@ public class Transform {
 		this.impl.setIdentity();
 	}
 
-	public void set(Transform var1) {
-		if (var1 == null) {
+	public void set(Transform transform) {
+		if (transform == null) {
 			throw new NullPointerException();
 		} else {
-			this.impl.set(var1.impl);
+			this.impl.set(transform.impl);
 		}
 	}
 
-	public void set(float[] var1) {
-		if (var1 == null) {
+	public void set(float[] matrix) {
+		if (matrix == null) {
 			throw new NullPointerException();
-		} else if (var1.length < 16) {
+		} else if (matrix.length < 16) {
 			throw new IllegalArgumentException();
 		} else {
-			this.impl.set(var1);
+			this.impl.set(matrix);
 		}
 	}
 
-	public void get(float[] var1) {
-		if (var1 == null) {
+	public void get(float[] matrix) {
+		if (matrix == null) {
 			throw new NullPointerException();
-		} else if (var1.length < 16) {
+		} else if (matrix.length < 16) {
 			throw new IllegalArgumentException();
 		} else {
-			this.impl.get(var1);
+			this.impl.get(matrix);
 		}
 	}
 
@@ -66,76 +66,76 @@ public class Transform {
 		this.impl.transpose();
 	}
 
-	public void postMultiply(Transform var1) {
-		if (var1 == null) {
+	public void postMultiply(Transform transform) {
+		if (transform == null) {
 			throw new NullPointerException();
 		} else {
-			this.impl.postMultiply(var1.impl, false);
+			this.impl.postMultiply(transform.impl, false);
 		}
 	}
 
-	public void preMultiply(Transform var1) {
-		this.impl.postMultiply(var1.impl, true);
+	public void preMultiply(Transform transform) {
+		this.impl.postMultiply(transform.impl, true);
 	}
 
-	public void postScale(float var1, float var2, float var3) {
-		this.impl.postScale(var1, var2, var3);
+	public void postScale(float sx, float sy, float sz) {
+		this.impl.postScale(sx, sy, sz);
 	}
 
-	public void postRotate(float var1, float var2, float var3, float var4) {
-		if (var2 == 0.0F && var3 == 0.0F && var4 == 0.0F && var1 != 0.0F) {
+	public void postRotate(float angle, float ax, float ay, float az) {
+		if (ax == 0.0F && ay == 0.0F && az == 0.0F && angle != 0.0F) {
 			throw new IllegalArgumentException();
 		} else {
-			this.impl.postRotate(var1, var2, var3, var4);
+			this.impl.postRotate(angle, ax, ay, az);
 		}
 	}
 
-	public void postRotateQuat(float var1, float var2, float var3, float var4) {
-		if (var1 == 0.0F && var2 == 0.0F && var3 == 0.0F && var4 == 0.0F) {
+	public void postRotateQuat(float qx, float qy, float qz, float qw) {
+		if (qx == 0.0F && qy == 0.0F && qz == 0.0F && qw == 0.0F) {
 			throw new IllegalArgumentException();
 		} else {
-			this.impl.postRotateQuat(var1, var2, var3, var4);
+			this.impl.postRotateQuat(qx, qy, qz, qw);
 		}
 	}
 
-	public void postTranslate(float var1, float var2, float var3) {
-		this.impl.postTranslate(var1, var2, var3);
+	public void postTranslate(float tx, float ty, float tz) {
+		this.impl.postTranslate(tx, ty, tz);
 	}
 
-	public void transform(VertexArray var1, float[] var2, boolean var3) {
-		if (var1 != null && var2 != null) {
-			if (var1.getComponentCount() != 4 && var2.length >= 4 * var1.getVertexCount()) {
-				int var4 = var3 ? 1 : 0;
-				int var5 = var1.getVertexCount();
-				int var6 = var1.getComponentCount();
-				int var7 = var5 * 4;
-				int var8 = 0;
-				int var9 = 0;
-				if (var1.getComponentType() == 1) {
-					byte[] var10 = new byte[var5 * var6];
-					var1.get(0, var5, var10);
+	public void transform(VertexArray in, float[] out, boolean W) {
+		if (in != null && out != null) {
+			if (in.getComponentCount() != 4 && out.length >= 4 * in.getVertexCount()) {
+				int w = W ? 1 : 0;
+				int vertexCount = in.getVertexCount();
+				int componentCount = in.getComponentCount();
+				int outLength = vertexCount * 4;
+				int outIndex = 0;
+				int inIndex = 0;
+				if (in.getComponentType() == 1) {
+					byte[] bytes = new byte[vertexCount * componentCount];
+					in.get(0, vertexCount, bytes);
 
-					while (var8 < var7) {
-						if (var8 % 4 < var6) {
-							var2[var8++] = (float) var10[var9++];
+					while (outIndex < outLength) {
+						if (outIndex % 4 < componentCount) {
+							out[outIndex++] = (float) bytes[inIndex++];
 						} else {
-							var2[var8++] = (float) var4;
+							out[outIndex++] = (float) w;
 						}
 					}
 				} else {
-					short[] var11 = new short[var5 * var6];
-					var1.get(0, var5, var11);
+					short[] shorts = new short[vertexCount * componentCount];
+					in.get(0, vertexCount, shorts);
 
-					while (var8 < var7) {
-						if (var8 % 4 < var6) {
-							var2[var8++] = (float) var11[var9++];
+					while (outIndex < outLength) {
+						if (outIndex % 4 < componentCount) {
+							out[outIndex++] = (float) shorts[inIndex++];
 						} else {
-							var2[var8++] = (float) var4;
+							out[outIndex++] = (float) w;
 						}
 					}
 				}
 
-				this.impl.transform(var2);
+				this.impl.transform(out);
 			} else {
 				throw new IllegalArgumentException();
 			}
@@ -144,13 +144,13 @@ public class Transform {
 		}
 	}
 
-	public void transform(float[] var1) {
-		if (var1 == null) {
+	public void transform(float[] vectors) {
+		if (vectors == null) {
 			throw new NullPointerException();
-		} else if (var1.length % 4 != 0) {
+		} else if (vectors.length % 4 != 0) {
 			throw new IllegalArgumentException();
 		} else {
-			this.impl.transform(var1);
+			this.impl.transform(vectors);
 		}
 	}
 }

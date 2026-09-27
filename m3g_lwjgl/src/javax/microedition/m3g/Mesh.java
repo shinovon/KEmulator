@@ -108,23 +108,23 @@ public class Mesh extends Node {
 			if (vb.getPositions((float[]) null) == null) {
 				throw new IllegalStateException("No vertex positions");
 			} else {
-				boolean var6 = false;
-				Vector4f var7 = new Vector4f(ray[0], ray[1], ray[2], 1.0F);
-				Vector4f var8 = new Vector4f(ray[3], ray[4], ray[5], 1.0F);
-				Transform var9;
-				(var9 = new Transform()).set(transform);
-				var9.getImpl_().invert();
-				var9.getImpl_().transform(var7);
-				var9.getImpl_().transform(var8);
-				var7.mul(1.0F / var7.w);
-				var8.mul(1.0F / var8.w);
-				var8.sub(var7);
+				boolean hit = false;
+				Vector4f rayOrigin = new Vector4f(ray[0], ray[1], ray[2], 1.0F);
+				Vector4f rayDirection = new Vector4f(ray[3], ray[4], ray[5], 1.0F);
+				Transform inverseTransform;
+				(inverseTransform = new Transform()).set(transform);
+				inverseTransform.getImpl_().invert();
+				inverseTransform.getImpl_().transform(rayOrigin);
+				inverseTransform.getImpl_().transform(rayDirection);
+				rayOrigin.mul(1.0F / rayOrigin.w);
+				rayDirection.mul(1.0F / rayDirection.w);
+				rayDirection.sub(rayOrigin);
 				Vector4f vtxA = new Vector4f();
 				Vector4f vtxB = new Vector4f();
 				Vector4f vtxC = new Vector4f();
-				Vector4f var13 = new Vector4f();
-				Vector4f var14 = new Vector4f();
-				Transform var15 = new Transform();
+				Vector4f texCoord = new Vector4f();
+				Vector4f hitInfo = new Vector4f();
+				Transform textureTransform = new Transform();
 				int[] triIndices = new int[4];
 				float[] texS = new float[Emulator3D.NumTextureUnits];
 				float[] texT = new float[Emulator3D.NumTextureUnits];
@@ -132,27 +132,27 @@ public class Mesh extends Node {
 
 				for (int submesh = 0; submesh < this.submeshes.length; ++submesh) {
 					if (this.appearances[submesh] != null && this.submeshes[submesh] != null) {
-						int var21;
+						int cullMode;
 						if (this.appearances[submesh].getPolygonMode() != null) {
 							label120:
 							{
-								var21 = this.appearances[submesh].getPolygonMode().getWinding() != 168 ? 1 : 0;
-								int var10000;
+								cullMode = this.appearances[submesh].getPolygonMode().getWinding() != 168 ? 1 : 0;
+								int resolvedCullMode;
 								switch (this.appearances[submesh].getPolygonMode().getCulling()) {
 									case 161:
-										var10000 = var21 ^ 1;
+										resolvedCullMode = cullMode ^ 1;
 										break;
 									case 162:
-										var10000 = 2;
+										resolvedCullMode = 2;
 										break;
 									default:
 										break label120;
 								}
 
-								var21 = var10000;
+								cullMode = resolvedCullMode;
 							}
 						} else {
-							var21 = 0;
+							cullMode = 0;
 						}
 
 						TriangleStripArray tsa = (TriangleStripArray) this.submeshes[submesh];
@@ -172,58 +172,58 @@ public class Mesh extends Node {
 							vb.getVertex(triIndices[1], vtxB);
 							vb.getVertex(triIndices[2], vtxC);
 
-							if (G3DUtils.intersectTriangle(var7, var8, vtxA, vtxB, vtxC, var14, triIndices[3] ^ var21) && ri.testDistance(var14.x)) {
+							if (G3DUtils.intersectTriangle(rayOrigin, rayDirection, vtxA, vtxB, vtxC, hitInfo, triIndices[3] ^ cullMode) && ri.testDistance(hitInfo.x)) {
 								if (vb.getNormalVertex(triIndices[0], vtxA)) {
 									vb.getNormalVertex(triIndices[1], vtxB);
 									vb.getNormalVertex(triIndices[2], vtxC);
 
 									normal = new float[3];
 
-									normal[0] = vtxA.x * (1.0F - (var14.y + var14.z)) + vtxB.x * var14.y + vtxC.x * var14.z;
-									normal[1] = vtxA.y * (1.0F - (var14.y + var14.z)) + vtxB.y * var14.y + vtxC.y * var14.z;
-									normal[2] = vtxA.z * (1.0F - (var14.y + var14.z)) + vtxB.z * var14.y + vtxC.z * var14.z;
+									normal[0] = vtxA.x * (1.0F - (hitInfo.y + hitInfo.z)) + vtxB.x * hitInfo.y + vtxC.x * hitInfo.z;
+									normal[1] = vtxA.y * (1.0F - (hitInfo.y + hitInfo.z)) + vtxB.y * hitInfo.y + vtxC.y * hitInfo.z;
+									normal[2] = vtxA.z * (1.0F - (hitInfo.y + hitInfo.z)) + vtxB.z * hitInfo.y + vtxC.z * hitInfo.z;
 								}
 
-								for (int var25 = 0; var25 < texS.length; ++var25) {
-									int var10001;
-									float var10002;
-									float[] var26;
-									if (vb.getTexVertex(triIndices[0], var25, vtxA)) {
-										vb.getTexVertex(triIndices[1], var25, vtxB);
-										vb.getTexVertex(triIndices[2], var25, vtxC);
-										var13.x = vtxA.x * (1.0F - (var14.y + var14.z)) + vtxB.x * var14.y + vtxC.x * var14.z;
-										var13.y = vtxA.y * (1.0F - (var14.y + var14.z)) + vtxB.y * var14.y + vtxC.y * var14.z;
-										var13.z = 0.0F;
-										var13.w = 1.0F;
-										if (this.appearances[submesh] != null && this.appearances[submesh].getTexture(var25) != null) {
-											this.appearances[submesh].getTexture(var25).getCompositeTransform(var15);
-											var15.getImpl_().transform(var13);
-											var13.mul(1.0F / var13.w);
+								for (int unit = 0; unit < texS.length; ++unit) {
+									int targetIndex;
+									float targetValue;
+									float[] targetArray;
+									if (vb.getTexVertex(triIndices[0], unit, vtxA)) {
+										vb.getTexVertex(triIndices[1], unit, vtxB);
+										vb.getTexVertex(triIndices[2], unit, vtxC);
+										texCoord.x = vtxA.x * (1.0F - (hitInfo.y + hitInfo.z)) + vtxB.x * hitInfo.y + vtxC.x * hitInfo.z;
+										texCoord.y = vtxA.y * (1.0F - (hitInfo.y + hitInfo.z)) + vtxB.y * hitInfo.y + vtxC.y * hitInfo.z;
+										texCoord.z = 0.0F;
+										texCoord.w = 1.0F;
+										if (this.appearances[submesh] != null && this.appearances[submesh].getTexture(unit) != null) {
+											this.appearances[submesh].getTexture(unit).getCompositeTransform(textureTransform);
+											textureTransform.getImpl_().transform(texCoord);
+											texCoord.mul(1.0F / texCoord.w);
 										}
 
-										texT[var25] = var13.x;
-										var26 = texS;
-										var10001 = var25;
-										var10002 = var13.y;
+										texT[unit] = texCoord.x;
+										targetArray = texS;
+										targetIndex = unit;
+										targetValue = texCoord.y;
 									} else {
-										texT[var25] = 0.0F;
-										var26 = texS;
-										var10001 = var25;
-										var10002 = 0.0F;
+										texT[unit] = 0.0F;
+										targetArray = texS;
+										targetIndex = unit;
+										targetValue = 0.0F;
 									}
 
-									var26[var10001] = var10002;
+									targetArray[targetIndex] = targetValue;
 								}
 
-								if (ri.endPick(var14.x, texT, texS, submesh, this, normal)) {
-									var6 = true;
+								if (ri.endPick(hitInfo.x, texT, texS, submesh, this, normal)) {
+									hit = true;
 								}
 							}
 						}
 					}
 				}
 
-				return var6;
+				return hit;
 			}
 		} else {
 			return false;

@@ -13,22 +13,22 @@ public class Sprite3D extends Node {
 	private int cropWidth;
 	private int cropHeight;
 
-	public Sprite3D(boolean var1, Image2D var2, Appearance var3) {
-		this.scaled = var1;
-		this.setImage(var2);
-		this.setAppearance(var3);
+	public Sprite3D(boolean scaled, Image2D image, Appearance appearance) {
+		this.scaled = scaled;
+		this.setImage(image);
+		this.setAppearance(appearance);
 	}
 
-	public void setImage(Image2D var1) {
-		if (var1 == null) {
+	public void setImage(Image2D image) {
+		if (image == null) {
 			throw new NullPointerException();
 		} else {
 			this.removeReference(this.image);
-			this.image = var1;
+			this.image = image;
 			this.addReference(this.image);
 			this.cropX = this.cropY = 0;
-			this.cropWidth = Math.min(var1.getWidth(), Emulator3D.MaxSpriteCropDimension);
-			this.cropHeight = Math.min(var1.getHeight(), Emulator3D.MaxSpriteCropDimension);
+			this.cropWidth = Math.min(image.getWidth(), Emulator3D.MaxSpriteCropDimension);
+			this.cropHeight = Math.min(image.getHeight(), Emulator3D.MaxSpriteCropDimension);
 		}
 	}
 
@@ -40,9 +40,9 @@ public class Sprite3D extends Node {
 		return this.scaled;
 	}
 
-	public void setAppearance(Appearance var1) {
+	public void setAppearance(Appearance appearance) {
 		this.removeReference(this.appearance);
-		this.appearance = var1;
+		this.appearance = appearance;
 		this.addReference(this.appearance);
 	}
 
@@ -50,12 +50,12 @@ public class Sprite3D extends Node {
 		return this.appearance;
 	}
 
-	public void setCrop(int var1, int var2, int var3, int var4) {
-		if (Math.abs(var3) <= Emulator3D.MaxSpriteCropDimension && Math.abs(var4) <= Emulator3D.MaxSpriteCropDimension) {
-			this.cropX = var1;
-			this.cropY = var2;
-			this.cropWidth = var3;
-			this.cropHeight = var4;
+	public void setCrop(int cropX, int cropY, int width, int height) {
+		if (Math.abs(width) <= Emulator3D.MaxSpriteCropDimension && Math.abs(height) <= Emulator3D.MaxSpriteCropDimension) {
+			this.cropX = cropX;
+			this.cropY = cropY;
+			this.cropWidth = width;
+			this.cropHeight = height;
 		} else {
 			throw new IllegalArgumentException("width or height exceeds the MaxSpriteCropDimension:" + Emulator3D.MaxSpriteCropDimension);
 		}
@@ -98,178 +98,178 @@ public class Sprite3D extends Node {
 		if ((scope & getScope()) == 0) return false;
 
 		if (this.appearance != null && this.image != null && this.scaled && this.cropWidth != 0 && this.cropHeight != 0) {
-			Camera var5;
-			if ((var5 = ri.getCamera()) != null && this.image != null) {
-				int[] var6;
-				boolean var7 = (var6 = new int[]{this.cropX, this.cropY, this.cropWidth, this.cropHeight})[2] < 0;
-				boolean var8 = var6[3] < 0;
-				var6[2] = Math.abs(var6[2]);
-				var6[3] = Math.abs(var6[3]);
-				int[] var9 = new int[4];
-				if (!G3DUtils.intersectRectangle(var6[0], var6[1], var6[2], var6[3], 0, 0, this.image.getWidth(), this.image.getHeight(), var9)) {
+			Camera camera;
+			if ((camera = ri.getCamera()) != null && this.image != null) {
+				int[] crop;
+				boolean flipX = (crop = new int[]{this.cropX, this.cropY, this.cropWidth, this.cropHeight})[2] < 0;
+				boolean flipY = crop[3] < 0;
+				crop[2] = Math.abs(crop[2]);
+				crop[3] = Math.abs(crop[3]);
+				int[] clippedCrop = new int[4];
+				if (!G3DUtils.intersectRectangle(crop[0], crop[1], crop[2], crop[3], 0, 0, this.image.getWidth(), this.image.getHeight(), clippedCrop)) {
 					return false;
 				} else {
-					Vector4f var10 = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
-					Vector4f var11 = new Vector4f(0.5F, 0.0F, 0.0F, 1.0F);
-					Vector4f var12 = new Vector4f(0.0F, 0.5F, 0.0F, 1.0F);
-					Transform var13 = new Transform();
-					this.getTransformTo(var5, var13);
-					var13.getImpl_().transform(var10);
-					var13.getImpl_().transform(var11);
-					var13.getImpl_().transform(var12);
-					Vector4f var14 = new Vector4f(var10);
-					var10.mul(1.0F / var10.w);
-					var11.mul(1.0F / var11.w);
-					var12.mul(1.0F / var12.w);
-					float var15 = (var10.z - ray[6]) / (ray[7] - ray[6]);
-					var11.sub(var10);
-					var12.sub(var10);
-					Vector4f var16 = new Vector4f(var11.length(), 0.0F, 0.0F, 0.0F);
-					Vector4f var17 = new Vector4f(0.0F, var12.length(), 0.0F, 0.0F);
-					var16.add(var14);
-					var17.add(var14);
-					var5.getProjection(var13);
-					var13.getImpl_().transform(var14);
-					var13.getImpl_().transform(var16);
-					var13.getImpl_().transform(var17);
-					if (var14.w > 0.0F && -var14.w < var14.z && var14.z <= var14.w) {
-						var14.mul(1.0F / var14.w);
-						var16.mul(1.0F / var16.w);
-						var17.mul(1.0F / var17.w);
-						var16.sub(var14);
-						var17.sub(var14);
-						var16.x = var16.length() / (float) var6[2];
-						var17.y = var17.length() / (float) var6[3];
-						var14.x -= (float) (2 * var6[0] + var6[2] - 2 * var9[0] - var9[2]) * var16.x;
-						var14.y += (float) (2 * var6[1] + var6[3] - 2 * var9[1] - var9[3]) * var17.y;
-						var16.x *= (float) var9[2];
-						var17.y *= (float) var9[3];
-						float[] var18 = new float[12];
-						int[] var19 = new int[8];
-						var18[0] = var14.x - var16.x;
-						var18[1] = var14.y + var17.y;
-						var18[2] = var14.z;
-						var18[3] = var18[0];
-						var18[4] = var14.y - var17.y;
-						var18[5] = var18[2];
-						var18[6] = var14.x + var16.x;
-						var18[7] = var18[1];
-						var18[8] = var18[2];
-						var18[9] = var18[6];
-						var18[10] = var18[4];
-						var18[11] = var18[2];
-						int[] var10000;
-						byte var10001;
-						int var10002;
-						if (!var7) {
-							var19[0] = var9[0];
-							var19[2] = var9[0];
-							var19[4] = var9[0] + var9[2];
-							var10000 = var19;
-							var10001 = 6;
-							var10002 = var9[0] + var9[2];
+					Vector4f origin = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
+					Vector4f unitX = new Vector4f(0.5F, 0.0F, 0.0F, 1.0F);
+					Vector4f unitY = new Vector4f(0.0F, 0.5F, 0.0F, 1.0F);
+					Transform tmpTransform = new Transform();
+					this.getTransformTo(camera, tmpTransform);
+					tmpTransform.getImpl_().transform(origin);
+					tmpTransform.getImpl_().transform(unitX);
+					tmpTransform.getImpl_().transform(unitY);
+					Vector4f center = new Vector4f(origin);
+					origin.mul(1.0F / origin.w);
+					unitX.mul(1.0F / unitX.w);
+					unitY.mul(1.0F / unitY.w);
+					float distance = (origin.z - ray[6]) / (ray[7] - ray[6]);
+					unitX.sub(origin);
+					unitY.sub(origin);
+					Vector4f scaleX = new Vector4f(unitX.length(), 0.0F, 0.0F, 0.0F);
+					Vector4f scaleY = new Vector4f(0.0F, unitY.length(), 0.0F, 0.0F);
+					scaleX.add(center);
+					scaleY.add(center);
+					camera.getProjection(tmpTransform);
+					tmpTransform.getImpl_().transform(center);
+					tmpTransform.getImpl_().transform(scaleX);
+					tmpTransform.getImpl_().transform(scaleY);
+					if (center.w > 0.0F && -center.w < center.z && center.z <= center.w) {
+						center.mul(1.0F / center.w);
+						scaleX.mul(1.0F / scaleX.w);
+						scaleY.mul(1.0F / scaleY.w);
+						scaleX.sub(center);
+						scaleY.sub(center);
+						scaleX.x = scaleX.length() / (float) crop[2];
+						scaleY.y = scaleY.length() / (float) crop[3];
+						center.x -= (float) (2 * crop[0] + crop[2] - 2 * clippedCrop[0] - clippedCrop[2]) * scaleX.x;
+						center.y += (float) (2 * crop[1] + crop[3] - 2 * clippedCrop[1] - clippedCrop[3]) * scaleY.y;
+						scaleX.x *= (float) clippedCrop[2];
+						scaleY.y *= (float) clippedCrop[3];
+						float[] quad = new float[12];
+						int[] texels = new int[8];
+						quad[0] = center.x - scaleX.x;
+						quad[1] = center.y + scaleY.y;
+						quad[2] = center.z;
+						quad[3] = quad[0];
+						quad[4] = center.y - scaleY.y;
+						quad[5] = quad[2];
+						quad[6] = center.x + scaleX.x;
+						quad[7] = quad[1];
+						quad[8] = quad[2];
+						quad[9] = quad[6];
+						quad[10] = quad[4];
+						quad[11] = quad[2];
+						int[] targetArray;
+						byte targetIndex;
+						int targetValue;
+						if (!flipX) {
+							texels[0] = clippedCrop[0];
+							texels[2] = clippedCrop[0];
+							texels[4] = clippedCrop[0] + clippedCrop[2];
+							targetArray = texels;
+							targetIndex = 6;
+							targetValue = clippedCrop[0] + clippedCrop[2];
 						} else {
-							var19[0] = var9[0] + var9[2];
-							var19[2] = var9[0] + var9[2];
-							var19[4] = var9[0];
-							var10000 = var19;
-							var10001 = 6;
-							var10002 = var9[0];
+							texels[0] = clippedCrop[0] + clippedCrop[2];
+							texels[2] = clippedCrop[0] + clippedCrop[2];
+							texels[4] = clippedCrop[0];
+							targetArray = texels;
+							targetIndex = 6;
+							targetValue = clippedCrop[0];
 						}
 
-						var10000[var10001] = var10002;
-						if (!var8) {
-							var19[1] = var9[1];
-							var19[3] = var9[1] + var9[3];
-							var19[5] = var9[1];
-							var10000 = var19;
-							var10001 = 7;
-							var10002 = var9[1] + var9[3];
+						targetArray[targetIndex] = targetValue;
+						if (!flipY) {
+							texels[1] = clippedCrop[1];
+							texels[3] = clippedCrop[1] + clippedCrop[3];
+							texels[5] = clippedCrop[1];
+							targetArray = texels;
+							targetIndex = 7;
+							targetValue = clippedCrop[1] + clippedCrop[3];
 						} else {
-							var19[1] = var9[1] + var9[3];
-							var19[3] = var9[1];
-							var19[5] = var9[1] + var9[3];
-							var10000 = var19;
-							var10001 = 7;
-							var10002 = var9[1];
+							texels[1] = clippedCrop[1] + clippedCrop[3];
+							texels[3] = clippedCrop[1];
+							texels[5] = clippedCrop[1] + clippedCrop[3];
+							targetArray = texels;
+							targetIndex = 7;
+							targetValue = clippedCrop[1];
 						}
 
-						var10000[var10001] = var10002;
-						float var20 = 2.0F * ri.getPickX() - 1.0F;
-						float var21 = 1.0F - 2.0F * ri.getPickY();
-						if (var20 >= var18[0] && var20 <= var18[6] && var21 <= var18[1] && var21 >= var18[4]) {
-							if (!ri.testDistance(var15)) {
+						targetArray[targetIndex] = targetValue;
+						float pickX = 2.0F * ri.getPickX() - 1.0F;
+						float pickY = 1.0F - 2.0F * ri.getPickY();
+						if (pickX >= quad[0] && pickX <= quad[6] && pickY <= quad[1] && pickY >= quad[4]) {
+							if (!ri.testDistance(distance)) {
 								return false;
 							}
 
-							var20 -= var18[0];
-							var21 = var18[1] - var21;
-							float[] var22 = new float[]{0.0F};
-							float[] var23 = new float[]{0.0F};
-							float[] var29;
-							float var30;
-							if (!var7) {
-								var29 = var22;
-								var10001 = 0;
-								var30 = (float) var19[0] + (float) (var19[4] - var19[0]) * var20 / (var18[6] - var18[0]);
+							pickX -= quad[0];
+							pickY = quad[1] - pickY;
+							float[] texS = new float[]{0.0F};
+							float[] texT = new float[]{0.0F};
+							float[] texCoordTarget;
+							float texCoordValue;
+							if (!flipX) {
+								texCoordTarget = texS;
+								targetIndex = 0;
+								texCoordValue = (float) texels[0] + (float) (texels[4] - texels[0]) * pickX / (quad[6] - quad[0]);
 							} else {
-								var29 = var22;
-								var10001 = 0;
-								var30 = (float) var19[0] - (float) (var19[0] - var19[4]) * var20 / (var18[6] - var18[0]);
+								texCoordTarget = texS;
+								targetIndex = 0;
+								texCoordValue = (float) texels[0] - (float) (texels[0] - texels[4]) * pickX / (quad[6] - quad[0]);
 							}
 
-							var29[var10001] = var30;
-							if (!var8) {
-								var29 = var23;
-								var10001 = 0;
-								var30 = (float) var19[1] + (float) (var19[3] - var19[1]) * var21 / (var18[1] - var18[4]);
+							texCoordTarget[targetIndex] = texCoordValue;
+							if (!flipY) {
+								texCoordTarget = texT;
+								targetIndex = 0;
+								texCoordValue = (float) texels[1] + (float) (texels[3] - texels[1]) * pickY / (quad[1] - quad[4]);
 							} else {
-								var29 = var23;
-								var10001 = 0;
-								var30 = (float) var19[1] - (float) (var19[1] - var19[3]) * var21 / (var18[1] - var18[4]);
+								texCoordTarget = texT;
+								targetIndex = 0;
+								texCoordValue = (float) texels[1] - (float) (texels[1] - texels[3]) * pickY / (quad[1] - quad[4]);
 							}
 
-							var29[var10001] = var30;
-							int var24 = G3DUtils.limit(G3DUtils.round(var22[0]), 0, this.image.getWidth() - 1);
-							int var25 = G3DUtils.limit(G3DUtils.round(var23[0]), 0, this.image.getWidth() - 1);
-							var22[0] = G3DUtils.limit(var22[0], 0.0F, (float) this.image.getWidth());
-							var23[0] = G3DUtils.limit(var23[0], 0.0F, (float) this.image.getHeight());
-							int var26 = 0;
-							byte var27 = -1;
+							texCoordTarget[targetIndex] = texCoordValue;
+							int texelX = G3DUtils.limit(G3DUtils.round(texS[0]), 0, this.image.getWidth() - 1);
+							int texelY = G3DUtils.limit(G3DUtils.round(texT[0]), 0, this.image.getWidth() - 1);
+							texS[0] = G3DUtils.limit(texS[0], 0.0F, (float) this.image.getWidth());
+							texT[0] = G3DUtils.limit(texT[0], 0.0F, (float) this.image.getHeight());
+							int alphaThreshold = 0;
+							byte alpha = -1;
 							if (this.appearance.getCompositingMode() != null) {
-								var26 = (int) (this.appearance.getCompositingMode().getAlphaThreshold() * 256.0F);
+								alphaThreshold = (int) (this.appearance.getCompositingMode().getAlphaThreshold() * 256.0F);
 							}
 
 							label71:
 							{
-								byte[] var31 = this.image.getImageData();
-								int var32;
-								byte var33;
+								byte[] imageData = this.image.getImageData();
+								int pixelOffset;
+								byte alphaOffset;
 								switch (this.image.getFormat()) {
 									case 96:
-										var32 = var25 * this.image.getWidth() * 1 + var24 * 1;
-										var33 = 0;
+										pixelOffset = texelY * this.image.getWidth() * 1 + texelX * 1;
+										alphaOffset = 0;
 										break;
 									case 97:
 									case 99:
 									default:
 										break label71;
 									case 98:
-										var32 = var25 * this.image.getWidth() * 2 + var24 * 2;
-										var33 = 1;
+										pixelOffset = texelY * this.image.getWidth() * 2 + texelX * 2;
+										alphaOffset = 1;
 										break;
 									case 100:
-										var32 = var25 * this.image.getWidth() * 4 + var24 * 4;
-										var33 = 3;
+										pixelOffset = texelY * this.image.getWidth() * 4 + texelX * 4;
+										alphaOffset = 3;
 								}
 
-								var27 = var31[var32 + var33];
+								alpha = imageData[pixelOffset + alphaOffset];
 							}
 
-							var22[0] /= (float) this.image.getWidth();
-							var23[0] /= (float) this.image.getHeight();
-							if ((var27 & 255) >= var26) {
-								return ri.endPick(var15, var22, var23, 0, this, new float[]{0, 0, 1});
+							texS[0] /= (float) this.image.getWidth();
+							texT[0] /= (float) this.image.getHeight();
+							if ((alpha & 255) >= alphaThreshold) {
+								return ri.endPick(distance, texS, texT, 0, this, new float[]{0, 0, 1});
 							}
 						}
 

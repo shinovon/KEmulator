@@ -28,8 +28,8 @@ public class CountedInputStream extends InputStream {
 		this.stream.close();
 	}
 
-	public CountedInputStream(InputStream var1) {
-		this.stream = var1;
+	public CountedInputStream(InputStream stream) {
+		this.stream = stream;
 		this.resetCounter();
 	}
 }
