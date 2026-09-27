@@ -9,37 +9,37 @@ public final class Quaternion {
 	public Quaternion() {
 	}
 
-	public Quaternion(float var1, float var2, float var3, float var4) {
-		this.x = var1;
-		this.y = var2;
-		this.z = var3;
-		this.w = var4;
+	public Quaternion(float x, float y, float z, float w) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
 	}
 
-	public Quaternion(float[] var1) {
-		this.set(var1);
+	public Quaternion(float[] xyzw) {
+		this.set(xyzw);
 	}
 
-	public Quaternion(Quaternion var1) {
-		this.set(var1);
+	public Quaternion(Quaternion other) {
+		this.set(other);
 	}
 
-	public final void set(float[] var1) {
-		if (var1.length != 4) {
+	public final void set(float[] xyzw) {
+		if (xyzw.length != 4) {
 			throw new Error("Invalid number of components for quaternion");
 		} else {
-			this.x = var1[0];
-			this.y = var1[1];
-			this.z = var1[2];
-			this.w = var1[3];
+			this.x = xyzw[0];
+			this.y = xyzw[1];
+			this.z = xyzw[2];
+			this.w = xyzw[3];
 		}
 	}
 
-	public final void set(Quaternion var1) {
-		this.x = var1.x;
-		this.y = var1.y;
-		this.z = var1.z;
-		this.w = var1.w;
+	public final void set(Quaternion other) {
+		this.x = other.x;
+		this.y = other.y;
+		this.z = other.z;
+		this.w = other.w;
 	}
 
 	private void setIdentity() {
@@ -48,102 +48,102 @@ public final class Quaternion {
 	}
 
 	public final void normalize() {
-		Quaternion var10000;
-		float var1;
-		float var10001;
-		if ((var1 = this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w) > 1.0E-5F) {
-			float var2 = 1.0F / (float) Math.sqrt((double) var1);
-			this.x *= var2;
-			this.y *= var2;
-			this.z *= var2;
-			var10000 = this;
-			var10001 = this.w * var2;
+		Quaternion target;
+		float lengthSquared;
+		float newW;
+		if ((lengthSquared = this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w) > 1.0E-5F) {
+			float invLength = 1.0F / (float) Math.sqrt((double) lengthSquared);
+			this.x *= invLength;
+			this.y *= invLength;
+			this.z *= invLength;
+			target = this;
+			newW = this.w * invLength;
 		} else {
 			this.x = this.y = this.z = 0.0F;
-			var10000 = this;
-			var10001 = 1.0F;
+			target = this;
+			newW = 1.0F;
 		}
 
-		var10000.w = var10001;
+		target.w = newW;
 	}
 
-	public final void setAngleAxis(float var1, float var2, float var3, float var4) {
-		Vector4f var5;
-		if ((var5 = new Vector4f(var2, var3, var4, 0.0F)).normalize()) {
-			float var6;
-			float var7 = (float) Math.sin((double) (var6 = (float) Math.toRadians((double) (0.5F * var1))));
-			this.x = var7 * var5.x;
-			this.y = var7 * var5.y;
-			this.z = var7 * var5.z;
-			this.w = (float) Math.cos((double) var6);
+	public final void setAngleAxis(float angle, float ax, float ay, float az) {
+		Vector4f axis;
+		if ((axis = new Vector4f(ax, ay, az, 0.0F)).normalize()) {
+			float halfAngle;
+			float sinHalfAngle = (float) Math.sin((double) (halfAngle = (float) Math.toRadians((double) (0.5F * angle))));
+			this.x = sinHalfAngle * axis.x;
+			this.y = sinHalfAngle * axis.y;
+			this.z = sinHalfAngle * axis.z;
+			this.w = (float) Math.cos((double) halfAngle);
 		} else {
 			this.setIdentity();
 		}
 	}
 
-	public final void getAngleAxis(float[] var1) {
+	public final void getAngleAxis(float[] angleAxis) {
 		this.normalize();
-		float var2 = 1.0F - this.w * this.w;
-		if (var2 > 1.0E-5F) {
-			float var3 = (float) Math.sqrt((double) var2);
-			var1[1] = this.x / var3;
-			var1[2] = this.y / var3;
-			var1[3] = this.z / var3;
+		float sinSquared = 1.0F - this.w * this.w;
+		if (sinSquared > 1.0E-5F) {
+			float sinHalfAngle = (float) Math.sqrt((double) sinSquared);
+			angleAxis[1] = this.x / sinHalfAngle;
+			angleAxis[2] = this.y / sinHalfAngle;
+			angleAxis[3] = this.z / sinHalfAngle;
 		} else {
-			var1[1] = var1[2] = 0.0F;
-			var1[3] = 1.0F;
+			angleAxis[1] = angleAxis[2] = 0.0F;
+			angleAxis[3] = 1.0F;
 		}
 
-		var1[0] = (float) Math.toDegrees(Math.acos((double) this.w) * 2.0);
+		angleAxis[0] = (float) Math.toDegrees(Math.acos((double) this.w) * 2.0);
 	}
 
-	public final void mul(Quaternion var1) {
-		Quaternion var2 = new Quaternion(this);
-		this.w = var2.w * var1.w - var2.x * var1.x - var2.y * var1.y - var2.z * var1.z;
-		this.x = var2.w * var1.x + var2.x * var1.w + var2.y * var1.z - var2.z * var1.y;
-		this.y = var2.w * var1.y - var2.x * var1.z + var2.y * var1.w + var2.z * var1.x;
-		this.z = var2.w * var1.z + var2.x * var1.y - var2.y * var1.x + var2.z * var1.w;
+	public final void mul(Quaternion other) {
+		Quaternion left = new Quaternion(this);
+		this.w = left.w * other.w - left.x * other.x - left.y * other.y - left.z * other.z;
+		this.x = left.w * other.x + left.x * other.w + left.y * other.z - left.z * other.y;
+		this.y = left.w * other.y - left.x * other.z + left.y * other.w + left.z * other.x;
+		this.z = left.w * other.z + left.x * other.y - left.y * other.x + left.z * other.w;
 	}
 
-	public final void mul(float var1) {
-		this.x *= var1;
-		this.y *= var1;
-		this.z *= var1;
-		this.w *= var1;
+	public final void mul(float scale) {
+		this.x *= scale;
+		this.y *= scale;
+		this.z *= scale;
+		this.w *= scale;
 	}
 
-	public final void add(Quaternion var1) {
-		this.x += var1.x;
-		this.y += var1.y;
-		this.z += var1.z;
-		this.w += var1.w;
+	public final void add(Quaternion other) {
+		this.x += other.x;
+		this.y += other.y;
+		this.z += other.z;
+		this.w += other.w;
 	}
 
-	public final void sub(Quaternion var1) {
-		this.x -= var1.x;
-		this.y -= var1.y;
-		this.z -= var1.z;
-		this.w -= var1.w;
+	public final void sub(Quaternion other) {
+		this.x -= other.x;
+		this.y -= other.y;
+		this.z -= other.z;
+		this.w -= other.w;
 	}
 
-	private void conjugate(Quaternion var1) {
-		this.x = -var1.x;
-		this.y = -var1.y;
-		this.z = -var1.z;
-		this.w = var1.w;
+	private void conjugate(Quaternion other) {
+		this.x = -other.x;
+		this.y = -other.y;
+		this.z = -other.z;
+		this.w = other.w;
 	}
 
-	private float dot(Quaternion var1) {
-		return this.x * var1.x + this.y * var1.y + this.z * var1.z + this.w * var1.w;
+	private float dot(Quaternion other) {
+		return this.x * other.x + this.y * other.y + this.z * other.z + this.w * other.w;
 	}
 
-	private void log(Quaternion var1) {
-		float var2;
-		if ((var2 = (float) Math.sqrt((double) (var1.x * var1.x + var1.y * var1.y + var1.z * var1.z))) > 1.0E-5F) {
-			float var3 = (float) (Math.atan2((double) var2, (double) this.w) / (double) var2);
-			this.x = var3 * var1.x;
-			this.y = var3 * var1.y;
-			this.z = var3 * var1.z;
+	private void log(Quaternion q) {
+		float vectorLength;
+		if ((vectorLength = (float) Math.sqrt((double) (q.x * q.x + q.y * q.y + q.z * q.z))) > 1.0E-5F) {
+			float scale = (float) (Math.atan2((double) vectorLength, (double) this.w) / (double) vectorLength);
+			this.x = scale * q.x;
+			this.y = scale * q.y;
+			this.z = scale * q.z;
 		} else {
 			this.x = this.y = this.z = 0.0F;
 		}
@@ -151,143 +151,143 @@ public final class Quaternion {
 		this.w = 0.0F;
 	}
 
-	public final void exp(Quaternion var1) {
-		Quaternion var10000;
-		float var10001;
-		float var2;
-		if ((var2 = (float) Math.sqrt((double) (var1.x * var1.x + var1.y * var1.y + var1.z * var1.z))) > 1.0E-5F) {
-			float var3 = (float) Math.sin((double) var2) / var2;
-			this.x = var3 * var1.x;
-			this.y = var3 * var1.y;
-			this.z = var3 * var1.z;
-			var10000 = this;
-			var10001 = (float) Math.cos((double) var2);
+	public final void exp(Quaternion q) {
+		Quaternion target;
+		float newW;
+		float angle;
+		if ((angle = (float) Math.sqrt((double) (q.x * q.x + q.y * q.y + q.z * q.z))) > 1.0E-5F) {
+			float scale = (float) Math.sin((double) angle) / angle;
+			this.x = scale * q.x;
+			this.y = scale * q.y;
+			this.z = scale * q.z;
+			target = this;
+			newW = (float) Math.cos((double) angle);
 		} else {
 			this.x = this.y = this.z = 0.0F;
-			var10000 = this;
-			var10001 = 1.0F;
+			target = this;
+			newW = 1.0F;
 		}
 
-		var10000.w = var10001;
+		target.w = newW;
 	}
 
-	public final void logDiff(Quaternion var1, Quaternion var2) {
-		this.set(var1);
+	public final void logDiff(Quaternion from, Quaternion to) {
+		this.set(from);
 		this.conjugate(this);
-		this.mul(var2);
+		this.mul(to);
 		this.log(this);
 	}
 
-	public final void slerp(float var1, Quaternion var2, Quaternion var3) {
-		float var4;
-		float var7;
-		float var8;
-		if ((var4 = var2.dot(var3)) + 1.0F > 1.0E-5F) {
-			float var10000;
-			if (1.0F - var4 > 1.0E-5F) {
-				float var5;
-				float var6 = (float) Math.sin((double) (var5 = (float) Math.acos((double) var4)));
-				var7 = (float) Math.sin((double) ((1.0F - var1) * var5)) / var6;
-				var10000 = (float) Math.sin((double) (var1 * var5)) / var6;
+	public final void slerp(float t, Quaternion from, Quaternion to) {
+		float cosOmega;
+		float fromWeight;
+		float toWeight;
+		if ((cosOmega = from.dot(to)) + 1.0F > 1.0E-5F) {
+			float toWeightValue;
+			if (1.0F - cosOmega > 1.0E-5F) {
+				float omega;
+				float sinOmega = (float) Math.sin((double) (omega = (float) Math.acos((double) cosOmega)));
+				fromWeight = (float) Math.sin((double) ((1.0F - t) * omega)) / sinOmega;
+				toWeightValue = (float) Math.sin((double) (t * omega)) / sinOmega;
 			} else {
-				var7 = 1.0F - var1;
-				var10000 = var1;
+				fromWeight = 1.0F - t;
+				toWeightValue = t;
 			}
 
-			var8 = var10000;
-			this.x = var7 * var2.x + var8 * var3.x;
-			this.y = var7 * var2.y + var8 * var3.y;
-			this.z = var7 * var2.z + var8 * var3.z;
-			this.w = var7 * var2.w + var8 * var3.w;
+			toWeight = toWeightValue;
+			this.x = fromWeight * from.x + toWeight * to.x;
+			this.y = fromWeight * from.y + toWeight * to.y;
+			this.z = fromWeight * from.z + toWeight * to.z;
+			this.w = fromWeight * from.w + toWeight * to.w;
 		} else {
-			this.x = -var2.y;
-			this.y = var2.x;
-			this.z = -var2.w;
-			this.w = var2.z;
-			var7 = (float) Math.sin((double) (1.0F - var1) * 3.141592653589793D / 2.0D);
-			var8 = (float) Math.sin((double) var1 * 3.141592653589793D / 2.0D);
-			this.x = var7 * var2.x + var8 * this.x;
-			this.y = var7 * var2.y + var8 * this.y;
-			this.z = var7 * var2.z + var8 * this.z;
+			this.x = -from.y;
+			this.y = from.x;
+			this.z = -from.w;
+			this.w = from.z;
+			fromWeight = (float) Math.sin((double) (1.0F - t) * 3.141592653589793D / 2.0D);
+			toWeight = (float) Math.sin((double) t * 3.141592653589793D / 2.0D);
+			this.x = fromWeight * from.x + toWeight * this.x;
+			this.y = fromWeight * from.y + toWeight * this.y;
+			this.z = fromWeight * from.z + toWeight * this.z;
 		}
 	}
 
-	public final void squad(float var1, Quaternion var2, Quaternion var3, Quaternion var4, Quaternion var5) {
-		Quaternion var6 = new Quaternion();
-		Quaternion var7 = new Quaternion();
-		var6.slerp(var1, var2, var5);
-		var7.slerp(var1, var3, var4);
-		this.slerp(2.0F * var1 * (1.0F - var1), var6, var7);
+	public final void squad(float t, Quaternion q0, Quaternion controlA, Quaternion controlB, Quaternion q1) {
+		Quaternion outer = new Quaternion();
+		Quaternion inner = new Quaternion();
+		outer.slerp(t, q0, q1);
+		inner.slerp(t, controlA, controlB);
+		this.slerp(2.0F * t * (1.0F - t), outer, inner);
 	}
 
-	public final void setRotation(Vector4f var1, Vector4f var2, Vector4f var3) {
-		if (var1.w == 0.0F && var2.w == 0.0F) {
-			Vector4f var4 = new Vector4f(var1);
-			Vector4f var5 = new Vector4f(var2);
-			float var7;
-			if (var3 != null) {
-				Vector4f var6;
-				(var6 = new Vector4f(var3)).normalize();
-				var4.normalize();
-				var7 = var4.dot(var6);
-				var6.mul(var7);
-				var4.sub(var6);
-				var6.set(var3);
-				var6.normalize();
-				var5.normalize();
-				var7 = var5.dot(var6);
-				var6.mul(var7);
-				var5.sub(var6);
+	public final void setRotation(Vector4f from, Vector4f to, Vector4f upAxis) {
+		if (from.w == 0.0F && to.w == 0.0F) {
+			Vector4f fromDir = new Vector4f(from);
+			Vector4f toDir = new Vector4f(to);
+			float scalar;
+			if (upAxis != null) {
+				Vector4f upDir;
+				(upDir = new Vector4f(upAxis)).normalize();
+				fromDir.normalize();
+				scalar = fromDir.dot(upDir);
+				upDir.mul(scalar);
+				fromDir.sub(upDir);
+				upDir.set(upAxis);
+				upDir.normalize();
+				toDir.normalize();
+				scalar = toDir.dot(upDir);
+				upDir.mul(scalar);
+				toDir.sub(upDir);
 			}
 
-			if (var4.normalize() && var5.normalize()) {
-				float var11;
-				if ((var11 = var4.dot(var5)) > 0.99999F) {
+			if (fromDir.normalize() && toDir.normalize()) {
+				float cosAngle;
+				if ((cosAngle = fromDir.dot(toDir)) > 0.99999F) {
 					this.setIdentity();
 				} else {
-					Quaternion var12;
-					float var10001;
-					if (var11 < -0.99999F) {
-						if (var3 == null) {
-							var3 = new Vector4f();
-							var7 = Math.abs(var4.x);
-							float var8 = Math.abs(var4.y);
-							float var9 = Math.abs(var4.z);
-							Vector4f var10000;
-							float var10002;
-							float var10003;
-							if (var7 <= var8 && var7 <= var9) {
-								var10000 = var3;
-								var10001 = 1.0F;
-								var10002 = 0.0F;
-								var10003 = 0.0F;
-							} else if (var8 <= var7 && var8 <= var9) {
-								var10000 = var3;
-								var10001 = 0.0F;
-								var10002 = 1.0F;
-								var10003 = 0.0F;
+					Quaternion target;
+					float angleOrAxisX;
+					if (cosAngle < -0.99999F) {
+						if (upAxis == null) {
+							upAxis = new Vector4f();
+							scalar = Math.abs(fromDir.x);
+							float absY = Math.abs(fromDir.y);
+							float absZ = Math.abs(fromDir.z);
+							Vector4f axisTarget;
+							float axisY;
+							float axisZ;
+							if (scalar <= absY && scalar <= absZ) {
+								axisTarget = upAxis;
+								angleOrAxisX = 1.0F;
+								axisY = 0.0F;
+								axisZ = 0.0F;
+							} else if (absY <= scalar && absY <= absZ) {
+								axisTarget = upAxis;
+								angleOrAxisX = 0.0F;
+								axisY = 1.0F;
+								axisZ = 0.0F;
 							} else {
-								var10000 = var3;
-								var10001 = 0.0F;
-								var10002 = 0.0F;
-								var10003 = 1.0F;
+								axisTarget = upAxis;
+								angleOrAxisX = 0.0F;
+								axisY = 0.0F;
+								axisZ = 1.0F;
 							}
 
-							var10000.set(var10001, var10002, var10003, 0.0F);
-							float var10 = var3.dot(var4);
-							var4.mul(var10);
-							var3.sub(var4);
+							axisTarget.set(angleOrAxisX, axisY, axisZ, 0.0F);
+							float upProjection = upAxis.dot(fromDir);
+							fromDir.mul(upProjection);
+							upAxis.sub(fromDir);
 						}
 
-						var12 = this;
-						var10001 = 180.0F;
+						target = this;
+						angleOrAxisX = 180.0F;
 					} else {
-						(var3 = new Vector4f()).cross(var4, var5);
-						var12 = this;
-						var10001 = (float) Math.toDegrees(Math.acos((double) var11));
+						(upAxis = new Vector4f()).cross(fromDir, toDir);
+						target = this;
+						angleOrAxisX = (float) Math.toDegrees(Math.acos((double) cosAngle));
 					}
 
-					var12.setAngleAxis(var10001, var3.x, var3.y, var3.z);
+					target.setAngleAxis(angleOrAxisX, upAxis.x, upAxis.y, upAxis.z);
 				}
 			} else {
 				this.setIdentity();

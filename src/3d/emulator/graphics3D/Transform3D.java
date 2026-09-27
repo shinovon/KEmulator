@@ -12,16 +12,16 @@ public final class Transform3D {
 		System.arraycopy(defaultMatrix, 0, this.m_matrix, 0, 16);
 	}
 
-	public final void get(float[] var1) {
-		System.arraycopy(this.m_matrix, 0, var1, 0, 16);
+	public final void get(float[] matrix) {
+		System.arraycopy(this.m_matrix, 0, matrix, 0, 16);
 	}
 
-	public final void set(float[] var1) {
-		System.arraycopy(var1, 0, this.m_matrix, 0, 16);
+	public final void set(float[] matrix) {
+		System.arraycopy(matrix, 0, this.m_matrix, 0, 16);
 	}
 
-	public final void set(Transform3D var1) {
-		System.arraycopy(var1.m_matrix, 0, this.m_matrix, 0, 16);
+	public final void set(Transform3D transform) {
+		System.arraycopy(transform.m_matrix, 0, this.m_matrix, 0, 16);
 	}
 
 	public final void invert() {
@@ -46,76 +46,76 @@ public final class Transform3D {
 		this.m_matrix[b] = tmp;
 	}
 
-	public final void postMultiply(Transform3D var1, boolean var2) {
-		float[] var3 = new float[16];
-		float[] var4 = (var2 ? this : var1).m_matrix;
-		float[] var5 = (var2 ? var1 : this).m_matrix;
+	public final void postMultiply(Transform3D transform, boolean preMultiply) {
+		float[] result = new float[16];
+		float[] left = (preMultiply ? this : transform).m_matrix;
+		float[] right = (preMultiply ? transform : this).m_matrix;
 
-		for (int var6 = 0; var6 < 4; ++var6) {
-			for (int var7 = 0; var7 < 4; ++var7) {
-				int var8 = var7 << 2;
-				var3[var8 + var6] += var4[0 + var6] * var5[var8 + 0];
-				var3[var8 + var6] += var4[4 + var6] * var5[var8 + 1];
-				var3[var8 + var6] += var4[8 + var6] * var5[var8 + 2];
-				var3[var8 + var6] += var4[12 + var6] * var5[var8 + 3];
+		for (int row = 0; row < 4; ++row) {
+			for (int column = 0; column < 4; ++column) {
+				int columnOffset = column << 2;
+				result[columnOffset + row] += left[0 + row] * right[columnOffset + 0];
+				result[columnOffset + row] += left[4 + row] * right[columnOffset + 1];
+				result[columnOffset + row] += left[8 + row] * right[columnOffset + 2];
+				result[columnOffset + row] += left[12 + row] * right[columnOffset + 3];
 			}
 		}
 
-		System.arraycopy(var3, 0, this.m_matrix, 0, 16);
+		System.arraycopy(result, 0, this.m_matrix, 0, 16);
 	}
 
-	public final void postRotate(float var1, float var2, float var3, float var4) {
-		Quaternion var5;
-		(var5 = new Quaternion()).setAngleAxis(var1, var2, var3, var4);
-		this.postRotateQuat(var5.x, var5.y, var5.z, var5.w);
+	public final void postRotate(float angle, float ax, float ay, float az) {
+		Quaternion rotation;
+		(rotation = new Quaternion()).setAngleAxis(angle, ax, ay, az);
+		this.postRotateQuat(rotation.x, rotation.y, rotation.z, rotation.w);
 	}
 
-	public final void postRotateQuat(float var1, float var2, float var3, float var4) {
-		Quaternion var5;
-		(var5 = new Quaternion(var1, var2, var3, var4)).normalize();
-		Transform3D var6;
-		float[] var7 = (var6 = new Transform3D()).m_matrix;
-		float var8 = var5.x * var5.x;
-		float var9 = var5.x * var5.y;
-		float var10 = var5.x * var5.z;
-		float var11 = var5.x * var5.w;
-		float var12 = var5.y * var5.y;
-		float var13 = var5.y * var5.z;
-		float var14 = var5.y * var5.w;
-		float var15 = var5.z * var5.z;
-		float var16 = var5.z * var5.w;
-		var7[0] = 1.0F - 2.0F * (var12 + var15);
-		var7[1] = 2.0F * (var9 - var16);
-		var7[2] = 2.0F * (var10 + var14);
-		var7[4] = 2.0F * (var9 + var16);
-		var7[5] = 1.0F - 2.0F * (var8 + var15);
-		var7[6] = 2.0F * (var13 - var11);
-		var7[8] = 2.0F * (var10 - var14);
-		var7[9] = 2.0F * (var13 + var11);
-		var7[10] = 1.0F - 2.0F * (var8 + var12);
-		this.postMultiply(var6, false);
+	public final void postRotateQuat(float qx, float qy, float qz, float qw) {
+		Quaternion quat;
+		(quat = new Quaternion(qx, qy, qz, qw)).normalize();
+		Transform3D rotation;
+		float[] matrix = (rotation = new Transform3D()).m_matrix;
+		float xx = quat.x * quat.x;
+		float xy = quat.x * quat.y;
+		float xz = quat.x * quat.z;
+		float xw = quat.x * quat.w;
+		float yy = quat.y * quat.y;
+		float yz = quat.y * quat.z;
+		float yw = quat.y * quat.w;
+		float zz = quat.z * quat.z;
+		float zw = quat.z * quat.w;
+		matrix[0] = 1.0F - 2.0F * (yy + zz);
+		matrix[1] = 2.0F * (xy - zw);
+		matrix[2] = 2.0F * (xz + yw);
+		matrix[4] = 2.0F * (xy + zw);
+		matrix[5] = 1.0F - 2.0F * (xx + zz);
+		matrix[6] = 2.0F * (yz - xw);
+		matrix[8] = 2.0F * (xz - yw);
+		matrix[9] = 2.0F * (yz + xw);
+		matrix[10] = 1.0F - 2.0F * (xx + yy);
+		this.postMultiply(rotation, false);
 	}
 
-	public final void postScale(float var1, float var2, float var3) {
-		this.m_matrix[0] *= var1;
-		this.m_matrix[1] *= var2;
-		this.m_matrix[2] *= var3;
-		this.m_matrix[4] *= var1;
-		this.m_matrix[5] *= var2;
-		this.m_matrix[6] *= var3;
-		this.m_matrix[8] *= var1;
-		this.m_matrix[9] *= var2;
-		this.m_matrix[10] *= var3;
-		this.m_matrix[12] *= var1;
-		this.m_matrix[13] *= var2;
-		this.m_matrix[14] *= var3;
+	public final void postScale(float sx, float sy, float sz) {
+		this.m_matrix[0] *= sx;
+		this.m_matrix[1] *= sy;
+		this.m_matrix[2] *= sz;
+		this.m_matrix[4] *= sx;
+		this.m_matrix[5] *= sy;
+		this.m_matrix[6] *= sz;
+		this.m_matrix[8] *= sx;
+		this.m_matrix[9] *= sy;
+		this.m_matrix[10] *= sz;
+		this.m_matrix[12] *= sx;
+		this.m_matrix[13] *= sy;
+		this.m_matrix[14] *= sz;
 	}
 
-	public final void postTranslate(float var1, float var2, float var3) {
-		this.m_matrix[3] += this.m_matrix[0] * var1 + this.m_matrix[1] * var2 + this.m_matrix[2] * var3;
-		this.m_matrix[7] += this.m_matrix[4] * var1 + this.m_matrix[5] * var2 + this.m_matrix[6] * var3;
-		this.m_matrix[11] += this.m_matrix[8] * var1 + this.m_matrix[9] * var2 + this.m_matrix[10] * var3;
-		this.m_matrix[15] += this.m_matrix[12] * var1 + this.m_matrix[13] * var2 + this.m_matrix[14] * var3;
+	public final void postTranslate(float tx, float ty, float tz) {
+		this.m_matrix[3] += this.m_matrix[0] * tx + this.m_matrix[1] * ty + this.m_matrix[2] * tz;
+		this.m_matrix[7] += this.m_matrix[4] * tx + this.m_matrix[5] * ty + this.m_matrix[6] * tz;
+		this.m_matrix[11] += this.m_matrix[8] * tx + this.m_matrix[9] * ty + this.m_matrix[10] * tz;
+		this.m_matrix[15] += this.m_matrix[12] * tx + this.m_matrix[13] * ty + this.m_matrix[14] * tz;
 	}
 
 	private void vecTransform(float[] vec, int i) {
@@ -130,20 +130,20 @@ public final class Transform3D {
 		vec[i + 3] = w;
 	}
 
-	public final void transform(float[] var1) {
-		for (int i = 0; i < var1.length; i += 4) {
-			this.vecTransform(var1, i);
+	public final void transform(float[] vectors) {
+		for (int i = 0; i < vectors.length; i += 4) {
+			this.vecTransform(vectors, i);
 		}
 	}
 
-	public final void transform(Vector4f var1) {
-		float var2 = this.m_matrix[0] * var1.x + this.m_matrix[1] * var1.y + this.m_matrix[2] * var1.z + this.m_matrix[3] * var1.w;
-		float var3 = this.m_matrix[4] * var1.x + this.m_matrix[5] * var1.y + this.m_matrix[6] * var1.z + this.m_matrix[7] * var1.w;
-		float var4 = this.m_matrix[8] * var1.x + this.m_matrix[9] * var1.y + this.m_matrix[10] * var1.z + this.m_matrix[11] * var1.w;
-		float var5 = this.m_matrix[12] * var1.x + this.m_matrix[13] * var1.y + this.m_matrix[14] * var1.z + this.m_matrix[15] * var1.w;
-		var1.x = var2;
-		var1.y = var3;
-		var1.z = var4;
-		var1.w = var5;
+	public final void transform(Vector4f vector) {
+		float x = this.m_matrix[0] * vector.x + this.m_matrix[1] * vector.y + this.m_matrix[2] * vector.z + this.m_matrix[3] * vector.w;
+		float y = this.m_matrix[4] * vector.x + this.m_matrix[5] * vector.y + this.m_matrix[6] * vector.z + this.m_matrix[7] * vector.w;
+		float z = this.m_matrix[8] * vector.x + this.m_matrix[9] * vector.y + this.m_matrix[10] * vector.z + this.m_matrix[11] * vector.w;
+		float w = this.m_matrix[12] * vector.x + this.m_matrix[13] * vector.y + this.m_matrix[14] * vector.z + this.m_matrix[15] * vector.w;
+		vector.x = x;
+		vector.y = y;
+		vector.z = z;
+		vector.w = w;
 	}
 }

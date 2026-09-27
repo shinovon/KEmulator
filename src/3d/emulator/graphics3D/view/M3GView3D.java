@@ -78,13 +78,13 @@ public final class M3GView3D implements PaintListener, Runnable {
 		renderPipe.setRenderInvisibleNodes(render);
 	}
 
-	public final void setXray(boolean var1) {
-		this.xray = var1;
+	public final void setXray(boolean xray) {
+		this.xray = xray;
 	}
 
-	public final void setViewport(int var1, int var2) {
-		this.viewportWidth = var1;
-		this.viewportHeight = var2;
+	public final void setViewport(int width, int height) {
+		this.viewportWidth = width;
+		this.viewportHeight = height;
 	}
 
 	private void setupViewport() {
@@ -96,72 +96,72 @@ public final class M3GView3D implements PaintListener, Runnable {
 		GL11.glDepthRange((double) this.depthRangeNear, (double) this.depthRangeFar);
 	}
 
-	public final void clearBackground(Background var1) {
+	public final void clearBackground(Background background) {
 		this.setupViewport();
 		this.setupDepth();
 		GL11.glClearDepth(1.0D);
 		GL11.glDepthMask(true);
 		GL11.glColorMask(true, true, true, true);
-		int var10000 = var1 != null && !this.xray ? var1.getColor() : 0;
-		GL11.glClearColor(G3DUtils.getFloatColor(var10000, 16), G3DUtils.getFloatColor(var10000, 8), G3DUtils.getFloatColor(var10000, 0), G3DUtils.getFloatColor(var10000, 24));
+		int clearColor = background != null && !this.xray ? background.getColor() : 0;
+		GL11.glClearColor(G3DUtils.getFloatColor(clearColor, 16), G3DUtils.getFloatColor(clearColor, 8), G3DUtils.getFloatColor(clearColor, 0), G3DUtils.getFloatColor(clearColor, 24));
 		GL11.glClear(16640);
-		if (var1 != null && !this.xray) {
-			GL11.glClear(var1.isColorClearEnabled() ? 16384 : 0);
-			this.method385(var1);
+		if (background != null && !this.xray) {
+			GL11.glClear(background.isColorClearEnabled() ? 16384 : 0);
+			this.drawBackgroundImage(background);
 		} else {
 			GL11.glClear(GL_COLOR_BUFFER_BIT);
 		}
 	}
 
-	private void method385(Background var1) {
-		if (var1 != null && var1.getImage() != null && var1.getCropWidth() > 0 && var1.getCropHeight() > 0) {
+	private void drawBackgroundImage(Background background) {
+		if (background != null && background.getImage() != null && background.getCropWidth() > 0 && background.getCropHeight() > 0) {
 			GL11.glDisable(2896);
 			GL11.glDisable(2912);
-			int var2 = var1.getImage().getFormat() == 99 ? 6407 : 6408;
-			int var3 = var1.getImage().getWidth();
-			int var4 = var1.getImage().getHeight();
+			int pixelFormat = background.getImage().getFormat() == 99 ? 6407 : 6408;
+			int imageWidth = background.getImage().getWidth();
+			int imageHeight = background.getImage().getHeight();
 			GL11.glMatrixMode(5889);
 			GL11.glLoadIdentity();
 			GL11.glMatrixMode(5888);
 			GL11.glLoadIdentity();
-			float var5 = (float) this.viewportWidth;
-			float var6 = (float) this.viewportHeight;
-			float var7 = var5 / (float) var1.getCropWidth();
-			float var8 = var6 / (float) var1.getCropHeight();
-			float var9 = var7 * (float) var3;
-			float var10 = var8 * (float) var4;
-			float var11 = -var5 * (float) var1.getCropX() / (float) var1.getCropWidth() - var5 / 2.0F;
-			float var12 = var6 * (float) var1.getCropY() / (float) var1.getCropHeight() + var6 / 2.0F;
-			int var13 = 1;
-			int var14 = 1;
-			if (var1.getImageModeX() == 33) {
-				if ((var11 %= var9) > 0.0F) {
-					var11 -= var9;
+			float viewWidth = (float) this.viewportWidth;
+			float viewHeight = (float) this.viewportHeight;
+			float zoomX = viewWidth / (float) background.getCropWidth();
+			float zoomY = viewHeight / (float) background.getCropHeight();
+			float tileWidth = zoomX * (float) imageWidth;
+			float tileHeight = zoomY * (float) imageHeight;
+			float startX = -viewWidth * (float) background.getCropX() / (float) background.getCropWidth() - viewWidth / 2.0F;
+			float startY = viewHeight * (float) background.getCropY() / (float) background.getCropHeight() + viewHeight / 2.0F;
+			int tilesX = 1;
+			int tilesY = 1;
+			if (background.getImageModeX() == 33) {
+				if ((startX %= tileWidth) > 0.0F) {
+					startX -= tileWidth;
 				}
 
-				var13 = (int) (2.5F + var5 / var9);
-				var11 -= (float) (var13 / 2) * var9;
+				tilesX = (int) (2.5F + viewWidth / tileWidth);
+				startX -= (float) (tilesX / 2) * tileWidth;
 			}
 
-			if (var1.getImageModeY() == 33) {
-				var12 %= var10;
-				var14 = (int) (2.5F + var6 / var10);
-				var12 += (float) (var14 / 2) * var10;
+			if (background.getImageModeY() == 33) {
+				startY %= tileHeight;
+				tilesY = (int) (2.5F + viewHeight / tileHeight);
+				startY += (float) (tilesY / 2) * tileHeight;
 			}
 
-			GL11.glPixelStorei(3314, var3);
+			GL11.glPixelStorei(3314, imageWidth);
 			GL11.glPixelStorei(3315, 0);
 			GL11.glPixelStorei(3316, 0);
 			GL11.glDepthFunc(519);
 			GL11.glDepthMask(false);
-			GL11.glPixelZoom(var7, -var8);
-			ByteBuffer var15 = memoryBuffers.getImageBuffer(var1.getImage().getImageData());
+			GL11.glPixelZoom(zoomX, -zoomY);
+			ByteBuffer pixels = memoryBuffers.getImageBuffer(background.getImage().getImageData());
 
-			for (int var16 = 0; var16 < var14; ++var16) {
-				for (int var17 = 0; var17 < var13; ++var17) {
+			for (int tileY = 0; tileY < tilesY; ++tileY) {
+				for (int tileX = 0; tileX < tilesX; ++tileX) {
 					GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
-					GL11.glBitmap(0, 0, 0.0F, 0.0F, var11 + (float) var17 * var9, var12 - (float) var16 * var10, var15);
-					GL11.glDrawPixels(var3, var4, var2, 5121, var15);
+					GL11.glBitmap(0, 0, 0.0F, 0.0F, startX + (float) tileX * tileWidth, startY - (float) tileY * tileHeight, pixels);
+					GL11.glDrawPixels(imageWidth, imageHeight, pixelFormat, 5121, pixels);
 				}
 			}
 
@@ -170,13 +170,13 @@ public final class M3GView3D implements PaintListener, Runnable {
 
 	}
 
-	public final void method368(Node var1, Transform var2) {
-		if (var1 == null) {
+	public final void render(Node node, Transform transform) {
+		if (node == null) {
 			throw new NullPointerException();
-		} else if (!(var1 instanceof Sprite3D) && !(var1 instanceof Mesh) && !(var1 instanceof Group)) {
+		} else if (!(node instanceof Sprite3D) && !(node instanceof Mesh) && !(node instanceof Group)) {
 			throw new IllegalArgumentException();
 		} else {
-			renderPipe.pushRenderNode(var1, var2 == null ? new Transform() : var2);
+			renderPipe.pushRenderNode(node, transform == null ? new Transform() : transform);
 			this.renderPushedNodes();
 		}
 	}
@@ -205,188 +205,188 @@ public final class M3GView3D implements PaintListener, Runnable {
 		MeshMorph.getViewInstance().clearCache();
 	}
 
-	private void renderVertex(VertexBuffer var1, IndexBuffer var2, Appearance var3, Transform var4, int scope, float alphaFactor) {
+	private void renderVertex(VertexBuffer vertexBuffer, IndexBuffer indexBuffer, Appearance appearance, Transform transform, int scope, float alphaFactor) {
 		if ((camera.getScope() & scope) != 0) {
 			this.setupViewport();
 			this.setupDepth();
 			setupCamera();
 			setupLights(lights, lightsTransforms, scope);
-			if (var4 != null) {
-				Transform var7;
-				(var7 = new Transform()).set(var4);
-				var7.transpose();
-				GL11.glMultMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) var7.getImpl()).m_matrix));
+			if (transform != null) {
+				Transform modelTransform;
+				(modelTransform = new Transform()).set(transform);
+				modelTransform.transpose();
+				GL11.glMultMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) modelTransform.getImpl()).m_matrix));
 			}
 
-			this.setupAppearance(var3, false);
-			this.draw(var1, var2, var3, alphaFactor);
+			this.setupAppearance(appearance, false);
+			this.draw(vertexBuffer, indexBuffer, appearance, alphaFactor);
 		}
 	}
 
-	private void renderSprite(Sprite3D var1, Transform var2, float alphaFactor) {
-		Vector4f var3 = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
-		Vector4f var4 = new Vector4f(1.0F, 0.0F, 0.0F, 1.0F);
-		Vector4f var5 = new Vector4f(0.0F, 1.0F, 0.0F, 1.0F);
-		Transform var6;
-		(var6 = new Transform(cameraTransform)).postMultiply(var2);
-		Transform3D impl = (Transform3D) var6.getImpl();
-		impl.transform(var3);
-		impl.transform(var4);
-		impl.transform(var5);
-		Vector4f var7 = new Vector4f(var3);
-		var3.mul(1.0F / var3.w);
-		var4.mul(1.0F / var4.w);
-		var5.mul(1.0F / var5.w);
-		var4.sub(var3);
-		var5.sub(var3);
-		Vector4f var8 = new Vector4f(var4.length(), 0.0F, 0.0F, 0.0F);
-		Vector4f var9 = new Vector4f(0.0F, var5.length(), 0.0F, 0.0F);
-		var8.add(var7);
-		var9.add(var7);
-		Transform var10 = new Transform();
-		camera.getProjection(var10);
-		impl = (Transform3D) var10.getImpl();
-		impl.transform(var7);
-		impl.transform(var8);
-		impl.transform(var9);
-		if (var7.w > 0.0F && -var7.w < var7.z && var7.z <= var7.w) {
-			var7.mul(1.0F / var7.w);
-			var8.mul(1.0F / var8.w);
-			var9.mul(1.0F / var9.w);
-			var8.sub(var7);
-			var9.sub(var7);
-			boolean var11 = var1.isScaled();
-			int[] var12;
-			boolean var13 = (var12 = new int[]{var1.getCropX(), var1.getCropY(), var1.getCropWidth(), var1.getCropHeight()})[2] < 0;
-			boolean var14 = var12[3] < 0;
-			var12[2] = Math.abs(var12[2]);
-			var12[3] = Math.abs(var12[3]);
-			float var15 = 1.0F;
-			float var16 = 1.0F;
-			float var17 = (float) ((var13 ? var12[2] : -var12[2]) / 2);
-			float var18 = (float) ((var14 ? -var12[3] : var12[3]) / 2);
-			float var19;
-			float var20;
-			if (!var11) {
-				if (var13) {
-					var15 = -1.0F;
+	private void renderSprite(Sprite3D sprite, Transform transform, float alphaFactor) {
+		Vector4f origin = new Vector4f(0.0F, 0.0F, 0.0F, 1.0F);
+		Vector4f unitX = new Vector4f(1.0F, 0.0F, 0.0F, 1.0F);
+		Vector4f unitY = new Vector4f(0.0F, 1.0F, 0.0F, 1.0F);
+		Transform modelView;
+		(modelView = new Transform(cameraTransform)).postMultiply(transform);
+		Transform3D impl = (Transform3D) modelView.getImpl();
+		impl.transform(origin);
+		impl.transform(unitX);
+		impl.transform(unitY);
+		Vector4f center = new Vector4f(origin);
+		origin.mul(1.0F / origin.w);
+		unitX.mul(1.0F / unitX.w);
+		unitY.mul(1.0F / unitY.w);
+		unitX.sub(origin);
+		unitY.sub(origin);
+		Vector4f scaleX = new Vector4f(unitX.length(), 0.0F, 0.0F, 0.0F);
+		Vector4f scaleY = new Vector4f(0.0F, unitY.length(), 0.0F, 0.0F);
+		scaleX.add(center);
+		scaleY.add(center);
+		Transform projection = new Transform();
+		camera.getProjection(projection);
+		impl = (Transform3D) projection.getImpl();
+		impl.transform(center);
+		impl.transform(scaleX);
+		impl.transform(scaleY);
+		if (center.w > 0.0F && -center.w < center.z && center.z <= center.w) {
+			center.mul(1.0F / center.w);
+			scaleX.mul(1.0F / scaleX.w);
+			scaleY.mul(1.0F / scaleY.w);
+			scaleX.sub(center);
+			scaleY.sub(center);
+			boolean scaled = sprite.isScaled();
+			int[] crop;
+			boolean flipX = (crop = new int[]{sprite.getCropX(), sprite.getCropY(), sprite.getCropWidth(), sprite.getCropHeight()})[2] < 0;
+			boolean flipY = crop[3] < 0;
+			crop[2] = Math.abs(crop[2]);
+			crop[3] = Math.abs(crop[3]);
+			float zoomX = 1.0F;
+			float zoomY = 1.0F;
+			float rasterOffsetX = (float) ((flipX ? crop[2] : -crop[2]) / 2);
+			float rasterOffsetY = (float) ((flipY ? -crop[3] : crop[3]) / 2);
+			float spriteWidth;
+			float spriteHeight;
+			if (!scaled) {
+				if (flipX) {
+					zoomX = -1.0F;
 				}
 
-				if (var14) {
-					var16 = -1.0F;
+				if (flipY) {
+					zoomY = -1.0F;
 				}
 
-				var19 = (float) var12[2];
-				var20 = (float) var12[3];
+				spriteWidth = (float) crop[2];
+				spriteHeight = (float) crop[3];
 			} else {
-				var15 = var8.length() * (float) this.viewportWidth * 0.5F;
-				var16 = var9.length() * (float) this.viewportHeight * 0.5F;
-				var19 = var15;
-				var20 = var16;
-				var17 = -var15 / 2.0F;
-				var18 = var16 / 2.0F;
-				if (var13) {
-					var17 += var15;
+				zoomX = scaleX.length() * (float) this.viewportWidth * 0.5F;
+				zoomY = scaleY.length() * (float) this.viewportHeight * 0.5F;
+				spriteWidth = zoomX;
+				spriteHeight = zoomY;
+				rasterOffsetX = -zoomX / 2.0F;
+				rasterOffsetY = zoomY / 2.0F;
+				if (flipX) {
+					rasterOffsetX += zoomX;
 				}
 
-				if (var14) {
-					var18 -= var16;
+				if (flipY) {
+					rasterOffsetY -= zoomY;
 				}
 
-				var15 /= var13 ? -((float) var12[2]) : (float) var12[2];
-				var16 /= var14 ? -((float) var12[3]) : (float) var12[3];
+				zoomX /= flipX ? -((float) crop[2]) : (float) crop[2];
+				zoomY /= flipY ? -((float) crop[3]) : (float) crop[3];
 			}
 
-			int[] var21 = new int[4];
-			if (G3DUtils.intersectRectangle(var12[0], var12[1], var12[2], var12[3], 0, 0, var1.getImage().getWidth(), var1.getImage().getHeight(), var21)) {
-				float var10000;
+			int[] clippedCrop = new int[4];
+			if (G3DUtils.intersectRectangle(crop[0], crop[1], crop[2], crop[3], 0, 0, sprite.getImage().getWidth(), sprite.getImage().getHeight(), clippedCrop)) {
+				float rasterOffset;
 				label96:
 				{
-					if (!var13) {
-						var10000 = var17 - var15 * (float) (var12[0] - var21[0]);
+					if (!flipX) {
+						rasterOffset = rasterOffsetX - zoomX * (float) (crop[0] - clippedCrop[0]);
 					} else {
-						if (var12[0] <= 0) {
+						if (crop[0] <= 0) {
 							break label96;
 						}
 
-						var10000 = var17 + var15 * (float) (var12[0] - var21[0]);
+						rasterOffset = rasterOffsetX + zoomX * (float) (crop[0] - clippedCrop[0]);
 					}
 
-					var17 = var10000;
+					rasterOffsetX = rasterOffset;
 				}
 
 				label90:
 				{
-					if (!var14) {
-						var10000 = var18 + var16 * (float) (var12[1] - var21[1]);
+					if (!flipY) {
+						rasterOffset = rasterOffsetY + zoomY * (float) (crop[1] - clippedCrop[1]);
 					} else {
-						if (var12[1] <= 0) {
+						if (crop[1] <= 0) {
 							break label90;
 						}
 
-						var10000 = var18 - var16 * (float) (var12[1] - var21[1]);
+						rasterOffset = rasterOffsetY - zoomY * (float) (crop[1] - clippedCrop[1]);
 					}
 
-					var18 = var10000;
+					rasterOffsetY = rasterOffset;
 				}
 
-				ByteBuffer var27;
-				short var28;
+				ByteBuffer pixels;
+				short pixelFormat;
 				label84:
 				{
-					Transform var22;
-					(var22 = new Transform()).postScale((float) this.viewportWidth / ((float) this.viewportWidth + var19), (float) this.viewportHeight / ((float) this.viewportHeight + var20), 1.0F);
-					var22.postMultiply(var10);
-					var10.set(var22);
-					int var23 = (int) (0F - var19 / 2.0F);
-					int var24 = (int) (0F - var20 / 2.0F);
-					int var25 = (int) ((float) this.viewportWidth + var19);
-					int var26 = (int) ((float) this.viewportHeight + var20);
-					var10.transpose();
-					var6.transpose();
-					GL11.glViewport(var23, viewportHeight - var24 - var26, var25, var26);
+					Transform viewportScale;
+					(viewportScale = new Transform()).postScale((float) this.viewportWidth / ((float) this.viewportWidth + spriteWidth), (float) this.viewportHeight / ((float) this.viewportHeight + spriteHeight), 1.0F);
+					viewportScale.postMultiply(projection);
+					projection.set(viewportScale);
+					int extendedX = (int) (0F - spriteWidth / 2.0F);
+					int extendedY = (int) (0F - spriteHeight / 2.0F);
+					int extendedWidth = (int) ((float) this.viewportWidth + spriteWidth);
+					int extendedHeight = (int) ((float) this.viewportHeight + spriteHeight);
+					projection.transpose();
+					modelView.transpose();
+					GL11.glViewport(extendedX, viewportHeight - extendedY - extendedHeight, extendedWidth, extendedHeight);
 					GL11.glMatrixMode(5889);
-					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) var10.getImpl()).m_matrix));
+					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) projection.getImpl()).m_matrix));
 					GL11.glMatrixMode(5888);
-					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
+					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) modelView.getImpl()).m_matrix));
 					GL11.glDisable(2896);
-					var27 = memoryBuffers.getImageBuffer(var1.getImage().getImageData());
+					pixels = memoryBuffers.getImageBuffer(sprite.getImage().getImageData());
 					GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
-					GL11.glPixelStorei(3314, var1.getImage().getWidth());
-					GL11.glPixelStorei(3315, var21[1]);
-					GL11.glPixelStorei(3316, var21[0]);
-					GL11.glBitmap(0, 0, 0.0F, 0.0F, var17, var18, var27);
-					GL11.glPixelZoom(var15, -var16);
-					var28 = 6407;
-					short var29;
-					switch (var1.getImage().getFormat()) {
+					GL11.glPixelStorei(3314, sprite.getImage().getWidth());
+					GL11.glPixelStorei(3315, clippedCrop[1]);
+					GL11.glPixelStorei(3316, clippedCrop[0]);
+					GL11.glBitmap(0, 0, 0.0F, 0.0F, rasterOffsetX, rasterOffsetY, pixels);
+					GL11.glPixelZoom(zoomX, -zoomY);
+					pixelFormat = 6407;
+					short format;
+					switch (sprite.getImage().getFormat()) {
 						case 96:
-							var29 = 6406;
+							format = 6406;
 							break;
 						case 97:
-							var29 = 6409;
+							format = 6409;
 							break;
 						case 98:
-							var29 = 6410;
+							format = 6410;
 							break;
 						case 99:
-							var29 = 6407;
+							format = 6407;
 							break;
 						case 100:
-							var29 = 6408;
+							format = 6408;
 							break;
 						default:
 							break label84;
 					}
 
-					var28 = var29;
+					pixelFormat = format;
 				}
 
-				this.setupAppearance(var1.getAppearance(), true);
+				this.setupAppearance(sprite.getAppearance(), true);
 				GL11.glColor4ub((byte) 255, (byte) 255, (byte) 255, (byte) (255 * alphaFactor));
 				GL11.glDisableClientState(GL_COLOR_ARRAY);
 
-				GL11.glDrawPixels(var21[2], var21[3], var28, 5121, var27);
+				GL11.glDrawPixels(clippedCrop[2], clippedCrop[3], pixelFormat, 5121, pixels);
 				GL11.glPixelStorei(3314, 0);
 				GL11.glPixelStorei(3315, 0);
 				GL11.glPixelStorei(3316, 0);
@@ -474,12 +474,12 @@ public final class M3GView3D implements PaintListener, Runnable {
 		if (window != 0) {
 			buffer.rewind();
 			GL11.glReadPixels(0, 0, viewportWidth, viewportHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-			int var8 = bufferImage.width << 2;
-			int var10 = bufferImage.data.length - var8;
+			int rowBytes = bufferImage.width << 2;
+			int offset = bufferImage.data.length - rowBytes;
 
 			for (int i = bufferImage.height; i > 0; --i) {
-				buffer.get(bufferImage.data, var10, var8);
-				var10 -= var8;
+				buffer.get(bufferImage.data, offset, rowBytes);
+				offset -= rowBytes;
 			}
 		}
 		SWTFrontend.getDisplay().syncExec(this);
@@ -510,68 +510,68 @@ public final class M3GView3D implements PaintListener, Runnable {
 		} catch (Exception ignored) {}
 	}
 
-	public static void setCamera(Camera var0, Transform var1) {
-		if (var1 != null) {
-			cameraTransform.set(var1);
+	public static void setCamera(Camera cam, Transform transform) {
+		if (transform != null) {
+			cameraTransform.set(transform);
 			((Transform3D) cameraTransform.getImpl()).invert();
 		} else {
 			cameraTransform.setIdentity();
 		}
 
-		camera = var0;
+		camera = cam;
 	}
 
-	public static int method381(Light var0, Transform var1) {
-		if (var0 == null) {
+	public static int addLight(Light light, Transform transform) {
+		if (light == null) {
 			throw new NullPointerException();
 		} else {
-			lights.add(var0);
-			if (var1 == null) {
+			lights.add(light);
+			if (transform == null) {
 				lightsTransforms.add(new Transform());
 			} else {
-				lightsTransforms.add(new Transform(var1));
+				lightsTransforms.add(new Transform(transform));
 			}
 
 			return lights.size();
 		}
 	}
 
-	public static void method388() {
+	public static void resetLights() {
 		lights.clear();
 		lightsTransforms.clear();
 	}
 
-	public final void method374(World var1) {
-		method388();
-		this.method365(var1, var1);
+	public final void collectWorldLights(World world) {
+		resetLights();
+		this.collectLights(world, world);
 	}
 
-	private void method365(World var1, Group var2) {
-		Transform var3 = new Transform();
+	private void collectLights(World world, Group group) {
+		Transform transform = new Transform();
 
-		for (int var4 = 0; var4 < var2.getChildCount(); ++var4) {
-			Node var5;
-			if ((var5 = var2.getChild(var4)) instanceof Light && var5.getTransformTo(var1, var3)) {
-				lights.add(var5);
-				lightsTransforms.add(new Transform(var3));
-			} else if (var5 instanceof Group) {
-				this.method365(var1, (Group) var5);
+		for (int i = 0; i < group.getChildCount(); ++i) {
+			Node child;
+			if ((child = group.getChild(i)) instanceof Light && child.getTransformTo(world, transform)) {
+				lights.add(child);
+				lightsTransforms.add(new Transform(transform));
+			} else if (child instanceof Group) {
+				this.collectLights(world, (Group) child);
 			}
 		}
 
 	}
 
-	private void setupAppearance(Appearance var1, boolean var3) {
-		if (!var3) {
-			this.setupPolygonMode(var1.getPolygonMode());
+	private void setupAppearance(Appearance appearance, boolean isSprite) {
+		if (!isSprite) {
+			this.setupPolygonMode(appearance.getPolygonMode());
 		}
 
-		this.setupCompositingMode(var1.getCompositingMode());
-		if (!var3) {
-			setupMaterial(var1.getMaterial());
+		this.setupCompositingMode(appearance.getCompositingMode());
+		if (!isSprite) {
+			setupMaterial(appearance.getMaterial());
 		}
 
-		this.setupFog(var1.getFog());
+		this.setupFog(appearance.getFog());
 	}
 
 	//Settings.xrayView -> xray
@@ -582,12 +582,12 @@ public final class M3GView3D implements PaintListener, Runnable {
 
 		GL11.glPolygonMode(GL_FRONT_AND_BACK, xray ? GL_LINE : GL_FILL);
 
-		int var1 = pm.getCulling();
-		if (var1 == PolygonMode.CULL_NONE) {
+		int culling = pm.getCulling();
+		if (culling == PolygonMode.CULL_NONE) {
 			GL11.glDisable(GL_CULL_FACE);
 		} else {
 			GL11.glEnable(GL_CULL_FACE);
-			GL11.glCullFace(var1 == PolygonMode.CULL_FRONT ? GL_FRONT : GL_BACK);
+			GL11.glCullFace(culling == PolygonMode.CULL_FRONT ? GL_FRONT : GL_BACK);
 		}
 
 		GL11.glShadeModel(pm.getShading() == PolygonMode.SHADE_FLAT ? GL_FLAT : GL_SMOOTH);
@@ -752,8 +752,8 @@ public final class M3GView3D implements PaintListener, Runnable {
 		int stripCount = triangleStripArray.getStripCount();
 
 		if (appearance != null && !this.xray) {
-			IntBuffer var10 = BufferUtils.createIntBuffer(Emulator3D.NumTextureUnits);
-			GL11.glGenTextures(var10);
+			IntBuffer textureIds = BufferUtils.createIntBuffer(Emulator3D.NumTextureUnits);
+			GL11.glGenTextures(textureIds);
 
 			for (int i = 0; i < Emulator3D.NumTextureUnits; ++i) {
 				Texture2D texture2D = appearance.getTexture(i);
@@ -769,7 +769,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 				}
 
 				GL11.glEnable(GL_TEXTURE_2D);
-				GL11.glBindTexture(GL_TEXTURE_2D, var10.get(i));
+				GL11.glBindTexture(GL_TEXTURE_2D, textureIds.get(i));
 
 				int blendMode = 0;
 				switch (texture2D.getBlending()) {
@@ -899,7 +899,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 
 			if (!useGL11()) {
 				for (int i = 0; i < Emulator3D.NumTextureUnits; ++i) {
-					if (GL11.glIsTexture(var10.get(i))) {
+					if (GL11.glIsTexture(textureIds.get(i))) {
 						GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
 						GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
 						GL11.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -908,7 +908,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 				}
 			}
 
-			GL11.glDeleteTextures(var10);
+			GL11.glDeleteTextures(textureIds);
 		} else {
 			//xray
 			for (int i = 0; i < stripCount; ++i) {
@@ -1039,7 +1039,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 		}
 	}
 
-	public final void drawGrid(float var1) {
+	public final void drawGrid(float cellSize) {
 		this.setupViewport();
 		this.setupDepth();
 		setupCamera();
@@ -1057,38 +1057,38 @@ public final class M3GView3D implements PaintListener, Runnable {
 		GL11.glColor4ub((byte) 70, (byte) 121, (byte) -80, (byte) -1);
 		GL11.glDisableClientState('\u8076');
 		GL11.glDisableClientState('\u8075');
-		float var2 = var1 * 5.0F;
-		boolean var3 = true;
+		float halfExtent = cellSize * 5.0F;
+		boolean filled = true;
 		GL11.glMatrixMode(5888);
 		GL11.glBegin(7);
-		float var10000 = -var2;
+		float next = -halfExtent;
 
 		while (true) {
-			float var4 = var10000;
-			if (var10000 >= var2) {
+			float x = next;
+			if (next >= halfExtent) {
 				GL11.glEnd();
 				return;
 			}
 
-			var10000 = -var2;
+			next = -halfExtent;
 
 			while (true) {
-				float var5 = var10000;
-				if (var10000 >= var2) {
-					var3 = !var3;
-					var10000 = var4 + var1;
+				float z = next;
+				if (next >= halfExtent) {
+					filled = !filled;
+					next = x + cellSize;
 					break;
 				}
 
-				if (var3) {
-					GL11.glVertex3f(var4, 0.0F, var5);
-					GL11.glVertex3f(var4 + var1, 0.0F, var5);
-					GL11.glVertex3f(var4 + var1, 0.0F, var5 + var1);
-					GL11.glVertex3f(var4, 0.0F, var5 + var1);
+				if (filled) {
+					GL11.glVertex3f(x, 0.0F, z);
+					GL11.glVertex3f(x + cellSize, 0.0F, z);
+					GL11.glVertex3f(x + cellSize, 0.0F, z + cellSize);
+					GL11.glVertex3f(x, 0.0F, z + cellSize);
 				}
 
-				var3 = !var3;
-				var10000 = var5 + var1;
+				filled = !filled;
+				next = z + cellSize;
 			}
 		}
 	}
