@@ -241,13 +241,13 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 				World var1 = (World) this.currentNode;
 				this.currentBackground = var1.getBackground();
 				if (this.anInt362 == 0) {
-					this.m3gview.method374(var1);
+					this.m3gview.collectWorldLights(var1);
 				}
 			} else {
 				Light var2;
 				(var2 = new Light()).setMode(128);
-				M3GView3D.method388();
-				M3GView3D.method381(var2, null);
+				M3GView3D.resetLights();
+				M3GView3D.addLight(var2, null);
 			}
 		}
 		this.canvasClientArea = this.canvas.getClientArea();
@@ -302,7 +302,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 			}
 			if (this.currentNode != null) {
 				try {
-					m3gview.method368(this.currentNode, null);
+					m3gview.render(this.currentNode, null);
 				} catch (Exception localException) {
 					//                localException.printStackTrace();
 				}

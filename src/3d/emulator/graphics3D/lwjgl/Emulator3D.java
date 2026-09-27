@@ -334,12 +334,12 @@ public final class Emulator3D implements IGraphics3D {
 
 			if (this.target != null) {
 				if (this.target instanceof Image2D) {
-					Image2D var9 = (Image2D) this.target;
+					Image2D targetImage = (Image2D) this.target;
 					// Read back only as much as the target actually holds. The
 					// drawable may be larger than the target, and GL reads from
 					// its bottom-left corner, which is exactly where we render.
-					int rw = Math.min(width, var9.getWidth());
-					int rh = Math.min(height, var9.getHeight());
+					int rw = Math.min(width, targetImage.getWidth());
+					int rh = Math.min(height, targetImage.getHeight());
 
 					buffer.rewind();
 					GL11.glReadPixels(x, y, rw, rh, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
@@ -348,17 +348,17 @@ public final class Emulator3D implements IGraphics3D {
 					int rgbaLen = w * rh;
 					if (readbackRGBA == null || readbackRGBA.length < rgbaLen)
 						readbackRGBA = new byte[rgbaLen];
-					byte[] var11 = readbackRGBA;
+					byte[] rgba = readbackRGBA;
 					// GL returns bottom-up rows, Image2D expects top-down
 					int off = rgbaLen - w;
 
 					for (int i = rh; i > 0; --i) {
-						buffer.get(var11, off, w);
+						buffer.get(rgba, off, w);
 						off -= w;
 					}
 
-					if (var9.getFormat() == Image2D.RGBA) {
-						var9.set(0, 0, rw, rh, var11);
+					if (targetImage.getFormat() == Image2D.RGBA) {
+						targetImage.set(0, 0, rw, rh, rgba);
 					} else {
 						int rgbLen = rw * rh * 3;
 						if (readbackRGB == null || readbackRGB.length < rgbLen)
@@ -366,12 +366,12 @@ public final class Emulator3D implements IGraphics3D {
 						byte[] data = readbackRGB;
 
 						for (int s = 0, d = 0; d < rgbLen; s += 4) {
-							data[d++] = var11[s];
-							data[d++] = var11[s + 1];
-							data[d++] = var11[s + 2];
+							data[d++] = rgba[s];
+							data[d++] = rgba[s + 1];
+							data[d++] = rgba[s + 2];
 						}
 
-						var9.set(0, 0, rw, rh, data);
+						targetImage.set(0, 0, rw, rh, data);
 					}
 				} else {
 					Graphics target = (Graphics) this.target;
@@ -391,13 +391,13 @@ public final class Emulator3D implements IGraphics3D {
 							buffer.get(swtBufferImage.data, writePos, width * 4);
 						}
 
-						Image var12 = new Image(null, swtBufferImage);
+						Image frameImage = new Image(null, swtBufferImage);
 						((Graphics2DSWT) (target.getImpl())).gc().drawImage(
-								var12,
+								frameImage,
 								0, 0, width, height,
 								x, y, width, height
 						);
-						var12.dispose();
+						frameImage.dispose();
 					} else {
 						buffer.rewind();
 						GL11.glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
@@ -767,12 +767,12 @@ public final class Emulator3D implements IGraphics3D {
 
 		GL11.glPolygonMode(GL_FRONT_AND_BACK, AppSettings.xrayView ? GL_LINE : GL_FILL);
 
-		int var1 = pm.getCulling();
-		if (var1 == PolygonMode.CULL_NONE) {
+		int culling = pm.getCulling();
+		if (culling == PolygonMode.CULL_NONE) {
 			GL11.glDisable(GL_CULL_FACE);
 		} else {
 			GL11.glEnable(GL_CULL_FACE);
-			GL11.glCullFace(var1 == PolygonMode.CULL_FRONT ? GL_FRONT : GL_BACK);
+			GL11.glCullFace(culling == PolygonMode.CULL_FRONT ? GL_FRONT : GL_BACK);
 		}
 
 		GL11.glShadeModel(pm.getShading() == PolygonMode.SHADE_FLAT ? GL_FLAT : GL_SMOOTH);
@@ -1181,173 +1181,173 @@ public final class Emulator3D implements IGraphics3D {
 			swapBuffers();
 	}
 
-	private void renderSprite(Sprite3D sprite, Transform var2, float alphaFactor) {
+	private void renderSprite(Sprite3D sprite, Transform transform, float alphaFactor) {
 		Profiler3D.LWJGL_renderSpriteCount++;
 
-		float[] var3 = new float[]{0.0F, 0.0F, 0.0F, 1.0F};
-		float[] var4 = new float[]{1.0F, 0.0F, 0.0F, 1.0F};
-		float[] var5 = new float[]{0.0F, 1.0F, 0.0F, 1.0F};
-		Transform var6;
-		(var6 = new Transform(CameraCache.invCam)).postMultiply(var2);
-		Transform3D impl = (Transform3D) var6.getImpl();
-		impl.transform(var3);
-		impl.transform(var4);
-		impl.transform(var5);
-		float[] var7 = new float[]{var3[0], var3[1], var3[2], var3[3]};
-		Vector4f.mul(var3, 1.0F / var3[3]);
-		Vector4f.mul(var4, 1.0F / var4[3]);
-		Vector4f.mul(var5, 1.0F / var5[3]);
-		Vector4f.sub(var4, var3);
-		Vector4f.sub(var5, var3);
-		float[] var8 = new float[]{Vector4f.length(var4), 0.0F, 0.0F, 0.0F};
-		float[] var9 = new float[]{0.0F, Vector4f.length(var5), 0.0F, 0.0F};
-		Vector4f.add(var8, var7);
-		Vector4f.add(var9, var7);
-		Transform var10 = new Transform();
-		CameraCache.camera.getProjection(var10);
-		impl = (Transform3D) var10.getImpl();
-		impl.transform(var7);
-		impl.transform(var8);
-		impl.transform(var9);
-		if (var7[3] > 0.0F && -var7[3] < var7[2] && var7[2] <= var7[3]) {
-			Vector4f.mul(var7, 1.0F / var7[3]);
-			Vector4f.mul(var8, 1.0F / var8[3]);
-			Vector4f.mul(var9, 1.0F / var9[3]);
-			Vector4f.sub(var8, var7);
-			Vector4f.sub(var9, var7);
-			boolean var11 = sprite.isScaled();
-			int[] var12;
-			boolean var13 = (var12 = new int[]{sprite.getCropX(), sprite.getCropY(), sprite.getCropWidth(), sprite.getCropHeight()})[2] < 0;
-			boolean var14 = var12[3] < 0;
-			var12[2] = Math.abs(var12[2]);
-			var12[3] = Math.abs(var12[3]);
-			float var15 = 1.0F;
-			float var16 = 1.0F;
-			float var17 = (float) ((var13 ? var12[2] : -var12[2]) / 2);
-			float var18 = (float) ((var14 ? -var12[3] : var12[3]) / 2);
-			float var19;
-			float var20;
-			if (!var11) {
-				if (var13) {
-					var15 = -1.0F;
+		float[] origin = new float[]{0.0F, 0.0F, 0.0F, 1.0F};
+		float[] unitX = new float[]{1.0F, 0.0F, 0.0F, 1.0F};
+		float[] unitY = new float[]{0.0F, 1.0F, 0.0F, 1.0F};
+		Transform modelView;
+		(modelView = new Transform(CameraCache.invCam)).postMultiply(transform);
+		Transform3D impl = (Transform3D) modelView.getImpl();
+		impl.transform(origin);
+		impl.transform(unitX);
+		impl.transform(unitY);
+		float[] center = new float[]{origin[0], origin[1], origin[2], origin[3]};
+		Vector4f.mul(origin, 1.0F / origin[3]);
+		Vector4f.mul(unitX, 1.0F / unitX[3]);
+		Vector4f.mul(unitY, 1.0F / unitY[3]);
+		Vector4f.sub(unitX, origin);
+		Vector4f.sub(unitY, origin);
+		float[] scaleX = new float[]{Vector4f.length(unitX), 0.0F, 0.0F, 0.0F};
+		float[] scaleY = new float[]{0.0F, Vector4f.length(unitY), 0.0F, 0.0F};
+		Vector4f.add(scaleX, center);
+		Vector4f.add(scaleY, center);
+		Transform projection = new Transform();
+		CameraCache.camera.getProjection(projection);
+		impl = (Transform3D) projection.getImpl();
+		impl.transform(center);
+		impl.transform(scaleX);
+		impl.transform(scaleY);
+		if (center[3] > 0.0F && -center[3] < center[2] && center[2] <= center[3]) {
+			Vector4f.mul(center, 1.0F / center[3]);
+			Vector4f.mul(scaleX, 1.0F / scaleX[3]);
+			Vector4f.mul(scaleY, 1.0F / scaleY[3]);
+			Vector4f.sub(scaleX, center);
+			Vector4f.sub(scaleY, center);
+			boolean scaled = sprite.isScaled();
+			int[] crop;
+			boolean flipX = (crop = new int[]{sprite.getCropX(), sprite.getCropY(), sprite.getCropWidth(), sprite.getCropHeight()})[2] < 0;
+			boolean flipY = crop[3] < 0;
+			crop[2] = Math.abs(crop[2]);
+			crop[3] = Math.abs(crop[3]);
+			float zoomX = 1.0F;
+			float zoomY = 1.0F;
+			float rasterOffsetX = (float) ((flipX ? crop[2] : -crop[2]) / 2);
+			float rasterOffsetY = (float) ((flipY ? -crop[3] : crop[3]) / 2);
+			float spriteWidth;
+			float spriteHeight;
+			if (!scaled) {
+				if (flipX) {
+					zoomX = -1.0F;
 				}
 
-				if (var14) {
-					var16 = -1.0F;
+				if (flipY) {
+					zoomY = -1.0F;
 				}
 
-				var19 = (float) var12[2];
-				var20 = (float) var12[3];
+				spriteWidth = (float) crop[2];
+				spriteHeight = (float) crop[3];
 			} else {
-				var15 = Vector4f.length(var8) * (float) this.viewportWidth * 0.5F;
-				var16 = Vector4f.length(var9) * (float) this.viewportHeight * 0.5F;
-				var19 = var15;
-				var20 = var16;
-				var17 = -var15 / 2.0F;
-				var18 = var16 / 2.0F;
-				if (var13) {
-					var17 += var15;
+				zoomX = Vector4f.length(scaleX) * (float) this.viewportWidth * 0.5F;
+				zoomY = Vector4f.length(scaleY) * (float) this.viewportHeight * 0.5F;
+				spriteWidth = zoomX;
+				spriteHeight = zoomY;
+				rasterOffsetX = -zoomX / 2.0F;
+				rasterOffsetY = zoomY / 2.0F;
+				if (flipX) {
+					rasterOffsetX += zoomX;
 				}
 
-				if (var14) {
-					var18 -= var16;
+				if (flipY) {
+					rasterOffsetY -= zoomY;
 				}
 
-				var15 /= var13 ? -((float) var12[2]) : (float) var12[2];
-				var16 /= var14 ? -((float) var12[3]) : (float) var12[3];
+				zoomX /= flipX ? -((float) crop[2]) : (float) crop[2];
+				zoomY /= flipY ? -((float) crop[3]) : (float) crop[3];
 			}
 
-			int[] var21 = new int[4];
-			if (G3DUtils.intersectRectangle(var12[0], var12[1], var12[2], var12[3], 0, 0, sprite.getImage().getWidth(), sprite.getImage().getHeight(), var21)) {
-				float var10000;
+			int[] clippedCrop = new int[4];
+			if (G3DUtils.intersectRectangle(crop[0], crop[1], crop[2], crop[3], 0, 0, sprite.getImage().getWidth(), sprite.getImage().getHeight(), clippedCrop)) {
+				float rasterOffset;
 				label96:
 				{
-					if (!var13) {
-						var10000 = var17 - var15 * (float) (var12[0] - var21[0]);
+					if (!flipX) {
+						rasterOffset = rasterOffsetX - zoomX * (float) (crop[0] - clippedCrop[0]);
 					} else {
-						if (var12[0] <= 0) {
+						if (crop[0] <= 0) {
 							break label96;
 						}
 
-						var10000 = var17 + var15 * (float) (var12[0] - var21[0]);
+						rasterOffset = rasterOffsetX + zoomX * (float) (crop[0] - clippedCrop[0]);
 					}
 
-					var17 = var10000;
+					rasterOffsetX = rasterOffset;
 				}
 
 				label90:
 				{
-					if (!var14) {
-						var10000 = var18 + var16 * (float) (var12[1] - var21[1]);
+					if (!flipY) {
+						rasterOffset = rasterOffsetY + zoomY * (float) (crop[1] - clippedCrop[1]);
 					} else {
-						if (var12[1] <= 0) {
+						if (crop[1] <= 0) {
 							break label90;
 						}
 
-						var10000 = var18 - var16 * (float) (var12[1] - var21[1]);
+						rasterOffset = rasterOffsetY - zoomY * (float) (crop[1] - clippedCrop[1]);
 					}
 
-					var18 = var10000;
+					rasterOffsetY = rasterOffset;
 				}
 
-				ByteBuffer var27;
-				short var28;
+				ByteBuffer pixels;
+				short pixelFormat;
 				label84:
 				{
-					Transform var22;
-					(var22 = new Transform()).postScale((float) this.viewportWidth / ((float) this.viewportWidth + var19), (float) this.viewportHeight / ((float) this.viewportHeight + var20), 1.0F);
-					var22.postMultiply(var10);
-					var10.set(var22);
-					int var23 = (int) ((float) this.viewportX - var19 / 2.0F);
-					int var24 = (int) ((float) this.viewportY - var20 / 2.0F);
-					int var25 = (int) ((float) this.viewportWidth + var19);
-					int var26 = (int) ((float) this.viewportHeight + var20);
-					var10.transpose();
-					var6.transpose();
-					GL11.glViewport(var23, targetHeight - var24 - var26, var25, var26);
+					Transform viewportScale;
+					(viewportScale = new Transform()).postScale((float) this.viewportWidth / ((float) this.viewportWidth + spriteWidth), (float) this.viewportHeight / ((float) this.viewportHeight + spriteHeight), 1.0F);
+					viewportScale.postMultiply(projection);
+					projection.set(viewportScale);
+					int extendedX = (int) ((float) this.viewportX - spriteWidth / 2.0F);
+					int extendedY = (int) ((float) this.viewportY - spriteHeight / 2.0F);
+					int extendedWidth = (int) ((float) this.viewportWidth + spriteWidth);
+					int extendedHeight = (int) ((float) this.viewportHeight + spriteHeight);
+					projection.transpose();
+					modelView.transpose();
+					GL11.glViewport(extendedX, targetHeight - extendedY - extendedHeight, extendedWidth, extendedHeight);
 					GL11.glMatrixMode(5889);
-					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) var10.getImpl()).m_matrix));
+					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) projection.getImpl()).m_matrix));
 					GL11.glMatrixMode(5888);
-					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) var6.getImpl()).m_matrix));
+					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) modelView.getImpl()).m_matrix));
 					GL11.glDisable(2896);
-//					var27 = sprite.getImage().getBuffer();
-					var27 = memoryBuffers.getImageBuffer(sprite.getImage().getImageData());
+//					pixels = sprite.getImage().getBuffer();
+					pixels = memoryBuffers.getImageBuffer(sprite.getImage().getImageData());
 					GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
 					GL11.glPixelStorei(3314, sprite.getImage().getWidth());
-					GL11.glPixelStorei(3315, var21[1]);
-					GL11.glPixelStorei(3316, var21[0]);
-					GL11.glBitmap(0, 0, 0.0F, 0.0F, var17, var18, var27);
-					GL11.glPixelZoom(var15, -var16);
-					var28 = 6407;
-					short var29;
+					GL11.glPixelStorei(3315, clippedCrop[1]);
+					GL11.glPixelStorei(3316, clippedCrop[0]);
+					GL11.glBitmap(0, 0, 0.0F, 0.0F, rasterOffsetX, rasterOffsetY, pixels);
+					GL11.glPixelZoom(zoomX, -zoomY);
+					pixelFormat = 6407;
+					short format;
 					switch (sprite.getImage().getFormat()) {
 						case 96:
-							var29 = 6406;
+							format = 6406;
 							break;
 						case 97:
-							var29 = 6409;
+							format = 6409;
 							break;
 						case 98:
-							var29 = 6410;
+							format = 6410;
 							break;
 						case 99:
-							var29 = 6407;
+							format = 6407;
 							break;
 						case 100:
-							var29 = 6408;
+							format = 6408;
 							break;
 						default:
 							break label84;
 					}
 
-					var28 = var29;
+					pixelFormat = format;
 				}
 
 				this.setupAppearance(sprite.getAppearance(), true);
 				GL11.glColor4ub((byte) 255, (byte) 255, (byte) 255, (byte) (255 * alphaFactor));
 				GL11.glDisableClientState(GL_COLOR_ARRAY);
 
-				GL11.glDrawPixels(var21[2], var21[3], var28, 5121, var27);
+				GL11.glDrawPixels(clippedCrop[2], clippedCrop[3], pixelFormat, 5121, pixels);
 				GL11.glPixelStorei(3314, 0);
 				GL11.glPixelStorei(3315, 0);
 				GL11.glPixelStorei(3316, 0);
@@ -1355,10 +1355,10 @@ public final class Emulator3D implements IGraphics3D {
 		}
 	}
 
-	public final void v3bind(Graphics var1) {
+	public final void v3bind(Graphics graphics) {
 	}
 
-	public final void v3release(Graphics var1) {
+	public final void v3release(Graphics graphics) {
 	}
 
 	public final void v3flush() {
