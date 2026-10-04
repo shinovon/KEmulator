@@ -454,12 +454,17 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		if (sequence == null) return 0;
 		long ms = 0L;
 		if (sequence instanceof Clip) {
-			ms = ((Clip) sequence).getMicrosecondLength();
+			Clip clip = (Clip) sequence;
+
+			ms = clip.getMicrosecondLength();
 			if (t < ms) ms = t;
 			if (ms < 0) ms = 0;
-			synchronized (sequence) {
-				((Clip) sequence).setMicrosecondPosition(mediaTime = t);
-			}
+			mediaTime = ms;
+
+			float frameRate = clip.getFormat().getFrameRate();
+			long frames = frameRate > 0 ? (long) (ms * (double) frameRate / 1000000D) : 0;
+			if (frames > Integer.MAX_VALUE) frames = Integer.MAX_VALUE;
+			clip.setFramePosition((int) frames);
 		} else if (sequence instanceof Sequence) {
 			ms = ((Sequence) sequence).getMicrosecondLength();
 			if (t < ms) ms = t;
@@ -821,20 +826,19 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					}
 				} else if (sequence instanceof Clip) {
 					Clip clip = (Clip) sequence;
-					synchronized (clip) {
-						clip.start();
-					}
+					this.complete = false;
+					clip.start();
 					if (b) {
 						notifyListeners(PlayerListener.STARTED, getMediaTime(), false);
 						b = false;
 					}
 					synchronized (playLock) {
-						playLock.wait();
+						while (!stop && !this.complete && playerThread == Thread.currentThread()) {
+							playLock.wait();
+						}
 					}
-					complete = this.complete;
-					synchronized (clip) {
-						clip.stop();
-					}
+					complete = this.complete && !stop;
+					clip.stop();
 				} else if (sequence instanceof emulator.javazoom.jl.player.Player) {
 					if (b) {
 						notifyListeners(PlayerListener.STARTED, getMediaTime(), false);
@@ -883,13 +887,16 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 					} catch (MediaException ignored) {}
 				}
 			}
-			state = PREFETCHED;
+			Thread current = playerThread;
+			if (current == null || current == Thread.currentThread())
+				state = PREFETCHED;
 			notifyListeners(complete ? PlayerListener.END_OF_MEDIA : PlayerListener.STOPPED, getMediaTime(), false);
 		} catch (Exception e) {
 			System.err.println("Exception in player thread!");
 			e.printStackTrace();
 		} finally {
-			playerThread = null;
+			if (playerThread == Thread.currentThread())
+				playerThread = null;
 			if (!Settings.enableMediaDump) players.remove(this);
 		}
 	}
@@ -907,9 +914,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		level = n;
 		if (sequence == null) return;
 		if (sequence instanceof Clip) {
-			synchronized (sequence) {
-				setVolume((Clip) sequence, n);
-			}
+			setVolume((Clip) sequence, n);
 			return;
 		}
 		if (sequence instanceof Sequence) {
