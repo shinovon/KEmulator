@@ -7,14 +7,22 @@ import java.net.InetSocketAddress;
 class UDPDatagramConnectionImpl implements UDPDatagramConnection {
 
 	DatagramSocket socket;
+	final String address;
+	final boolean server;
 
 	UDPDatagramConnectionImpl(String addr) throws IOException {
+		address = addr;
 		final int n = addr.indexOf("://") + 3;
 		final int n2 = addr.lastIndexOf(":") + 1;
-		if (n == n2 - 1) {
-			this.socket = new DatagramSocket(Integer.parseInt(addr.substring(n2)));
+		if (addr.startsWith("datagram://:")) {
+			this.socket = new DatagramSocket(n2 == addr.length() ? 0 : Integer.parseInt(addr.substring(n2)));
+			server = true;
 		} else {
+			if (n2 == addr.length()) {
+				throw new IllegalArgumentException("Invalid url: " + addr);
+			}
 			this.socket = new DatagramSocket(new InetSocketAddress(addr.substring(n, n2 - 1), Integer.parseInt(addr.substring(n2))));
+			server = false;
 		}
 	}
 
@@ -43,29 +51,27 @@ class UDPDatagramConnectionImpl implements UDPDatagramConnection {
 	}
 
 	public Datagram newDatagram(int size) throws IOException {
-		if (size < 0) {
-			throw new IllegalArgumentException();
-		}
-		return new DatagramImpl(null, size, null);
+		return newDatagram(size, null);
 	}
 
 	public Datagram newDatagram(int size, String addr) throws IOException {
 		if (size < 0) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("size");
 		}
-		return new DatagramImpl(null, size, addr);
+		byte[] buf = new byte[size];
+		return newDatagram(buf, size, null);
 	}
 
 	public Datagram newDatagram(byte[] buf, int size) throws IOException {
-		if (buf == null || size < 0 || size > buf.length) {
-			throw new IllegalArgumentException();
-		}
-		return new DatagramImpl(buf, size, null);
+		return newDatagram(buf, size, null);
 	}
 
 	public Datagram newDatagram(byte[] buf, int size, String addr) throws IOException {
 		if (buf == null || size < 0 || size > buf.length) {
 			throw new IllegalArgumentException();
+		}
+		if (addr == null && !server) {
+			addr = address;
 		}
 		return new DatagramImpl(buf, size, addr);
 	}
