@@ -18,7 +18,7 @@ class UDPDatagramConnectionImpl implements UDPDatagramConnection {
 			this.socket = new DatagramSocket(n2 == addr.length() ? 0 : Integer.parseInt(addr.substring(n2)));
 			server = true;
 		} else {
-			if (n2 == addr.length()) {
+			if (n2 == n - 2) {
 				throw new IllegalArgumentException("Invalid url: " + addr);
 			}
 			this.socket = new DatagramSocket(new InetSocketAddress(addr.substring(n, n2 - 1), Integer.parseInt(addr.substring(n2))));
