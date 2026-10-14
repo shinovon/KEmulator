@@ -767,9 +767,9 @@ public final class GltfExporter {
     private BufferedImage toBufferedImage(Image2D img) {
         int w = img.getWidth();
         int h = img.getHeight();
-        byte[] data = img.getImageData();
+        byte[] data = img._getImageData();
         int format = img.getFormat();
-        int bpp = img.getBitsPerColor();
+        int bpp = img._getBytesPerColor();
 
         int[] argb = new int[w * h];
         for (int y = 0; y < h; y++) {

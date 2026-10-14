@@ -2,7 +2,6 @@ package emulator.graphics3D.view;
 
 import emulator.AppSettings;
 import emulator.Emulator;
-import emulator.Settings;
 import emulator.graphics3D.G3DUtils;
 import emulator.graphics3D.Transform3D;
 import emulator.graphics3D.Vector4f;
@@ -155,7 +154,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 			GL11.glDepthFunc(519);
 			GL11.glDepthMask(false);
 			GL11.glPixelZoom(zoomX, -zoomY);
-			ByteBuffer pixels = memoryBuffers.getImageBuffer(background.getImage().getImageData());
+			ByteBuffer pixels = memoryBuffers.getImageBuffer(background.getImage()._getImageData());
 
 			for (int tileY = 0; tileY < tilesY; ++tileY) {
 				for (int tileX = 0; tileX < tilesX; ++tileX) {
@@ -350,7 +349,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 					GL11.glMatrixMode(5888);
 					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) modelView.getImpl()).m_matrix));
 					GL11.glDisable(2896);
-					pixels = memoryBuffers.getImageBuffer(sprite.getImage().getImageData());
+					pixels = memoryBuffers.getImageBuffer(sprite.getImage()._getImageData());
 					GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
 					GL11.glPixelStorei(3314, sprite.getImage().getWidth());
 					GL11.glPixelStorei(3315, clippedCrop[1]);
@@ -823,7 +822,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 				GL11.glTexImage2D(GL_TEXTURE_2D, 0,
 						texFormat, image2D.getWidth(), image2D.getHeight(), 0,
 						texFormat, GL_UNSIGNED_BYTE,
-						memoryBuffers.getImageBuffer(image2D.getImageData())
+						memoryBuffers.getImageBuffer(image2D._getImageData())
 				);
 
 				GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,

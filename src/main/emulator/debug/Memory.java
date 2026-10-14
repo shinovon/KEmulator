@@ -523,11 +523,9 @@ public final class Memory {
 		} else {
 			try {
 				if (cls == Image2D.class) {
-					final Image2D image2D = (Image2D) o;
-					res += image2D.size();
+					res += ((Image2D) o)._size();
 				}
-			} catch (NoClassDefFoundError ignored) {
-			}
+			} catch (Throwable ignored) {}
 			return res;
 		}
 

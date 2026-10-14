@@ -127,7 +127,7 @@ public class Image2D extends Object3D {
         return (Image2D) Engine.instantiateJavaPeer(this.qonvertATITCImpl(n));
     }
 
-    public int getBitsPerColor() {
+    public int _getBytesPerColor() {
         int m = 1;
         switch (getFormat()) {
             case ALPHA:
@@ -148,7 +148,7 @@ public class Image2D extends Object3D {
         return m;
     }
 
-    public int size() {
-        return getWidth() * getHeight() * getBitsPerColor() + 4;
+    public int _size() {
+        return getWidth() * getHeight() * _getBytesPerColor() + 4;
     }
 }

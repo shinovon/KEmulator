@@ -242,7 +242,7 @@ public class Sprite3D extends Node {
 
 							label71:
 							{
-								byte[] imageData = this.image.getImageData();
+								byte[] imageData = this.image._getImageData();
 								int pixelOffset;
 								byte alphaOffset;
 								switch (this.image.getFormat()) {

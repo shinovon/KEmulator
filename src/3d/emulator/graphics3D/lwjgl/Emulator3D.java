@@ -593,7 +593,7 @@ public final class Emulator3D implements IGraphics3D {
 		GL11.glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 
 		GL11.glPixelZoom(imgScaleX, -imgScaleY);
-		ByteBuffer imgBuffer = memoryBuffers.getImageBuffer(bg.getImage().getImageData());
+		ByteBuffer imgBuffer = memoryBuffers.getImageBuffer(bg.getImage()._getImageData());
 //		ByteBuffer imgBuffer = bg.getImage().getBuffer();
 
 		for (int y = 0; y < repeatsY; y++) {
@@ -961,11 +961,11 @@ public final class Emulator3D implements IGraphics3D {
 					GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
 				}
 
-				int id = image2D.getId();
+				int id = image2D._getId();
 				if (id == 0) {
 					id = GL11.glGenTextures();
-					image2D.setId(id);
-					image2D.setLoaded(false);
+					image2D._setId(id);
+					image2D._setLoaded(false);
 					if (!usedGLTextures.contains(id))
 						usedGLTextures.add(id);
 					texturesTable.put(id, image2D);
@@ -1002,8 +1002,8 @@ public final class Emulator3D implements IGraphics3D {
 				blendColor[3] = 1.0F;
 				GL11.glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, memoryBuffers.getFloatBuffer(blendColor));
 
-				if (!image2D.isLoaded()) {
-					image2D.setLoaded(true);
+				if (!image2D._isLoaded()) {
+					image2D._setLoaded(true);
 
 					Profiler3D.LWJGL_glTexImage2DCount++;
 
@@ -1031,7 +1031,7 @@ public final class Emulator3D implements IGraphics3D {
 					GL11.glTexImage2D(GL_TEXTURE_2D, 0,
 							texFormat, image2D.getWidth(), image2D.getHeight(), 0,
 							texFormat, GL_UNSIGNED_BYTE,
-							memoryBuffers.getImageBuffer(image2D.getImageData())
+							memoryBuffers.getImageBuffer(image2D._getImageData())
 //							image2D.getBuffer()
 					);
 				}
@@ -1111,7 +1111,7 @@ public final class Emulator3D implements IGraphics3D {
 
 				Image2D image2D = tex.getImage();
 
-				if (image2D.getId() != 0) {
+				if (image2D._getId() != 0) {
 					if (!useGL11()) {
 						GL13.glActiveTexture(GL13.GL_TEXTURE0 + i);
 						GL13.glClientActiveTexture(GL13.GL_TEXTURE0 + i);
@@ -1311,7 +1311,7 @@ public final class Emulator3D implements IGraphics3D {
 					GL11.glLoadMatrixf(memoryBuffers.getFloatBuffer(((Transform3D) modelView.getImpl()).m_matrix));
 					GL11.glDisable(2896);
 //					pixels = sprite.getImage().getBuffer();
-					pixels = memoryBuffers.getImageBuffer(sprite.getImage().getImageData());
+					pixels = memoryBuffers.getImageBuffer(sprite.getImage()._getImageData());
 					GL11.glRasterPos4f(0.0F, 0.0F, 0.0F, 1.0F);
 					GL11.glPixelStorei(3314, sprite.getImage().getWidth());
 					GL11.glPixelStorei(3315, clippedCrop[1]);
@@ -1365,7 +1365,7 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	public void finalizeTexture(Image2D image2D) {
-		int id = image2D.getId();
+		int id = image2D._getId();
 		if (id == 0) return;
 
 		if (usedGLTextures.contains(id))
@@ -1374,7 +1374,7 @@ public final class Emulator3D implements IGraphics3D {
 		if (!unusedGLTextures.contains(id))
 			unusedGLTextures.add(id);
 
-		image2D.setId(0);
+		image2D._setId(0);
 	}
 
 	public void releaseTextures() {
@@ -1411,7 +1411,7 @@ public final class Emulator3D implements IGraphics3D {
 	}
 
 	public void invalidateTexture(Image2D image2D) {
-		image2D.setLoaded(false);
+		image2D._setLoaded(false);
 	}
 
 	private void releaseTexture(int id) {
@@ -1421,7 +1421,7 @@ public final class Emulator3D implements IGraphics3D {
 		if (texturesTable.containsKey(id)) {
 			Image2D img = texturesTable.get(id);
 			if (img != null)
-				img.setId(0);
+				img._setId(0);
 		}
 		texturesTable.remove(id);
 	}

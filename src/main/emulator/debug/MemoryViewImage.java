@@ -11,7 +11,6 @@ import ru.woesss.j2me.micro3d.TextureImpl;
 import javax.microedition.lcdui.Image;
 import javax.microedition.m3g.Image2D;
 import java.nio.IntBuffer;
-import java.util.Objects;
 
 public final class MemoryViewImage extends Image {
 	public final MemoryViewImageType type;
@@ -41,7 +40,7 @@ public final class MemoryViewImage extends Image {
 		if (imgFormat < Image2D.ALPHA || imgFormat > Image2D.RGBA) return null; //no m3g support
 
 		int imgW = img2d.getWidth(), imgH = img2d.getHeight();
-		int imgBPP = img2d.getBitsPerColor();
+		int imgBPP = img2d._getBytesPerColor();
 		boolean imgHasAlpha =
 				imgFormat == Image2D.ALPHA ||
 						imgFormat == Image2D.LUMINANCE_ALPHA ||

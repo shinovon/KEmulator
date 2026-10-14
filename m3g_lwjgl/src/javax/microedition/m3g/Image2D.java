@@ -118,7 +118,7 @@ public class Image2D extends Object3D {
 		if (image == null) {
 			throw new NullPointerException();
 		} else if (this.mutable && x >= 0 && y >= 0 && width > 0 && height > 0 && x + width <= this.width && y + height <= this.height) {
-			int bytesPerPixel = this.getBitsPerColor();
+			int bytesPerPixel = this._getBytesPerColor();
 			if (image.length < width * height * bytesPerPixel) {
 				throw new IllegalArgumentException();
 			} else {
@@ -148,7 +148,7 @@ public class Image2D extends Object3D {
 		return this.height;
 	}
 
-	public int getBitsPerColor() {
+	public int _getBytesPerColor() {
 		return bytesPerPixel(this.type);
 	}
 
@@ -172,7 +172,7 @@ public class Image2D extends Object3D {
 		return format >= 96 && format <= 100;
 	}
 
-	public final byte[] getImageData() {
+	public final byte[] _getImageData() {
 //		if (buffer != null) {
 //			buffer.position(buffer.capacity() - size);
 //			byte[] t = new byte[size];
@@ -291,31 +291,31 @@ public class Image2D extends Object3D {
 		((Emulator3D) Graphics3D.getImpl()).finalizeTexture(this);
 	}
 
-	public boolean isLoaded() {
+	public boolean _isLoaded() {
 		return loaded;
 	}
 
-	public void setLoaded(boolean b) {
+	public void _setLoaded(boolean b) {
 		loaded = b;
 	}
 
-	public void setId(int id) {
+	public void _setId(int id) {
 		this.id = id;
 		loaded = false;
 	}
 
-	public int getId() {
+	public int _getId() {
 		return id;
 	}
 
-	public int size() {
+	public int _size() {
 		// TODO
 //		if (buffer != null) return buffer.capacity();
 		return imageData.length;
 	}
 
 	public void getPixels(byte[] dist) {
-		byte[] b = getImageData();
+		byte[] b = _getImageData();
 		System.arraycopy(b, 0, dist, 0, b.length);
 	}
 
