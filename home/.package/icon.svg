@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 800 800"
+   width="100%"
+   height="100%"
+   version="1.1"
+   id="svg31"
+   sodipodi:docname="456.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview31"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1"
+     inkscape:cx="399.5"
+     inkscape:cy="400"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg31" />
+  <defs
+     id="defs17">
+    <linearGradient
+       id="bodyGradient"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0"
+         stop-color="#D2D7DB"
+         id="stop1" />
+      <stop
+         offset="0.25"
+         stop-color="#EAEFF2"
+         id="stop2" />
+      <stop
+         offset="0.5"
+         stop-color="#F9FBFC"
+         id="stop3" />
+      <stop
+         offset="0.75"
+         stop-color="#DCE1E5"
+         id="stop4" />
+      <stop
+         offset="1"
+         stop-color="#BCC1C5"
+         id="stop5" />
+    </linearGradient>
+    <linearGradient
+       id="innerBodyGradient"
+       x1="0%"
+       y1="0%"
+       x2="0%"
+       y2="100%">
+      <stop
+         offset="0"
+         stop-color="#E2E7EA"
+         id="stop6" />
+      <stop
+         offset="1"
+         stop-color="#A6AAB0"
+         id="stop7" />
+    </linearGradient>
+    <linearGradient
+       id="screenFrameGradient"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="0%">
+      <stop
+         offset="0"
+         stop-color="#404348"
+         id="stop8" />
+      <stop
+         offset="0.5"
+         stop-color="#646870"
+         id="stop9" />
+      <stop
+         offset="1"
+         stop-color="#2D2F33"
+         id="stop10" />
+    </linearGradient>
+    <linearGradient
+       id="screenBg"
+       x1="0%"
+       y1="0%"
+       x2="0%"
+       y2="100%">
+      <stop
+         offset="0"
+         stop-color="#A5C8E4"
+         id="stop11" />
+      <stop
+         offset="0.4"
+         stop-color="#4A80C2"
+         id="stop12" />
+      <stop
+         offset="1"
+         stop-color="#112B66"
+         id="stop13" />
+    </linearGradient>
+    <linearGradient
+       id="interfaceBlue"
+       x1="0%"
+       y1="0%"
+       x2="100%"
+       y2="100%">
+      <stop
+         offset="0"
+         stop-color="#80D0FF"
+         id="stop14" />
+      <stop
+         offset="1"
+         stop-color="#0066CC"
+         id="stop15" />
+    </linearGradient>
+    <radialGradient
+       id="dropShadow"
+       cx="50%"
+       cy="50%"
+       r="50%">
+      <stop
+         offset="0"
+         stop-color="rgba(0,0,0,0.15)"
+         id="stop16" />
+      <stop
+         offset="1"
+         stop-color="rgba(0,0,0,0)"
+         id="stop17" />
+    </radialGradient>
+  </defs>
+  <ellipse
+     cx="400"
+     cy="740"
+     rx="220"
+     ry="35"
+     fill="url(#dropShadow)"
+     id="ellipse17" />
+  <g
+     id="MainBody">
+    <path
+       d="M 230 40 L 570 40 A 30 30 0 0 1 600 70 L 600 630 A 40 40 0 0 1 580 665 L 520 720 A 50 50 0 0 1 480 735 L 320 735 A 50 50 0 0 1 280 720 L 220 665 A 40 40 0 0 1 200 630 L 200 70 A 30 30 0 0 1 230 40 Z"
+       fill="url(#bodyGradient)"
+       stroke="#9AA0A6"
+       stroke-width="3"
+       id="path17" />
+    <path
+       d="M 242 55 L 558 55 A 18 18 0 0 1 576 73 L 576 620 L 505 685 L 295 685 L 224 620 L 224 73 A 18 18 0 0 1 242 55 Z"
+       fill="url(#innerBodyGradient)"
+       opacity="0.9"
+       id="path18" />
+  </g>
+  <g
+     id="DisplayModule">
+    <rect
+       x="245"
+       y="75"
+       width="310"
+       height="450"
+       rx="8"
+       fill="url(#screenFrameGradient)"
+       stroke="#1A1C1E"
+       stroke-width="2"
+       id="rect18" />
+    <circle
+       cx="265"
+       cy="90"
+       r="4"
+       fill="#111"
+       id="circle18" />
+    <rect
+       x="520"
+       y="86"
+       width="15"
+       height="8"
+       rx="4"
+       fill="#15171A"
+       id="rect19" />
+    <rect
+       x="255"
+       y="105"
+       width="290"
+       height="405"
+       fill="url(#screenBg)"
+       id="rect20" />
+    <path
+       d="M 255 105 L 545 105 L 545 220 C 420 250, 320 180, 255 260 Z"
+       fill="#FFFFFF"
+       opacity="0.12"
+       id="path20" />
+  </g>
+  <g
+     id="ScreenInterface">
+    <rect
+       x="270"
+       y="140"
+       width="35"
+       height="30"
+       fill="#E86C3F"
+       opacity="0.6"
+       rx="2"
+       id="rect21" />
+    <rect
+       x="470"
+       y="145"
+       width="50"
+       height="40"
+       fill="#EDF3F7"
+       opacity="0.4"
+       rx="3"
+       id="rect22" />
+    <rect
+       x="460"
+       y="300"
+       width="65"
+       height="35"
+       fill="#B33A3A"
+       opacity="0.7"
+       rx="2"
+       id="rect23" />
+    <path
+       d="M 255 220 L 310 220 L 310 260 L 280 260 L 280 340 L 330 340 L 330 390 L 255 390 Z"
+       fill="#1A438A"
+       opacity="0.75"
+       id="path23" />
+    <path
+       d="M 270 240 L 325 240 L 325 290 L 295 290 L 295 360 L 310 360 L 310 380 L 270 380 Z"
+       fill="url(#interfaceBlue)"
+       opacity="0.5"
+       id="path24" />
+    <rect
+       x="330"
+       y="380"
+       width="140"
+       height="110"
+       fill="#1C222E"
+       stroke="#526480"
+       stroke-width="3"
+       rx="4"
+       id="rect24" />
+    <path
+       d="M 340 460 L 380 420 L 410 440 L 460 395"
+       fill="none"
+       stroke="#529BFF"
+       stroke-width="3"
+       stroke-linecap="round"
+       id="path25" />
+    <path
+       d="M 340 475 L 390 445 L 430 465 L 460 430"
+       fill="none"
+       stroke="#3A5680"
+       stroke-width="2"
+       stroke-linecap="round"
+       id="path26" />
+    <circle
+       cx="410"
+       cy="440"
+       r="5"
+       fill="#FF5252"
+       id="circle26" />
+    <circle
+       cx="380"
+       cy="420"
+       r="3"
+       fill="#52FF52"
+       id="circle27" />
+    <path
+       d="M 510 460 L 545 430 L 545 490 L 520 490 Z"
+       fill="#2E7D32"
+       opacity="0.6"
+       id="path27" />
+  </g>
+  <g
+     id="ControlPanel">
+    <rect
+       x="365"
+       y="615"
+       width="70"
+       height="60"
+       rx="10"
+       fill="#B0B5BA"
+       stroke="#7A8085"
+       stroke-width="2"
+       id="rect27" />
+    <rect
+       x="375"
+       y="623"
+       width="50"
+       height="44"
+       rx="6"
+       fill="#D6DADF"
+       stroke="#979C3A"
+       stroke-width="1"
+       id="rect28" />
+    <circle
+       cx="400"
+       cy="645"
+       r="12"
+       fill="#9AA0A6"
+       id="circle28" />
+    <path
+       d="M 250 560 L 310 560 L 320 610 L 250 610 Z"
+       fill="#9AA0A6"
+       stroke="#6C7175"
+       stroke-width="2"
+       stroke-linejoin="round"
+       id="path28" />
+    <rect
+       x="260"
+       y="570"
+       width="40"
+       height="30"
+       rx="4"
+       fill="#D6DADF"
+       id="rect29" />
+    <path
+       d="M 550 560 L 490 560 L 480 610 L 550 610 Z"
+       fill="#9AA0A6"
+       stroke="#6C7175"
+       stroke-width="2"
+       stroke-linejoin="round"
+       id="path29" />
+    <rect
+       x="500"
+       y="570"
+       width="40"
+       height="30"
+       rx="4"
+       fill="#D6DADF"
+       id="rect30" />
+    <rect
+       x="385"
+       y="695"
+       width="30"
+       height="8"
+       rx="4"
+       fill="#52FF52"
+       opacity="0.8"
+       filter="drop-shadow(0px 0px 3px #52FF52)"
+       id="rect31" />
+  </g>
+</svg>
