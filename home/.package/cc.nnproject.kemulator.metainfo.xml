@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+	<id>cc.nnproject.kemulator</id>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>Custom</project_license>
+	<name>KEmulator</name>
+	<project_group>nnproject</project_group>
+	<developer_name>Shinovon</developer_name>
+	<content_rating type="oars-1.1" />
+	<summary>MIDP emulator</summary>
+	<description>
+		<p>Emulator for j2me, CLDC, MIDP applications and games.</p>
+	</description>
+	<categories>
+		<category>Utility</category>
+		<category>Development</category>
+		<category>Network</category>
+		<category>Emulator</category>
+	</categories>
+	<screenshots>
+		<screenshot type="default">
+			<image>https://raw.githubusercontent.com/shinovon/KEmulator/refs/heads/main/screenshot.png</image>
+			<caption>KEmulator</caption>
+		</screenshot>
+	</screenshots>
+	<url type="homepage">https://nnp.nnchan.ru/kem</url>
+	<url type="bugtracker">https://github.com/shinovon/KEmulator/issues</url>
+	<releases>
+		<release version="2.22" date="2026-09-17">
+		<description translatable="no">
+			<ul>
+				<li>Fixed crash in debug tools on Java 22+</li>
+				<li>Fixed crash when showing empty POPUP ChoiceGroup</li>
+				<li>Fixed handling of Graphics translation in M3G</li>
+				<li>Fixed Sprint Media API</li>
+				<li>Fixed item command not showing in left softkey label</li>
+				<li>Added option to pass window minimized state to MIDlet</li>
+				<li>Removed SWT 2D engine</li>
+				<li>Added 320x480 device preset</li>
+				<li>Added option to exclude images from objects size in Memory View</li>
+				<li>Added custom class watcher view for Hashtable</li>
+				<li>Added datagram support</li>
+				<li>Added MascotME as micro3d software engine</li>
+				<li>Initial macOS support in IDEA setup</li>
+				<li>Removed discord rich presence</li>
+				<li>Fixed TiledBackground in Siemens API</li>
+				<li>Fixed M3G View on Java 9+</li>
+				<li>Improved AMR support in multi-platform build</li>
+				<li>Fixed rendering to texture in LWJGL M3G engine</li>
+				<li>Fixed loading of 4-bit indexed PNG</li>
+			</ul>
+		</description>
+
+		</release>
+	</releases>
+	<launchable type="desktop-id">cc.nnproject.kemulator.desktop</launchable>
+</component>
