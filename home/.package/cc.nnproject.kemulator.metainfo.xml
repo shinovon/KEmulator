@@ -53,5 +53,14 @@
 
 		</release>
 	</releases>
+	<keywords>
+		<keyword>symbian</keyword>
+		<keyword>j2me</keyword>
+		<keyword>java</keyword>
+		<keyword>midp</keyword>
+		<keyword>emulator</keyword>
+		<keyword>kemnn</keyword>
+		<keyword>nnmod</keyword>
+  	</keywords>
 	<launchable type="desktop-id">cc.nnproject.kemulator.desktop</launchable>
 </component>
