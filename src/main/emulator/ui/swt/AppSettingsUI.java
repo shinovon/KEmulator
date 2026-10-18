@@ -147,7 +147,7 @@ public class AppSettingsUI {
 		lblNewLabel.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
 		String name = "Name: " + Emulator.getEmulator().getAppProperty("MIDlet-Name");
 		if (AppSettings.uei) {
-			name = name + " (UEI)";
+			name = name + " (IDE)";
 		}
 		lblNewLabel.setText(name);
 

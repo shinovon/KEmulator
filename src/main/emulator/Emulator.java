@@ -247,7 +247,7 @@ public class Emulator implements Runnable {
 		} else if (midletJarPath != null && Emulator.emulatorimpl.getAppProperties() != null) {
 			sb.append(" - ").append(Emulator.emulatorimpl.getAppProperty(Emulator.doja ? "AppName" : "MIDlet-Name"));
 		}
-		if (AppSettings.uei) sb.append(" (UEI)");
+		if (AppSettings.uei) sb.append(" (IDE)");
 		return sb.toString();
 	}
 
