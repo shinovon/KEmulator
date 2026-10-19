@@ -1,0 +1,22 @@
+name: Flatpak AppStream linter
+
+on:
+  push:
+    paths:
+      - home/.package/cc.nnproject.kemulator.metainfo.xml
+  pull_request:
+    paths:
+      - home/.package/cc.nnproject.kemulator.metainfo.xml
+
+jobs:
+  flatpak-appstream-lint:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-builder-lint:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Run AppStream linter
+        run: flatpak-builder-lint --gha-format appstream home/.package/cc.nnproject.kemulator.metainfo.xml
