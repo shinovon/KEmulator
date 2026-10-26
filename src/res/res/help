@@ -2,7 +2,7 @@ $v2.22.1 [2026.10.26]
 Added JSR-82 Bluetooth emulation over LAN
 Fixed FPS limiter
 Fixed DatagramConnection
-Removed Linux 32-bit binaries
+Removed Linux x86 32-bit binaries
 Fixed lock in wav player
 
 $v2.22 [2026.09.17]
