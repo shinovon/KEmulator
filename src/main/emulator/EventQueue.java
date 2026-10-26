@@ -265,6 +265,10 @@ public final class EventQueue implements Runnable {
 	}
 
 	public void serviceRepaints() {
+		if (Thread.currentThread() == inputThread) {
+			// prevent deadlocks
+			return;
+		}
 		if (Settings.ignoreServiceRepaints) return;
 		synchronized (callbackLock) {
 			if (!repaintPending) return;
