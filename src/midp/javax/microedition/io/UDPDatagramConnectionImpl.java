@@ -1,5 +1,7 @@
 package javax.microedition.io;
 
+import emulator.Emulator;
+
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
@@ -12,6 +14,7 @@ class UDPDatagramConnectionImpl implements UDPDatagramConnection {
 
 	UDPDatagramConnectionImpl(String addr) throws IOException {
 		address = addr;
+		Emulator.getEmulator().getLogStream().println("Datagram opened: " + addr);
 		final int n = addr.indexOf("://") + 3;
 		final int n2 = addr.lastIndexOf(":") + 1;
 		if (addr.startsWith("datagram://:")) {
@@ -21,7 +24,8 @@ class UDPDatagramConnectionImpl implements UDPDatagramConnection {
 			if (n2 == n - 2) {
 				throw new IllegalArgumentException("Invalid url: " + addr);
 			}
-			this.socket = new DatagramSocket(new InetSocketAddress(addr.substring(n, n2 - 1), Integer.parseInt(addr.substring(n2))));
+//			this.socket = new DatagramSocket(new InetSocketAddress(addr.substring(n, n2 - 1), Integer.parseInt(addr.substring(n2))));
+			this.socket = new DatagramSocket(null);
 			server = false;
 		}
 	}
