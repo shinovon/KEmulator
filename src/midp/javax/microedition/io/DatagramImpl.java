@@ -39,7 +39,6 @@ class DatagramImpl implements Datagram {
 	}
 
 	void receive(DatagramSocket socket) throws IOException {
-		packet.setLength(packet.getData().length - packet.getOffset());
 		socket.receive(packet);
 		addr = "datagram://" + packet.getAddress().getHostAddress() + ":" + packet.getPort();
 		setLength(packet.getLength());
@@ -65,6 +64,7 @@ class DatagramImpl implements Datagram {
 		if (addr == null || !addr.startsWith("datagram://")) {
 			throw new IllegalArgumentException();
 		}
+		this.addr = addr;
 		addr = addr.substring("datagram://".length());
 		int i = addr.indexOf(':');
 		int port = 0;
@@ -81,7 +81,7 @@ class DatagramImpl implements Datagram {
 	public void setAddress(Datagram p0) {
 		if (p0 == null) throw new IllegalArgumentException();
 		packet.setAddress(((DatagramImpl) p0).packet.getAddress());
-		addr = packet.getAddress().getHostAddress();
+		addr = ((DatagramImpl) p0).addr;
 	}
 
 	public void setLength(int len) {
