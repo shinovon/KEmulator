@@ -128,7 +128,7 @@ public class Render {
 			}
 			Rectangle clip = this.clip;
 			if (doClip) {
-				clip.setBounds(graphics.getClipX(), graphics.getClipY(), graphics.getClipWidth(), graphics.getClipHeight());
+				clip.setBounds(graphics.getClipX() + graphics.getTranslateX(), graphics.getClipY() + graphics.getTranslateY(), graphics.getClipWidth(), graphics.getClipHeight());
 			} else {
 				clip.width = width;
 				clip.height = height;
