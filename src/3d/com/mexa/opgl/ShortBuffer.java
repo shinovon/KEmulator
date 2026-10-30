@@ -18,7 +18,7 @@ package com.mexa.opgl;
 
 import org.lwjgl.BufferUtils;
 
-public class ShortBuffer extends Buffer implements com.nttdocomo.ui.ogl.ShortBuffer {
+public class ShortBuffer extends Buffer {
 
 	private ShortBuffer(int size) {
 		super(BufferUtils.createShortBuffer(size));

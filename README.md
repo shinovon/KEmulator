@@ -93,5 +93,4 @@ Graphics card:
 
 ### Decompiled code
 - KEmulator v0.9.8, v1.0.3 by Wu.Liang
-- Nokia S40 SDK
-- GLEmulator
+

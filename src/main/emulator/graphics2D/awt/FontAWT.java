@@ -17,27 +17,7 @@ public final class FontAWT implements IFont {
 
 	public FontAWT(final String s, final int size, final int style, boolean height) {
 		super();
-		if ("Series 60".equals(s)) {
-			if (s60Font == null) {
-				try {
-					s60Font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/res/s60snr.ttf"));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			this.font = s60Font.deriveFont(style, size);
-		} else if ("Nokia".equals(s)) {
-			if (nokiaFont == null) {
-				try {
-					nokiaFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/res/Nokia.ttf"));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			this.font = nokiaFont.deriveFont(style, size);
-		} else {
-			this.font = new Font(s, style, size);
-		}
+		this.font = new Font(s, style, size);
 		init(size, height);
 	}
 

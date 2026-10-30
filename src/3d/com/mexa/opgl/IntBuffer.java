@@ -18,7 +18,7 @@ package com.mexa.opgl;
 
 import org.lwjgl.BufferUtils;
 
-public class IntBuffer extends Buffer implements com.nttdocomo.ui.ogl.IntBuffer {
+public class IntBuffer extends Buffer {
 
 	private IntBuffer(int size) {
 		super(BufferUtils.createIntBuffer(size));

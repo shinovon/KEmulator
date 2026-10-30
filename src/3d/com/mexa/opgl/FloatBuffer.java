@@ -18,7 +18,7 @@ package com.mexa.opgl;
 
 import org.lwjgl.BufferUtils;
 
-public class FloatBuffer extends Buffer implements com.nttdocomo.ui.ogl.FloatBuffer {
+public class FloatBuffer extends Buffer {
 
 	private FloatBuffer(int size) {
 		super(BufferUtils.createFloatBuffer(size));

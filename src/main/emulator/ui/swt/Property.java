@@ -2261,8 +2261,6 @@ public final class Property implements IProperty, SelectionListener {
 		});
 		final FontData[] fontList = Property.display.getFontList(null, true);
 		final ArrayList<Comparable> list = new ArrayList<Comparable>();
-		list.add("Nokia");
-		list.add("Series 60");
 		for (FontData fontData : fontList) {
 			if (!list.contains(fontData.getName()) && !fontData.getName().startsWith("@")) {
 				list.add(fontData.getName());
