@@ -52,6 +52,8 @@ public final class M3GLoader {
 	public static Object3D[] load(byte[] data, int offset) throws IOException {
 		if (data == null) {
 			throw new NullPointerException();
+		} else if (offset < 0 || offset >= data.length) {
+			throw new IndexOutOfBoundsException();
 		} else {
 			try {
 				return (new M3GLoader()).loadFromByteArray(data, offset);

@@ -1,7 +1,6 @@
 package emulator.graphics3D.m3g;
 
 import javax.microedition.m3g.*;
-import java.util.Comparator;
 import java.util.Vector;
 
 public final class RenderPipe {
@@ -118,7 +117,28 @@ public final class RenderPipe {
 	}
 
 	public void sortNodes() {
-		roList.sort(Comparator.comparingInt((RenderObject renderObject) -> renderObject.sortKey));
+		sortNodes(null);
+	}
+
+	public void sortNodes(Transform invCamera) {
+		if (invCamera != null) {
+			for (int i = 0; i < roList.size(); i++) {
+				roList.get(i).computeDepth(invCamera);
+			}
+		}
+
+		// JSR-184 fixes layer and opaque/blended order; depth is the permitted
+		// additional sort (blended back-to-front, opaque front-to-back).
+		roList.sort((a, b) -> {
+			int cmp = Integer.compare(a.sortKey, b.sortKey);
+			if (cmp != 0 || invCamera == null) {
+				return cmp;
+			}
+			if ((a.sortKey & 1) == 0) {
+				return Float.compare(a.depth, b.depth);
+			}
+			return Float.compare(b.depth, a.depth);
+		});
 	}
 
 	public void setRenderInvisibleNodes(boolean render) {

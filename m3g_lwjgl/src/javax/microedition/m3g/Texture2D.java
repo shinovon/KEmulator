@@ -111,7 +111,7 @@ public class Texture2D extends Transformable {
 	}
 
 	public void setBlendColor(int RGB) {
-		this.blendColor = RGB;
+		this.blendColor = RGB & 0xffffff;
 	}
 
 	public int getBlendColor() {
@@ -121,7 +121,7 @@ public class Texture2D extends Transformable {
 	protected void updateProperty(int property, float[] values) {
 		switch (property) {
 			case 258:
-				this.blendColor = G3DUtils.getIntColor(values);
+				this.blendColor = G3DUtils.getIntColor(values) & 0xffffff;
 				return;
 			default:
 				super.updateProperty(property, values);

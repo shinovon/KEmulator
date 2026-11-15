@@ -52,13 +52,11 @@ public class Graphics3D {
 	}
 
 	public void bindTarget(Object target, boolean depthBuffer, int hints) {
-		impl.enableDepthBuffer(depthBuffer);
-
 		if (Graphics3D.target != null) {
 			throw new IllegalStateException("Target already bound");
 		} else if (target == null) {
 			throw new NullPointerException("target");
-		} else if (hints != 0 && (hints & (ANTIALIAS | DITHER | OVERWRITE | TRUE_COLOR)) == 0) {
+		} else if ((hints & ~(ANTIALIAS | DITHER | OVERWRITE | TRUE_COLOR)) != 0) {
 			throw new IllegalArgumentException("hints");
 		}
 
@@ -77,6 +75,7 @@ public class Graphics3D {
 				throw new IllegalArgumentException();
 			}
 
+			impl.enableDepthBuffer(depthBuffer);
 			Graphics3D.target = target;
 			impl.bindTarget(g);
 			setViewport(g.getClipX() + g.getTranslateX(), g.getClipY() + g.getTranslateY(), g.getClipWidth(), g.getClipHeight());
@@ -102,6 +101,7 @@ public class Graphics3D {
 				throw new IllegalArgumentException();
 			}
 
+			impl.enableDepthBuffer(depthBuffer);
 			Graphics3D.target = target;
 			impl.bindTarget(img2d);
 			setViewport(0, 0, targetW, targetH);

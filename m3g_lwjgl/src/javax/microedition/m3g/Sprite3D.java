@@ -231,7 +231,7 @@ public class Sprite3D extends Node {
 
 							texCoordTarget[targetIndex] = texCoordValue;
 							int texelX = G3DUtils.limit(G3DUtils.round(texS[0]), 0, this.image.getWidth() - 1);
-							int texelY = G3DUtils.limit(G3DUtils.round(texT[0]), 0, this.image.getWidth() - 1);
+							int texelY = G3DUtils.limit(G3DUtils.round(texT[0]), 0, this.image.getHeight() - 1);
 							texS[0] = G3DUtils.limit(texS[0], 0.0F, (float) this.image.getWidth());
 							texT[0] = G3DUtils.limit(texT[0], 0.0F, (float) this.image.getHeight());
 							int alphaThreshold = 0;
