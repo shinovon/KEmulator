@@ -234,9 +234,9 @@ WATCHES_FRAME_PROFILER=Monitor de perfilado
 
 #Option Frame
 
-OPTION_FRAME_TITLE=Opciones y propiedades
+OPTION_FRAME_TITLE=Configuración
 
-OPTION_TAB_CUSTOM=General
+OPTION_TAB_GENERAL=General
 OPTION_TAB_KEYMAP=Teclas
 OPTION_TAB_FONT=Fuente
 OPTION_TAB_SYSTEM=Sistema
@@ -249,12 +249,16 @@ OPTION_TAB_M3G=M3G
 OPTION_TAB_MASCOT=Mascot Capsule
 OPTION_TAB_SECURITY=Seguridad
 OPTION_TAB_SYSTEM_PROPERTIES=Propiedades
+OPTION_TAB_TWEAKS=Ajustes
+OPTION_TAB_3D=3D
 
-OPTION_CUSTOM_DEVICE=Dispositivo seleccionado:
-OPTION_CUSTOM_ENCODING=Codificación predeterminada:
+OPTION_CUSTOM_DEVICE_PRESET=Dispositivo predefinido:
+OPTION_CUSTOM_ENCODING=Codificación:
 OPTION_CUSTOM_MAX_FPS=Límite de FPS:
+OPTION_CUSTOM_PLATFORM=Plataforma:
 
 OPTION_CUSTOM_PROPERTIES=Propiedades personalizadas
+OPTION_CUSTOM_SCREEN_SIZE=Tamaño de la pantalla:
 OPTION_CUSTOM_SCREEN_WIDTH=Ancho de la pantalla:
 OPTION_CUSTOM_SCREEN_HEIGHT=Altura de la pantalla:
 OPTION_CUSTOM_KEY_LSK=Tecla de función izquierda:
@@ -264,7 +268,9 @@ OPTION_CUSTOM_KEY_UP=Arriba:
 OPTION_CUSTOM_KEY_DOWN=Abajo:
 OPTION_CUSTOM_KEY_LEFT=Izquierda:
 OPTION_CUSTOM_KEY_RIGHT=Derecha:
-OPTION_CUSTOM_LOCALE=Localización MIDP:
+OPTION_CUSTOM_LOCALE=Localización:
+OPTION_CUSTOM_SWAP_SOFTKEYS=Intercambiar teclas de función
+OPTION_CUSTOM_SWAP_SCREEN=Intercambiar
 
 OPTION_KEYMAP_CONTROLLER=Controlador:
 OPTION_KEYMAP_REFRESH=Actualizar
@@ -309,7 +315,7 @@ OPTION_SYSTEM_AUTOGEN_JAD=Generar automáticamente archivo JAD con \“KEmu-Plat
 OPTION_SYSTEM_TRACK_NEW=Realizar seguimiento de operaciones \“new/new[]...\”
 OPTION_SYSTEM_TRACK_METHOD=Realizar seguimiento de llamadas a métodos
 OPTION_SYSTEM_DISCORD_RICHPRESENCE=Discord Rich Presence
-OPTION_SYSTEM_AWT_ANTIALIASING=AWT Smooth drawing
+OPTION_SYSTEM_AWT_ANTIALIASING=Dibujo suavizado con AWT
 OPTION_SYSTEM_TEXT_ANTIALIASING=Antialiasing de texto
 OPTION_SYSTEM_FPS_COUNT=Contador de FPS
 
