@@ -30,23 +30,26 @@ public class KeyframeSequence extends Object3D {
 		(copy = (KeyframeSequence) super.duplicateObject()).keyframes = (int[]) this.keyframes.clone();
 		copy.keyframeValues = new float[this.keyframeCount][this.componentCount];
 		int i;
-		if (this.interpolationType == 179) {
+
+		for (i = 0; i < this.keyframeCount; ++i) {
+			copy.keyframeValues[i] = (float[]) this.keyframeValues[i].clone();
+		}
+
+		if (this.interpolationType == SQUAD) {
+			copy.squadOutControls = new Quaternion[this.keyframeCount];
+			copy.squadInControls = new Quaternion[this.keyframeCount];
+
 			for (i = 0; i < this.squadOutControls.length; ++i) {
 				copy.squadOutControls[i] = new Quaternion(this.squadOutControls[i]);
 				copy.squadInControls[i] = new Quaternion(this.squadInControls[i]);
 			}
-
-			for (i = 0; i < this.keyframeCount; ++i) {
-				copy.keyframeValues[i] = (float[]) this.keyframeValues[i].clone();
-			}
-		} else if (this.interpolationType == 178) {
+		} else if (this.interpolationType == SPLINE) {
 			copy.inTangent = new float[this.keyframeCount][this.componentCount];
 			copy.outTangent = new float[this.keyframeCount][this.componentCount];
 
 			for (i = 0; i < this.keyframeCount; ++i) {
 				copy.inTangent[i] = (float[]) this.inTangent[i].clone();
 				copy.outTangent[i] = (float[]) this.outTangent[i].clone();
-				copy.keyframeValues[i] = (float[]) this.keyframeValues[i].clone();
 			}
 		}
 
@@ -164,7 +167,12 @@ public class KeyframeSequence extends Object3D {
 	}
 
 	public void setDuration(int duration) {
-		this.duration = duration;
+		if (duration <= 0) {
+			throw new IllegalArgumentException();
+		} else {
+			this.duration = duration;
+			this.dirty = false;
+		}
 	}
 
 	public int getDuration() {
@@ -252,6 +260,8 @@ public class KeyframeSequence extends Object3D {
 
 	private void validate() {
 		if (this.duration <= 0) {
+			throw new IllegalStateException();
+		} else if (this.keyframes[this.validRangeLast] > this.duration) {
 			throw new IllegalStateException();
 		} else {
 			int nextIndex = this.validRangeFirst;

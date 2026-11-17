@@ -15,33 +15,34 @@ public class Material extends Object3D {
 	private float shininess = 0.0F;
 
 	public void setColor(int target, int ARGB) {
-		if ((target & 1024) == 0 && (target & 2048) == 0 && (target & 4096) == 0 && (target & 8192) == 0) {
+		if (target == 0 || (target & ~(AMBIENT | DIFFUSE | EMISSIVE | SPECULAR)) != 0) {
 			throw new IllegalArgumentException();
 		} else {
-			if ((target & 1024) != 0) {
-				this.ambientColor = ARGB;
+			if ((target & AMBIENT) != 0) {
+				this.ambientColor = ARGB & 0xffffff;
 			}
 
-			if ((target & 2048) != 0) {
+			if ((target & DIFFUSE) != 0) {
 				this.diffuseColor = ARGB;
 			}
 
-			if ((target & 4096) != 0) {
-				this.emissiveColor = ARGB;
+			if ((target & EMISSIVE) != 0) {
+				this.emissiveColor = ARGB & 0xffffff;
 			}
 
-			if ((target & 8192) != 0) {
-				this.specularColor = ARGB;
+			if ((target & SPECULAR) != 0) {
+				this.specularColor = ARGB & 0xffffff;
 			}
 
 		}
 	}
 
 	public int getColor(int target) {
-		if (target != 1024 && target != 2048 && target != 4096 && target != 8192) {
+		if (target != AMBIENT && target != DIFFUSE && target != EMISSIVE && target != SPECULAR) {
 			throw new IllegalArgumentException();
 		} else {
-			return target == 1024 ? this.ambientColor : (target == 2048 ? this.diffuseColor : (target == 4096 ? this.emissiveColor : (target == 8192 ? this.specularColor : 0)));
+			int color = target == AMBIENT ? this.ambientColor : (target == DIFFUSE ? this.diffuseColor : (target == EMISSIVE ? this.emissiveColor : this.specularColor));
+			return target == DIFFUSE ? color : color & 0xffffff;
 		}
 	}
 
@@ -71,7 +72,7 @@ public class Material extends Object3D {
 				this.diffuseColor = this.diffuseColor & 16777215 | G3DUtils.getIntColor(value) & -16777216;
 				return;
 			case 257:
-				this.ambientColor = G3DUtils.getIntColor(value);
+				this.ambientColor = G3DUtils.getIntColor(value) & 0xffffff;
 				return;
 			case 258:
 			case 259:
@@ -91,13 +92,13 @@ public class Material extends Object3D {
 				this.diffuseColor = this.diffuseColor & -16777216 | G3DUtils.getIntColor(value) & 16777215;
 				return;
 			case 262:
-				this.emissiveColor = G3DUtils.getIntColor(value);
+				this.emissiveColor = G3DUtils.getIntColor(value) & 0xffffff;
 				return;
 			case 271:
 				this.shininess = G3DUtils.limit(value[0], 0.0F, 128.0F);
 				return;
 			case 272:
-				this.specularColor = G3DUtils.getIntColor(value);
+				this.specularColor = G3DUtils.getIntColor(value) & 0xffffff;
 		}
 	}
 }

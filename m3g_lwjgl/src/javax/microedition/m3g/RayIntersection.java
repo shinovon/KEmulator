@@ -53,7 +53,7 @@ public class RayIntersection {
 	}
 
 	public float getTextureS(int index) {
-		if (index < 0 && index >= Emulator3D.NumTextureUnits) {
+		if (index < 0 || index >= Emulator3D.NumTextureUnits) {
 			throw new IndexOutOfBoundsException();
 		}
 
@@ -61,11 +61,11 @@ public class RayIntersection {
 	}
 
 	public float getTextureT(int index) {
-		if (index < 0 && index >= Emulator3D.NumTextureUnits) {
+		if (index < 0 || index >= Emulator3D.NumTextureUnits) {
 			throw new IndexOutOfBoundsException();
 		}
 
-		return textureS[index];
+		return textureT[index];
 	}
 
 	public float getNormalX() {

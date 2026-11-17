@@ -161,6 +161,10 @@ public abstract class Node extends Transformable {
 	}
 
 	public final void align(Node reference) {
+		if (reference != null && reference.getRoot() != getRoot()) {
+			throw new IllegalArgumentException("reference is not in the same scene graph");
+		}
+
 		alignment(reference);
 	}
 
@@ -357,16 +361,16 @@ public abstract class Node extends Transformable {
 
 	protected void updateAlignReferences() {
 		Node duplicatedRef;
-		if (this.zTarget != 144) {
+		if (this.zTarget != 144 && this.zRef != null) {
 			duplicatedRef = this.zRef.m_duplicatedNode;
-			if (this.zRef != null && duplicatedRef != null && duplicatedRef.isDescendantOf(this.m_duplicatedNode.getRoot())) {
+			if (duplicatedRef != null && (duplicatedRef == this.m_duplicatedNode.getRoot() || duplicatedRef.isDescendantOf(this.m_duplicatedNode.getRoot()))) {
 				this.m_duplicatedNode.zRef = duplicatedRef;
 			}
 		}
 
-		if (this.yTarget != 144) {
+		if (this.yTarget != 144 && this.yRef != null) {
 			duplicatedRef = this.yRef.m_duplicatedNode;
-			if (this.yRef != null && duplicatedRef != null && duplicatedRef.isDescendantOf(this.m_duplicatedNode.getRoot())) {
+			if (duplicatedRef != null && (duplicatedRef == this.m_duplicatedNode.getRoot() || duplicatedRef.isDescendantOf(this.m_duplicatedNode.getRoot()))) {
 				this.m_duplicatedNode.yRef = duplicatedRef;
 			}
 		}

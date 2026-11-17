@@ -42,12 +42,16 @@ public class VertexBuffer extends Object3D {
 		return vertexCount;
 	}
 
+	private boolean hasOtherArrays(VertexArray replaced) {
+		return arraysCount - (replaced != null ? 1 : 0) > 0;
+	}
+
 	public void setPositions(VertexArray newPoses, float scale, float[] bias) {
 		if (newPoses != null && newPoses.getComponentCount() != 3) {
 			throw new IllegalArgumentException();
 		} else if (newPoses != null && bias != null && bias.length < 3) {
 			throw new IllegalArgumentException();
-		} else if (newPoses != null && vertexCount != 0 && newPoses.getVertexCount() != vertexCount) {
+		} else if (newPoses != null && hasOtherArrays(positions) && newPoses.getVertexCount() != vertexCount) {
 			throw new IllegalArgumentException();
 		} else {
 			removeReference(positions);
@@ -79,7 +83,7 @@ public class VertexBuffer extends Object3D {
 	public void setTexCoords(int index, VertexArray newUvm, float scale, float[] bias) {
 		if (newUvm != null && newUvm.getComponentCount() != 2 && newUvm.getComponentCount() != 3) {
 			throw new IllegalArgumentException();
-		} else if (newUvm != null && vertexCount != 0 && newUvm.getVertexCount() != vertexCount) {
+		} else if (newUvm != null && index >= 0 && index < Emulator3D.NumTextureUnits && hasOtherArrays(uvms[index]) && newUvm.getVertexCount() != vertexCount) {
 			throw new IllegalArgumentException();
 		} else if (newUvm != null && bias != null && bias.length < newUvm.getComponentCount()) {
 			throw new IllegalArgumentException();
@@ -114,7 +118,7 @@ public class VertexBuffer extends Object3D {
 	public void setNormals(VertexArray newNorms) {
 		if (newNorms != null && newNorms.getComponentCount() != 3) {
 			throw new IllegalArgumentException();
-		} else if (newNorms != null && vertexCount != 0 && newNorms.getVertexCount() != vertexCount) {
+		} else if (newNorms != null && hasOtherArrays(normals) && newNorms.getVertexCount() != vertexCount) {
 			throw new IllegalArgumentException();
 		} else {
 			removeReference(normals);
@@ -139,7 +143,7 @@ public class VertexBuffer extends Object3D {
 			throw new IllegalArgumentException();
 		} else if (newCols != null && newCols.getComponentCount() != 3 && newCols.getComponentCount() != 4) {
 			throw new IllegalArgumentException();
-		} else if (newCols != null && vertexCount != 0 && newCols.getVertexCount() != vertexCount) {
+		} else if (newCols != null && hasOtherArrays(colors) && newCols.getVertexCount() != vertexCount) {
 			throw new IllegalArgumentException();
 		} else {
 			removeReference(colors);

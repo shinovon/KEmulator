@@ -11,7 +11,7 @@ public class VertexArray extends Object3D {
 	private short[] shortValues;
 
 	public VertexArray(int numVertices, int numComponents, int componentSize) {
-		if ((numVertices >= 1 && numVertices <= 65535) && (numComponents >= 2 || numComponents <= 4) && (componentSize >= 1 || componentSize <= 2)) {
+		if ((numVertices >= 1 && numVertices <= 65535) && (numComponents >= 2 && numComponents <= 4) && (componentSize >= 1 && componentSize <= 2)) {
 			vertexCount = numVertices;
 			componentCount = numComponents;
 			componentType = componentSize;

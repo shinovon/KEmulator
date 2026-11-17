@@ -37,7 +37,7 @@ public class Light extends Node {
 	}
 
 	public void setColor(int RGB) {
-		this.color = RGB;
+		this.color = RGB & 0xffffff;
 	}
 
 	public int getColor() {
@@ -97,7 +97,7 @@ public class Light extends Node {
 	protected void updateProperty(int property, float[] values) {
 		switch (property) {
 			case 258:
-				this.color = G3DUtils.getIntColor(values);
+				this.color = G3DUtils.getIntColor(values) & 0xffffff;
 				return;
 			case 265:
 				this.intensity = values[0];

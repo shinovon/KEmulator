@@ -46,16 +46,14 @@ public class Group extends Node {
 	}
 
 	public void removeChild(Node child) {
-		if (child != null) {
+		if (child != null && children.contains(child)) {
 			if (child.isSkinnedMeshBone()) {
 				throw new IllegalArgumentException();
 			}
 
-			if (children.contains(child)) {
-				children.remove(child);
-				child.parent = null;
-				removeReference(child);
-			}
+			children.remove(child);
+			child.parent = null;
+			removeReference(child);
 		}
 	}
 

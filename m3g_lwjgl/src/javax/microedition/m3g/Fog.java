@@ -49,7 +49,7 @@ public class Fog extends Object3D {
 	}
 
 	public void setColor(int RGB) {
-		this.color = RGB;
+		this.color = RGB & 0xffffff;
 	}
 
 	public int getColor() {
@@ -59,7 +59,7 @@ public class Fog extends Object3D {
 	protected void updateProperty(int property, float[] value) {
 		switch (property) {
 			case 258:
-				this.color = G3DUtils.getIntColor(value);
+				this.color = G3DUtils.getIntColor(value) & 0xffffff;
 				return;
 			case 259:
 			case 261:

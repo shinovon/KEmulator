@@ -180,11 +180,26 @@ public class SkinnedMesh extends Mesh {
 		skeleton.alignment(reference);
 	}
 
+	protected void updateAlignReferences() {
+		super.updateAlignReferences();
+		skeleton.updateAlignReferences();
+	}
+
+	protected void clearAlignReferences() {
+		super.clearAlignReferences();
+		skeleton.clearAlignReferences();
+	}
+
 	protected boolean rayIntersect(int scope, float[] ray, RayIntersection ri, Transform transform) {
 		MeshMorph.getInstance().getMorphedVertexBuffer(this);
 		MeshMorph.getInstance().clearCache();
-		return super.rayIntersect(scope, ray, ri, transform, MeshMorph.getInstance().morphed) ||
-				skeleton.rayIntersect(scope, ray, ri, transform);
+		boolean hit = super.rayIntersect(scope, ray, ri, transform, MeshMorph.getInstance().morphed);
+
+		Transform skeletonTransform = new Transform(transform);
+		Transform localSkeletonTransform = new Transform();
+		skeleton.getCompositeTransform(localSkeletonTransform);
+		skeletonTransform.postMultiply(localSkeletonTransform);
+		return skeleton.rayIntersect(scope, ray, ri, skeletonTransform) || hit;
 	}
 
 	public Vector getTransforms() {
