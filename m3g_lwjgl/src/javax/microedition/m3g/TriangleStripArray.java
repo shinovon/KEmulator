@@ -15,7 +15,7 @@ public class TriangleStripArray extends IndexBuffer {
 			throw new IllegalArgumentException();
 		}
 
-		long sumStripLengths = 0L;
+		int sumStripLengths = 0;
 
 		for (int i = stripLengths.length - 1; i >= 0; --i) {
 			if (stripLengths[i] < 3) {
@@ -28,7 +28,7 @@ public class TriangleStripArray extends IndexBuffer {
 		if (firstIndex < 0 || sumStripLengths > 65535L - firstIndex) {
 			throw new IndexOutOfBoundsException();
 		} else {
-			super.indices = new int[(int) sumStripLengths];
+			super.indices = new int[sumStripLengths];
 
 			for (int i = 0; i < sumStripLengths; ++i) {
 				super.indices[i] = firstIndex + i;
@@ -46,7 +46,7 @@ public class TriangleStripArray extends IndexBuffer {
 			throw new IllegalArgumentException();
 		}
 
-		long sumStripLengths = 0L;
+		int sumStripLengths = 0;
 
 		for (int i = stripLengths.length - 1; i >= 0; --i) {
 			if (stripLengths[i] < 3) {
@@ -60,14 +60,14 @@ public class TriangleStripArray extends IndexBuffer {
 			throw new IllegalArgumentException();
 		}
 
-		for (int i = (int) sumStripLengths - 1; i >= 0; --i) {
+		for (int i = sumStripLengths - 1; i >= 0; --i) {
 			if (indices[i] < 0 || indices[i] > 65535) {
 				throw new IndexOutOfBoundsException();
 			}
 		}
 
-		super.indices = new int[(int) sumStripLengths];
-		System.arraycopy(indices, 0, super.indices, 0, (int) sumStripLengths);
+		super.indices = new int[sumStripLengths];
+		System.arraycopy(indices, 0, super.indices, 0, sumStripLengths);
 		this.stripLengths = new int[stripLengths.length];
 		System.arraycopy(stripLengths, 0, this.stripLengths, 0, stripLengths.length);
 		copyToNative();
