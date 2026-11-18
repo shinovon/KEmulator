@@ -6,7 +6,7 @@ public class Camera extends Node {
 	public static final int GENERIC = 48;
 	public static final int PARALLEL = 49;
 	public static final int PERSPECTIVE = 50;
-	private int projectionType = 48;
+	private int projectionType = GENERIC;
 	private Transform generic = new Transform();
 	private float[] projection = new float[4];
 
@@ -30,7 +30,7 @@ public class Camera extends Node {
 			this.projection[1] = aspectRatio;
 			this.projection[2] = near;
 			this.projection[3] = far;
-			this.projectionType = 49;
+			this.projectionType = PARALLEL;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -42,7 +42,7 @@ public class Camera extends Node {
 			this.projection[1] = aspectRatio;
 			this.projection[2] = near;
 			this.projection[3] = far;
-			this.projectionType = 50;
+			this.projectionType = PERSPECTIVE;
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -53,7 +53,7 @@ public class Camera extends Node {
 			throw new NullPointerException();
 		} else {
 			this.generic.set(transform);
-			this.projectionType = 48;
+			this.projectionType = GENERIC;
 		}
 	}
 
@@ -101,7 +101,7 @@ public class Camera extends Node {
 		if (params != null && params.length < 4) {
 			throw new IllegalArgumentException();
 		} else {
-			if (params != null && this.projectionType != 48) {
+			if (params != null && this.projectionType != GENERIC) {
 				System.arraycopy(this.projection, 0, params, 0, 4);
 			}
 
@@ -110,20 +110,20 @@ public class Camera extends Node {
 	}
 
 	protected void updateProperty(int property, float[] values) {
-		if (this.projectionType != 48) {
+		if (this.projectionType != GENERIC) {
 			switch (property) {
-				case 263:
-					this.projection[3] = this.projectionType != 50 ? values[0] : G3DUtils.limitPositive(values[0]);
+				case AnimationTrack.FAR_DISTANCE:
+					this.projection[3] = this.projectionType != PERSPECTIVE ? values[0] : G3DUtils.limitPositive(values[0]);
 					return;
-				case 264:
-					this.projection[0] = this.projectionType != 50 ? G3DUtils.limitPositive(values[0]) : G3DUtils.limit(values[0], 0.0F, 180.0F);
+				case AnimationTrack.FIELD_OF_VIEW:
+					this.projection[0] = this.projectionType != PERSPECTIVE ? G3DUtils.limitPositive(values[0]) : G3DUtils.limit(values[0], 0.0F, 180.0F);
 					return;
-				case 265:
-				case 266:
+				case AnimationTrack.INTENSITY:
+				case AnimationTrack.MORPH_WEIGHTS:
 				default:
 					break;
-				case 267:
-					this.projection[2] = this.projectionType != 50 ? values[0] : G3DUtils.limitPositive(values[0]);
+				case AnimationTrack.NEAR_DISTANCE:
+					this.projection[2] = this.projectionType != PERSPECTIVE ? values[0] : G3DUtils.limitPositive(values[0]);
 					return;
 			}
 		}

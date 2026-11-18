@@ -68,36 +68,36 @@ public class Material extends Object3D {
 
 	protected void updateProperty(int property, float[] value) {
 		switch (property) {
-			case 256:
-				this.diffuseColor = this.diffuseColor & 16777215 | G3DUtils.getIntColor(value) & -16777216;
+			case AnimationTrack.ALPHA:
+				this.diffuseColor = this.diffuseColor & 0xffffff | G3DUtils.getIntColor(value) & 0xff000000;
 				return;
-			case 257:
+			case AnimationTrack.AMBIENT_COLOR:
 				this.ambientColor = G3DUtils.getIntColor(value) & 0xffffff;
 				return;
-			case 258:
-			case 259:
-			case 260:
-			case 263:
-			case 264:
-			case 265:
-			case 266:
-			case 267:
-			case 268:
-			case 269:
-			case 270:
+			case AnimationTrack.COLOR:
+			case AnimationTrack.CROP:
+			case AnimationTrack.DENSITY:
+			case AnimationTrack.FAR_DISTANCE:
+			case AnimationTrack.FIELD_OF_VIEW:
+			case AnimationTrack.INTENSITY:
+			case AnimationTrack.MORPH_WEIGHTS:
+			case AnimationTrack.NEAR_DISTANCE:
+			case AnimationTrack.ORIENTATION:
+			case AnimationTrack.PICKABILITY:
+			case AnimationTrack.SCALE:
 			default:
 				super.updateProperty(property, value);
 				return;
-			case 261:
-				this.diffuseColor = this.diffuseColor & -16777216 | G3DUtils.getIntColor(value) & 16777215;
+			case AnimationTrack.DIFFUSE_COLOR:
+				this.diffuseColor = this.diffuseColor & 0xff000000 | G3DUtils.getIntColor(value) & 0xffffff;
 				return;
-			case 262:
+			case AnimationTrack.EMISSIVE_COLOR:
 				this.emissiveColor = G3DUtils.getIntColor(value) & 0xffffff;
 				return;
-			case 271:
+			case AnimationTrack.SHININESS:
 				this.shininess = G3DUtils.limit(value[0], 0.0F, 128.0F);
 				return;
-			case 272:
+			case AnimationTrack.SPECULAR_COLOR:
 				this.specularColor = G3DUtils.getIntColor(value) & 0xffffff;
 		}
 	}

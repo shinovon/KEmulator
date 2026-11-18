@@ -113,17 +113,17 @@ public class Background extends Object3D {
 
 	protected void updateProperty(int property, float[] value) {
 		switch (property) {
-			case 256:
+			case AnimationTrack.ALPHA:
 				this.color = this.color & 16777215 | G3DUtils.getIntColor(value) & -16777216;
 				return;
-			case 257:
+			case AnimationTrack.AMBIENT_COLOR:
 			default:
 				super.updateProperty(property, value);
 				break;
-			case 258:
+			case AnimationTrack.COLOR:
 				this.color = this.color & -16777216 | G3DUtils.getIntColor(value) & 16777215;
 				return;
-			case 259:
+			case AnimationTrack.CROP:
 				this.cropX = G3DUtils.round(value[0]);
 				this.cropY = G3DUtils.round(value[1]);
 				if (value.length > 2) {
