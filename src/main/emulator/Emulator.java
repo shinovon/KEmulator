@@ -1129,6 +1129,7 @@ public class Emulator implements Runnable {
 			notifyDestroyed();
 		} catch (NullPointerException ignored) {}
 		try {
+			Thread.sleep(100);
 			ProcessBuilder newKem = new ProcessBuilder().directory(new File(getAbsolutePath())).command(cmd).inheritIO();
 			newKem.environment().remove("GDK_BACKEND");
 			newKem.environment().remove("WAYLAND_DISPLAY");
