@@ -63,7 +63,7 @@ public class Camera extends Node {
 			float width;
 			float depth;
 			float[] matrix;
-			if (this.projectionType == 49) {
+			if (this.projectionType == PARALLEL) {
 				height = this.projection[0];
 				width = this.projection[1] * height;
 				if ((depth = this.projection[3] - this.projection[2]) == 0.0F) {
@@ -76,7 +76,7 @@ public class Camera extends Node {
 				matrix[11] = -(this.projection[2] + this.projection[3]) / depth;
 				matrix[15] = 1.0F;
 				transform.set(matrix);
-			} else if (this.projectionType == 50) {
+			} else if (this.projectionType == PERSPECTIVE) {
 				height = (float) Math.tan(Math.toRadians((double) (this.projection[0] / 2.0F)));
 				width = this.projection[1] * height;
 				if ((depth = this.projection[3] - this.projection[2]) == 0.0F) {
@@ -112,19 +112,19 @@ public class Camera extends Node {
 	protected void updateProperty(int property, float[] values) {
 		if (this.projectionType != GENERIC) {
 			switch (property) {
-				case AnimationTrack.FAR_DISTANCE:
-					this.projection[3] = this.projectionType != PERSPECTIVE ? values[0] : G3DUtils.limitPositive(values[0]);
-					return;
-				case AnimationTrack.FIELD_OF_VIEW:
-					this.projection[0] = this.projectionType != PERSPECTIVE ? G3DUtils.limitPositive(values[0]) : G3DUtils.limit(values[0], 0.0F, 180.0F);
-					return;
-				case AnimationTrack.INTENSITY:
-				case AnimationTrack.MORPH_WEIGHTS:
-				default:
-					break;
-				case AnimationTrack.NEAR_DISTANCE:
-					this.projection[2] = this.projectionType != PERSPECTIVE ? values[0] : G3DUtils.limitPositive(values[0]);
-					return;
+			case AnimationTrack.FAR_DISTANCE:
+				this.projection[3] = this.projectionType != PERSPECTIVE ? values[0] : G3DUtils.limitPositive(values[0]);
+				return;
+			case AnimationTrack.FIELD_OF_VIEW:
+				this.projection[0] = this.projectionType != PERSPECTIVE ? G3DUtils.limitPositive(values[0]) : G3DUtils.limit(values[0], 0.0F, 180.0F);
+				return;
+			case AnimationTrack.INTENSITY:
+			case AnimationTrack.MORPH_WEIGHTS:
+			default:
+				break;
+			case AnimationTrack.NEAR_DISTANCE:
+				this.projection[2] = this.projectionType != PERSPECTIVE ? values[0] : G3DUtils.limitPositive(values[0]);
+				return;
 			}
 		}
 

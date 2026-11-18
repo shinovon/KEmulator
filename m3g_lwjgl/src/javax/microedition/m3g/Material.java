@@ -68,37 +68,37 @@ public class Material extends Object3D {
 
 	protected void updateProperty(int property, float[] value) {
 		switch (property) {
-			case AnimationTrack.ALPHA:
-				this.diffuseColor = this.diffuseColor & 0xffffff | G3DUtils.getIntColor(value) & 0xff000000;
-				return;
-			case AnimationTrack.AMBIENT_COLOR:
-				this.ambientColor = G3DUtils.getIntColor(value) & 0xffffff;
-				return;
-			case AnimationTrack.COLOR:
-			case AnimationTrack.CROP:
-			case AnimationTrack.DENSITY:
-			case AnimationTrack.FAR_DISTANCE:
-			case AnimationTrack.FIELD_OF_VIEW:
-			case AnimationTrack.INTENSITY:
-			case AnimationTrack.MORPH_WEIGHTS:
-			case AnimationTrack.NEAR_DISTANCE:
-			case AnimationTrack.ORIENTATION:
-			case AnimationTrack.PICKABILITY:
-			case AnimationTrack.SCALE:
-			default:
-				super.updateProperty(property, value);
-				return;
-			case AnimationTrack.DIFFUSE_COLOR:
-				this.diffuseColor = this.diffuseColor & 0xff000000 | G3DUtils.getIntColor(value) & 0xffffff;
-				return;
-			case AnimationTrack.EMISSIVE_COLOR:
-				this.emissiveColor = G3DUtils.getIntColor(value) & 0xffffff;
-				return;
-			case AnimationTrack.SHININESS:
-				this.shininess = G3DUtils.limit(value[0], 0.0F, 128.0F);
-				return;
-			case AnimationTrack.SPECULAR_COLOR:
-				this.specularColor = G3DUtils.getIntColor(value) & 0xffffff;
+		case AnimationTrack.ALPHA:
+			this.diffuseColor = this.diffuseColor & 0xffffff | G3DUtils.getIntColor(value) & 0xff000000;
+			return;
+		case AnimationTrack.AMBIENT_COLOR:
+			this.ambientColor = G3DUtils.getIntColor(value) & 0xffffff;
+			return;
+		case AnimationTrack.COLOR:
+		case AnimationTrack.CROP:
+		case AnimationTrack.DENSITY:
+		case AnimationTrack.FAR_DISTANCE:
+		case AnimationTrack.FIELD_OF_VIEW:
+		case AnimationTrack.INTENSITY:
+		case AnimationTrack.MORPH_WEIGHTS:
+		case AnimationTrack.NEAR_DISTANCE:
+		case AnimationTrack.ORIENTATION:
+		case AnimationTrack.PICKABILITY:
+		case AnimationTrack.SCALE:
+		default:
+			super.updateProperty(property, value);
+			return;
+		case AnimationTrack.DIFFUSE_COLOR:
+			this.diffuseColor = this.diffuseColor & 0xff000000 | G3DUtils.getIntColor(value) & 0xffffff;
+			return;
+		case AnimationTrack.EMISSIVE_COLOR:
+			this.emissiveColor = G3DUtils.getIntColor(value) & 0xffffff;
+			return;
+		case AnimationTrack.SHININESS:
+			this.shininess = G3DUtils.limit(value[0], 0.0F, 128.0F);
+			return;
+		case AnimationTrack.SPECULAR_COLOR:
+			this.specularColor = G3DUtils.getIntColor(value) & 0xffffff;
 		}
 	}
 }

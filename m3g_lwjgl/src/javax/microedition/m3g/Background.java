@@ -113,24 +113,24 @@ public class Background extends Object3D {
 
 	protected void updateProperty(int property, float[] value) {
 		switch (property) {
-			case AnimationTrack.ALPHA:
-				this.color = this.color & 16777215 | G3DUtils.getIntColor(value) & -16777216;
+		case AnimationTrack.ALPHA:
+			this.color = this.color & 16777215 | G3DUtils.getIntColor(value) & -16777216;
+			return;
+		case AnimationTrack.AMBIENT_COLOR:
+		default:
+			super.updateProperty(property, value);
+			break;
+		case AnimationTrack.COLOR:
+			this.color = this.color & -16777216 | G3DUtils.getIntColor(value) & 16777215;
+			return;
+		case AnimationTrack.CROP:
+			this.cropX = G3DUtils.round(value[0]);
+			this.cropY = G3DUtils.round(value[1]);
+			if (value.length > 2) {
+				this.cropWidth = Math.max(G3DUtils.round(value[2]), 0);
+				this.cropHeight = Math.max(G3DUtils.round(value[3]), 0);
 				return;
-			case AnimationTrack.AMBIENT_COLOR:
-			default:
-				super.updateProperty(property, value);
-				break;
-			case AnimationTrack.COLOR:
-				this.color = this.color & -16777216 | G3DUtils.getIntColor(value) & 16777215;
-				return;
-			case AnimationTrack.CROP:
-				this.cropX = G3DUtils.round(value[0]);
-				this.cropY = G3DUtils.round(value[1]);
-				if (value.length > 2) {
-					this.cropWidth = Math.max(G3DUtils.round(value[2]), 0);
-					this.cropHeight = Math.max(G3DUtils.round(value[3]), 0);
-					return;
-				}
+			}
 		}
 
 	}

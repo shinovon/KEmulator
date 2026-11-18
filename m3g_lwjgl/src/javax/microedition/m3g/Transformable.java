@@ -125,26 +125,26 @@ public abstract class Transformable extends Object3D {
 
 	protected void updateProperty(int property, float[] values) {
 		switch (property) {
-			case AnimationTrack.ORIENTATION:
-				rotation.set(values);
-				rotation.normalize();
-				return;
-			case AnimationTrack.SCALE:
-				if (values.length == 1) {
-					scale[0] = scale[1] = scale[2] = values[0];
-				} else {
-					scale[0] = values[0];
-					scale[1] = values[1];
-					scale[2] = values[2];
-				}
-				return;
-			case AnimationTrack.TRANSLATION:
-				translation[0] = values[0];
-				translation[1] = values[1];
-				translation[2] = values[2];
-				return;
-			default:
-				super.updateProperty(property, values);
+		case AnimationTrack.ORIENTATION:
+			rotation.set(values);
+			rotation.normalize();
+			return;
+		case AnimationTrack.SCALE:
+			if (values.length == 1) {
+				scale[0] = scale[1] = scale[2] = values[0];
+			} else {
+				scale[0] = values[0];
+				scale[1] = values[1];
+				scale[2] = values[2];
+			}
+			return;
+		case AnimationTrack.TRANSLATION:
+			translation[0] = values[0];
+			translation[1] = values[1];
+			translation[2] = values[2];
+			return;
+		default:
+			super.updateProperty(property, values);
 		}
 	}
 

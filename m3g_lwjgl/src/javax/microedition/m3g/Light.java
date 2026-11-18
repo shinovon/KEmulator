@@ -96,20 +96,20 @@ public class Light extends Node {
 
 	protected void updateProperty(int property, float[] values) {
 		switch (property) {
-			case 258:
-				this.color = G3DUtils.getIntColor(values) & 0xffffff;
-				return;
-			case 265:
-				this.intensity = values[0];
-				return;
-			case 273:
-				this.spotAngle = G3DUtils.limit(values[0], 0.0F, 90.0F);
-				return;
-			case 274:
-				this.spotExponent = G3DUtils.limit(values[0], 0.0F, 128.0F);
-				return;
-			default:
-				super.updateProperty(property, values);
+		case AnimationTrack.COLOR:
+			this.color = G3DUtils.getIntColor(values) & 0xffffff;
+			return;
+		case AnimationTrack.INTENSITY:
+			this.intensity = values[0];
+			return;
+		case AnimationTrack.SPOT_ANGLE:
+			this.spotAngle = G3DUtils.limit(values[0], 0.0F, 90.0F);
+			return;
+		case AnimationTrack.SPOT_EXPONENT:
+			this.spotExponent = G3DUtils.limit(values[0], 0.0F, 128.0F);
+			return;
+		default:
+			super.updateProperty(property, values);
 		}
 	}
 

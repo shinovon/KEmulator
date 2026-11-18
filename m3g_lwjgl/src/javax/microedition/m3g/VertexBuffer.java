@@ -210,16 +210,16 @@ public class VertexBuffer extends Object3D {
 
 	protected void updateProperty(int property, float[] value) {
 		switch (property) {
-			case AnimationTrack.ALPHA:
-				defaultColor &= 0xffffff;
-				defaultColor |= G3DUtils.getIntColor(value) & 0xff000000;
-				return;
-			case AnimationTrack.COLOR:
-				defaultColor &= 0xff000000;
-				defaultColor |= G3DUtils.getIntColor(value) & 0xffffff;
-				return;
-			default:
-				super.updateProperty(property, value);
+		case AnimationTrack.ALPHA:
+			defaultColor &= 0xffffff;
+			defaultColor |= G3DUtils.getIntColor(value) & 0xff000000;
+			return;
+		case AnimationTrack.COLOR:
+			defaultColor &= 0xff000000;
+			defaultColor |= G3DUtils.getIntColor(value) & 0xffffff;
+			return;
+		default:
+			super.updateProperty(property, value);
 		}
 	}
 

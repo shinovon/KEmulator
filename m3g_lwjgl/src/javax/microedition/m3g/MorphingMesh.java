@@ -100,21 +100,21 @@ public class MorphingMesh extends Mesh {
 
 	protected void updateProperty(int property, float[] values) {
 		switch (property) {
-			case 266:
-				this.m_baseWeight = 1.0F;
+		case AnimationTrack.MORPH_WEIGHTS:
+			this.m_baseWeight = 1.0F;
 
-				for (int i = 0; i < this.weights.length; ++i) {
-					if (i < values.length) {
-						this.weights[i] = values[i];
-						this.m_baseWeight -= values[i];
-					} else {
-						this.weights[i] = 0.0F;
-					}
+			for (int i = 0; i < this.weights.length; ++i) {
+				if (i < values.length) {
+					this.weights[i] = values[i];
+					this.m_baseWeight -= values[i];
+				} else {
+					this.weights[i] = 0.0F;
 				}
+			}
 
-				return;
-			default:
-				super.updateProperty(property, values);
+			return;
+		default:
+			super.updateProperty(property, values);
 		}
 	}
 

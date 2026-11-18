@@ -23,7 +23,7 @@ public abstract class Node extends Transformable {
 	protected Node m_duplicatedNode;
 
 	Node() {
-		this.yTarget = this.zTarget = 144;
+		this.yTarget = this.zTarget = NONE;
 		this.yRef = this.zRef = null;
 		this.boneFlag = false;
 	}
@@ -187,7 +187,7 @@ public abstract class Node extends Transformable {
 			Quaternion alignRotation = new Quaternion(0.0F, 0.0F, 0.0F, 1.0F);
 			float[] localTranslation = new float[3];
 			this.getTranslation(localTranslation);
-			if (this.zTarget != 144) {
+			if (this.zTarget != NONE) {
 				if (this.zRef == null && reference == this) {
 					throw new IllegalStateException();
 				}
@@ -200,7 +200,7 @@ public abstract class Node extends Transformable {
 				alignRotation.setRotation(Vector4f.Z_AXIS, targetVector, (Vector4f) null);
 			}
 
-			if (this.yTarget != 144) {
+			if (this.yTarget != NONE) {
 				if (this.yRef == null && reference == this) {
 					throw new IllegalStateException();
 				}
@@ -208,7 +208,7 @@ public abstract class Node extends Transformable {
 				(this.yRef == null ? reference : this.yRef).getTransformTo(this.parent, targetTransform);
 				tmpTransform.postTranslate(-localTranslation[0], -localTranslation[1], -localTranslation[2]);
 				targetTransform.preMultiply(tmpTransform);
-				if (this.zTarget != 144) {
+				if (this.zTarget != NONE) {
 					tmpTransform.setIdentity();
 					tmpTransform.postRotateQuat(alignRotation.x, alignRotation.y, alignRotation.z, -alignRotation.w);
 					targetTransform.preMultiply(tmpTransform);
@@ -216,7 +216,7 @@ public abstract class Node extends Transformable {
 
 				transformTarget(this.yTarget, targetTransform, origin, xAxis, yAxis, zAxis, targetVector);
 				targetVector.w = 0.0F;
-				if (this.zTarget != 144) {
+				if (this.zTarget != NONE) {
 					Quaternion yRotation;
 					(yRotation = new Quaternion()).setRotation(Vector4f.Y_AXIS, targetVector, Vector4f.Z_AXIS);
 					alignRotation.mul(yRotation);
@@ -225,7 +225,7 @@ public abstract class Node extends Transformable {
 				}
 			}
 
-			if (this.zTarget != 144 || this.yTarget != 144) {
+			if (this.zTarget != NONE || this.yTarget != NONE) {
 				super.rotation.set(alignRotation);
 			}
 
@@ -236,17 +236,17 @@ public abstract class Node extends Transformable {
 
 	private static void transformTarget(int target, Transform transform, Vector4f origin, Vector4f xAxis, Vector4f yAxis, Vector4f zAxis, Vector4f result) {
 		switch (target) {
-			case 145:
-				result.set(origin == null ? Vector4f.ORIGIN : origin);
-				break;
-			case 146:
-				result.set(xAxis == null ? Vector4f.X_AXIS : xAxis);
-				break;
-			case 147:
-				result.set(yAxis == null ? Vector4f.Y_AXIS : yAxis);
-				break;
-			case 148:
-				result.set(zAxis == null ? Vector4f.Z_AXIS : zAxis);
+		case ORIGIN:
+			result.set(origin == null ? Vector4f.ORIGIN : origin);
+			break;
+		case X_AXIS:
+			result.set(xAxis == null ? Vector4f.X_AXIS : xAxis);
+			break;
+		case Y_AXIS:
+			result.set(yAxis == null ? Vector4f.Y_AXIS : yAxis);
+			break;
+		case Z_AXIS:
+			result.set(zAxis == null ? Vector4f.Z_AXIS : zAxis);
 		}
 
 		transform.getImpl_().transform(result);
@@ -270,34 +270,34 @@ public abstract class Node extends Transformable {
 	}
 
 	public int getAlignmentTarget(int axis) {
-		if (axis != 148 && axis != 147) {
+		if (axis != Z_AXIS && axis != Y_AXIS) {
 			throw new IllegalArgumentException("axis != Z_AXIS && axis != Y_AXIS");
 		} else {
-			return axis == 148 ? this.zTarget : this.yTarget;
+			return axis == Z_AXIS ? this.zTarget : this.yTarget;
 		}
 	}
 
 	public Node getAlignmentReference(int axis) {
-		if (axis != 148 && axis != 147) {
+		if (axis != Z_AXIS && axis != Y_AXIS) {
 			throw new IllegalArgumentException("axis != Z_AXIS && axis != Y_AXIS");
 		} else {
-			return axis == 148 ? this.zRef : this.yRef;
+			return axis == Z_AXIS ? this.zRef : this.yRef;
 		}
 	}
 
 	protected void updateProperty(int property, float[] values) {
 		switch (property) {
-			case 256:
-				this.alphaFactor = G3DUtils.limit(values[0], 0.0F, 1.0F);
-				return;
-			case 269:
-				this.pickingEnable = values[0] >= 0.5F;
-				return;
-			case 276:
-				this.renderingEnable = values[0] >= 0.5F;
-				return;
-			default:
-				super.updateProperty(property, values);
+		case AnimationTrack.ALPHA:
+			this.alphaFactor = G3DUtils.limit(values[0], 0.0F, 1.0F);
+			return;
+		case AnimationTrack.PICKABILITY:
+			this.pickingEnable = values[0] >= 0.5F;
+			return;
+		case AnimationTrack.VISIBILITY:
+			this.renderingEnable = values[0] >= 0.5F;
+			return;
+		default:
+			super.updateProperty(property, values);
 		}
 	}
 
@@ -361,14 +361,14 @@ public abstract class Node extends Transformable {
 
 	protected void updateAlignReferences() {
 		Node duplicatedRef;
-		if (this.zTarget != 144 && this.zRef != null) {
+		if (this.zTarget != NONE && this.zRef != null) {
 			duplicatedRef = this.zRef.m_duplicatedNode;
 			if (duplicatedRef != null && (duplicatedRef == this.m_duplicatedNode.getRoot() || duplicatedRef.isDescendantOf(this.m_duplicatedNode.getRoot()))) {
 				this.m_duplicatedNode.zRef = duplicatedRef;
 			}
 		}
 
-		if (this.yTarget != 144 && this.yRef != null) {
+		if (this.yTarget != NONE && this.yRef != null) {
 			duplicatedRef = this.yRef.m_duplicatedNode;
 			if (duplicatedRef != null && (duplicatedRef == this.m_duplicatedNode.getRoot() || duplicatedRef.isDescendantOf(this.m_duplicatedNode.getRoot()))) {
 				this.m_duplicatedNode.yRef = duplicatedRef;

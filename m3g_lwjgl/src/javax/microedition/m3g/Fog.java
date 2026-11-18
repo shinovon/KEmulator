@@ -58,26 +58,26 @@ public class Fog extends Object3D {
 
 	protected void updateProperty(int property, float[] value) {
 		switch (property) {
-			case 258:
-				this.color = G3DUtils.getIntColor(value) & 0xffffff;
-				return;
-			case 259:
-			case 261:
-			case 262:
-			case 264:
-			case 265:
-			case 266:
-			default:
-				super.updateProperty(property, value);
-				return;
-			case 260:
-				this.density = G3DUtils.limitPositive(value[0]);
-				return;
-			case 263:
-				this.far = value[0];
-				return;
-			case 267:
-				this.near = value[0];
+		case AnimationTrack.ALPHA:
+			this.color = G3DUtils.getIntColor(value) & 0xffffff;
+			return;
+		case 259:
+		case 261:
+		case 262:
+		case 264:
+		case 265:
+		case 266:
+		default:
+			super.updateProperty(property, value);
+			return;
+		case AnimationTrack.DENSITY:
+			this.density = G3DUtils.limitPositive(value[0]);
+			return;
+		case AnimationTrack.FAR_DISTANCE:
+			this.far = value[0];
+			return;
+		case AnimationTrack.NEAR_DISTANCE:
+			this.near = value[0];
 		}
 	}
 }

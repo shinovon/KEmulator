@@ -61,9 +61,9 @@ public class Texture2D extends Transformable {
 	}
 
 	public void setFiltering(int levelFilter, int imageFilter) {
-		if (levelFilter != 208 && levelFilter != 209 && levelFilter != 210) {
+		if (levelFilter != FILTER_BASE_LEVEL && levelFilter != FILTER_LINEAR && levelFilter != FILTER_NEAREST) {
 			throw new IllegalArgumentException();
-		} else if (imageFilter != 209 && imageFilter != 210) {
+		} else if (imageFilter != FILTER_LINEAR && imageFilter != FILTER_NEAREST) {
 			throw new IllegalArgumentException();
 		} else {
 			this.levelFilter = levelFilter;
@@ -80,9 +80,9 @@ public class Texture2D extends Transformable {
 	}
 
 	public void setWrapping(int wrapS, int wrapT) {
-		if (wrapS != 240 && wrapS != 241) {
+		if (wrapS != WRAP_CLAMP && wrapS != WRAP_REPEAT) {
 			throw new IllegalArgumentException();
-		} else if (wrapT != 240 && wrapT != 241) {
+		} else if (wrapT != WRAP_CLAMP && wrapT != WRAP_REPEAT) {
 			throw new IllegalArgumentException();
 		} else {
 			this.wrappingS = wrapS;
@@ -99,7 +99,7 @@ public class Texture2D extends Transformable {
 	}
 
 	public void setBlending(int func) {
-		if (func >= 224 && func <= 228) {
+		if (func >= FUNC_ADD && func <= FUNC_REPLACE) {
 			this.blending = func;
 		} else {
 			throw new IllegalArgumentException();
@@ -120,11 +120,11 @@ public class Texture2D extends Transformable {
 
 	protected void updateProperty(int property, float[] values) {
 		switch (property) {
-			case 258:
-				this.blendColor = G3DUtils.getIntColor(values) & 0xffffff;
-				return;
-			default:
-				super.updateProperty(property, values);
+		case AnimationTrack.COLOR:
+			this.blendColor = G3DUtils.getIntColor(values) & 0xffffff;
+			return;
+		default:
+			super.updateProperty(property, values);
 		}
 	}
 }
