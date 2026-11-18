@@ -468,6 +468,7 @@ public class RecordStore {
 				dataOutputStream.writeInt(version);
 				dataOutputStream.writeInt(authmode);
 				dataOutputStream.writeBoolean(writable);
+				dataOutputStream.flush();
 			} finally {
 				dataOutputStream.close();
 			}
