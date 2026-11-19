@@ -710,6 +710,9 @@ public class Emulator implements Runnable {
 			Emulator.emulatorimpl.getScreen().initScreen(AppSettings.screenWidth, AppSettings.screenHeight);
 			Emulator.emulatorimpl.getScreen().setWindowIcon(inputStream);
 			setProperties();
+
+			if (AppSettings.preloadResources) ResourceManager.preloadResources();
+
 			if (doja) {
 				Emulator.eventQueue = new EventQueue();
 				midlet = new IApplicationMIDlet(Emulator.midletClassName.trim());

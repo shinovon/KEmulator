@@ -67,6 +67,7 @@ public class AppSettings {
 	public static boolean motorolaSoftKeyFix;
 	public static boolean keyPressOnRepeat;
 	public static boolean synchronizeKeyEvents;
+	public static boolean preloadResources;
 
 	// patches
 	public static boolean patchYield;
@@ -138,6 +139,7 @@ public class AppSettings {
 		motorolaSoftKeyFix = false;
 		keyPressOnRepeat = false;
 		synchronizeKeyEvents = false;
+		preloadResources = false;
 
 		patchYield = false;
 		ignoreGc = true;
@@ -420,6 +422,9 @@ public class AppSettings {
 		if (properties.containsKey("SynchronizeKeyEvents")) {
 			synchronizeKeyEvents = Boolean.parseBoolean(properties.get("SynchronizeKeyEvents"));
 		}
+		if (properties.containsKey("PreloadResources")) {
+			preloadResources = Boolean.parseBoolean(properties.get("PreloadResources"));
+		}
 
 		if (properties.containsKey("PatchYield")) {
 			patchYield = Boolean.parseBoolean(properties.get("PatchYield"));
@@ -541,6 +546,7 @@ public class AppSettings {
 		AppSettings.set("MotorolaSoftKeyFix", motorolaSoftKeyFix);
 		AppSettings.set("KeyPressOnRepeat", keyPressOnRepeat);
 		AppSettings.set("SynchronizeKeyEvents", synchronizeKeyEvents);
+		AppSettings.set("PreloadResources", preloadResources);
 		AppSettings.set("AsyncFlush", asyncFlush);
 		AppSettings.set("StartAppOnResume", startAppOnResume);
 

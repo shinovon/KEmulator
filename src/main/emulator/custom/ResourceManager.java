@@ -9,9 +9,35 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.InputConnection;
 import java.io.*;
 import java.util.Enumeration;
+import java.util.HashMap;
 
 public final class ResourceManager {
 	public ResourceManager() {
+	}
+
+	private static boolean loaded;
+	private static HashMap<String, byte[]> resourcesTable;
+
+	public static void preloadResources() {
+		resourcesTable = new HashMap<>();
+		synchronized (Emulator.jarFileLock) {
+			ZipFile zipFile = Emulator.midletJar;
+			Enumeration entries = zipFile.getEntries();
+			do {
+				ZipEntry entry = (ZipEntry) entries.nextElement();
+				String name = entry.getName();
+				if (name.endsWith(".class") || entry.isDirectory())
+					continue;
+
+				try {
+					byte[] data = new byte[(int) entry.getSize()];
+					resourcesTable.put(name.toLowerCase(), data);
+					new DataInputStream(zipFile.getInputStream(entry)).readFully(data);
+					Emulator.getEmulator().getLogStream().println("Preloaded resource " + name + " (" + data.length + ")");
+				} catch (Exception ignored) {}
+			} while (entries.hasMoreElements());
+		}
+		loaded = true;
 	}
 
 	public static InputStream getResourceAsStream(final String s) {
@@ -19,30 +45,31 @@ public final class ResourceManager {
 		byte[] data;
 		try {
 			if (Emulator.midletJarPath != null) {
-				while (name.length() > 0 && name.startsWith("/")) {
+				while (name.length() != 0 && name.startsWith("/")) {
 					name = name.substring(1);
 				}
-				synchronized (Emulator.jarFileLock) {
-					ZipFile zipFile = Emulator.midletJar;
-					ZipEntry entry;
-					if ((entry = zipFile.getEntry(name)) == null) {
-						// try again by searching entry ignoring case
-						Enumeration entries = zipFile.getEntries();
-						fail:
-						{
-							do {
-								entry = (ZipEntry) entries.nextElement();
-								if (entry.getName().equalsIgnoreCase(name)) {
-									break fail;
-								}
-							} while (entries.hasMoreElements());
-							Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (null)");
-							throw new IOException();
+				if (!loaded || (data = resourcesTable.get(s.toLowerCase())) == null) {
+					synchronized (Emulator.jarFileLock) {
+						ZipFile zipFile = Emulator.midletJar;
+						ZipEntry entry;
+						if ((entry = zipFile.getEntry(name)) == null) {
+							// try again by searching entry ignoring case
+							Enumeration entries = zipFile.getEntries();
+							fail: {
+								do {
+									entry = (ZipEntry) entries.nextElement();
+									if (entry.getName().equalsIgnoreCase(name)) {
+										break fail;
+									}
+								} while (entries.hasMoreElements());
+								Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (null)");
+								throw new IOException();
+							}
 						}
+						data = new byte[(int) entry.getSize()];
+						Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (" + data.length + ")");
+						new DataInputStream(zipFile.getInputStream(entry)).readFully(data);
 					}
-					data = new byte[(int) entry.getSize()];
-					Emulator.getEmulator().getLogStream().println("Custom.jar.getResourceStream: " + s + " (" + data.length + ")");
-					new DataInputStream(zipFile.getInputStream(entry)).readFully(data);
 				}
 			} else {
 				final File fileFromClassPath;

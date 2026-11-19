@@ -84,6 +84,7 @@ public class AppSettingsUI {
 	private Button m3gDisableLightClampCheck;
 	private Button startAppOnResumeCheck;
 	private Button m3gThreadCheck;
+	private Button preloadResourcesCheck;
 	private CTabFolder tabFolder;
 
 	public AppSettingsUI() {
@@ -526,6 +527,11 @@ public class AppSettingsUI {
 		startAppOnResumeCheck.setText("Send startApp on resume");
 		startAppOnResumeCheck.setSelection(AppSettings.startAppOnResume);
 
+		preloadResourcesCheck = new Button(grpTweaks, SWT.CHECK);
+		preloadResourcesCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		preloadResourcesCheck.setText("Preload resources");
+		preloadResourcesCheck.setSelection(AppSettings.preloadResources);
+
 		composite_9.setSize(composite_9.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		scrolledComposite_2.setContent(composite_9);
 		scrolledComposite_2.setMinSize(composite_9.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -874,6 +880,7 @@ public class AppSettingsUI {
 			AppSettings.synchronizeKeyEvents = synchronizeKeyEventsCheck.getSelection();
 			AppSettings.asyncFlush = asyncFlushCheck.getSelection();
 			AppSettings.startAppOnResume = startAppOnResumeCheck.getSelection();
+			AppSettings.preloadResources = preloadResourcesCheck.getSelection();
 		}
 
 		// 3d tab
