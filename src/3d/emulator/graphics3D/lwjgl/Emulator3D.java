@@ -579,14 +579,14 @@ public final class Emulator3D implements IGraphics3D {
 			}
 
 			repeatsX = (int) (2.5f + viewportW / offsetX);
-			drawX -= repeatsX / 2f * offsetX;
+			drawX -= (float) (repeatsX / 2) * offsetX;
 		}
 
 		int repeatsY = 1;
 		if (bg.getImageModeY() == Background.REPEAT) {
 			drawY %= offsetY;
 			repeatsY = (int) (2.5f + viewportH / offsetY);
-			drawY += repeatsY / 2f * offsetY;
+			drawY += (float) (repeatsY / 2) * offsetY;
 		}
 
 		GL11.glPixelStorei(GL_UNPACK_ROW_LENGTH, imgW);
