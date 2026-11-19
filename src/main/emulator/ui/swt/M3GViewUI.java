@@ -412,68 +412,62 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 
         new MenuItem(this.cameraMenu, 2);*/
 
-		(this.clipPlanesMenuItem = new MenuItem(this.cameraMenu, 8)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes") + "\tC");
-		this.clipPlanesMenuItem.setAccelerator(67);
-		M3GViewUI aClass90_11671 = this;
+		(this.clipPlanesMenuItem = new MenuItem(this.cameraMenu, SWT.PUSH)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes") + "\tC");
+		this.clipPlanesMenuItem.setAccelerator('C');
 		this.clipPlanesMenuItem.addSelectionListener(new SelectionAdapter() {
-			private final M3GViewUI aClass90_1167 = aClass90_11671;
-
-			public final void widgetSelected(final SelectionEvent selectionEvent) {
-				final M3GViewCameraSetDialog class30;
-				(class30 = new M3GViewCameraSetDialog(getShell(this.aClass90_1167), 1)).setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes"));
-				class30.method338(getNearPlane(this.aClass90_1167), getFarPlane(this.aClass90_1167));
-				class30.method340();
-				if (getProjectionMode(this.aClass90_1167) == 0) {
-					if (class30.aFloat606 > 0.0f) {
-						setNearPlane(this.aClass90_1167, class30.aFloat606);
+			@Override
+			public void widgetSelected(final SelectionEvent selectionEvent) {
+				M3GViewCameraSetDialog dialog = new M3GViewCameraSetDialog(getShell(M3GViewUI.this), M3GViewCameraSetDialog.Mode.CLIPPING_PLANES);
+				dialog.setText(UILocale.get("M3G_VIEW_CAMERA_CLIP_PLANES", "Clipping Planes"));
+				dialog.setClippingPlanes(getNearPlane(M3GViewUI.this), getFarPlane(M3GViewUI.this));
+				dialog.open();
+				if (getProjectionMode(M3GViewUI.this) == 0) {
+					if (dialog.nearPlane > 0.0f) {
+						setNearPlane(M3GViewUI.this, dialog.nearPlane);
 					}
-					if (class30.aFloat608 > 0.0f) {
-						setFarPlane(this.aClass90_1167, class30.aFloat608);
+					if (dialog.farPlane > 0.0f) {
+						setFarPlane(M3GViewUI.this, dialog.farPlane);
 					}
 				} else {
-					setNearPlane(this.aClass90_1167, class30.aFloat606);
-					setFarPlane(this.aClass90_1167, class30.aFloat608);
+					setNearPlane(M3GViewUI.this, dialog.nearPlane);
+					setFarPlane(M3GViewUI.this, dialog.farPlane);
 				}
-                updateCameraProjection(this.aClass90_1167);
+				updateCameraProjection(M3GViewUI.this);
 			}
 		});
-		(this.fovMenuItem = new MenuItem(this.cameraMenu, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View") + "\tF");
-		this.fovMenuItem.setAccelerator(70);
-		M3GViewUI aClass90_6251 = this;
+		(this.fovMenuItem = new MenuItem(this.cameraMenu, SWT.PUSH)).setText(UILocale.get("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View") + "\tF");
+		this.fovMenuItem.setAccelerator('F');
 		this.fovMenuItem.addSelectionListener(new SelectionAdapter() {
-			private final M3GViewUI aClass90_625 = aClass90_6251;
-
-			public final void widgetSelected(final SelectionEvent selectionEvent) {
-				final M3GViewCameraSetDialog class30;
-				(class30 = new M3GViewCameraSetDialog(getShell(this.aClass90_625), 0)).setText(UILocale.get("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View"));
-				class30.method337(getFov(this.aClass90_625));
-				class30.method340();
-				if (class30.aFloat603 > 0.0f) {
-					if (getProjectionMode(this.aClass90_625) == 0) {
-						if (class30.aFloat603 < 180.0f) {
-							setFov(this.aClass90_625, class30.aFloat603);
+			@Override
+			public void widgetSelected(final SelectionEvent selectionEvent) {
+				M3GViewCameraSetDialog dialog = new M3GViewCameraSetDialog(getShell(M3GViewUI.this), M3GViewCameraSetDialog.Mode.FIELD_OF_VIEW);
+				dialog.setText(UILocale.get("M3G_VIEW_CAMEAR_FIELD_OF_VIEW", "Field of View"));
+				dialog.setFieldOfView(getFov(M3GViewUI.this));
+				dialog.open();
+				if (dialog.fieldOfView > 0.0f) {
+					if (getProjectionMode(M3GViewUI.this) == 0) {
+						if (dialog.fieldOfView < 180.0f) {
+							setFov(M3GViewUI.this, dialog.fieldOfView);
 						}
 					} else {
-						setFov(this.aClass90_625, class30.aFloat603);
+						setFov(M3GViewUI.this, dialog.fieldOfView);
 					}
-					updateCameraProjection(this.aClass90_625);
+					updateCameraProjection(M3GViewUI.this);
 				}
 			}
 		});
-		(this.cameraPositionMenuItem = new MenuItem(this.cameraMenu, 8)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position") + "\tP");
-		this.cameraPositionMenuItem.setAccelerator(80);
-		M3GViewUI aClass90_13021 = this;
+		(this.cameraPositionMenuItem = new MenuItem(this.cameraMenu, SWT.PUSH)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position") + "\tP");
+		this.cameraPositionMenuItem.setAccelerator('P');
 		this.cameraPositionMenuItem.addSelectionListener(new SelectionAdapter() {
-			private final M3GViewUI aClass90_1302 = aClass90_13021;
-
-			public final void widgetSelected(final SelectionEvent selectionEvent) {
-				final M3GViewCameraSetDialog class30;
-				(class30 = new M3GViewCameraSetDialog(getShell(this.aClass90_1302), 2)).setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position"));
-				class30.method339(getCameraX(this.aClass90_1302), getCameraY(this.aClass90_1302), getCameraZ(this.aClass90_1302));
-				class30.method340();
-				setCameraX(this.aClass90_1302, class30.aFloat610);
-				setCameraY(this.aClass90_1302, class30.aFloat612);
-				setCameraZ(this.aClass90_1302, class30.aFloat614);
+			@Override
+			public void widgetSelected(final SelectionEvent selectionEvent) {
+				M3GViewCameraSetDialog dialog = new M3GViewCameraSetDialog(getShell(M3GViewUI.this), M3GViewCameraSetDialog.Mode.POSITION);
+				dialog.setText(UILocale.get("M3G_VIEW_CAMEAR_POSITION", "Camera Position"));
+				dialog.setCameraPosition(getCameraX(M3GViewUI.this), getCameraY(M3GViewUI.this), getCameraZ(M3GViewUI.this));
+				dialog.open();
+				setCameraX(M3GViewUI.this, dialog.cameraX);
+				setCameraY(M3GViewUI.this, dialog.cameraY);
+				setCameraZ(M3GViewUI.this, dialog.cameraZ);
 			}
 		});
 		new MenuItem(this.cameraMenu, 2);
