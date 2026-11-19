@@ -20,8 +20,9 @@ public final class LightsCache {
 
 		for (int i = 0; i < group.getChildCount(); ++i) {
 			Node child = group.getChild(i);
+			if (!child.isRenderingEnabled()) continue;
 
-			if (child instanceof Light && isEffectivelyEnabled(child) && child.getTransformTo(world, tmpMat)) {
+			if (child instanceof Light && child.getTransformTo(world, tmpMat)) {
 				m_lights.add(child);
 				m_lightsTransform.add(new Transform(tmpMat));
 			} else if (child instanceof Group) {
@@ -30,16 +31,6 @@ public final class LightsCache {
 				addLightsFromGroup(world, ((SkinnedMesh) child).getSkeleton());
 			}
 		}
-	}
-
-	private static boolean isEffectivelyEnabled(Node node) {
-		for (Node current = node; current != null; current = current.getParent()) {
-			if (!current.isRenderingEnabled()) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	public static int addLight(Light light, Transform transform) {
