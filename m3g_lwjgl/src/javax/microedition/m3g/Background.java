@@ -17,7 +17,7 @@ public class Background extends Object3D {
 	private int cropHeight;
 
 	public Background() {
-		this.imageModeX = this.imageModeY = 32;
+		this.imageModeX = this.imageModeY = BORDER;
 	}
 
 	public void setColorClearEnable(boolean enable) {
@@ -45,7 +45,7 @@ public class Background extends Object3D {
 	}
 
 	public void setImage(Image2D image) {
-		if (image != null && image.getFormat() != 99 && image.getFormat() != 100) {
+		if (image != null && image.getFormat() != Image2D.RGB && image.getFormat() != Image2D.RGBA) {
 			throw new IllegalArgumentException();
 		} else {
 			this.removeReference(this.image);
@@ -66,9 +66,9 @@ public class Background extends Object3D {
 	}
 
 	public void setImageMode(int modeX, int modeY) {
-		if (modeX != 32 && modeX != 33) {
+		if (modeX != BORDER && modeX != REPEAT) {
 			throw new IllegalArgumentException();
-		} else if (modeY != 32 && modeY != 33) {
+		} else if (modeY != BORDER && modeY != REPEAT) {
 			throw new IllegalArgumentException();
 		} else {
 			this.imageModeX = modeX;
@@ -114,14 +114,14 @@ public class Background extends Object3D {
 	protected void updateProperty(int property, float[] value) {
 		switch (property) {
 		case AnimationTrack.ALPHA:
-			this.color = this.color & 16777215 | G3DUtils.getIntColor(value) & -16777216;
+			this.color = this.color & 0xFFFFFF | G3DUtils.getIntColor(value) & 0xFF000000;
 			return;
 		case AnimationTrack.AMBIENT_COLOR:
 		default:
 			super.updateProperty(property, value);
 			break;
 		case AnimationTrack.COLOR:
-			this.color = this.color & -16777216 | G3DUtils.getIntColor(value) & 16777215;
+			this.color = this.color & 0xFF000000 | G3DUtils.getIntColor(value) & 0xFFFFFF;
 			return;
 		case AnimationTrack.CROP:
 			this.cropX = G3DUtils.round(value[0]);

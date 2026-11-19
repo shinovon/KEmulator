@@ -187,90 +187,90 @@ public class Image2D extends Object3D {
 		int i;
 		if (mutable) {
 			switch (type) {
-				case 96:
-				case 97:
-					result = new byte[pixelCount];
+			case ALPHA:
+			case LUMINANCE:
+				result = new byte[pixelCount];
 
-					for (i = pixelCount - 1; i >= 0; --i) {
-						result[i] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
-					}
+				for (i = pixelCount - 1; i >= 0; --i) {
+					result[i] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
+				}
 
-					return result;
-				case 98:
-					result = new byte[pixelCount * 2];
+				return result;
+			case LUMINANCE_ALPHA:
+				result = new byte[pixelCount * 2];
 
-					for (i = pixelCount - 1; i >= 0; --i) {
-						result[i * 2] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
-						result[i * 2 + 1] = -1;
-					}
+				for (i = pixelCount - 1; i >= 0; --i) {
+					result[i * 2] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
+					result[i * 2 + 1] = -1;
+				}
 
-					return result;
-				case 99:
-					result = new byte[pixelCount * 3];
+				return result;
+			case RGB:
+				result = new byte[pixelCount * 3];
 
-					for (i = pixelCount - 1; i >= 0; --i) {
-						result[i * 3] = (byte) (data[i] >> 16 & 255);
-						result[i * 3 + 1] = (byte) (data[i] >> 8 & 255);
-						result[i * 3 + 2] = (byte) (data[i] & 255);
-					}
+				for (i = pixelCount - 1; i >= 0; --i) {
+					result[i * 3] = (byte) (data[i] >> 16 & 255);
+					result[i * 3 + 1] = (byte) (data[i] >> 8 & 255);
+					result[i * 3 + 2] = (byte) (data[i] & 255);
+				}
 
-					return result;
-				case 100:
-					result = new byte[pixelCount * 4];
+				return result;
+			case RGBA:
+				result = new byte[pixelCount * 4];
 
-					for (i = pixelCount - 1; i >= 0; --i) {
-						result[i * 4] = (byte) (data[i] >> 16 & 255);
-						result[i * 4 + 1] = (byte) (data[i] >> 8 & 255);
-						result[i * 4 + 2] = (byte) (data[i] & 255);
-						result[i * 4 + 3] = -1;
-					}
+				for (i = pixelCount - 1; i >= 0; --i) {
+					result[i * 4] = (byte) (data[i] >> 16 & 255);
+					result[i * 4 + 1] = (byte) (data[i] >> 8 & 255);
+					result[i * 4 + 2] = (byte) (data[i] & 255);
+					result[i * 4 + 3] = -1;
+				}
 			}
 		} else {
 			switch (type) {
-				case 96:
-					result = new byte[pixelCount];
+			case ALPHA:
+				result = new byte[pixelCount];
 
-					for (i = pixelCount - 1; i >= 0; --i) {
-						result[i] = (byte) (data[i] >> 24 & 255);
-					}
+				for (i = pixelCount - 1; i >= 0; --i) {
+					result[i] = (byte) (data[i] >> 24 & 255);
+				}
 
-					return result;
-				case 97:
-					result = new byte[pixelCount];
+				return result;
+			case LUMINANCE:
+				result = new byte[pixelCount];
 
-					for (i = pixelCount - 1; i >= 0; --i) {
-						result[i] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
-					}
+				for (i = pixelCount - 1; i >= 0; --i) {
+					result[i] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
+				}
 
-					return result;
-				case 98:
-					result = new byte[pixelCount * 2];
+				return result;
+			case LUMINANCE_ALPHA:
+				result = new byte[pixelCount * 2];
 
-					for (i = pixelCount - 1; i >= 0; --i) {
-						result[i * 2] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
-						result[i * 2 + 1] = (byte) (data[i] >> 24 & 255);
-					}
+				for (i = pixelCount - 1; i >= 0; --i) {
+					result[i * 2] = (byte) (((data[i] >> 16 & 255) + (data[i] >> 8 & 255) + (data[i] & 255)) / 3 & 255);
+					result[i * 2 + 1] = (byte) (data[i] >> 24 & 255);
+				}
 
-					return result;
-				case 99:
-					result = new byte[pixelCount * 3];
+				return result;
+			case RGB:
+				result = new byte[pixelCount * 3];
 
-					for (i = pixelCount - 1; i >= 0; --i) {
-						result[i * 3] = (byte) (data[i] >> 16 & 255);
-						result[i * 3 + 1] = (byte) (data[i] >> 8 & 255);
-						result[i * 3 + 2] = (byte) (data[i] & 255);
-					}
+				for (i = pixelCount - 1; i >= 0; --i) {
+					result[i * 3] = (byte) (data[i] >> 16 & 255);
+					result[i * 3 + 1] = (byte) (data[i] >> 8 & 255);
+					result[i * 3 + 2] = (byte) (data[i] & 255);
+				}
 
-					return result;
-				case 100:
-					result = new byte[pixelCount * 4];
+				return result;
+			case RGBA:
+				result = new byte[pixelCount * 4];
 
-					for (i = pixelCount - 1; i >= 0; --i) {
-						result[i * 4] = (byte) (data[i] >> 16 & 255);
-						result[i * 4 + 1] = (byte) (data[i] >> 8 & 255);
-						result[i * 4 + 2] = (byte) (data[i] & 255);
-						result[i * 4 + 3] = (byte) (data[i] >> 24 & 255);
-					}
+				for (i = pixelCount - 1; i >= 0; --i) {
+					result[i * 4] = (byte) (data[i] >> 16 & 255);
+					result[i * 4 + 1] = (byte) (data[i] >> 8 & 255);
+					result[i * 4 + 2] = (byte) (data[i] & 255);
+					result[i * 4 + 3] = (byte) (data[i] >> 24 & 255);
+				}
 			}
 		}
 

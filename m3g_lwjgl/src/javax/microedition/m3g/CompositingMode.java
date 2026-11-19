@@ -16,7 +16,7 @@ public class CompositingMode extends Object3D {
 	private boolean alphaWrite = true;
 
 	public void setBlending(int mode) {
-		if (mode >= 64 && mode <= 68) {
+		if (mode >= ALPHA && mode <= REPLACE) {
 			this.blending = mode;
 		} else {
 			throw new IllegalArgumentException();

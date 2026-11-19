@@ -8,15 +8,15 @@ public class PolygonMode extends Object3D {
 	public static final int SHADE_SMOOTH = 165;
 	public static final int WINDING_CCW = 168;
 	public static final int WINDING_CW = 169;
-	private int culling = 160;
-	private int shading = 165;
-	private int winding = 168;
+	private int culling = CULL_BACK;
+	private int shading = SHADE_SMOOTH;
+	private int winding = WINDING_CW;
 	private boolean twoSidedLighting = false;
 	private boolean localCameraLighting = false;
 	private boolean perspectiveCorrection = false;
 
 	public void setCulling(int mode) {
-		if (mode >= 160 && mode <= 162) {
+		if (mode >= CULL_BACK && mode <= CULL_NONE) {
 			this.culling = mode;
 		} else {
 			throw new IllegalArgumentException();
@@ -28,7 +28,7 @@ public class PolygonMode extends Object3D {
 	}
 
 	public void setWinding(int mode) {
-		if (mode != 169 && mode != 168) {
+		if (mode != WINDING_CW && mode != WINDING_CCW) {
 			throw new IllegalArgumentException();
 		} else {
 			this.winding = mode;
@@ -40,7 +40,7 @@ public class PolygonMode extends Object3D {
 	}
 
 	public void setShading(int mode) {
-		if (mode != 164 && mode != 165) {
+		if (mode != SHADE_FLAT && mode != SHADE_SMOOTH) {
 			throw new IllegalArgumentException();
 		} else {
 			this.shading = mode;

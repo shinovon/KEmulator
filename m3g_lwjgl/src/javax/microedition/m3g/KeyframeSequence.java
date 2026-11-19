@@ -112,7 +112,7 @@ public class KeyframeSequence extends Object3D {
 			if (time >= 0 && value.length >= this.componentCount) {
 				this.keyframes[index] = time;
 				float[] keyframe = this.keyframeValues[index];
-				if (this.interpolationType != 177 && this.interpolationType != 179) {
+				if (this.interpolationType != SLERP && this.interpolationType != SQUAD) {
 					System.arraycopy(value, 0, keyframe, 0, keyframe.length);
 				} else {
 					Quaternion orientation;
@@ -180,7 +180,7 @@ public class KeyframeSequence extends Object3D {
 	}
 
 	public void setRepeatMode(int mode) {
-		if (mode != 192 && mode != 193) {
+		if (mode != CONSTANT && mode != LOOP) {
 			throw new IllegalArgumentException();
 		} else {
 			this.repeatMode = mode;
@@ -398,7 +398,7 @@ public class KeyframeSequence extends Object3D {
 	}
 
 	private float incomingTangentScale(int frame) {
-		if (this.repeatMode != 192 || frame != this.validRangeFirst && frame != this.validRangeLast) {
+		if (this.repeatMode != CONSTANT || frame != this.validRangeFirst && frame != this.validRangeLast) {
 			int prevFrame = this.keyframeBefore(frame);
 			return 2.0F * (float) this.timeDelta(prevFrame) / (float) (this.timeDelta(frame) + this.timeDelta(prevFrame));
 		} else {
@@ -407,7 +407,7 @@ public class KeyframeSequence extends Object3D {
 	}
 
 	private float outgoingTangentScale(int frame) {
-		if (this.repeatMode != 192 || frame != this.validRangeFirst && frame != this.validRangeLast) {
+		if (this.repeatMode != CONSTANT || frame != this.validRangeFirst && frame != this.validRangeLast) {
 			int prevFrame = this.keyframeBefore(frame);
 			return 2.0F * (float) this.timeDelta(frame) / (float) (this.timeDelta(prevFrame) + this.timeDelta(frame));
 		} else {
@@ -418,10 +418,10 @@ public class KeyframeSequence extends Object3D {
 	private void updateTangents() {
 		if (!this.dirty) {
 			throw new Error();
-		} else if (this.interpolationType == 178) {
+		} else if (this.interpolationType == SPLINE) {
 			this.precalculateTangents();
 		} else {
-			if (this.interpolationType == 179) {
+			if (this.interpolationType == SQUAD) {
 				this.precalculateAB();
 			}
 

@@ -24,11 +24,11 @@ public class Texture2D extends Transformable {
 
 	public Texture2D(Image2D image) {
 		this.setImage(image);
-		this.wrappingS = 241;
-		this.wrappingT = 241;
-		this.levelFilter = 208;
-		this.imageFilter = 210;
-		this.blending = 227;
+		this.wrappingS = WRAP_REPEAT;
+		this.wrappingT = WRAP_REPEAT;
+		this.levelFilter = FILTER_BASE_LEVEL;
+		this.imageFilter = FILTER_NEAREST;
+		this.blending = FUNC_MODULATE;
 		this.blendColor = 0;
 	}
 

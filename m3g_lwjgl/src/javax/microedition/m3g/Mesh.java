@@ -136,7 +136,7 @@ public class Mesh extends Node {
 						if (this.appearances[submesh].getPolygonMode() != null) {
 							label120:
 							{
-								cullMode = this.appearances[submesh].getPolygonMode().getWinding() != 168 ? 1 : 0;
+								cullMode = this.appearances[submesh].getPolygonMode().getWinding() != PolygonMode.WINDING_CCW ? 1 : 0;
 								int resolvedCullMode;
 								switch (this.appearances[submesh].getPolygonMode().getCulling()) {
 									case 161:

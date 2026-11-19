@@ -12,7 +12,7 @@ public class VertexBuffer extends Object3D {
 	private VertexArray[] uvms;
 	private VertexArray colors = null;
 
-	private int defaultColor = -1;
+	private int defaultColor = 0xFFFFFFFF;
 
 	private float[] posScaleBias;
 	private float[][] uvScaleBias;

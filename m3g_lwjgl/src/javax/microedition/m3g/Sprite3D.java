@@ -246,19 +246,19 @@ public class Sprite3D extends Node {
 								int pixelOffset;
 								byte alphaOffset;
 								switch (this.image.getFormat()) {
-									case 96:
+									case Image2D.ALPHA:
 										pixelOffset = texelY * this.image.getWidth() * 1 + texelX * 1;
 										alphaOffset = 0;
 										break;
-									case 97:
-									case 99:
+									case Image2D.LUMINANCE:
+									case Image2D.RGB:
 									default:
 										break label71;
-									case 98:
+									case Image2D.LUMINANCE_ALPHA:
 										pixelOffset = texelY * this.image.getWidth() * 2 + texelX * 2;
 										alphaOffset = 1;
 										break;
-									case 100:
+									case Image2D.RGBA:
 										pixelOffset = texelY * this.image.getWidth() * 4 + texelX * 4;
 										alphaOffset = 3;
 								}

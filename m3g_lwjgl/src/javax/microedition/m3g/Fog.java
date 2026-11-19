@@ -5,14 +5,14 @@ import emulator.graphics3D.G3DUtils;
 public class Fog extends Object3D {
 	public static final int EXPONENTIAL = 80;
 	public static final int LINEAR = 81;
-	private int mode = 81;
+	private int mode = LINEAR;
 	private float density = 1.0F;
 	private float near = 0.0F;
 	private float far = 1.0F;
 	private int color = 0;
 
 	public void setMode(int mode) {
-		if (mode != 80 && mode != 81) {
+		if (mode != EXPONENTIAL && mode != LINEAR) {
 			throw new IllegalArgumentException();
 		} else {
 			this.mode = mode;
@@ -61,12 +61,12 @@ public class Fog extends Object3D {
 		case AnimationTrack.ALPHA:
 			this.color = G3DUtils.getIntColor(value) & 0xffffff;
 			return;
-		case 259:
-		case 261:
-		case 262:
-		case 264:
-		case 265:
-		case 266:
+		case AnimationTrack.CROP:
+		case AnimationTrack.DIFFUSE_COLOR:
+		case AnimationTrack.EMISSIVE_COLOR:
+		case AnimationTrack.FIELD_OF_VIEW:
+		case AnimationTrack.INTENSITY:
+		case AnimationTrack.MORPH_WEIGHTS:
 		default:
 			super.updateProperty(property, value);
 			return;

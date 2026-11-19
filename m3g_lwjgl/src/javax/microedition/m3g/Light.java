@@ -7,8 +7,8 @@ public class Light extends Node {
 	public static final int DIRECTIONAL = 129;
 	public static final int OMNI = 130;
 	public static final int SPOT = 131;
-	private int mode = 129;
-	private int color = 16777215;
+	private int mode = DIRECTIONAL;
+	private int color = 0xFFFFFF;
 	private float intensity = 1.0F;
 	private float constantAttenuation = 1.0F;
 	private float linearAttenuation = 0.0F;
@@ -17,7 +17,7 @@ public class Light extends Node {
 	private float spotExponent = 0.0F;
 
 	public void setMode(int mode) {
-		if (mode >= 128 && mode <= 131) {
+		if (mode >= AMBIENT && mode <= SPOT) {
 			this.mode = mode;
 		} else {
 			throw new IllegalArgumentException();
