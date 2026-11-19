@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-//https://github.com/ezyang/SensorSimulator/blob/master/SensorSimulatorSettings/src/org/openintents/sensorsimulator/hardware/SensorSimulatorClient.java
+
 public final class SensorSimulatorClient {
 	protected boolean connected;
 	Socket mSocket;

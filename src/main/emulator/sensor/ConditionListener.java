@@ -2,8 +2,6 @@ package emulator.sensor;
 
 import javax.microedition.sensor.Condition;
 
-//ConditionListenerPair from
-//https://github.com/hbao/phonemefeaturedevices/blob/master/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/ChannelImpl.java#L84
 final class ConditionListener {
 	private javax.microedition.sensor.ConditionListener listener;
 	private Condition condition;
@@ -17,8 +15,8 @@ final class ConditionListener {
 	public final Condition getCondition() {
 		return this.condition;
 	}
-    //method266 = equals; but I'm scared of renaming
-	public final boolean method266(final ConditionListener ConditionListener) {
+
+	public final boolean equals(final ConditionListener ConditionListener) {
 		return this.listener == ConditionListener.listener && this.condition == ConditionListener.condition;
 	}
 

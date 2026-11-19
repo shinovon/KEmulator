@@ -5,7 +5,7 @@ import javax.microedition.sensor.LimitCondition;
 import javax.microedition.sensor.ObjectCondition;
 import javax.microedition.sensor.RangeCondition;
 import java.util.Vector;
-// https://github.com/hbao/phonemefeaturedevices/blob/78b194c67b3b21a9ec6a847972e6bf5dbafdde04/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/ChannelUrl.java
+
 public final class ChannelUrl {
 	public ChannelUrl() {
 		super();
@@ -14,20 +14,20 @@ public final class ChannelUrl {
 	public static String createUrl(final ChannelImpl ChannelImpl) {
 		final StringBuffer sb;
 		(sb = new StringBuffer("channel=")).append(ChannelImpl.getName());
-		final Condition[] method274;
-		if ((method274 = ChannelImpl.getAllConditions()) != null && method274.length > 0) {
-			final Vector vector = new Vector<Condition>(method274.length);
-			for (int i = 0; i < method274.length; ++i) {
-				if (!(method274[i] instanceof ObjectCondition)) {
-					boolean b = false;
+		final Condition[] allConditions;
+		if ((allConditions = ChannelImpl.getAllConditions()) != null && allConditions.length > 0) {
+			final Vector vector = new Vector<Condition>(allConditions.length);
+			for (int i = 0; i < allConditions.length; ++i) {
+				if (!(allConditions[i] instanceof ObjectCondition)) {
+					boolean found = false;
 					for (int size = vector.size(), j = 0; j < size; ++j) {
-						if (method274[i].equals(vector.elementAt(j))) {
-							b = true;
+						if (allConditions[i].equals(vector.elementAt(j))) {
+							found = true;
 							break;
 						}
 					}
-					if (!b) {
-						vector.addElement(method274[i]);
+					if (!found) {
+						vector.addElement(allConditions[i]);
 					}
 				}
 			}
