@@ -2,7 +2,7 @@ package emulator.sensor;
 
 import javax.microedition.sensor.*;
 import java.io.IOException;
-//https://github.com/hbao/phonemefeaturedevices/blob/master/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/Sensor.java
+
 public final class Sensor implements SensorInfo, SensorConnection, ChannelDataListener {
     private String description;
     private String contextType;
@@ -19,7 +19,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
     private int listeningProcessCounter;
     SensorProperties props;
     private volatile int state;
-    private volatile boolean aBoolean313; // unknown
+    private volatile boolean ignoreData;
     private ChannelImpl[] channels;
     private boolean isSensorAvailabilityPushSupported;
     private boolean isSensorConditionPushSupported;
@@ -121,7 +121,7 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
     }
 
     public final synchronized void open() throws IOException {
-        this.aBoolean313 = false;
+        this.ignoreData = false;
         if (this.state != 4) {
             throw new IOException("Sensor is already opened");
         }
@@ -163,8 +163,8 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
         return this.getData(n, 0L, false, false, false);
     }
 
-    public final synchronized Data[] getData(int anInt448, final long n, final boolean b, final boolean b2, final boolean b3) throws IOException {
-        if ((anInt448 < 1 && n < 1L) || anInt448 > this.maxBufferSize) {
+    public final synchronized Data[] getData(int bufferSize, final long bufferingPeriod, final boolean isTimestampIncluded, final boolean isUncertaintyIncluded, final boolean isValidityIncluded) throws IOException {
+        if ((bufferSize < 1 && bufferingPeriod < 1L) || bufferSize > this.maxBufferSize) {
             throw new IllegalArgumentException("Wrong buffer size or/and period values");
         }
         if (this.state == 2) {
@@ -173,15 +173,15 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
         if (this.state == 4) {
             throw new IOException("Wrong state");
         }
-        if (anInt448 < 1) {
-            anInt448 = this.maxBufferSize;
+        if (bufferSize < 1) {
+            bufferSize = this.maxBufferSize;
         }
         this.listener = null;
         this.channelCount = 0;
         this.channelStatus = 0;
         this.retData = new DataImpl[this.channels.length];
         for (int i = 0; i < this.channels.length; ++i) {
-            this.channels[i].startDataCollection(this, anInt448, n, b, b2, b3, false);
+            this.channels[i].startDataCollection(this, bufferSize, bufferingPeriod, isTimestampIncluded, isUncertaintyIncluded, isValidityIncluded, false);
         }
         this.isNotify = false;
         while (!this.isNotify) {
@@ -198,25 +198,25 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
     }
 
     public final void channelDataReceived(final int n, final DataImpl l) {
-        if (!this.aBoolean313) {
+        if (!this.ignoreData) {
             this.retData[n] = l;
-            Object aDataListener451 = this;
-            final int anInt455;
+            Object listener = this;
+            final int channelCount;
             synchronized (this) {
                 ++this.channelCount;
-                anInt455 = this.channelCount;
+                channelCount = this.channelCount;
             }
-            if (anInt455 == this.channels.length) {
+            if (channelCount == this.channels.length) {
                 synchronized (this) {
-                    if ((aDataListener451 = this.listener) == null && this.state == 1) {
+                    if ((listener = this.listener) == null && this.state == 1) {
                         this.isNotify = true;
                         this.notify();
                     }
                 }
-                if (aDataListener451 != null) {
+                if (listener != null) {
                     final boolean b = this.listeningProcessCounter != 0;
                     ++this.listeningProcessCounter;
-                    ((DataListener) aDataListener451).dataReceived(this, this.retData, b);
+                    ((DataListener) listener).dataReceived(this, this.retData, b);
                     --this.listeningProcessCounter;
                     synchronized (this) {
                         this.channelCount = 0;
@@ -226,11 +226,11 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
         }
     }
 
-    public final void channelErrorReceived(final int anInt459, final int anInt460) {
+    public final void channelErrorReceived(final int number, final int errorCode) {
         synchronized (this) {
             if (this.state != 4) {
-                this.channelStatus = anInt460;
-                this.channelNumber = anInt459;
+                this.channelStatus = errorCode;
+                this.channelNumber = number;
                 this.isNotify = true;
                 this.notify();
             }
@@ -246,15 +246,15 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
             throw new IllegalStateException("Connection is already closed");
         }
         if (this.state == 2) {
-            final boolean aBoolean313 = this.aBoolean313;
-            this.aBoolean313 = true;
+            final boolean aBoolean313 = this.ignoreData;
+            this.ignoreData = true;
             for (int i = 0; i < this.channels.length; ++i) {
                 this.channels[i].stopGetData();
             }
             synchronized (this) {
                 this.listener = null;
             }
-            this.aBoolean313 = aBoolean313;
+            this.ignoreData = aBoolean313;
             this.state = 1;
         }
     }
@@ -263,35 +263,35 @@ public final class Sensor implements SensorInfo, SensorConnection, ChannelDataLi
         this.setDataListener(dataListener, n, 0L, false, false, false);
     }
 
-    public final synchronized void setDataListener(final DataListener aDataListener451, int anInt448, final long n, final boolean b, final boolean b2, final boolean b3) {
-        if ((anInt448 < 1 && n < 1L) || anInt448 > this.maxBufferSize) {
+    public final synchronized void setDataListener(final DataListener listener, int bufferSize, final long n, final boolean b, final boolean b2, final boolean b3) {
+        if ((bufferSize < 1 && n < 1L) || bufferSize > this.maxBufferSize) {
             throw new IllegalArgumentException("Wrong buffer size or/and period values");
         }
         if (this.state == 4) {
             throw new IllegalStateException("Connection is closed");
         }
-        if (aDataListener451 == null) {
+        if (listener == null) {
             throw new NullPointerException("Listener is null");
         }
         if (this.state == 2) {
             this.removeDataListener();
         }
         this.state = 2;
-        if (anInt448 < 1) {
-            anInt448 = this.maxBufferSize;
+        if (bufferSize < 1) {
+            bufferSize = this.maxBufferSize;
         }
-        this.listener = aDataListener451;
+        this.listener = listener;
         this.channelCount = 0;
         this.channelStatus = 0;
         this.listeningProcessCounter = 0;
         this.retData = new DataImpl[this.channels.length];
         for (int i = 0; i < this.channels.length; ++i) {
-            this.channels[i].startDataCollection(this, anInt448, n, b, b2, b3, true);
+            this.channels[i].startDataCollection(this, bufferSize, n, b, b2, b3, true);
         }
     }
 
     public final void close() throws IOException {
-        this.aBoolean313 = true;
+        this.ignoreData = true;
         this.sensorDevice.shutdownSensor();
         if (this.state == 2) {
             this.removeDataListener();

@@ -5,8 +5,7 @@ import javax.microedition.sensor.SensorInfo;
 import javax.microedition.sensor.SensorListener;
 import javax.microedition.sensor.Unit;
 import java.util.Vector;
-//taken from
-//https://github.com/hbao/phonemefeaturedevices/blob/78b194c67b3b21a9ec6a847972e6bf5dbafdde04/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/SensorRegistry.java
+
 public final class SensorRegistry {
 	private static final Sensor[] sensorsCache;
 

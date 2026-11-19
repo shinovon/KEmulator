@@ -1,5 +1,5 @@
 package emulator.sensor;
-//https://github.com/hbao/phonemefeaturedevices/blob/master/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/ConditionHelpers.java
+
 public final class ConditionHelpers {
 	public ConditionHelpers() {
 		super();

@@ -2,7 +2,7 @@ package emulator.sensor;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-//class need to be renamed into SensorPropertiesImpl
+
 public final class SensorPropertiesImpl implements SensorProperties {
 	private Hashtable properties;
 

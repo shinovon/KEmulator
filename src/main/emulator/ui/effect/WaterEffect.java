@@ -18,10 +18,10 @@ public final class WaterEffect {
     /** Damping factor for the wave. */
     public int damping;
 
-    private int[] buffer1; // anIntArray318
-    private int[] buffer2; // anIntArray321
+    private int[] buffer1;
+    private int[] buffer2;
 
-    private final Random random; // aRandom319
+    private final Random random;
 
     public WaterEffect() {
         super();
@@ -73,7 +73,6 @@ public final class WaterEffect {
      * @param bufferIndex The source buffer index (0 or 1).
      * @param dampingFactor The factor to dampen the waves.
      */
-    // This was method139
     private void updateSimulation(int bufferIndex, int dampingFactor) {
         int i = this.width + 1;
         int[] srcBuffer;
@@ -197,7 +196,6 @@ public final class WaterEffect {
     /**
      * Renders the refraction effect with dynamic shading.
      */
-    // This was method141
     private void renderRefractionWithShading(int[] srcImage, int[] dstImage) {
         int i = this.width + 1;
         int maxOffset = this.width * this.height;
@@ -238,7 +236,6 @@ public final class WaterEffect {
      * @param shade The shade value (height difference), subtracted from R, G, B.
      * @return The modified ARGB color.
      */
-    // This was method138
     private static int applyShading(final int color, final int shade) {
         int r = (color >> 16 & 0xFF) - shade;
         int g = (color >> 8 & 0xFF) - shade;

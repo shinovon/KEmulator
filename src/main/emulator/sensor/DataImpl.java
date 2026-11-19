@@ -2,7 +2,7 @@ package emulator.sensor;
 
 import javax.microedition.sensor.ChannelInfo;
 import javax.microedition.sensor.Data;
-//https://github.com/hbao/phonemefeaturedevices/blob/master/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/DataImpl.java
+
 public final class DataImpl implements Data {
 	private ChannelInfo channelInfo;
 	private boolean isTimestampIncluded;

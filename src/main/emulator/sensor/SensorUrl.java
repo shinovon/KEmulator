@@ -1,7 +1,7 @@
 package emulator.sensor;
 
 import javax.microedition.sensor.SensorInfo;
-//https://github.com/hbao/phonemefeaturedevices/blob/78b194c67b3b21a9ec6a847972e6bf5dbafdde04/VirtualMachine/phoneme_feature/jsr256/src/share/classes/com/sun/javame/sensor/SensorUrl.java
+
 public final class SensorUrl {
     private int currPos;
     private String parseUrl;
@@ -61,18 +61,18 @@ public final class SensorUrl {
     }
 
     private String idCompareArr(final String[] array) throws IllegalArgumentException {
-        final String method256 = this.getId();
-        boolean b = false;
+        final String id = this.getId();
+        boolean found = false;
         for (int i = 0; i < array.length; ++i) {
-            if (method256.equals(array[i])) {
-                b = true;
+            if (id.equals(array[i])) {
+                found = true;
                 break;
             }
         }
-        if (!b) {
+        if (!found) {
             throw new IllegalArgumentException("Current word isn't found in the input array");
         }
-        return method256;
+        return id;
     }
 
     private void checkSeparator(final char c) throws IllegalArgumentException {
@@ -84,9 +84,9 @@ public final class SensorUrl {
         }
     }
 
-    public static SensorUrl parseUrl(final String aString463) {
+    public static SensorUrl parseUrl(final String sensorUrl) {
         final SensorUrl d;
-        (d = new SensorUrl()).parseUrl = aString463;
+        (d = new SensorUrl()).parseUrl = sensorUrl;
         if (!d.parseUrl.startsWith("sensor:")) {
             throw new IllegalArgumentException("Wrong scheme");
         }
@@ -98,22 +98,22 @@ public final class SensorUrl {
         int n3 = 0;
         while (d.currPos < length) {
             d.checkSeparator(';');
-            final String method248 = d.idCompareArr(new String[]{"contextType", "model", "location"});
+            final String paramName = d.idCompareArr(new String[]{"contextType", "model", "location"});
             d.checkSeparator('=');
-            if (method248.equals("contextType")) {
+            if (paramName.equals("contextType")) {
                 if (n != 0) {
                     throw new IllegalArgumentException("contextType defined twice");
                 }
                 n = 1;
                 d.contextType = d.idCompareArr(new String[]{"ambient", "device", "user", "vehicle"});
-            } else if (method248.equals("model")) {
+            } else if (paramName.equals("model")) {
                 if (n2 != 0) {
                     throw new IllegalArgumentException("model defined twice");
                 }
                 n2 = 1;
                 d.model = d.getId();
             } else {
-                if (!method248.equals("location")) {
+                if (!paramName.equals("location")) {
                     continue;
                 }
                 if (n3 != 0) {
