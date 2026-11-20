@@ -80,6 +80,9 @@ abstract class Program {
 		glAttachShader(program, vertexId);   // add the vertex shader to program
 		glAttachShader(program, fragmentId); // add the fragment shader to program
 
+		// Some compatibility drivers require attribute array 0 to be enabled to draw.
+		// Position is the only array guaranteed to be present for a flat-color primitive.
+		glBindAttribLocation(program, 0, "aPosition");
 		glLinkProgram(program);                  // create OpenGL program executables
 		IntBuffer status = BufferUtils.createIntBuffer(1);
 		glGetProgramiv(program, GL_LINK_STATUS, status);
