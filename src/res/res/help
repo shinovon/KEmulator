@@ -1,9 +1,12 @@
-$v2.22.1 [2026.10.26]
+$v2.22.1 [2026.11.20]
 Added JSR-82 Bluetooth emulation over LAN
 Fixed FPS limiter
 Fixed DatagramConnection
 Removed Linux x86 32-bit binaries
 Fixed lock in wav player
+Fixes in MascotCapsule GL engine
+Fixes in M3G LWJGL engine
+Added preload resources option
 
 $v2.22 [2026.09.17]
 Fixed crash in debug tools on Java 22+
