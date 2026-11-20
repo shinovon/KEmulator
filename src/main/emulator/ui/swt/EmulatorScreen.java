@@ -753,9 +753,9 @@ public final class EmulatorScreen implements
 				final char char1 = method698.charAt(0);
 				final String substring = method698.substring(1);
 				if (char1 == '0') {
-					method578(Integer.parseInt(substring));
+					dispatchKeyPressed(Integer.parseInt(substring));
 				} else if (char1 == '1') {
-					method580(Integer.parseInt(substring));
+					dispatchKeyReleased(Integer.parseInt(substring));
 				}
 				h = Emulator.getRobot();
 			}
@@ -767,9 +767,9 @@ public final class EmulatorScreen implements
 			final char char2 = s.charAt(0);
 			final String substring2 = s.substring(1);
 			if (char2 == '0') {
-				method578(Integer.parseInt(substring2));
+				dispatchKeyPressed(Integer.parseInt(substring2));
 			} else if (char2 == '1') {
-				method580(Integer.parseInt(substring2));
+				dispatchKeyReleased(Integer.parseInt(substring2));
 			}
 		}
 		if (AppSettings.asyncFlush) {
@@ -1583,7 +1583,7 @@ public final class EmulatorScreen implements
 		}
 		if (parent == this.menuView) {
 			if (menuItem == this.helpMenuItem) {
-				new About().method454(this.shell);
+				new About().open(this.shell);
 				return;
 			}
 			if (menuItem == updateMenuItem) {
@@ -1732,7 +1732,7 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.methodsMenuItem) {
-				if (((SWTFrontend) Emulator.getEmulator()).getMethods().method438()) {
+				if (((SWTFrontend) Emulator.getEmulator()).getMethods().isVisible()) {
 					((SWTFrontend) Emulator.getEmulator()).getMethods().dispose();
 					return;
 				}
@@ -1909,7 +1909,7 @@ public final class EmulatorScreen implements
 
 			@Override
 			public void controlResized(ControlEvent controlEvent) {
-				caret.a(paintTransform, rotation);
+				caret.setRenderTransform(paintTransform, rotation);
 				if (swtContent != null && lastDisplayable != null && lastDisplayable instanceof Screen
 						&& ((Screen) lastDisplayable)._isSWT()) {
 					((Screen) lastDisplayable)._swtUpdateSizes();
@@ -1939,7 +1939,7 @@ public final class EmulatorScreen implements
 
 		stackLayout = new StackLayout();
 		canvas.setLayout(stackLayout);
-		this.method589();
+		this.installFileDropTarget();
 		this.caret = new CaretImpl(this.canvas);
 		shell.layout();
 
@@ -2173,7 +2173,7 @@ public final class EmulatorScreen implements
 		shell.setText(title);
 	}
 
-	private static void method578(final int n) {
+	private static void dispatchKeyPressed(final int n) {
 		if (Emulator.getCurrentDisplay().getCurrent() == null) {
 			return;
 		}
@@ -2186,7 +2186,7 @@ public final class EmulatorScreen implements
 		}
 	}
 
-	private static void method580(final int n) {
+	private static void dispatchKeyReleased(final int n) {
 		if (Emulator.getCurrentDisplay().getCurrent() == null) {
 			return;
 		}
@@ -2576,7 +2576,7 @@ public final class EmulatorScreen implements
 		this.controlMoved(controlEvent);
 	}
 
-	private void mp(int i) {
+	private void forwardKeyPressToDisplayable(int i) {
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
 			Emulator.getCanvas()._invokeKeyPressed(i);
 		} else {
@@ -2584,7 +2584,7 @@ public final class EmulatorScreen implements
 		}
 	}
 
-	private void mr(int i) {
+	private void forwardKeyReleaseToDisplayable(int i) {
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
 			Emulator.getCanvas()._invokeKeyReleased(i);
 		} else {
@@ -2592,7 +2592,7 @@ public final class EmulatorScreen implements
 		}
 	}
 
-	private void mrp(int i) {
+	private void forwardKeyRepeatToCanvas(int i) {
 		if (Emulator.getCurrentDisplay().getCurrent() == Emulator.getCanvas()) {
 			Emulator.getCanvas()._invokeKeyRepeated(i);
 		}
@@ -2625,7 +2625,7 @@ public final class EmulatorScreen implements
 		}
 	}
 
-	private void method589() {
+	private void installFileDropTarget() {
 		final DropTarget dropTarget;
 		(dropTarget = new DropTarget(this.canvas, 19)).setTransfer(FileTransfer.getInstance());
 		dropTarget.addDropListener(new DropTargetAdapter() {
@@ -2654,11 +2654,11 @@ public final class EmulatorScreen implements
 	}
 
 
-	static Shell method561(final EmulatorScreen class93) {
+	static Shell getScreenShell(final EmulatorScreen class93) {
 		return class93.shell;
 	}
 
-	public static Display method564() {
+	public static Display getSwtDisplay() {
 		return EmulatorScreen.display;
 	}
 
@@ -2666,11 +2666,11 @@ public final class EmulatorScreen implements
 		return class93.canvas;
 	}
 
-	static int method566(final EmulatorScreen class93) {
+	static int getPauseState(final EmulatorScreen class93) {
 		return class93.pauseState;
 	}
 
-	static long method559(final EmulatorScreen class93, final long aLong1017) {
+	static long setVibrationStartTime(final EmulatorScreen class93, final long aLong1017) {
 		return class93.vibraStart = aLong1017;
 	}
 
@@ -2829,11 +2829,11 @@ public final class EmulatorScreen implements
 
 		public void run() {
 			if (this.aBoolean1479) {
-				this.anInt1478 = EmulatorScreen.method561(this.aClass93_1480).getLocation().x;
-				this.anInt1481 = EmulatorScreen.method561(this.aClass93_1480).getLocation().y;
+				this.anInt1478 = EmulatorScreen.getScreenShell(this.aClass93_1480).getLocation().x;
+				this.anInt1481 = EmulatorScreen.getScreenShell(this.aClass93_1480).getLocation().y;
 				return;
 			}
-			EmulatorScreen.method561(this.aClass93_1480).setLocation(this.anInt1478, this.anInt1481);
+			EmulatorScreen.getScreenShell(this.aClass93_1480).setLocation(this.anInt1478, this.anInt1481);
 		}
 	}
 
@@ -2847,7 +2847,7 @@ public final class EmulatorScreen implements
 
 		Vibrate(final EmulatorScreen aClass93_1196) {
 			super();
-			EmulatorScreen.method559(this.aClass93_1196 = aClass93_1196, System.currentTimeMillis());
+			EmulatorScreen.setVibrationStartTime(this.aClass93_1196 = aClass93_1196, System.currentTimeMillis());
 			this.stop = false;
 			this.aRandom1195 = new Random();
 		}
@@ -2862,7 +2862,7 @@ public final class EmulatorScreen implements
 					this.anInt1193 = 10;
 					final ShellPosition shellPosition = this.aClass93_1196.new ShellPosition(aClass93_1196, 0, 0, true);
 					while (System.currentTimeMillis() - this.aClass93_1196.vibraStart < this.aClass93_1196.vibra && !this.stop) {
-						if (EmulatorScreen.method566(this.aClass93_1196) != 2) {
+						if (EmulatorScreen.getPauseState(this.aClass93_1196) != 2) {
 							if (EmulatorScreen.this.shell.isDisposed()) return;
 							display.syncExec(shellPosition);
 							this.anInt1197 = shellPosition.anInt1478;
@@ -2907,7 +2907,7 @@ public final class EmulatorScreen implements
 				case 1: {
 					if (Settings.showLogFrame) {
 						this.screen.logMenuItem.setSelection(true);
-						((Log) Emulator.getEmulator().getLogStream()).createWindow(EmulatorScreen.method561(this.screen));
+						((Log) Emulator.getEmulator().getLogStream()).createWindow(EmulatorScreen.getScreenShell(this.screen));
 						return;
 					}
 					break;
@@ -2916,8 +2916,8 @@ public final class EmulatorScreen implements
 					if (Settings.showInfoFrame) {
 						infosEnabled = true;
 						this.screen.infosMenuItem.setSelection(true);
-						EmulatorScreen.getCanvas(this.screen).setCursor(new Cursor(EmulatorScreen.method564(), 2));
-						((SWTFrontend) Emulator.getEmulator()).getInfos().open(EmulatorScreen.method561(this.screen));
+						EmulatorScreen.getCanvas(this.screen).setCursor(new Cursor(EmulatorScreen.getSwtDisplay(), 2));
+						((SWTFrontend) Emulator.getEmulator()).getInfos().open(EmulatorScreen.getScreenShell(this.screen));
 						break;
 					}
 					break;

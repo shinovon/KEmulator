@@ -81,7 +81,7 @@ public final class CaretImpl implements ICaret, ModifyListener, TraverseListener
 		});
 	}
 
-	public final void a(Transform paramTransform, int paramInt) {
+	public final void setRenderTransform(Transform paramTransform, int paramInt) {
 	}
 
 	public synchronized final void setCaretLocation(final int x, final int y) {

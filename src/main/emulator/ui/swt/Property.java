@@ -248,7 +248,7 @@ public final class Property implements IProperty, SelectionListener {
 	 */
 	public void open(final Shell parent) {
 		display = parent.getDisplay();
-		this.method372(parent);
+		this.createSettingsShell(parent);
 		this.setsShell.pack();
 		this.setsShell.setSize(420, this.setsShell.getSize().y);
 		systemScrollComp.setMinHeight(systemComp.computeSize(-1, -1).y);
@@ -874,7 +874,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.updateProxy();
 	}
 
-	private void method372(final Shell shell) {
+	private void createSettingsShell(final Shell shell) {
 		this.setsShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		setsShell.setText(UILocale.get("OPTION_FRAME_TITLE", "Options & Properties"));
 		this.setsShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
@@ -894,8 +894,8 @@ public final class Property implements IProperty, SelectionListener {
 		final GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		this.setsShell.setLayout(layout);
-		this.method393();
-		this.method390();
+		this.createKeyMappingControls();
+		this.createDialogButtons();
 	}
 
 	private void genLanguageList() {
@@ -938,7 +938,7 @@ public final class Property implements IProperty, SelectionListener {
 		languageCombo.setText(Settings.uiLanguage);
 	}
 
-	private void method390() {
+	private void createDialogButtons() {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalAlignment = 4;
 		layoutData.horizontalSpan = 2;
@@ -968,7 +968,7 @@ public final class Property implements IProperty, SelectionListener {
 		});
 	}
 
-	private void method393() {
+	private void createKeyMappingControls() {
 		final GridData layoutData = new GridData();
 		layoutData.grabExcessVerticalSpace = true;
 		(layoutData).horizontalAlignment = 4;
@@ -1196,7 +1196,7 @@ public final class Property implements IProperty, SelectionListener {
 		aCLabel646.setText(UILocale.get("OPTION_KEYMAP_CONTROLLER", "Controller:"));
 		aCLabel646.setLayoutData(layoutData);
 		
-		this.method400();
+		this.createControllerSelector();
 		
 		CLabel aCLabel741 = new CLabel(keyMapBindsComp, 0);
 		(aCLabel741).setText(UILocale.get("OPTION_KEYMAP_LSK", "LeftSoftKey:"));
@@ -1392,10 +1392,10 @@ public final class Property implements IProperty, SelectionListener {
 		aButton696 .setText(UILocale.get("OPTION_KEYMAP_KEY_CACHE", "Enable Key Cache"));
 		this.aButton696.setLayoutData(layoutData28);
 		this.aButton696.setSelection(Settings.enableKeyCache);
-		this.method404();
+		this.cacheKeyboardBindings();
 	}
 
-	private void method400() {
+	private void createControllerSelector() {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalSpan = 2;
 		layoutData.verticalAlignment = 2;
@@ -1406,7 +1406,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.controllerCombo.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent modifyEvent) {
-				method406();
+				refreshKeyBindingFields();
 			}
 		});
 		final GridData layoutData2 = new GridData();
@@ -1419,7 +1419,7 @@ public final class Property implements IProperty, SelectionListener {
 		keymapRefreshBtn.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				Controllers.refresh(true);
-				method402();
+				populateControllerSelector();
 			}
 		});
 		Button keymapClearBtn;
@@ -1515,13 +1515,13 @@ public final class Property implements IProperty, SelectionListener {
 					Controllers.bind(i, 17, "10");
 					Controllers.bind(i, 18, "11");
 				}
-				method406();
+				refreshKeyBindingFields();
 			}
 		});
-		this.method402();
+		this.populateControllerSelector();
 	}
 
-	private void method402() {
+	private void populateControllerSelector() {
 		this.controllerCombo.removeAll();
 		this.controllerCombo.add("Keyboard");
 		for (int method740 = Controllers.getControllersCount(), i = 0; i < method740; ++i) {
@@ -1530,7 +1530,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.controllerCombo.setText("Keyboard");
 	}
 
-	private void method404() {
+	private void cacheKeyboardBindings() {
 		Property.aStringArray661[0] = this.aText627.getText().trim();
 		Property.aStringArray661[1] = this.aText754.getText().trim();
 		Property.aStringArray661[2] = this.aText757.getText().trim();
@@ -1552,7 +1552,7 @@ public final class Property implements IProperty, SelectionListener {
 		Property.aStringArray661[18] = this.aText735.getText().trim();
 	}
 
-	private void method406() {
+	private void refreshKeyBindingFields() {
 		final int selectionIndex;
 		if ((selectionIndex = this.controllerCombo.getSelectionIndex()) < 0 || this.aText627 == null || this.aText627.isDisposed()) {
 			return;
@@ -1616,7 +1616,7 @@ public final class Property implements IProperty, SelectionListener {
 
 			public final void run() {
 				int selectionIndex;
-				if ((selectionIndex = method376(this.aClass38_1497).getSelectionIndex()) == 0) {
+				if ((selectionIndex = getControllerCombo(this.aClass38_1497).getSelectionIndex()) == 0) {
 					return;
 				}
 				final String method749;
@@ -1630,66 +1630,66 @@ public final class Property implements IProperty, SelectionListener {
 				}
 				--selectionIndex;
 				Text text;
-				if (method405(this.aClass38_1497).isFocusControl()) {
+				if (getDigit0KeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 0, method749);
-					text = method405(this.aClass38_1497);
-				} else if (method380(this.aClass38_1497).isFocusControl()) {
+					text = getDigit0KeyField(this.aClass38_1497);
+				} else if (getDigit1KeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 1, method749);
-					text = method380(this.aClass38_1497);
-				} else if (method385(this.aClass38_1497).isFocusControl()) {
+					text = getDigit1KeyField(this.aClass38_1497);
+				} else if (getDigit2KeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 2, method749);
-					text = method385(this.aClass38_1497);
-				} else if (method388(this.aClass38_1497).isFocusControl()) {
+					text = getDigit2KeyField(this.aClass38_1497);
+				} else if (getDigit3KeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 3, method749);
-					text = method388(this.aClass38_1497);
-				} else if (method391(this.aClass38_1497).isFocusControl()) {
+					text = getDigit3KeyField(this.aClass38_1497);
+				} else if (getDigit4KeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 4, method749);
-					text = method391(this.aClass38_1497);
-				} else if (method394(this.aClass38_1497).isFocusControl()) {
+					text = getDigit4KeyField(this.aClass38_1497);
+				} else if (getDigit5KeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 5, method749);
-					text = method394(this.aClass38_1497);
-				} else if (method397(this.aClass38_1497).isFocusControl()) {
+					text = getDigit5KeyField(this.aClass38_1497);
+				} else if (getDigit6KeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 6, method749);
-					text = method397(this.aClass38_1497);
-				} else if (method399(this.aClass38_1497).isFocusControl()) {
+					text = getDigit6KeyField(this.aClass38_1497);
+				} else if (getDigit7KeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 7, method749);
-					text = method399(this.aClass38_1497);
-				} else if (method401(this.aClass38_1497).isFocusControl()) {
+					text = getDigit7KeyField(this.aClass38_1497);
+				} else if (getDigit8KeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 8, method749);
-					text = method401(this.aClass38_1497);
-				} else if (method403(this.aClass38_1497).isFocusControl()) {
+					text = getDigit8KeyField(this.aClass38_1497);
+				} else if (getDigit9KeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 9, method749);
-					text = method403(this.aClass38_1497);
-				} else if (method407(this.aClass38_1497).isFocusControl()) {
+					text = getDigit9KeyField(this.aClass38_1497);
+				} else if (getStarKeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 10, method749);
-					text = method407(this.aClass38_1497);
-				} else if (method409(this.aClass38_1497).isFocusControl()) {
+					text = getStarKeyField(this.aClass38_1497);
+				} else if (getPoundKeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 11, method749);
-					text = method409(this.aClass38_1497);
-				} else if (method411(this.aClass38_1497).isFocusControl()) {
+					text = getPoundKeyField(this.aClass38_1497);
+				} else if (getLeftDirectionKeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 14, method749);
-					text = method411(this.aClass38_1497);
-				} else if (method413(this.aClass38_1497).isFocusControl()) {
+					text = getLeftDirectionKeyField(this.aClass38_1497);
+				} else if (getRightDirectionKeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 15, method749);
-					text = method413(this.aClass38_1497);
-				} else if (method415(this.aClass38_1497).isFocusControl()) {
+					text = getRightDirectionKeyField(this.aClass38_1497);
+				} else if (getUpDirectionKeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 12, method749);
-					text = method415(this.aClass38_1497);
-				} else if (method417(this.aClass38_1497).isFocusControl()) {
+					text = getUpDirectionKeyField(this.aClass38_1497);
+				} else if (getDownDirectionKeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 13, method749);
-					text = method417(this.aClass38_1497);
-				} else if (method419(this.aClass38_1497).isFocusControl()) {
+					text = getDownDirectionKeyField(this.aClass38_1497);
+				} else if (getCenterKeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 16, method749);
-					text = method419(this.aClass38_1497);
-				} else if (method366(this.aClass38_1497).isFocusControl()) {
+					text = getCenterKeyField(this.aClass38_1497);
+				} else if (getLeftSoftKeyField(this.aClass38_1497).isFocusControl()) {
 					Controllers.bind(selectionIndex, 17, method749);
-					text = method366(this.aClass38_1497);
+					text = getLeftSoftKeyField(this.aClass38_1497);
 				} else {
-					if (!method377(this.aClass38_1497).isFocusControl()) {
+					if (!getRightSoftKeyField(this.aClass38_1497).isFocusControl()) {
 						return;
 					}
 					Controllers.bind(selectionIndex, 18, method749);
-					text = method377(this.aClass38_1497);
+					text = getRightSoftKeyField(this.aClass38_1497);
 				}
 				text.setText(string);
 			}
@@ -2194,10 +2194,10 @@ public final class Property implements IProperty, SelectionListener {
 		this.aSpinner670.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent modifyEvent) {
-				method360(1);
+				refreshFontPreviews(1);
 			}
 		});
-		this.method420(fontPreviewGroup);
+		this.createLargeFontPreview(fontPreviewGroup);
 		CLabel aCLabel642 = new CLabel(fontPreviewGroup, 0);
 		(aCLabel642).setText(UILocale.get("OPTION_FONT_MIDDLE_SIZE", "Medium Size:"));
 		this.aSpinner679 = new Spinner(fontPreviewGroup, 2048);
@@ -2206,10 +2206,10 @@ public final class Property implements IProperty, SelectionListener {
 		this.aSpinner679.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent modifyEvent) {
-				method360(2);
+				refreshFontPreviews(2);
 			}
 		});
-		this.method422(fontPreviewGroup);
+		this.createMediumFontPreview(fontPreviewGroup);
 		CLabel aCLabel644 = new CLabel(fontPreviewGroup, 0);
 		(aCLabel644).setText(UILocale.get("OPTION_FONT_SMALL_SIZE", "Small Size:"));
 		this.aSpinner690 = new Spinner(fontPreviewGroup, 2048);
@@ -2218,10 +2218,10 @@ public final class Property implements IProperty, SelectionListener {
 		this.aSpinner690.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent modifyEvent) {
-				method360(4);
+				refreshFontPreviews(4);
 			}
 		});
-		this.method424(fontPreviewGroup);
+		this.createSmallFontPreview(fontPreviewGroup);
 		CLabel aCLabel645 = new CLabel(fontPreviewGroup, 0);
 		(aCLabel645).setText(UILocale.get("OPTION_FONT_TEST_TEXT", "Test Text:"));
 		this.aText633 = new Text(fontPreviewGroup, 2048);
@@ -2229,7 +2229,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.aText633.setLayoutData(layoutData);
 		this.aText633.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
-				method360(7);
+				refreshFontPreviews(7);
 			}
 		});
 
@@ -2256,7 +2256,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.defaultFontCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
 				lastChangedFont = 0;
-				method360(7);
+				refreshFontPreviews(7);
 			}
 		});
 		final FontData[] fontList = Property.display.getFontList(null, true);
@@ -2297,7 +2297,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.monoFontCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
 				lastChangedFont = 1;
-				method360(7);
+				refreshFontPreviews(7);
 			}
 		});
 		final FontData[] fontList = Property.display.getFontList(null, true);
@@ -2325,7 +2325,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.monoFontCombo.setText(this.monospaceFont);
 	}
 
-	private void method420(Composite parent) {
+	private void createLargeFontPreview(Composite parent) {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
@@ -2335,7 +2335,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.aCanvas663.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
 				if (anIImage671 == null) {
-					method360(1);
+					refreshFontPreviews(1);
 				}
 				if (Settings.g2d == 0) {
 					((ImageSWT) anIImage671).method12(paintEvent.gc, 0, 0);
@@ -2348,7 +2348,7 @@ public final class Property implements IProperty, SelectionListener {
 		});
 	}
 
-	private void method422(Composite parent) {
+	private void createMediumFontPreview(Composite parent) {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
@@ -2358,14 +2358,14 @@ public final class Property implements IProperty, SelectionListener {
 		this.aCanvas680.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
 				if (anIImage674 == null) {
-					method360(2);
+					refreshFontPreviews(2);
 				}
 				anIImage674.copyToScreen(paintEvent.gc);
 			}
 		});
 	}
 
-	private void method424(Composite parent) {
+	private void createSmallFontPreview(Composite parent) {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
@@ -2375,7 +2375,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.aCanvas691.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
 				if (anIImage693 == null) {
-					method360(4);
+					refreshFontPreviews(4);
 				}
 				if (Settings.g2d == 0) {
 					((ImageSWT) anIImage693).copyToScreen(paintEvent.gc);
@@ -2388,7 +2388,7 @@ public final class Property implements IProperty, SelectionListener {
 		});
 	}
 
-	private void method360(final int n) {
+	private void refreshFontPreviews(final int n) {
 		if (!this.setsShell.isVisible()) {
 			return;
 		}
@@ -2513,7 +2513,7 @@ public final class Property implements IProperty, SelectionListener {
 				final String open;
 				if ((open = directoryDialog.open()) != null) {
 					aText662.setText(open);
-					method428();
+					refreshRmsTree();
 				}
 				((EmulatorScreen) Emulator.getEmulator().getScreen()).resumeStep();
 			}
@@ -2543,7 +2543,7 @@ public final class Property implements IProperty, SelectionListener {
 			clearRecordsBtn.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent selectionEvent) {
 					// TODO: rms delete
-					final String string = method374() + ".";
+					final String string = resolveRmsDirectory() + ".";
 					for (int i = 0; i < aTable665.getItemCount(); ++i) {
 						final File file;
 						if (aTable665.getItem(i).getChecked()) {
@@ -2552,11 +2552,11 @@ public final class Property implements IProperty, SelectionListener {
 							} catch (Exception ignored) {}
 						}
 					}
-					method428();
+					refreshRmsTree();
 				}
 			});
 			new TableColumn(this.aTable665, 0).setWidth(200);
-			this.method428();
+			this.refreshRmsTree();
 		} else {
 			rmsTree = new Tree(recordsComp, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 			rmsTree.setLayoutData(layoutData3);
@@ -2648,7 +2648,7 @@ public final class Property implements IProperty, SelectionListener {
 		}
 	}
 
-	private String method374() {
+	private String resolveRmsDirectory() {
 		String s = null;
 		Label_0083:
 		{
@@ -2673,10 +2673,10 @@ public final class Property implements IProperty, SelectionListener {
 		return s + "/";
 	}
 
-	private void method428() {
+	private void refreshRmsTree() {
 		if (rmsTree != null) {
 			rmsTree.removeAll();
-			String rootPath = method374();
+			String rootPath = resolveRmsDirectory();
 			String[] list = new File(rootPath).list();
 			if (list != null) {
 				for (String s : list) {
@@ -2800,7 +2800,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.aButton764.setLayoutData(layoutData);
 		this.aButton764.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				method352();
+				testProxyConnection();
 			}
 		});
 		Property aClass38_8311 = this;
@@ -2808,14 +2808,14 @@ public final class Property implements IProperty, SelectionListener {
 			private final Property aClass38_831 = aClass38_8311;
 
 			public final void modifyText(final ModifyEvent modifyEvent) {
-				final boolean b = method383(this.aClass38_831).getSelectionIndex() != 0;
-				method423(this.aClass38_831).setEnabled(b);
-				method425(this.aClass38_831).setEnabled(b);
-				method427(this.aClass38_831).setEnabled(b);
-				method429(this.aClass38_831).setEnabled(b);
-				method431(this.aClass38_831).setEnabled(b);
-				method357(this.aClass38_831).setEnabled(b);
-				method395(this.aClass38_831);
+				final boolean b = getProxyTypeCombo(this.aClass38_831).getSelectionIndex() != 0;
+				getProxyHostField(this.aClass38_831).setEnabled(b);
+				getProxyPortField(this.aClass38_831).setEnabled(b);
+				getProxyUsernameField(this.aClass38_831).setEnabled(b);
+				getProxyPasswordField(this.aClass38_831).setEnabled(b);
+				getProxyDomainField(this.aClass38_831).setEnabled(b);
+				getProxyConnectButton(this.aClass38_831).setEnabled(b);
+				clearAppliedProxyProperties(this.aClass38_831);
 			}
 		});
 		this.proxyTypeCombo.select(Settings.proxyType);
@@ -2856,7 +2856,7 @@ public final class Property implements IProperty, SelectionListener {
 		System.getProperties().remove("socksProxyPort");
 	}
 
-	private void method352() {
+	private void testProxyConnection() {
 		Emulator.getEmulator().getScreen();
 		EmulatorScreen.pauseStep();
 		if (this.aText635.getText().trim().length() < 1) {
@@ -2896,119 +2896,119 @@ public final class Property implements IProperty, SelectionListener {
 		return setsShell;
 	}
 
-	static Combo method376(final Property class38) {
+	static Combo getControllerCombo(final Property class38) {
 		return class38.controllerCombo;
 	}
 
-	static Text method366(final Property class38) {
+	static Text getLeftSoftKeyField(final Property class38) {
 		return class38.aText731;
 	}
 
-	static String[] method365() {
+	static String[] getKeyboardBindings() {
 		return Property.aStringArray661;
 	}
 
-	static Text method377(final Property class38) {
+	static Text getRightSoftKeyField(final Property class38) {
 		return class38.aText735;
 	}
 
-	static Text method380(final Property class38) {
+	static Text getDigit1KeyField(final Property class38) {
 		return class38.aText754;
 	}
 
-	static Text method385(final Property class38) {
+	static Text getDigit2KeyField(final Property class38) {
 		return class38.aText757;
 	}
 
-	static Text method388(final Property class38) {
+	static Text getDigit3KeyField(final Property class38) {
 		return class38.aText760;
 	}
 
-	static Text method391(final Property class38) {
+	static Text getDigit4KeyField(final Property class38) {
 		return class38.aText763;
 	}
 
-	static Text method394(final Property class38) {
+	static Text getDigit5KeyField(final Property class38) {
 		return class38.aText766;
 	}
 
-	static Text method397(final Property class38) {
+	static Text getDigit6KeyField(final Property class38) {
 		return class38.aText768;
 	}
 
-	static Text method399(final Property class38) {
+	static Text getDigit7KeyField(final Property class38) {
 		return class38.aText770;
 	}
 
-	static Text method401(final Property class38) {
+	static Text getDigit8KeyField(final Property class38) {
 		return class38.aText772;
 	}
 
-	static Text method403(final Property class38) {
+	static Text getDigit9KeyField(final Property class38) {
 		return class38.aText774;
 	}
 
-	static Text method405(final Property class38) {
+	static Text getDigit0KeyField(final Property class38) {
 		return class38.aText627;
 	}
 
-	static Text method407(final Property class38) {
+	static Text getStarKeyField(final Property class38) {
 		return class38.aText629;
 	}
 
-	static Text method409(final Property class38) {
+	static Text getPoundKeyField(final Property class38) {
 		return class38.aText631;
 	}
 
-	static Text method411(final Property class38) {
+	static Text getLeftDirectionKeyField(final Property class38) {
 		return class38.aText739;
 	}
 
-	static Text method413(final Property class38) {
+	static Text getRightDirectionKeyField(final Property class38) {
 		return class38.aText742;
 	}
 
-	static Text method415(final Property class38) {
+	static Text getUpDirectionKeyField(final Property class38) {
 		return class38.aText745;
 	}
 
-	static Text method417(final Property class38) {
+	static Text getDownDirectionKeyField(final Property class38) {
 		return class38.aText748;
 	}
 
-	static Text method419(final Property class38) {
+	static Text getCenterKeyField(final Property class38) {
 		return class38.aText751;
 	}
 
-	static Combo method383(final Property class38) {
+	static Combo getProxyTypeCombo(final Property class38) {
 		return class38.proxyTypeCombo;
 	}
 
-	static Text method423(final Property class38) {
+	static Text getProxyHostField(final Property class38) {
 		return class38.aText635;
 	}
 
-	static Text method425(final Property class38) {
+	static Text getProxyPortField(final Property class38) {
 		return class38.aText637;
 	}
 
-	static Text method427(final Property class38) {
+	static Text getProxyUsernameField(final Property class38) {
 		return class38.aText639;
 	}
 
-	static Text method429(final Property class38) {
+	static Text getProxyPasswordField(final Property class38) {
 		return class38.aText641;
 	}
 
-	static Text method431(final Property class38) {
+	static Text getProxyDomainField(final Property class38) {
 		return class38.aText643;
 	}
 
-	static Button method357(final Property class38) {
+	static Button getProxyConnectButton(final Property class38) {
 		return class38.aButton764;
 	}
 
-	static void method395(final Property class38) {
+	static void clearAppliedProxyProperties(final Property class38) {
 		removeProxyProperties();
 	}
 

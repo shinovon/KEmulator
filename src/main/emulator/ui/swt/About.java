@@ -241,7 +241,7 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 		}
 	}
 
-	public final void method454(final Shell shell) {
+	public final void open(final Shell shell) {
 		this.createAboutShell(shell);
 		final Display display = shell.getDisplay();
 		this.aboutShell.setLocation(shell.getLocation().x + (shell.getSize().x - this.aboutShell.getSize().x >> 1), shell.getLocation().y + (shell.getSize().y - this.aboutShell.getSize().y >> 1));
@@ -265,10 +265,10 @@ public final class About implements MouseListener, MouseMoveListener, PaintListe
 		this.waterCanvas.addMouseListener(this);
 		this.waterCanvas.addMouseMoveListener(this);
 		waterCanvas.addPaintListener(this);
-		this.method455(Emulator.class.getResourceAsStream("/res/sign"));
+		this.loadAnimatedLogo(Emulator.class.getResourceAsStream("/res/sign"));
 	}
 
-	private void method455(final InputStream inputStream) {
+	private void loadAnimatedLogo(final InputStream inputStream) {
 		try {
 			this.logoImage = new ImageSWT(inputStream);
 			this.waterImage = new ImageSWT(this.logoImage.getWidth(), this.logoImage.getHeight(), false, 6393563);

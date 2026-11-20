@@ -217,15 +217,15 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		}
 	}
 
-	private void method301(final Instance c, final Field field, final TreeItem treeItem) {
+	private void populateArrayField(final Instance c, final Field field, final TreeItem treeItem) {
 		final String name = ClassTypes.getReadableClassName(field.getType());
 		if (field.getType().isArray()) {
 			final Object method870 = ClassTypes.getFieldValue(c.getInstance(), field);
-			method305(method870, method303(method870, name.substring(0, name.length() - 2)), treeItem);
+			populateArrayElements(method870, resolveArrayElementTypeName(method870, name.substring(0, name.length() - 2)), treeItem);
 		}
 	}
 
-	private static String method303(final Object o, String method870) {
+	private static String resolveArrayElementTypeName(final Object o, String method870) {
 		if (method870.equalsIgnoreCase("java.lang.Object")) {
 			try {
 				final String string;
@@ -239,7 +239,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		return method870;
 	}
 
-	private static void method305(final Object o, final String s, final TreeItem treeItem) {
+	private static void populateArrayElements(final Object o, final String s, final TreeItem treeItem) {
 		treeItem.removeAll();
 		if (o != null) {
 			for (int length = Array.getLength(o), i = 0; i < length; ++i) {
@@ -264,12 +264,12 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		if (item.getParentItem() == null) {
 			Object field = item.getData();
 			if (field instanceof Field) {
-				this.method301(c, (Field) field, item);
+				this.populateArrayField(c, (Field) field, item);
 				display.asyncExec(this);
 			} else {
 				final String name = ClassTypes.getReadableClassName(c.getCls().getComponentType());
 				final Object method870 = Array.get(c.getInstance(), Integer.parseInt((String) field));
-				method305(method870, method303(method870, name.substring(0, name.length() - 2)), item);
+				populateArrayElements(method870, resolveArrayElementTypeName(method870, name.substring(0, name.length() - 2)), item);
 				display.asyncExec(this);
 			}
 			return;
@@ -291,7 +291,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			clazz = c.getCls().getComponentType();
 		}
 		final String method869 = ClassTypes.getReadableClassName(clazz);
-		String s = method303(o, method869.substring(0, method869.length() - 2));
+		String s = resolveArrayElementTypeName(o, method869.substring(0, method869.length() - 2));
 		String s2;
 		while (true) {
 			s2 = s;
@@ -302,7 +302,7 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 			o = Array.get(o, treeItem2.getParentItem().indexOf(treeItem2));
 			s = s2.substring(0, s2.length() - 2);
 		}
-		method305(o, s2, item);
+		populateArrayElements(o, s2, item);
 		display.asyncExec(this);
 	}
 
