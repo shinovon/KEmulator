@@ -10,7 +10,7 @@ public class PolygonMode extends Object3D {
 	public static final int WINDING_CW = 169;
 	private int culling = CULL_BACK;
 	private int shading = SHADE_SMOOTH;
-	private int winding = WINDING_CW;
+	private int winding = WINDING_CCW;
 	private boolean twoSidedLighting = false;
 	private boolean localCameraLighting = false;
 	private boolean perspectiveCorrection = false;
