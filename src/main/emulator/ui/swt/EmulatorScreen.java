@@ -1691,11 +1691,12 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.smsConsoleMenuItem) {
-				if (((MessageConsole) Emulator.getEmulator().getMessage()).method479()) {
-					((MessageConsole) Emulator.getEmulator().getMessage()).dispose();
+				MessageConsole messageConsole = (MessageConsole) Emulator.getEmulator().getMessage();
+				if (messageConsole.isVisible()) {
+					messageConsole.dispose();
 					return;
 				}
-				((MessageConsole) Emulator.getEmulator().getMessage()).open(this.shell);
+				messageConsole.open(this.shell);
 				return;
 			}
 			if (menuItem == m3gViewMenuItem) {
@@ -2553,10 +2554,11 @@ public final class EmulatorScreen implements
 				watchShell.setLocation(this.shell.getLocation().x - watchShell.getSize().x, this.shell.getLocation().y);
 			}
 		}
-		if (((MessageConsole) Emulator.getEmulator().getMessage()).method479()) {
-			final Shell method329 = ((MessageConsole) Emulator.getEmulator().getMessage()).method480();
-			if (((MessageConsole) Emulator.getEmulator().getMessage()).method488() && !method329.isDisposed()) {
-				method329.setLocation(this.shell.getLocation().x - method329.getSize().x, this.shell.getLocation().y);
+		MessageConsole messageConsole = (MessageConsole) Emulator.getEmulator().getMessage();
+		if (messageConsole.isVisible()) {
+			Shell messageShell = messageConsole.getShell();
+			if (messageConsole.isAttachedToParent() && !messageShell.isDisposed()) {
+				messageShell.setLocation(this.shell.getLocation().x - messageShell.getSize().x, this.shell.getLocation().y);
 			}
 		}
 		final Shell method330;
