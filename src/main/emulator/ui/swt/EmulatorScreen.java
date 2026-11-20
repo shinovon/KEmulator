@@ -1631,11 +1631,11 @@ public final class EmulatorScreen implements
 				return;
 			}
 			if (menuItem == this.keypadMenuItem) {
-				if (((SWTFrontend) Emulator.getEmulator()).getKeyPad().method834()) {
-					((SWTFrontend) Emulator.getEmulator()).getKeyPad().dipose();
+				if (((SWTFrontend) Emulator.getEmulator()).getKeyPad().isOpen()) {
+					((SWTFrontend) Emulator.getEmulator()).getKeyPad().dispose();
 					return;
 				}
-				((SWTFrontend) Emulator.getEmulator()).getKeyPad().method835(this.shell);
+				((SWTFrontend) Emulator.getEmulator()).getKeyPad().open(this.shell);
 				return;
 			}
 			if (menuItem == this.infosMenuItem) {
@@ -2564,7 +2564,7 @@ public final class EmulatorScreen implements
 			method330.setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
 		}
 		final Shell method331;
-		if (((SWTFrontend) Emulator.getEmulator()).getKeyPad().method834() && !(method331 = ((SWTFrontend) Emulator.getEmulator()).getKeyPad().method833()).isDisposed()) {
+		if (((SWTFrontend) Emulator.getEmulator()).getKeyPad().isOpen() && !(method331 = ((SWTFrontend) Emulator.getEmulator()).getKeyPad().getShell()).isDisposed()) {
 			method331.setLocation(this.shell.getLocation().x + this.shell.getSize().x, this.shell.getLocation().y);
 		}
 	}
