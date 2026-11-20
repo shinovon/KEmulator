@@ -8,12 +8,12 @@ import java.util.Random;
  */
 public final class WaterEffect {
 
-    private int width; // anInt316
-    private int height; // anInt320
-    private final boolean useShading; // aBoolean317
+    private int width;
+    private int height;
+    private final boolean useShading;
 
     /** 0 = buffer1 is active, 1 = buffer2 is active. Used for swapping. */
-    public int currentBufferIndex; // Recommended refactor name: currentBufferIndex
+    public int currentBufferIndex;
 
     /** Damping factor for the wave. */
     public int damping;
@@ -165,7 +165,6 @@ public final class WaterEffect {
     /**
      * Renders the refraction effect (no shading).
      */
-    // This was method140
     private void renderRefraction(final int[] srcImage, final int[] dstImage) {
         int i = this.width + 1;
         final int[] heightMap = this.buffer1;
