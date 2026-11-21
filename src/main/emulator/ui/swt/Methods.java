@@ -137,7 +137,7 @@ public final class Methods implements Runnable, DisposeListener {
 					}
 					n = n2;
 				}
-				if (method441(this.aClass46_1439).getSortDirection() == 128) {
+				if (getMethodsTable(this.aClass46_1439).getSortDirection() == 128) {
 					return n;
 				}
 				return -n;
@@ -194,7 +194,7 @@ public final class Methods implements Runnable, DisposeListener {
 			h.methodProfiles = new Hashtable();
 			h.method591();
 		}
-		this.method449();
+		this.createMethodsShell();
 		this.display = Display.getCurrent();
 		Rectangle clientArea = shell.getMonitor().getClientArea();
 		Point size = shell.getSize();
@@ -218,31 +218,31 @@ public final class Methods implements Runnable, DisposeListener {
 		this.visible = false;
 	}
 
-	public final boolean method438() {
+	public final boolean isVisible() {
 		return this.visible;
 	}
 
-	private void method449() {
+	private void createMethodsShell() {
 		(this.shell = new Shell(1264)).setText(UILocale.get("METHOD_FRAME_TITLE", "Methods"));
 		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		this.shell.setSize(new Point(752, 483));
 		this.shell.setLayout(new GridLayout());
-		this.method450();
+		this.createMainSash();
 	}
 
-	private void method450() {
+	private void createMainSash() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalAlignment = 4;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.verticalAlignment = 4;
 		(this.mainSashForm = new SashForm(this.shell, 0)).setOrientation(512);
-		this.method451();
+		this.createMethodsTablePanel();
 		this.mainSashForm.setLayoutData(layoutData);
-		this.method452();
+		this.createMethodDetailsPanel();
 	}
 
-	private void method451() {
+	private void createMethodsTablePanel() {
 		final GridData layoutData;
 		(layoutData = new GridData()).horizontalSpan = 2;
 		layoutData.grabExcessVerticalSpace = true;
@@ -388,7 +388,7 @@ public final class Methods implements Runnable, DisposeListener {
 		}
 	}
 
-	private void method452() {
+	private void createMethodDetailsPanel() {
 		final GridData layoutData;
 		(layoutData = new GridData()).grabExcessHorizontalSpace = false;
 		layoutData.verticalAlignment = 4;
@@ -444,15 +444,15 @@ public final class Methods implements Runnable, DisposeListener {
 		this.dispose();
 	}
 
-	static Table method441(final Methods class46) {
+	static Table getMethodsTable(final Methods class46) {
 		return class46.methodsTable;
 	}
 
-	static Shell method442(final Methods class46) {
+	static Shell getMethodsShell(final Methods class46) {
 		return class46.shell;
 	}
 
-	static void method443(final Methods class46, final TableItem[] array) {
+	static void showSelectedMethodDetails(final Methods class46, final TableItem[] array) {
 		class46.displayMethodDetails(array);
 	}
 }

@@ -3,8 +3,14 @@ package emulator.ui.swt;
 import emulator.Emulator;
 import emulator.UILocale;
 import emulator.ui.IMessage;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -23,207 +29,179 @@ import java.io.InterruptedIOException;
 import java.util.Vector;
 
 public final class MessageConsole implements IMessage, ControlListener, DisposeListener {
+	private static final int MESSAGE_TEXT_STYLE = SWT.BORDER | SWT.V_SCROLL | SWT.WRAP;
+	private static String lastMessageText;
+
+	private final Vector<String> pendingMessages = new Vector<>();
 	private Shell shell;
-	private boolean aBoolean869;
-	private Vector aVector870;
-	static String aString871;
-	private boolean visible;
-	private Group aGroup872;
-	private Group aGroup876;
-	private Button aButton873;
-	private StyledText aStyledText874;
-	private StyledText aStyledText877;
-	private Button aButton878;
-	private Button aButton880;
 	private Shell parent;
-	private boolean aBoolean881;
+	private StyledText receivedMessages;
+	private boolean blockReceivedMessages;
+	private boolean visible;
+	private boolean attachedToParent;
 
-	public MessageConsole() {
-		super();
-		this.shell = null;
-		this.aGroup872 = null;
-		this.aGroup876 = null;
-		this.aButton873 = null;
-		this.aStyledText874 = null;
-		this.aStyledText877 = null;
-		this.aButton878 = null;
-		this.aButton880 = null;
-		this.aBoolean869 = false;
-		this.aVector870 = new Vector();
-	}
-
-	public final Message receive(final String s) throws IOException, InterruptedIOException {
-		if (this.aVector870.size() > 0) {
-			final String s2 = (String) this.aVector870.firstElement();
-			this.aVector870.removeElementAt(0);
-			return new TextMessageImpl(s, s2);
+	@Override
+	public Message receive(String address) throws IOException, InterruptedIOException {
+		synchronized (pendingMessages) {
+			if (pendingMessages.isEmpty()) {
+				return null;
+			}
+			return new TextMessageImpl(address, pendingMessages.remove(0));
 		}
-		return null;
 	}
 
-	public final void send(final Message message, final String s) throws IOException, InterruptedIOException {
-		if (this.aBoolean869) {
+	@Override
+	public void send(Message message, String address) throws IOException, InterruptedIOException {
+		if (blockReceivedMessages) {
 			throw new InterruptedIOException();
 		}
-		Label_0106:
-		{
-			StringBuffer sb;
-			String payloadText;
-			if (message instanceof TextMessage) {
-				final TextMessage textMessage = (TextMessage) message;
-				sb = new StringBuffer().append("Message From ").append(textMessage.getAddress()).append("\n");
-				payloadText = textMessage.getPayloadText();
-			} else {
-				if (!(message instanceof BinaryMessage)) {
-					break Label_0106;
-				}
-				sb = new StringBuffer().append("Message From ").append(message.getAddress());
-				payloadText = "\n [Binary data]";
-			}
-			MessageConsole.aString871 = sb.append(payloadText).toString();
+
+		if (message instanceof TextMessage) {
+			TextMessage textMessage = (TextMessage) message;
+			lastMessageText = "Message From " + textMessage.getAddress() + "\n" + textMessage.getPayloadText();
+		} else if (message instanceof BinaryMessage) {
+			lastMessageText = "Message From " + message.getAddress() + "\n [Binary data]";
 		}
-		Emulator.getEmulator().getLogStream().println(MessageConsole.aString871);
+		Emulator.getEmulator().getLogStream().println(lastMessageText);
+
 		try {
-			shell.getDisplay().syncExec(new Runnable() {
-				public void run() {
-					if (aStyledText877 == null || aStyledText877.isDisposed()) {
-						return;
-					}
-					aStyledText877.append(MessageConsole.aString871);
-					aStyledText877.setTopIndex(aStyledText877.getLineCount());
+			shell.getDisplay().syncExec(() -> {
+				if (receivedMessages != null && !receivedMessages.isDisposed()) {
+					receivedMessages.append(lastMessageText);
+					receivedMessages.setTopIndex(receivedMessages.getLineCount());
 				}
 			});
 		} catch (Exception ignored) {}
 	}
 
-	public final boolean method479() {
-		return this.visible;
+	public boolean isVisible() {
+		return visible;
 	}
 
-	public final Shell method480() {
-		return this.shell;
+	public Shell getShell() {
+		return shell;
 	}
 
-	public final void open(final Shell parent) {
-		this.method487();
-		final Display current = parent.getDisplay();
+	public boolean isAttachedToParent() {
+		return attachedToParent;
+	}
+
+	public void open(Shell parent) {
+		createContents();
+		Display display = parent.getDisplay();
 		this.parent = parent;
-		this.shell.setLocation(parent.getLocation().x - parent.getSize().x, parent.getLocation().y);
-		this.shell.setSize(parent.getSize());
-		this.visible = true;
-		this.aBoolean881 = true;
-		this.shell.open();
-		this.shell.addControlListener(this);
-		this.shell.addDisposeListener(this);
-		while (!this.shell.isDisposed()) {
-			if (!current.readAndDispatch()) {
-				current.sleep();
+		Point parentSize = parent.getSize();
+		shell.setLocation(getDockLocation(parentSize.x));
+		shell.setSize(parentSize);
+		visible = true;
+		attachedToParent = true;
+		shell.open();
+		shell.addControlListener(this);
+		shell.addDisposeListener(this);
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}
 		}
-		this.visible = false;
+		visible = false;
 	}
 
-	public final void dispose() {
-		if (this.shell != null && !this.shell.isDisposed()) {
-			this.shell.dispose();
+	public void dispose() {
+		if (shell != null && !shell.isDisposed()) {
+			shell.dispose();
 		}
-		this.visible = false;
+		visible = false;
 	}
 
-	private void method487() {
-		(this.shell = new Shell()).setText(UILocale.get("SMS_CONSOLE_TITLE", "SMS Console"));
-		this.shell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		this.shell.setLayout(new GridLayout());
-		this.shell.setSize(new Point(100, 200));
-		this.method490();
-		this.method491();
+	private void createContents() {
+		shell = new Shell();
+		shell.setText(UILocale.get("SMS_CONSOLE_TITLE", "SMS Console"));
+		shell.setImage(new Image(Display.getCurrent(), getClass().getResourceAsStream("/res/icon")));
+		shell.setLayout(new GridLayout());
+		shell.setSize(new Point(100, 200));
+		createSendGroup();
+		createReceiveGroup();
 	}
 
-	private void method490() {
-		final GridData gridData;
-		(gridData = new GridData()).horizontalAlignment = 2;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.verticalAlignment = 2;
-		gridData.heightHint = 20;
-		gridData.widthHint = 60;
-		final GridData layoutData;
-		(layoutData = new GridData()).horizontalAlignment = 4;
-		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.grabExcessVerticalSpace = true;
-		layoutData.verticalAlignment = 4;
-		final GridData layoutData2;
-		(layoutData2 = new GridData()).horizontalAlignment = 4;
-		layoutData2.grabExcessHorizontalSpace = true;
-		layoutData2.grabExcessVerticalSpace = true;
-		layoutData2.verticalAlignment = 4;
-		layoutData2.horizontalSpan = 2;
-		final GridLayout layout;
-		(layout = new GridLayout()).numColumns = 2;
-		(this.aGroup872 = new Group(this.shell, 0)).setLayout(layout);
-		this.aGroup872.setText(UILocale.get("SMS_CONSOLE_SEND_TO", "Send to midlet"));
-		this.aGroup872.setLayoutData(layoutData);
-		(this.aStyledText874 = new StyledText(this.aGroup872, 2624)).setLayoutData(layoutData2);
-		(this.aButton878 = new Button(this.aGroup872, 8388616)).setText(UILocale.get("SMS_CONSOLE_CLEAR", "Clear"));
-		this.aButton878.setLayoutData(gridData);
-		this.aButton878.addSelectionListener(new SelectionAdapter() {
+	private void createSendGroup() {
+		Group sendGroup = new Group(shell, SWT.NONE);
+		sendGroup.setLayout(new GridLayout(2, false));
+		sendGroup.setText(UILocale.get("SMS_CONSOLE_SEND_TO", "Send to midlet"));
+		sendGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		StyledText messageInput = new StyledText(sendGroup, MESSAGE_TEXT_STYLE);
+		messageInput.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		Button clearButton = createSendButton(sendGroup, UILocale.get("SMS_CONSOLE_CLEAR", "Clear"));
+		clearButton.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent selectionEvent) {
-				aStyledText874.setText("");
+			public void widgetSelected(SelectionEvent event) {
+				messageInput.setText("");
 			}
 		});
-		(this.aButton880 = new Button(this.aGroup872, 8388616)).setText(UILocale.get("SMS_CONSOLE_SEND", "Send"));
-		this.aButton880.setLayoutData(gridData);
-		this.aButton880.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent selectionEvent) {
-				final String text;
-				if ((text = aStyledText874.getText()) != null && text.length() > 0) {
-					aVector870.addElement(text);
+		Button sendButton = createSendButton(sendGroup, UILocale.get("SMS_CONSOLE_SEND", "Send"));
+		sendButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				String text = messageInput.getText();
+				if (text != null && !text.isEmpty()) {
+					pendingMessages.addElement(text);
 				}
 			}
 		});
 	}
 
-	private void method491() {
-		final GridData gridData;
-		(gridData = new GridData()).horizontalAlignment = 4;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
-		gridData.verticalAlignment = 4;
-		(this.aGroup876 = new Group(this.shell, 0)).setLayout(new GridLayout());
-		this.aGroup876.setText(UILocale.get("SMS_CONSOLE_RECEIVE", "Receive from midlet"));
-		this.aGroup876.setLayoutData(gridData);
-		(this.aButton873 = new Button(this.aGroup876, 32)).setText(UILocale.get("SMS_CONSOLE_BLOCK", "Block the received message"));
-		this.aButton873.setSelection(this.aBoolean869);
-		this.aButton873.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent selectionEvent) {
-				aBoolean869 = aButton873.getSelection();
+	private static Button createSendButton(Group group, String label) {
+		Button button = new Button(group, SWT.FLAT | SWT.PUSH);
+		button.setText(label);
+		GridData layout = new GridData(GridData.CENTER, GridData.CENTER, true, false);
+		layout.widthHint = 60;
+		layout.heightHint = 20;
+		button.setLayoutData(layout);
+		return button;
+	}
+
+	private void createReceiveGroup() {
+		Group receiveGroup = new Group(shell, SWT.NONE);
+		receiveGroup.setLayout(new GridLayout());
+		receiveGroup.setText(UILocale.get("SMS_CONSOLE_RECEIVE", "Receive from midlet"));
+		receiveGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		Button blockButton = new Button(receiveGroup, SWT.CHECK);
+		blockButton.setText(UILocale.get("SMS_CONSOLE_BLOCK", "Block the received message"));
+		blockButton.setSelection(blockReceivedMessages);
+		blockButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				blockReceivedMessages = blockButton.getSelection();
 			}
 		});
-		(this.aStyledText877 = new StyledText(this.aGroup876, 2624)).setLayoutData(gridData);
+		receivedMessages = new StyledText(receiveGroup, MESSAGE_TEXT_STYLE);
+		receivedMessages.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	}
 
-	public final boolean method488() {
-		return this.aBoolean881;
+	private Point getDockLocation(int consoleWidth) {
+		Point parentLocation = parent.getLocation();
+		return new Point(parentLocation.x - consoleWidth, parentLocation.y);
 	}
 
-	public final void controlMoved(final ControlEvent controlEvent) {
-		MessageConsole class83;
-		boolean aBoolean881;
-		if (Math.abs(this.parent.getLocation().x - this.shell.getSize().x - this.shell.getLocation().x) < 10 && Math.abs(this.parent.getLocation().y - this.shell.getLocation().y) < 20) {
-			this.shell.setLocation(this.parent.getLocation().x - this.shell.getSize().x, this.parent.getLocation().y);
-			class83 = this;
-			aBoolean881 = true;
-		} else {
-			class83 = this;
-			aBoolean881 = false;
+	@Override
+	public void controlMoved(ControlEvent event) {
+		Point dockLocation = getDockLocation(shell.getSize().x);
+		Point consoleLocation = shell.getLocation();
+		boolean withinDockRange = Math.abs(dockLocation.x - consoleLocation.x) < 10
+				&& Math.abs(dockLocation.y - consoleLocation.y) < 20;
+		if (withinDockRange) {
+			shell.setLocation(dockLocation);
 		}
-		class83.aBoolean881 = aBoolean881;
+		attachedToParent = withinDockRange;
 	}
 
-	public final void controlResized(final ControlEvent controlEvent) {
+	@Override
+	public void controlResized(ControlEvent event) {
 	}
 
-	public final void widgetDisposed(final DisposeEvent disposeEvent) {
-		this.dispose();
+	@Override
+	public void widgetDisposed(DisposeEvent event) {
+		dispose();
 	}
 }

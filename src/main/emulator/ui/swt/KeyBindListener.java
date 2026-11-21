@@ -20,7 +20,7 @@ final class KeyBindListener extends KeyAdapter {
 		keyEvent.keyCode &= 0xFEFFFFFF;
 		if (((Property) Emulator.getEmulator().getProperty()).controllerCombo.getSelectionIndex() == 0 && KeyMapping.keyToString(String.valueOf(keyEvent.keyCode)) != null) {
 			text.setText(KeyMapping.keyToString(String.valueOf(keyEvent.keyCode)));
-			Property.method365()[i] = text.getText().trim();
+			Property.getKeyboardBindings()[i] = text.getText().trim();
 		}
 		keyEvent.doit = false;
 	}
