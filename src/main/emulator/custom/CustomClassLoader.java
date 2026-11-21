@@ -33,11 +33,11 @@ public final class CustomClassLoader extends ClassLoader {
 			try {
 				return super.loadClass(s, b);
 			} catch (ClassNotFoundException ex) {
-				final Class method806;
-				if ((method806 = this.loadLibraryClass(s)) == null) {
+				final Class libraryClass;
+				if ((libraryClass = this.loadLibraryClass(s)) == null) {
 					throw ex;
 				}
-				return method806;
+				return libraryClass;
 			}
 		}
 		final Class class1 = this.findClass(s);
