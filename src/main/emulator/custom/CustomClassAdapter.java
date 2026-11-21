@@ -63,9 +63,9 @@ public final class CustomClassAdapter extends ClassVisitor implements Opcodes {
 		return null;
 	}
 
-	public CustomClassAdapter(final ClassVisitor classVisitor, final String aString1165) {
+	public CustomClassAdapter(final ClassVisitor classVisitor, final String className) {
 		super(Opcodes.ASM4, classVisitor);
-		this.className = aString1165;
+		this.className = className;
 	}
 
 	public final void visit(final int n, final int n2, final String s, final String s2, String s3, final String[] array) {

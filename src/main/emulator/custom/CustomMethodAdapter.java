@@ -8,15 +8,15 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 public final class CustomMethodAdapter extends MethodVisitor implements Opcodes {
-	private int anInt1185;
+	private int extraStack;
 	private String className;
 	private String methodName;
 	private String methodDesc;
-	private String aString1190;
+	private String allocationTraceMessage;
 	private int sourceLine;
 
-	private void method707(final int n) {
-		this.anInt1185 = Math.max(this.anInt1185, n);
+	private void requireExtraStack(final int n) {
+		this.extraStack = Math.max(this.extraStack, n);
 	}
 
 
@@ -57,7 +57,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 			} else if (cls.equals("java/util/Random") && (Settings.recordKeys || Settings.playingRecordedKeys)) {
 				if (name.equals("<init>")) {
 					if (sign.equals("()V")) {
-						this.method707(2);
+						this.requireExtraStack(2);
 						super.visitLdcInsn(new Long(Settings.recordedRandomSeed));
 						super.visitMethodInsn(acc, cls, name, "(J)V");
 						return;
@@ -87,20 +87,20 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				}
 			} else if (cls.equals("java/lang/String")) {
 				if (name.equals("<init>") && sign.startsWith("([B") && !sign.endsWith("Ljava/lang/String;)V")) {
-					this.method707(1);
+					this.requireExtraStack(1);
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding", "()Ljava/lang/String;");
 					super.visitMethodInsn(acc, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
 					return;
 				}
 				if (name.equals("getBytes") && sign.startsWith("()")) {
-					this.method707(1);
+					this.requireExtraStack(1);
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding", "()Ljava/lang/String;");
 					super.visitMethodInsn(acc, cls, name, "(Ljava/lang/String;)[B");
 					return;
 				}
 			} else if (cls.equals("java/io/InputStreamReader")) {
 				if (name.equals("<init>") && sign.equals("(Ljava/io/InputStream;)V")) {
-					this.method707(1);
+					this.requireExtraStack(1);
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "getEncoding", "()Ljava/lang/String;");
 					super.visitMethodInsn(acc, cls, name, sign.substring(0, sign.length() - 2) + "Ljava/lang/String;)V");
 					return;
@@ -239,18 +239,18 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 	}
 
 	public final void visitMaxs(final int n, final int n2) {
-		super.visitMaxs(n + this.anInt1185, n2);
+		super.visitMaxs(n + this.extraStack, n2);
 	}
 
-	public CustomMethodAdapter(final MethodVisitor methodVisitor, final String aString1186, final String s, final String aString1187) {
+	public CustomMethodAdapter(final MethodVisitor methodVisitor, final String className, final String s, final String methodDescriptor) {
 		super(Opcodes.ASM4, methodVisitor);
-		this.anInt1185 = 0;
-		this.className = aString1186;
+		this.extraStack = 0;
+		this.className = className;
 		this.methodName = s;
-		this.methodDesc = aString1187;
+		this.methodDesc = methodDescriptor;
 		if (Settings.enableNewTrack || Settings.enableMethodTrack) {
-			this.methodName = aString1186 + "." + s;
-			this.aString1190 = "";
+			this.methodName = className + "." + s;
+			this.allocationTraceMessage = "";
 			this.sourceLine = 0;
 			final int lastIndex;
 			if ((lastIndex = this.className.lastIndexOf(36)) != -1) {
@@ -263,25 +263,25 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 		}
 	}
 
-	public final void visitLineNumber(final int anInt1188, final Label label) {
+	public final void visitLineNumber(final int lineNumber, final Label label) {
 		if (Settings.enableNewTrack) {
-			this.sourceLine = anInt1188;
+			this.sourceLine = lineNumber;
 		}
-		super.visitLineNumber(anInt1188, label);
+		super.visitLineNumber(lineNumber, label);
 	}
 
-	private void method708(final String s) {
+	private void emitAllocationTrace(final String s) {
 		try {
-			super.visitLdcInsn((this.aString1190 = s + "\t at " + this.methodName + " (" + this.className + ".java:" + this.sourceLine + ")\n"));
+			super.visitLdcInsn((this.allocationTraceMessage = s + "\t at " + this.methodName + " (" + this.className + ".java:" + this.sourceLine + ")\n"));
 			super.visitMethodInsn(184, "emulator/custom/CustomMethod", "showTrackInfo", "(Ljava/lang/String;)V");
-			this.method707(1);
+			this.requireExtraStack(1);
 		} catch (Exception ignored) {}
 	}
 
 	public final void visitMultiANewArrayInsn(final String s, final int n) {
 //		System.out.println("visitMulti " + s);
 		if (Settings.enableNewTrack) {
-			this.method708("new " + emulator.debug.ClassTypes.method870(s));
+			this.emitAllocationTrace("new " + emulator.debug.ClassTypes.method870(s));
 		}
 		if (s.contains("com/docomostar/")) {
 			super.visitMultiANewArrayInsn(s.replace("com/docomostar/", "com/nttdocomo/"), n);
@@ -314,7 +314,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 						break Label_0078;
 					}
 				}
-				f.method708(sb.append(s2).toString());
+				f.emitAllocationTrace(sb.append(s2).toString());
 			}
 		}
 		if (s.contains("java/util/TimerTask")) {
@@ -401,7 +401,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 						break Label_0116;
 					}
 				}
-				f.method708(s);
+				f.emitAllocationTrace(s);
 			}
 		}
 		super.visitIntInsn(n, n2);
@@ -416,7 +416,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 
 	public final void visitCode() {
 		if (Settings.enableMethodTrack) {
-			this.method707(1);
+			this.requireExtraStack(1);
 			super.visitLdcInsn((this.methodName + this.methodDesc));
 			super.visitMethodInsn(184, "emulator/custom/CustomMethod", "beginMethod", "(Ljava/lang/String;)V");
 		}
@@ -432,7 +432,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 				case 176:
 				case 177:
 				case 191: {
-					this.method707(1);
+					this.requireExtraStack(1);
 					super.visitLdcInsn((this.methodName + this.methodDesc));
 					super.visitMethodInsn(184, "emulator/custom/CustomMethod", "endMethod", "(Ljava/lang/String;)V");
 					break;

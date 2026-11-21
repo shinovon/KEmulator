@@ -3,8 +3,8 @@ package emulator.ui.swt;
 import emulator.Emulator;
 import emulator.Settings;
 import emulator.UILocale;
-import emulator.custom.h;
-import emulator.custom.h.MethodInfo;
+import emulator.custom.MethodProfiler;
+import emulator.custom.MethodProfiler.MethodInfo;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.*;
@@ -61,10 +61,10 @@ public final class Methods implements Runnable, DisposeListener {
 
 	private void refreshMethodData() {
 		this.methodDataList.clear();
-		this.methodDataList.addAll(h.methodProfiles.values());
-		final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
+		this.methodDataList.addAll(MethodProfiler.methodProfiles.values());
+		final Enumeration<MethodProfiler.MethodInfo> elements = MethodProfiler.methodProfiles.elements();
 		while (elements.hasMoreElements()) {
-			final h.MethodInfo data = elements.nextElement();
+			final MethodProfiler.MethodInfo data = elements.nextElement();
 			final TableItem tableItem;
 			(tableItem = new TableItem(this.methodsTable, 0)).setData(data);
 			tableItem.setText(0, data.className);
@@ -144,7 +144,7 @@ public final class Methods implements Runnable, DisposeListener {
 			}
 		});
 		for (int i = this.methodDataList.size() - 1; i >= 0; --i) {
-			final h.MethodInfo data = (MethodInfo) this.methodDataList.get(i);
+			final MethodProfiler.MethodInfo data = (MethodInfo) this.methodDataList.get(i);
 			final TableItem item;
 			(item = this.methodsTable.getItem(i)).setData(data);
 			item.setText(0, data.className);
@@ -166,19 +166,19 @@ public final class Methods implements Runnable, DisposeListener {
 		}
 		try {
 			long max = 0L;
-			final Enumeration<h.MethodInfo> elements = (Enumeration<h.MethodInfo>) h.methodProfiles.elements();
+			final Enumeration<MethodProfiler.MethodInfo> elements = (Enumeration<MethodProfiler.MethodInfo>) MethodProfiler.methodProfiles.elements();
 			while (elements.hasMoreElements()) {
 				max = Math.max(max, elements.nextElement().totalExecutionTime);
 			}
 			if (max > 0L) {
-				final Enumeration<h.MethodInfo> elements2 = (Enumeration<h.MethodInfo>) h.methodProfiles.elements();
+				final Enumeration<MethodProfiler.MethodInfo> elements2 = (Enumeration<MethodProfiler.MethodInfo>) MethodProfiler.methodProfiles.elements();
 				while (elements2.hasMoreElements()) {
-					final h.MethodInfo methodInfo = elements2.nextElement();
+					final MethodProfiler.MethodInfo methodInfo = elements2.nextElement();
 					methodInfo.timePercentage = 100.0f * methodInfo.totalExecutionTime / max;
 				}
 			}
 			for (int i = this.methodDataList.size() - 1; i >= 0; --i) {
-				final h.MethodInfo methodInfo2 = (MethodInfo) this.methodDataList.get(i);
+				final MethodProfiler.MethodInfo methodInfo2 = (MethodInfo) this.methodDataList.get(i);
 				final TableItem item;
 				(item = this.methodsTable.getItem(i)).setText(5, String.valueOf(methodInfo2.callCount));
 				item.setText(6, Methods.numberFormat.format(methodInfo2.totalExecutionTime));
@@ -190,9 +190,9 @@ public final class Methods implements Runnable, DisposeListener {
 	}
 
 	public final void showWindow() {
-		if (h.methodProfiles == null) {
-			h.methodProfiles = new Hashtable();
-			h.method591();
+		if (MethodProfiler.methodProfiles == null) {
+			MethodProfiler.methodProfiles = new Hashtable();
+			MethodProfiler.loadMethodProfiles();
 		}
 		this.createMethodsShell();
 		this.display = Display.getCurrent();
@@ -258,9 +258,9 @@ public final class Methods implements Runnable, DisposeListener {
 		this.resetCallsBtn.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
-				final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
+				final Enumeration<MethodProfiler.MethodInfo> elements = MethodProfiler.methodProfiles.elements();
 				while (elements.hasMoreElements()) {
-					final h.MethodInfo methodInfo;
+					final MethodProfiler.MethodInfo methodInfo;
 					(methodInfo = elements.nextElement()).callCount = 0;
 					methodInfo.totalExecutionTime = 0L;
 					methodInfo.averageExecutionTime = 0.0f;
@@ -280,9 +280,9 @@ public final class Methods implements Runnable, DisposeListener {
 				if ((open = fileDialog.open()) != null) {
 					try {
 						final PrintWriter printWriter = new PrintWriter(new FileOutputStream(open));
-						final Enumeration<h.MethodInfo> elements = h.methodProfiles.elements();
+						final Enumeration<MethodProfiler.MethodInfo> elements = MethodProfiler.methodProfiles.elements();
 						while (elements.hasMoreElements()) {
-							printWriter.write(elements.nextElement().method705(true, true));
+							printWriter.write(elements.nextElement().formatDisassembly(true, true));
 						}
 						printWriter.close();
 					} catch (FileNotFoundException ex) {
@@ -382,9 +382,9 @@ public final class Methods implements Runnable, DisposeListener {
 		if (array == null || array.length < 1) {
 			return;
 		}
-		final h.MethodInfo methodInfo;
-		if ((methodInfo = (h.MethodInfo) array[0].getData()) != null) {
-			this.codeViewer.setText(methodInfo.method705(this.showLineNumbersBtn.getSelection(), this.showFramesBtn.getSelection()));
+		final MethodProfiler.MethodInfo methodInfo;
+		if ((methodInfo = (MethodProfiler.MethodInfo) array[0].getData()) != null) {
+			this.codeViewer.setText(methodInfo.formatDisassembly(this.showLineNumbersBtn.getSelection(), this.showFramesBtn.getSelection()));
 		}
 	}
 
