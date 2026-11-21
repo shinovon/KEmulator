@@ -131,50 +131,50 @@ public final class Property implements IProperty, SelectionListener {
 	};
 
 	private static Display display;
-	private Shell setsShell;
-	private Text aText662;
+	private Shell settingsShell;
+	private Text rmsFolderText;
 	private CTabFolder tabFolder;
-	private Text aText731;
-	private Text aText735;
-	private Text aText739;
-	private Text aText742;
-	private Text aText745;
-	private Text aText748;
-	private Text aText751;
-	private Text aText754;
-	private Text aText757;
-	private Text aText760;
-	private Text aText763;
-	private Text aText766;
-	private Text aText768;
-	private Text aText770;
-	private Text aText772;
-	private Text aText774;
-	private Text aText627;
-	private Text aText629;
-	private Text aText631;
-	private Button aButton696;
-	private Button aButton703;
-	private Button aButton714;
-	private Button aButton719;
+	private Text leftSoftKeyBinding;
+	private Text rightSoftKeyBinding;
+	private Text leftBinding;
+	private Text rightBinding;
+	private Text upBinding;
+	private Text downBinding;
+	private Text fireBinding;
+	private Text num1Binding;
+	private Text num2Binding;
+	private Text num3Binding;
+	private Text num4Binding;
+	private Text num5Binding;
+	private Text num6Binding;
+	private Text num7Binding;
+	private Text num8Binding;
+	private Text num9Binding;
+	private Text num0Binding;
+	private Text starBinding;
+	private Text poundBinding;
+	private Button keyCacheCheck;
+	private Button recordReleasedImagesCheck;
+	private Button trackAllocationsCheck;
+	private Button trackMethodCallsCheck;
 	private Composite systemComp;
 	private ScrolledComposite systemScrollComp;
 	private Button vibrationCheck;
 	private Button noNetworkBtn;
-	private Button aButton746;
-	private Button aButton749;
-	private Button aButton752;
+	private Button xrayOverlapCheck;
+	private Button xrayClipCheck;
+	private Button infoColorHexCheck;
 	private Composite fontComp;
 	private ScrolledComposite fontScrollComp;
 	private Combo defaultFontCombo;
 	private Combo monoFontCombo;
-	private Spinner aSpinner670;
-	private Canvas aCanvas663;
-	private Spinner aSpinner679;
-	private Canvas aCanvas680;
-	private Spinner aSpinner690;
-	private Canvas aCanvas691;
-	private Text aText633;
+	private Spinner largeFontSpinner;
+	private Canvas largeFontCanvas;
+	private Spinner mediumFontSpinner;
+	private Canvas mediumFontCanvas;
+	private Spinner smallFontSpinner;
+	private Canvas smallFontCanvas;
+	private Text fontPreviewText;
 	private String defaultFont;
 	private String monospaceFont;
 	private String rmsFolder;
@@ -182,21 +182,21 @@ public final class Property implements IProperty, SelectionListener {
 	private int fontMediumSize;
 	private int fontLargeSize;
 	Combo controllerCombo;
-	private static String[] aStringArray661;
-	private IImage anIImage671;
-	private IImage anIImage674;
-	private IImage anIImage693;
+	private static String[] keyboardBindings;
+	private IImage largeFontPreview;
+	private IImage mediumFontPreview;
+	private IImage smallFontPreview;
 	private Composite recordsComp;
-	private Table aTable665;
+	private Table legacyRecordsTable;
 	private Composite networkComp;
 	private Group networkProxyGroup;
 	private Combo proxyTypeCombo;
-	private Text aText635;
-	private Text aText637;
-	private Text aText639;
-	private Text aText641;
-	private Text aText643;
-	private Button aButton764;
+	private Text proxyHostText;
+	private Text proxyPortText;
+	private Text proxyUserText;
+	private Text proxyPasswordText;
+	private Text proxyDomainText;
+	private Button proxyConnectButton;
 	private Button antiAliasBtn;
 	private Composite mediaComp;
 	private Text vlcDirText;
@@ -249,8 +249,8 @@ public final class Property implements IProperty, SelectionListener {
 	public void open(final Shell parent) {
 		display = parent.getDisplay();
 		this.createSettingsShell(parent);
-		this.setsShell.pack();
-		this.setsShell.setSize(420, this.setsShell.getSize().y);
+		this.settingsShell.pack();
+		this.settingsShell.setSize(420, this.settingsShell.getSize().y);
 		systemScrollComp.setMinHeight(systemComp.computeSize(-1, -1).y);
 		
 		systemScrollComp.setExpandVertical(true);
@@ -259,16 +259,16 @@ public final class Property implements IProperty, SelectionListener {
 		securityComp.setMinHeight(securityContent.computeSize(-1, -1).y);
 		securityComp.setExpandVertical(true);
 
-		this.setsShell.setLocation(parent.getLocation().x + (parent.getSize().x - this.setsShell.getSize().x >> 1), parent.getLocation().y + (parent.getSize().y - this.setsShell.getSize().y >> 1));
-		this.setsShell.open();
-		while (!this.setsShell.isDisposed()) {
+		this.settingsShell.setLocation(parent.getLocation().x + (parent.getSize().x - this.settingsShell.getSize().x >> 1), parent.getLocation().y + (parent.getSize().y - this.settingsShell.getSize().y >> 1));
+		this.settingsShell.open();
+		while (!this.settingsShell.isDisposed()) {
 			if (!Property.display.readAndDispatch()) {
 				Property.display.sleep();
 			}
 		}
-		this.anIImage671 = null;
-		this.anIImage674 = null;
-		this.anIImage693 = null;
+		this.largeFontPreview = null;
+		this.mediumFontPreview = null;
+		this.smallFontPreview = null;
 	}
 
 	public String getDefaultFontName() {
@@ -279,40 +279,17 @@ public final class Property implements IProperty, SelectionListener {
 		return monospaceFont;
 	}
 
-	public void setDefaultFontName(final String aString682) {
-		this.defaultFont = aString682;
+	public void setDefaultFontName(final String fontName) {
+		this.defaultFont = fontName;
 	}
 
 	public String getRmsFolderPath() {
-		String s = this.rmsFolder;
-		Label_0077:
-		{
-			StringBuffer sb;
-			String substring;
-			if (s.startsWith(".")) {
-				sb = new StringBuffer().append(Emulator.getUserPath());
-				substring = s.substring(1);
-			} else {
-				if (!s.startsWith("/") && !s.startsWith("\\")) {
-					break Label_0077;
-				}
-				sb = new StringBuffer().append(Emulator.getUserPath());
-				substring = s;
-			}
-			s = sb.append(substring).toString();
-		}
+		String s = resolveUserRelativePath(this.rmsFolder);
 		if (s.startsWith("file://")) s = s.substring(7);
 		final File file = new File(s);
 		if (!file.exists() || !file.isDirectory()) {
 			file.mkdirs();
 		}
-        /*
-        final String string = s + "/" + this.method355();
-        final File file2;
-        if (!(file2 = new File(string)).exists() || !file2.isDirectory()) {
-            file2.mkdirs();
-        }
-        */
 		try {
 			return file.getCanonicalPath() + File.separator;
 		} catch (IOException e) {
@@ -777,50 +754,50 @@ public final class Property implements IProperty, SelectionListener {
 	private void apply() {
 		this.defaultFont = this.defaultFontCombo.getText().trim();
 		this.monospaceFont = this.monoFontCombo.getText().trim();
-		this.rmsFolder = this.aText662.getText().trim();
-		this.fontSmallSize = this.aSpinner690.getSelection();
-		this.fontMediumSize = this.aSpinner679.getSelection();
-		this.fontLargeSize = this.aSpinner670.getSelection();
-		KeyMapping.mapDeviceKey(17, KeyMapping.method601(Property.aStringArray661[17]));
-		KeyMapping.mapDeviceKey(18, KeyMapping.method601(Property.aStringArray661[18]));
-		KeyMapping.mapDeviceKey(14, KeyMapping.method601(Property.aStringArray661[14]));
-		KeyMapping.mapDeviceKey(15, KeyMapping.method601(Property.aStringArray661[15]));
-		KeyMapping.mapDeviceKey(12, KeyMapping.method601(Property.aStringArray661[12]));
-		KeyMapping.mapDeviceKey(13, KeyMapping.method601(Property.aStringArray661[13]));
-		KeyMapping.mapDeviceKey(16, KeyMapping.method601(Property.aStringArray661[16]));
-		KeyMapping.mapDeviceKey(10, KeyMapping.method601(Property.aStringArray661[10]));
-		KeyMapping.mapDeviceKey(11, KeyMapping.method601(Property.aStringArray661[11]));
-		KeyMapping.mapDeviceKey(1, KeyMapping.method601(Property.aStringArray661[1]));
-		KeyMapping.mapDeviceKey(2, KeyMapping.method601(Property.aStringArray661[2]));
-		KeyMapping.mapDeviceKey(3, KeyMapping.method601(Property.aStringArray661[3]));
-		KeyMapping.mapDeviceKey(4, KeyMapping.method601(Property.aStringArray661[4]));
-		KeyMapping.mapDeviceKey(5, KeyMapping.method601(Property.aStringArray661[5]));
-		KeyMapping.mapDeviceKey(6, KeyMapping.method601(Property.aStringArray661[6]));
-		KeyMapping.mapDeviceKey(7, KeyMapping.method601(Property.aStringArray661[7]));
-		KeyMapping.mapDeviceKey(8, KeyMapping.method601(Property.aStringArray661[8]));
-		KeyMapping.mapDeviceKey(9, KeyMapping.method601(Property.aStringArray661[9]));
-		KeyMapping.mapDeviceKey(0, KeyMapping.method601(Property.aStringArray661[0]));
+		this.rmsFolder = this.rmsFolderText.getText().trim();
+		this.fontSmallSize = this.smallFontSpinner.getSelection();
+		this.fontMediumSize = this.mediumFontSpinner.getSelection();
+		this.fontLargeSize = this.largeFontSpinner.getSelection();
+		KeyMapping.mapDeviceKey(17, KeyMapping.method601(Property.keyboardBindings[17]));
+		KeyMapping.mapDeviceKey(18, KeyMapping.method601(Property.keyboardBindings[18]));
+		KeyMapping.mapDeviceKey(14, KeyMapping.method601(Property.keyboardBindings[14]));
+		KeyMapping.mapDeviceKey(15, KeyMapping.method601(Property.keyboardBindings[15]));
+		KeyMapping.mapDeviceKey(12, KeyMapping.method601(Property.keyboardBindings[12]));
+		KeyMapping.mapDeviceKey(13, KeyMapping.method601(Property.keyboardBindings[13]));
+		KeyMapping.mapDeviceKey(16, KeyMapping.method601(Property.keyboardBindings[16]));
+		KeyMapping.mapDeviceKey(10, KeyMapping.method601(Property.keyboardBindings[10]));
+		KeyMapping.mapDeviceKey(11, KeyMapping.method601(Property.keyboardBindings[11]));
+		KeyMapping.mapDeviceKey(1, KeyMapping.method601(Property.keyboardBindings[1]));
+		KeyMapping.mapDeviceKey(2, KeyMapping.method601(Property.keyboardBindings[2]));
+		KeyMapping.mapDeviceKey(3, KeyMapping.method601(Property.keyboardBindings[3]));
+		KeyMapping.mapDeviceKey(4, KeyMapping.method601(Property.keyboardBindings[4]));
+		KeyMapping.mapDeviceKey(5, KeyMapping.method601(Property.keyboardBindings[5]));
+		KeyMapping.mapDeviceKey(6, KeyMapping.method601(Property.keyboardBindings[6]));
+		KeyMapping.mapDeviceKey(7, KeyMapping.method601(Property.keyboardBindings[7]));
+		KeyMapping.mapDeviceKey(8, KeyMapping.method601(Property.keyboardBindings[8]));
+		KeyMapping.mapDeviceKey(9, KeyMapping.method601(Property.keyboardBindings[9]));
+		KeyMapping.mapDeviceKey(0, KeyMapping.method601(Property.keyboardBindings[0]));
 		KeyMapping.init();
-		if (Settings.enableKeyCache != this.aButton696.getSelection()) {
+		if (Settings.enableKeyCache != this.keyCacheCheck.getSelection()) {
 			KeyMapping.keyCacheStack.clear();
-			Settings.enableKeyCache = this.aButton696.getSelection();
+			Settings.enableKeyCache = this.keyCacheCheck.getSelection();
 		}
 		if (Settings.enableVibration != this.vibrationCheck.getSelection() && !(Settings.enableVibration = this.vibrationCheck.getSelection())) {
 			Emulator.getEmulator().getScreen().stopVibra();
 		}
 		Settings.networkNotAvailable = this.noNetworkBtn.getSelection();
-		Settings.xrayOverlapScreen = this.aButton746.getSelection();
-		Settings.xrayShowClipBorder = this.aButton749.getSelection();
-		Settings.infoColorHex = this.aButton752.getSelection();
-		Settings.recordReleasedImg = this.aButton703.getSelection();
-		Settings.enableNewTrack = this.aButton714.getSelection();
-		Settings.enableMethodTrack = this.aButton719.getSelection();
+		Settings.xrayOverlapScreen = this.xrayOverlapCheck.getSelection();
+		Settings.xrayShowClipBorder = this.xrayClipCheck.getSelection();
+		Settings.infoColorHex = this.infoColorHexCheck.getSelection();
+		Settings.recordReleasedImg = this.recordReleasedImagesCheck.getSelection();
+		Settings.enableNewTrack = this.trackAllocationsCheck.getSelection();
+		Settings.enableMethodTrack = this.trackMethodCallsCheck.getSelection();
 		Settings.proxyType = this.proxyTypeCombo.getSelectionIndex();
-		Settings.proxyHost = this.aText635.getText().trim();
-		Settings.proxyPort = this.aText637.getText().trim();
-		Settings.proxyUser = this.aText639.getText().trim();
-		Settings.proxyPass = this.aText641.getText();
-		Settings.proxyDomain = this.aText643.getText().trim();
+		Settings.proxyHost = this.proxyHostText.getText().trim();
+		Settings.proxyPort = this.proxyPortText.getText().trim();
+		Settings.proxyUser = this.proxyUserText.getText().trim();
+		Settings.proxyPass = this.proxyPasswordText.getText();
+		Settings.proxyDomain = this.proxyDomainText.getText().trim();
 		Settings.awtAntiAliasing = antiAliasBtn.getSelection();
 		Settings.textAntiAliasing = antiAliasTextBtn.getSelection();
 		Settings.vlcDir = vlcDirText.getText().trim();
@@ -875,25 +852,25 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void createSettingsShell(final Shell shell) {
-		this.setsShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		setsShell.setText(UILocale.get("OPTION_FRAME_TITLE", "Options & Properties"));
-		this.setsShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
+		this.settingsShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
+		settingsShell.setText(UILocale.get("OPTION_FRAME_TITLE", "Options & Properties"));
+		this.settingsShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
 		// 1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI
-		//setsShell.setFont(setsShell.getFont().getFontData()[0]);
+		//settingsShell.setFont(settingsShell.getFont().getFontData()[0]);
 		try {
 			if (f == null) {
-				FontData fd = setsShell.getFont().getFontData()[0];
+				FontData fd = settingsShell.getFont().getFontData()[0];
 				fd.height = (fd.height / -fd.data.lfHeight) * 12;
 				f = new Font(shell.getDisplay(), fd);
 			}
 
-			setsShell.setFont(f);
+			settingsShell.setFont(f);
 		} catch (Error ignored) {
 
 		}
 		final GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
-		this.setsShell.setLayout(layout);
+		this.settingsShell.setLayout(layout);
 		this.createKeyMappingControls();
 		this.createDialogButtons();
 	}
@@ -920,7 +897,7 @@ public final class Property implements IProperty, SelectionListener {
 		comboLayoutData.horizontalAlignment = GridData.FILL;
 		comboLayoutData.grabExcessHorizontalSpace = true;
 		
-		languageCombo = new Combo(langComposite, 12);
+		languageCombo = new Combo(langComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
 		languageCombo.setLayoutData(comboLayoutData);
 		languageCombo.setFont(f);
 		File folder = new File(Emulator.getAbsolutePath() + "/lang/");
@@ -940,30 +917,30 @@ public final class Property implements IProperty, SelectionListener {
 
 	private void createDialogButtons() {
 		final GridData layoutData = new GridData();
-		(layoutData).horizontalAlignment = 4;
+		(layoutData).horizontalAlignment = GridData.FILL;
 		layoutData.horizontalSpan = 2;
 		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.verticalAlignment = 2;
-		Composite aComposite667 = new Composite(this.setsShell, 0);
-		aComposite667.setLayout(new GridLayout(2, true));
-		(aComposite667).setLayoutData(layoutData);
-		Button aButton676 = new Button(aComposite667, 8388616);
-		aButton676.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton676.setSelection(false);
-		aButton676.setText(UILocale.get("DIALOG_OK", "OK"));
-		aButton676.addSelectionListener(new SelectionAdapter() {
+		layoutData.verticalAlignment = GridData.CENTER;
+		Composite dialogButtons = new Composite(this.settingsShell, SWT.NONE);
+		dialogButtons.setLayout(new GridLayout(2, true));
+		(dialogButtons).setLayoutData(layoutData);
+		Button okButton = new Button(dialogButtons, SWT.FLAT | SWT.PUSH);
+		okButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		okButton.setSelection(false);
+		okButton.setText(UILocale.get("DIALOG_OK", "OK"));
+		okButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				apply();
 				saveProperties();
-				setsShell.dispose();
+				settingsShell.dispose();
 			}
 		});
-		Button aButton685 = new Button(aComposite667, 8388616);
-		aButton685.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton685.setText(UILocale.get("DIALOG_CANCEL", "Cancel"));
-		aButton685.addSelectionListener(new SelectionAdapter() {
+		Button cancelButton = new Button(dialogButtons, SWT.FLAT | SWT.PUSH);
+		cancelButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		cancelButton.setText(UILocale.get("DIALOG_CANCEL", "Cancel"));
+		cancelButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent selectionEvent) {
-				setsShell.dispose();
+				settingsShell.dispose();
 			}
 		});
 	}
@@ -971,11 +948,11 @@ public final class Property implements IProperty, SelectionListener {
 	private void createKeyMappingControls() {
 		final GridData layoutData = new GridData();
 		layoutData.grabExcessVerticalSpace = true;
-		(layoutData).horizontalAlignment = 4;
+		(layoutData).horizontalAlignment = GridData.FILL;
 		layoutData.horizontalSpan = 2;
 		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.verticalAlignment = 2;
-		this.tabFolder = new CTabFolder(this.setsShell, SWT.BORDER | SWT.FLAT);
+		layoutData.verticalAlignment = GridData.CENTER;
+		this.tabFolder = new CTabFolder(this.settingsShell, SWT.BORDER | SWT.FLAT);
 //		tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(22));
 		this.tabFolder.setSimple(true);
 		tabFolder.setFont(f);
@@ -992,193 +969,193 @@ public final class Property implements IProperty, SelectionListener {
 		this.setupNetworkComp();
 		this.setupMediaComp();
 		setupSecurityComp();
-		final CTabItem keymapTab = new CTabItem(this.tabFolder, 0);
+		final CTabItem keymapTab = new CTabItem(this.tabFolder, SWT.NONE);
 		keymapTab.setText(UILocale.get("OPTION_TAB_KEYMAP", "KeyMap"));
 		keymapTab.setControl(this.keyMapTabComp);
-		final CTabItem sysFontTab = new CTabItem(this.tabFolder, 0);
+		final CTabItem sysFontTab = new CTabItem(this.tabFolder, SWT.NONE);
 		sysFontTab.setText(UILocale.get("OPTION_TAB_FONT", "Font"));
 		sysFontTab.setControl(this.fontScrollComp);
-		final CTabItem systemTab = new CTabItem(this.tabFolder, 0);
+		final CTabItem systemTab = new CTabItem(this.tabFolder, SWT.NONE);
 		systemTab.setText(UILocale.get("OPTION_TAB_SYSTEM", "System"));
 		systemTab.setControl(this.systemScrollComp);
-		final CTabItem disableApiTab = new CTabItem(this.tabFolder, 0);
+		final CTabItem disableApiTab = new CTabItem(this.tabFolder, SWT.NONE);
 		disableApiTab.setText(UILocale.get("OPTION_TAB_DISABLE_API", "Disable APIs"));
 		disableApiTab.setControl(this.disableApiComp);
-		final CTabItem rmsTab = new CTabItem(this.tabFolder, 0);
+		final CTabItem rmsTab = new CTabItem(this.tabFolder, SWT.NONE);
 		rmsTab.setText(UILocale.get("OPTION_TAB_RECORDS", "Records"));
 		rmsTab.setControl(this.recordsComp);
-		final CTabItem networkTab = new CTabItem(this.tabFolder, 0);
+		final CTabItem networkTab = new CTabItem(this.tabFolder, SWT.NONE);
 		networkTab.setText(UILocale.get("OPTION_TAB_NETWORK", "Network"));
 		networkTab.setControl(this.networkComp);
-		final CTabItem mediaTab = new CTabItem(this.tabFolder, 0);
+		final CTabItem mediaTab = new CTabItem(this.tabFolder, SWT.NONE);
 		mediaTab.setText(UILocale.get("OPTION_TAB_MEDIA", "Media"));
 		mediaTab.setControl(this.mediaComp);
-		final CTabItem securityTab = new CTabItem(this.tabFolder, 0);
+		final CTabItem securityTab = new CTabItem(this.tabFolder, SWT.NONE);
 		securityTab.setText(UILocale.get("OPTION_TAB_SECURITY", "Security"));
 		securityTab.setControl(this.securityComp);
-		final CTabItem propsTab = new CTabItem(this.tabFolder, 0);
+		final CTabItem propsTab = new CTabItem(this.tabFolder, SWT.NONE);
 		propsTab.setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
 		propsTab.setControl(this.propsComp);
 	}
 
 	private void setupKeyMapComp() {
 		final GridData layoutData = new GridData();
-		(layoutData).horizontalAlignment = 4;
-		layoutData.verticalAlignment = 2;
+		(layoutData).horizontalAlignment = GridData.FILL;
+		layoutData.verticalAlignment = GridData.CENTER;
 		final GridData layoutData2 = new GridData();
 		(layoutData2).grabExcessHorizontalSpace = true;
-		layoutData2.verticalAlignment = 2;
-		layoutData2.horizontalAlignment = 4;
+		layoutData2.verticalAlignment = GridData.CENTER;
+		layoutData2.horizontalAlignment = GridData.FILL;
 		final GridData layoutData3 = new GridData();
 		(layoutData3).grabExcessHorizontalSpace = false;
-		layoutData3.verticalAlignment = 2;
-		layoutData3.horizontalAlignment = 4;
+		layoutData3.verticalAlignment = GridData.CENTER;
+		layoutData3.horizontalAlignment = GridData.FILL;
 		final GridData layoutData4 = new GridData();
 		(layoutData4).grabExcessHorizontalSpace = false;
-		layoutData4.verticalAlignment = 2;
-		layoutData4.horizontalAlignment = 4;
+		layoutData4.verticalAlignment = GridData.CENTER;
+		layoutData4.horizontalAlignment = GridData.FILL;
 		final GridData layoutData5 = new GridData();
 		(layoutData5).grabExcessHorizontalSpace = false;
-		layoutData5.verticalAlignment = 2;
-		layoutData5.horizontalAlignment = 4;
+		layoutData5.verticalAlignment = GridData.CENTER;
+		layoutData5.horizontalAlignment = GridData.FILL;
 		final GridData layoutData6 = new GridData();
 		(layoutData6).grabExcessHorizontalSpace = false;
-		layoutData6.verticalAlignment = 2;
-		layoutData6.horizontalAlignment = 4;
+		layoutData6.verticalAlignment = GridData.CENTER;
+		layoutData6.horizontalAlignment = GridData.FILL;
 		final GridData layoutData7 = new GridData();
 		(layoutData7).grabExcessHorizontalSpace = false;
-		layoutData7.verticalAlignment = 2;
-		layoutData7.horizontalAlignment = 4;
+		layoutData7.verticalAlignment = GridData.CENTER;
+		layoutData7.horizontalAlignment = GridData.FILL;
 		final GridData layoutData8 = new GridData();
 		(layoutData8).grabExcessHorizontalSpace = false;
-		layoutData8.verticalAlignment = 2;
-		layoutData8.horizontalAlignment = 4;
+		layoutData8.verticalAlignment = GridData.CENTER;
+		layoutData8.horizontalAlignment = GridData.FILL;
 		final GridData layoutData9 = new GridData();
 		(layoutData9).grabExcessHorizontalSpace = false;
-		layoutData9.verticalAlignment = 2;
-		layoutData9.horizontalAlignment = 4;
+		layoutData9.verticalAlignment = GridData.CENTER;
+		layoutData9.horizontalAlignment = GridData.FILL;
 		final GridData layoutData10 = new GridData();
 		(layoutData10).grabExcessHorizontalSpace = false;
-		layoutData10.verticalAlignment = 2;
-		layoutData10.horizontalAlignment = 4;
+		layoutData10.verticalAlignment = GridData.CENTER;
+		layoutData10.horizontalAlignment = GridData.FILL;
 		final GridData layoutData11 = new GridData();
 		(layoutData11).grabExcessHorizontalSpace = false;
-		layoutData11.verticalAlignment = 2;
-		layoutData11.horizontalAlignment = 4;
+		layoutData11.verticalAlignment = GridData.CENTER;
+		layoutData11.horizontalAlignment = GridData.FILL;
 		final GridData layoutData12 = new GridData();
 		(layoutData12).grabExcessHorizontalSpace = false;
-		layoutData12.verticalAlignment = 2;
-		layoutData12.horizontalAlignment = 4;
+		layoutData12.verticalAlignment = GridData.CENTER;
+		layoutData12.horizontalAlignment = GridData.FILL;
 		final GridData layoutData13 = new GridData();
 		(layoutData13).grabExcessHorizontalSpace = false;
-		layoutData13.verticalAlignment = 2;
-		layoutData13.horizontalAlignment = 4;
+		layoutData13.verticalAlignment = GridData.CENTER;
+		layoutData13.horizontalAlignment = GridData.FILL;
 		final GridData layoutData14 = new GridData();
 		(layoutData14).grabExcessHorizontalSpace = false;
-		layoutData14.verticalAlignment = 2;
-		layoutData14.horizontalAlignment = 4;
+		layoutData14.verticalAlignment = GridData.CENTER;
+		layoutData14.horizontalAlignment = GridData.FILL;
 		final GridData layoutData15 = new GridData();
 		(layoutData15).grabExcessHorizontalSpace = false;
-		layoutData15.verticalAlignment = 2;
-		layoutData15.horizontalAlignment = 4;
+		layoutData15.verticalAlignment = GridData.CENTER;
+		layoutData15.horizontalAlignment = GridData.FILL;
 		final GridData layoutData16 = new GridData();
 		(layoutData16).grabExcessHorizontalSpace = false;
-		layoutData16.verticalAlignment = 2;
-		layoutData16.horizontalAlignment = 4;
+		layoutData16.verticalAlignment = GridData.CENTER;
+		layoutData16.horizontalAlignment = GridData.FILL;
 		final GridData layoutData17 = new GridData();
 		(layoutData17).grabExcessHorizontalSpace = false;
-		layoutData17.verticalAlignment = 2;
-		layoutData17.horizontalAlignment = 4;
+		layoutData17.verticalAlignment = GridData.CENTER;
+		layoutData17.horizontalAlignment = GridData.FILL;
 		final GridData layoutData18 = new GridData();
 		(layoutData18).grabExcessHorizontalSpace = false;
-		layoutData18.verticalAlignment = 2;
-		layoutData18.horizontalAlignment = 4;
+		layoutData18.verticalAlignment = GridData.CENTER;
+		layoutData18.horizontalAlignment = GridData.FILL;
 		final GridData layoutData19 = new GridData();
 		(layoutData19).grabExcessHorizontalSpace = false;
-		layoutData19.verticalAlignment = 2;
-		layoutData19.horizontalAlignment = 4;
+		layoutData19.verticalAlignment = GridData.CENTER;
+		layoutData19.horizontalAlignment = GridData.FILL;
 		final GridData layoutData20 = new GridData();
 		(layoutData20).grabExcessHorizontalSpace = true;
-		layoutData20.verticalAlignment = 2;
-		layoutData20.horizontalAlignment = 4;
+		layoutData20.verticalAlignment = GridData.CENTER;
+		layoutData20.horizontalAlignment = GridData.FILL;
 		final GridData layoutData21 = new GridData();
-		(layoutData21).horizontalAlignment = 4;
-		layoutData21.verticalAlignment = 2;
+		(layoutData21).horizontalAlignment = GridData.FILL;
+		layoutData21.verticalAlignment = GridData.CENTER;
 		layoutData21.widthHint = 30;
 		final GridData layoutData22 = new GridData();
-		(layoutData22).horizontalAlignment = 4;
-		layoutData22.verticalAlignment = 2;
+		(layoutData22).horizontalAlignment = GridData.FILL;
+		layoutData22.verticalAlignment = GridData.CENTER;
 		final GridData layoutData23 = new GridData();
-		(layoutData23).horizontalAlignment = 4;
-		layoutData23.verticalAlignment = 2;
+		(layoutData23).horizontalAlignment = GridData.FILL;
+		layoutData23.verticalAlignment = GridData.CENTER;
 		final GridData layoutData24 = new GridData();
-		(layoutData24).horizontalAlignment = 4;
-		layoutData24.verticalAlignment = 2;
+		(layoutData24).horizontalAlignment = GridData.FILL;
+		layoutData24.verticalAlignment = GridData.CENTER;
 		final GridData layoutData25 = new GridData();
-		(layoutData25).horizontalAlignment = 4;
-		layoutData25.verticalAlignment = 2;
+		(layoutData25).horizontalAlignment = GridData.FILL;
+		layoutData25.verticalAlignment = GridData.CENTER;
 		layoutData25.widthHint = 30;
 		final GridData layoutData26 = new GridData();
-		(layoutData26).horizontalAlignment = 4;
-		layoutData26.verticalAlignment = 2;
+		(layoutData26).horizontalAlignment = GridData.FILL;
+		layoutData26.verticalAlignment = GridData.CENTER;
 		final GridData layoutData27 = new GridData();
-		(layoutData27).horizontalAlignment = 4;
-		layoutData27.verticalAlignment = 2;
+		(layoutData27).horizontalAlignment = GridData.FILL;
+		layoutData27.verticalAlignment = GridData.CENTER;
 		final GridData layoutData28 = new GridData();
 		(layoutData28).horizontalSpan = 2;
-		layoutData28.verticalAlignment = 2;
-		layoutData28.horizontalAlignment = 4;
+		layoutData28.verticalAlignment = GridData.CENTER;
+		layoutData28.horizontalAlignment = GridData.FILL;
 		final GridData layoutData29 = new GridData();
-		(layoutData29).horizontalAlignment = 4;
-		layoutData29.verticalAlignment = 2;
+		(layoutData29).horizontalAlignment = GridData.FILL;
+		layoutData29.verticalAlignment = GridData.CENTER;
 		final GridData layoutData30 = new GridData();
-		(layoutData30).horizontalAlignment = 4;
-		layoutData30.verticalAlignment = 2;
+		(layoutData30).horizontalAlignment = GridData.FILL;
+		layoutData30.verticalAlignment = GridData.CENTER;
 		final GridData layoutData31 = new GridData();
-		(layoutData31).horizontalAlignment = 4;
-		layoutData31.verticalAlignment = 2;
+		(layoutData31).horizontalAlignment = GridData.FILL;
+		layoutData31.verticalAlignment = GridData.CENTER;
 		final GridData layoutData32 = new GridData();
-		(layoutData32).horizontalAlignment = 4;
-		layoutData32.verticalAlignment = 2;
+		(layoutData32).horizontalAlignment = GridData.FILL;
+		layoutData32.verticalAlignment = GridData.CENTER;
 		final GridData layoutData33 = new GridData();
-		(layoutData33).horizontalAlignment = 4;
-		layoutData33.verticalAlignment = 2;
+		(layoutData33).horizontalAlignment = GridData.FILL;
+		layoutData33.verticalAlignment = GridData.CENTER;
 		final GridData layoutData34 = new GridData();
-		(layoutData34).horizontalAlignment = 4;
-		layoutData34.verticalAlignment = 2;
+		(layoutData34).horizontalAlignment = GridData.FILL;
+		layoutData34.verticalAlignment = GridData.CENTER;
 		final GridData layoutData36 = new GridData();
-		(layoutData36).horizontalAlignment = 4;
-		layoutData36.verticalAlignment = 2;
+		(layoutData36).horizontalAlignment = GridData.FILL;
+		layoutData36.verticalAlignment = GridData.CENTER;
 		final GridData layoutData37 = new GridData();
 		layoutData37.grabExcessHorizontalSpace = true;
-		(layoutData37).horizontalAlignment = 4;
-		layoutData37.verticalAlignment = 2;
+		(layoutData37).horizontalAlignment = GridData.FILL;
+		layoutData37.verticalAlignment = GridData.CENTER;
 		final GridData layoutData38 = new GridData();
 		layoutData38.grabExcessHorizontalSpace = true;
-		(layoutData38).horizontalAlignment = 4;
-		layoutData38.verticalAlignment = 2;
+		(layoutData38).horizontalAlignment = GridData.FILL;
+		layoutData38.verticalAlignment = GridData.CENTER;
 		final GridData layoutData39 = new GridData();
-		(layoutData39).horizontalAlignment = 4;
-		layoutData39.verticalAlignment = 2;
+		(layoutData39).horizontalAlignment = GridData.FILL;
+		layoutData39.verticalAlignment = GridData.CENTER;
 		final GridData layoutData40 = new GridData();
-		(layoutData40).horizontalAlignment = 4;
+		(layoutData40).horizontalAlignment = GridData.FILL;
 		layoutData40.grabExcessHorizontalSpace = false;
-		layoutData40.verticalAlignment = 2;
+		layoutData40.verticalAlignment = GridData.CENTER;
 
-		keyMapTabComp = new Composite(this.tabFolder, 0);
+		keyMapTabComp = new Composite(this.tabFolder, SWT.NONE);
 		keyMapTabComp.setFont(f);
 		GridLayout l = new GridLayout();
 		l.marginWidth = 0;
 		l.marginHeight = 0;
 		keyMapTabComp.setLayout(l);
 
-		keyMapControllerComp = new Composite(keyMapTabComp, 0);
+		keyMapControllerComp = new Composite(keyMapTabComp, SWT.NONE);
 		keyMapControllerComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		l = new GridLayout();
 		l.numColumns = 6;
 		keyMapControllerComp.setLayout(l);
 
-		Composite keyMapBindsComp = new Composite(keyMapTabComp, 0);
+		Composite keyMapBindsComp = new Composite(keyMapTabComp, SWT.NONE);
 		final GridLayout layout = new GridLayout();
 		keyMapBindsComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -1192,216 +1169,216 @@ public final class Property implements IProperty, SelectionListener {
 		layout.numColumns = 4;
 		keyMapBindsComp.setLayout(layout);
 		
-		CLabel aCLabel646 = new CLabel(this.keyMapControllerComp, 0);
-		aCLabel646.setText(UILocale.get("OPTION_KEYMAP_CONTROLLER", "Controller:"));
-		aCLabel646.setLayoutData(layoutData);
+		CLabel controllerLabel = new CLabel(this.keyMapControllerComp, SWT.NONE);
+		controllerLabel.setText(UILocale.get("OPTION_KEYMAP_CONTROLLER", "Controller:"));
+		controllerLabel.setLayoutData(layoutData);
 		
 		this.createControllerSelector();
 		
-		CLabel aCLabel741 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel741).setText(UILocale.get("OPTION_KEYMAP_LSK", "LeftSoftKey:"));
-		aCLabel741.setLayoutData(layoutData38);
+		CLabel leftSoftKeyLabel = new CLabel(keyMapBindsComp, SWT.NONE);
+		(leftSoftKeyLabel).setText(UILocale.get("OPTION_KEYMAP_LSK", "LeftSoftKey:"));
+		leftSoftKeyLabel.setLayoutData(layoutData38);
 		
-		(this.aText731 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText731.setLayoutData(layoutData20);
-		this.aText731.setText(KeyMapping.get(17));
-		this.aText731.addKeyListener(new KeyBindListener(aText731, 17));
-		aText731.addVerifyListener(verify);
+		(this.leftSoftKeyBinding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.leftSoftKeyBinding.setLayoutData(layoutData20);
+		this.leftSoftKeyBinding.setText(KeyMapping.get(17));
+		this.leftSoftKeyBinding.addKeyListener(new KeyBindListener(leftSoftKeyBinding, 17));
+		leftSoftKeyBinding.addVerifyListener(verify);
 		
-		CLabel aCLabel744 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel744).setText(UILocale.get("OPTION_KEYMAP_RSK", "RightSoftKey:"));
-		aCLabel744.setLayoutData(layoutData37);
+		CLabel rightSoftKeyLabel = new CLabel(keyMapBindsComp, SWT.NONE);
+		(rightSoftKeyLabel).setText(UILocale.get("OPTION_KEYMAP_RSK", "RightSoftKey:"));
+		rightSoftKeyLabel.setLayoutData(layoutData37);
 		
-		(this.aText735 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText735.setLayoutData(layoutData2);
-		this.aText735.setText(KeyMapping.get(18));
-		this.aText735.addKeyListener(new KeyBindListener(aText735, 18));
-		aText735.addVerifyListener(verify);
+		(this.rightSoftKeyBinding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.rightSoftKeyBinding.setLayoutData(layoutData2);
+		this.rightSoftKeyBinding.setText(KeyMapping.get(18));
+		this.rightSoftKeyBinding.addKeyListener(new KeyBindListener(rightSoftKeyBinding, 18));
+		rightSoftKeyBinding.addVerifyListener(verify);
 		
-		CLabel aCLabel762 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel762).setText(UILocale.get("OPTION_KEYMAP_NUM_1", "Num_1:"));
-		aCLabel762.setLayoutData(layoutData40);
+		CLabel num1Label = new CLabel(keyMapBindsComp, SWT.NONE);
+		(num1Label).setText(UILocale.get("OPTION_KEYMAP_NUM_1", "Num_1:"));
+		num1Label.setLayoutData(layoutData40);
 		
-		(this.aText754 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText754.setLayoutData(layoutData16);
-		this.aText754.setText(KeyMapping.get(1));
-		this.aText754.addKeyListener(new KeyBindListener(aText754, 1));
-		aText754.addVerifyListener(verify);
+		(this.num1Binding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.num1Binding.setLayoutData(layoutData16);
+		this.num1Binding.setText(KeyMapping.get(1));
+		this.num1Binding.addKeyListener(new KeyBindListener(num1Binding, 1));
+		num1Binding.addVerifyListener(verify);
 		
-		CLabel aCLabel765 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel765).setText(UILocale.get("OPTION_KEYMAP_NUM_2", "Num_2:"));
-		aCLabel765.setLayoutData(layoutData32);
+		CLabel num2Label = new CLabel(keyMapBindsComp, SWT.NONE);
+		(num2Label).setText(UILocale.get("OPTION_KEYMAP_NUM_2", "Num_2:"));
+		num2Label.setLayoutData(layoutData32);
 		
-		(this.aText757 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText757.setLayoutData(layoutData5);
-		this.aText757.setText(KeyMapping.get(2));
-		this.aText757.addKeyListener(new KeyBindListener(aText757, 2));
-		aText757.addVerifyListener(verify);
+		(this.num2Binding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.num2Binding.setLayoutData(layoutData5);
+		this.num2Binding.setText(KeyMapping.get(2));
+		this.num2Binding.addKeyListener(new KeyBindListener(num2Binding, 2));
+		num2Binding.addVerifyListener(verify);
 		
-		CLabel aCLabel767 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel767).setText(UILocale.get("OPTION_KEYMAP_NUM_3", "Num_3:"));
-		aCLabel767.setLayoutData(layoutData31);
+		CLabel num3Label = new CLabel(keyMapBindsComp, SWT.NONE);
+		(num3Label).setText(UILocale.get("OPTION_KEYMAP_NUM_3", "Num_3:"));
+		num3Label.setLayoutData(layoutData31);
 		
-		(this.aText760 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText760.setLayoutData(layoutData15);
-		this.aText760.setText(KeyMapping.get(3));
-		this.aText760.addKeyListener(new KeyBindListener(aText760, 3));
-		aText760.addVerifyListener(verify);
+		(this.num3Binding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.num3Binding.setLayoutData(layoutData15);
+		this.num3Binding.setText(KeyMapping.get(3));
+		this.num3Binding.addKeyListener(new KeyBindListener(num3Binding, 3));
+		num3Binding.addVerifyListener(verify);
 		
-		CLabel aCLabel769 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel769).setText(UILocale.get("OPTION_KEYMAP_NUM_4", "Num_4:"));
-		aCLabel769.setLayoutData(layoutData27);
+		CLabel num4Label = new CLabel(keyMapBindsComp, SWT.NONE);
+		(num4Label).setText(UILocale.get("OPTION_KEYMAP_NUM_4", "Num_4:"));
+		num4Label.setLayoutData(layoutData27);
 		
-		(this.aText763 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText763.setLayoutData(layoutData6);
-		this.aText763.setText(KeyMapping.get(4));
-		this.aText763.addKeyListener(new KeyBindListener(aText763, 4));
-		aText763.addVerifyListener(verify);
+		(this.num4Binding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.num4Binding.setLayoutData(layoutData6);
+		this.num4Binding.setText(KeyMapping.get(4));
+		this.num4Binding.addKeyListener(new KeyBindListener(num4Binding, 4));
+		num4Binding.addVerifyListener(verify);
 		
-		CLabel aCLabel771 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel771).setText(UILocale.get("OPTION_KEYMAP_NUM_5", "Num_5:"));
-		aCLabel771.setLayoutData(layoutData25);
+		CLabel num5Label = new CLabel(keyMapBindsComp, SWT.NONE);
+		(num5Label).setText(UILocale.get("OPTION_KEYMAP_NUM_5", "Num_5:"));
+		num5Label.setLayoutData(layoutData25);
 		
-		(this.aText766 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText766.setLayoutData(layoutData14);
-		this.aText766.setText(KeyMapping.get(5));
-		this.aText766.addKeyListener(new KeyBindListener(aText766, 5));
-		aText766.addVerifyListener(verify);
+		(this.num5Binding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.num5Binding.setLayoutData(layoutData14);
+		this.num5Binding.setText(KeyMapping.get(5));
+		this.num5Binding.addKeyListener(new KeyBindListener(num5Binding, 5));
+		num5Binding.addVerifyListener(verify);
 		
-		CLabel aCLabel773 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel773).setText(UILocale.get("OPTION_KEYMAP_NUM_6", "Num_6:"));
-		aCLabel773.setLayoutData(layoutData26);
+		CLabel num6Label = new CLabel(keyMapBindsComp, SWT.NONE);
+		(num6Label).setText(UILocale.get("OPTION_KEYMAP_NUM_6", "Num_6:"));
+		num6Label.setLayoutData(layoutData26);
 		
-		(this.aText768 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText768.setLayoutData(layoutData7);
-		this.aText768.setText(KeyMapping.get(6));
-		this.aText768.addKeyListener(new KeyBindListener(aText768, 6));
-		aText768.addVerifyListener(verify);
+		(this.num6Binding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.num6Binding.setLayoutData(layoutData7);
+		this.num6Binding.setText(KeyMapping.get(6));
+		this.num6Binding.addKeyListener(new KeyBindListener(num6Binding, 6));
+		num6Binding.addVerifyListener(verify);
 		
-		CLabel aCLabel626 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel626).setText(UILocale.get("OPTION_KEYMAP_NUM_7", "Num_7:"));
-		aCLabel626.setLayoutData(layoutData24);
+		CLabel num7Label = new CLabel(keyMapBindsComp, SWT.NONE);
+		(num7Label).setText(UILocale.get("OPTION_KEYMAP_NUM_7", "Num_7:"));
+		num7Label.setLayoutData(layoutData24);
 		
-		(this.aText770 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText770.setLayoutData(layoutData13);
-		this.aText770.setText(KeyMapping.get(7));
-		this.aText770.addKeyListener(new KeyBindListener(aText770, 7));
-		aText770.addVerifyListener(verify);
+		(this.num7Binding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.num7Binding.setLayoutData(layoutData13);
+		this.num7Binding.setText(KeyMapping.get(7));
+		this.num7Binding.addKeyListener(new KeyBindListener(num7Binding, 7));
+		num7Binding.addVerifyListener(verify);
 		
-		CLabel aCLabel628 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel628).setText(UILocale.get("OPTION_KEYMAP_NUM_8", "Num_8:"));
-		aCLabel628.setLayoutData(layoutData23);
+		CLabel num8Label = new CLabel(keyMapBindsComp, SWT.NONE);
+		(num8Label).setText(UILocale.get("OPTION_KEYMAP_NUM_8", "Num_8:"));
+		num8Label.setLayoutData(layoutData23);
 		
-		(this.aText772 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText772.setLayoutData(layoutData8);
-		this.aText772.setText(KeyMapping.get(8));
-		this.aText772.addKeyListener(new KeyBindListener(aText772, 8));
-		aText772.addVerifyListener(verify);
+		(this.num8Binding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.num8Binding.setLayoutData(layoutData8);
+		this.num8Binding.setText(KeyMapping.get(8));
+		this.num8Binding.addKeyListener(new KeyBindListener(num8Binding, 8));
+		num8Binding.addVerifyListener(verify);
 		
-		CLabel aCLabel630 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel630).setText(UILocale.get("OPTION_KEYMAP_NUM_9", "Num_9:"));
-		aCLabel630.setLayoutData(layoutData21);
+		CLabel num9Label = new CLabel(keyMapBindsComp, SWT.NONE);
+		(num9Label).setText(UILocale.get("OPTION_KEYMAP_NUM_9", "Num_9:"));
+		num9Label.setLayoutData(layoutData21);
 		
-		(this.aText774 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText774.setLayoutData(layoutData12);
-		this.aText774.setText(KeyMapping.get(9));
-		this.aText774.addKeyListener(new KeyBindListener(aText774, 9));
-		aText774.addVerifyListener(verify);
+		(this.num9Binding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.num9Binding.setLayoutData(layoutData12);
+		this.num9Binding.setText(KeyMapping.get(9));
+		this.num9Binding.addKeyListener(new KeyBindListener(num9Binding, 9));
+		num9Binding.addVerifyListener(verify);
 		
-		CLabel aCLabel632 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel632).setText(UILocale.get("OPTION_KEYMAP_NUM_0", "Num_0:"));
-		aCLabel632.setLayoutData(layoutData22);
+		CLabel num0Label = new CLabel(keyMapBindsComp, SWT.NONE);
+		(num0Label).setText(UILocale.get("OPTION_KEYMAP_NUM_0", "Num_0:"));
+		num0Label.setLayoutData(layoutData22);
 		
-		this.aText627 = new Text(keyMapBindsComp, 2048);
-		aText627.setEditable(true);
-		this.aText627.setLayoutData(layoutData9);
-		this.aText627.setText(KeyMapping.get(0));
-		this.aText627.addKeyListener(new KeyBindListener(aText627, 0));
-		aText627.addVerifyListener(verify);
+		this.num0Binding = new Text(keyMapBindsComp, SWT.BORDER);
+		num0Binding.setEditable(true);
+		this.num0Binding.setLayoutData(layoutData9);
+		this.num0Binding.setText(KeyMapping.get(0));
+		this.num0Binding.addKeyListener(new KeyBindListener(num0Binding, 0));
+		num0Binding.addVerifyListener(verify);
 		
-		CLabel aCLabel634 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel634).setText(UILocale.get("OPTION_KEYMAP_KEY_*", "Key *:"));
-		aCLabel634.setLayoutData(layoutData30);
+		CLabel starKeyLabel = new CLabel(keyMapBindsComp, SWT.NONE);
+		(starKeyLabel).setText(UILocale.get("OPTION_KEYMAP_KEY_*", "Key *:"));
+		starKeyLabel.setLayoutData(layoutData30);
 		
-		(this.aText629 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText629.setLayoutData(layoutData11);
-		this.aText629.setText(KeyMapping.get(10));
-		this.aText629.addKeyListener(new KeyBindListener(aText629, 10));
-		aText629.addVerifyListener(verify);
+		(this.starBinding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.starBinding.setLayoutData(layoutData11);
+		this.starBinding.setText(KeyMapping.get(10));
+		this.starBinding.addKeyListener(new KeyBindListener(starBinding, 10));
+		starBinding.addVerifyListener(verify);
 		
-		CLabel aCLabel636 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel636).setText(UILocale.get("OPTION_KEYMAP_KEY_#", "Key #:"));
-		aCLabel636.setLayoutData(layoutData29);
+		CLabel poundKeyLabel = new CLabel(keyMapBindsComp, SWT.NONE);
+		(poundKeyLabel).setText(UILocale.get("OPTION_KEYMAP_KEY_#", "Key #:"));
+		poundKeyLabel.setLayoutData(layoutData29);
 		
-		(this.aText631 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText631.setLayoutData(layoutData10);
-		this.aText631.setText(KeyMapping.get(11));
-		this.aText631.addKeyListener(new KeyBindListener(aText631, 11));
-		aText631.addVerifyListener(verify);
+		(this.poundBinding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.poundBinding.setLayoutData(layoutData10);
+		this.poundBinding.setText(KeyMapping.get(11));
+		this.poundBinding.addKeyListener(new KeyBindListener(poundBinding, 11));
+		poundBinding.addVerifyListener(verify);
 		
-		CLabel aCLabel747 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel747).setText(UILocale.get("OPTION_KEYMAP_PAD_LEFT", "Pad_Left:"));
+		CLabel leftKeyLabel = new CLabel(keyMapBindsComp, SWT.NONE);
+		(leftKeyLabel).setText(UILocale.get("OPTION_KEYMAP_PAD_LEFT", "Pad_Left:"));
 		
-		(this.aText739 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText739.setLayoutData(layoutData19);
-		this.aText739.setText(KeyMapping.get(14));
-		this.aText739.addKeyListener(new KeyBindListener(aText739, 14));
-		aText739.addVerifyListener(verify);
+		(this.leftBinding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.leftBinding.setLayoutData(layoutData19);
+		this.leftBinding.setText(KeyMapping.get(14));
+		this.leftBinding.addKeyListener(new KeyBindListener(leftBinding, 14));
+		leftBinding.addVerifyListener(verify);
 		
-		CLabel aCLabel750 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel750).setText(UILocale.get("OPTION_KEYMAP_PAD_RIGHT", "Pad_Right:"));
-		aCLabel750.setLayoutData(layoutData36);
+		CLabel rightKeyLabel = new CLabel(keyMapBindsComp, SWT.NONE);
+		(rightKeyLabel).setText(UILocale.get("OPTION_KEYMAP_PAD_RIGHT", "Pad_Right:"));
+		rightKeyLabel.setLayoutData(layoutData36);
 		
-		(this.aText742 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText742.setLayoutData(layoutData3);
-		this.aText742.setText(KeyMapping.get(15));
-		this.aText742.addKeyListener(new KeyBindListener(aText742, 15));
-		aText742.addVerifyListener(verify);
+		(this.rightBinding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.rightBinding.setLayoutData(layoutData3);
+		this.rightBinding.setText(KeyMapping.get(15));
+		this.rightBinding.addKeyListener(new KeyBindListener(rightBinding, 15));
+		rightBinding.addVerifyListener(verify);
 		
-		CLabel aCLabel753 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel753).setText(UILocale.get("OPTION_KEYMAP_PAD_UP", "Pad_Up:"));
-		aCLabel753.setLayoutData(layoutData34);
+		CLabel upKeyLabel = new CLabel(keyMapBindsComp, SWT.NONE);
+		(upKeyLabel).setText(UILocale.get("OPTION_KEYMAP_PAD_UP", "Pad_Up:"));
+		upKeyLabel.setLayoutData(layoutData34);
 		
-		(this.aText745 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText745.setLayoutData(layoutData18);
-		this.aText745.setText(KeyMapping.get(12));
-		this.aText745.addKeyListener(new KeyBindListener(aText745, 12));
-		aText745.addVerifyListener(verify);
+		(this.upBinding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.upBinding.setLayoutData(layoutData18);
+		this.upBinding.setText(KeyMapping.get(12));
+		this.upBinding.addKeyListener(new KeyBindListener(upBinding, 12));
+		upBinding.addVerifyListener(verify);
 		
-		CLabel aCLabel756 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel756).setText(UILocale.get("OPTION_KEYMAP_PAD_DOWN", "Pad_Down:"));
-		aCLabel756.setLayoutData(layoutData33);
+		CLabel downKeyLabel = new CLabel(keyMapBindsComp, SWT.NONE);
+		(downKeyLabel).setText(UILocale.get("OPTION_KEYMAP_PAD_DOWN", "Pad_Down:"));
+		downKeyLabel.setLayoutData(layoutData33);
 		
-		(this.aText748 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText748.setLayoutData(layoutData4);
-		this.aText748.setText(KeyMapping.get(13));
-		this.aText748.addKeyListener(new KeyBindListener(aText748, 13));
-		aText748.addVerifyListener(verify);
+		(this.downBinding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.downBinding.setLayoutData(layoutData4);
+		this.downBinding.setText(KeyMapping.get(13));
+		this.downBinding.addKeyListener(new KeyBindListener(downBinding, 13));
+		downBinding.addVerifyListener(verify);
 		
-		CLabel aCLabel759 = new CLabel(keyMapBindsComp, 0);
-		(aCLabel759).setText(UILocale.get("OPTION_KEYMAP_PAD_MIDDLE", "Pad_Middle:"));
-		aCLabel759.setLayoutData(layoutData39);
+		CLabel fireKeyLabel = new CLabel(keyMapBindsComp, SWT.NONE);
+		(fireKeyLabel).setText(UILocale.get("OPTION_KEYMAP_PAD_MIDDLE", "Pad_Middle:"));
+		fireKeyLabel.setLayoutData(layoutData39);
 		
-		(this.aText751 = new Text(keyMapBindsComp, 2048)).setEditable(true);
-		this.aText751.setLayoutData(layoutData17);
-		this.aText751.setText(KeyMapping.get(16));
-		this.aText751.addKeyListener(new KeyBindListener(aText751, 16));
-		aText751.addVerifyListener(verify);
+		(this.fireBinding = new Text(keyMapBindsComp, SWT.BORDER)).setEditable(true);
+		this.fireBinding.setLayoutData(layoutData17);
+		this.fireBinding.setText(KeyMapping.get(16));
+		this.fireBinding.addKeyListener(new KeyBindListener(fireBinding, 16));
+		fireBinding.addVerifyListener(verify);
 		
-		this.aButton696 = new Button(keyMapBindsComp, 32);
-		aButton696 .setText(UILocale.get("OPTION_KEYMAP_KEY_CACHE", "Enable Key Cache"));
-		this.aButton696.setLayoutData(layoutData28);
-		this.aButton696.setSelection(Settings.enableKeyCache);
+		this.keyCacheCheck = new Button(keyMapBindsComp, SWT.CHECK);
+		keyCacheCheck .setText(UILocale.get("OPTION_KEYMAP_KEY_CACHE", "Enable Key Cache"));
+		this.keyCacheCheck.setLayoutData(layoutData28);
+		this.keyCacheCheck.setSelection(Settings.enableKeyCache);
 		this.cacheKeyboardBindings();
 	}
 
 	private void createControllerSelector() {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalSpan = 2;
-		layoutData.verticalAlignment = 2;
+		layoutData.verticalAlignment = GridData.CENTER;
 		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.horizontalAlignment = 4;
-		this.controllerCombo = new Combo(this.keyMapControllerComp, 8);
+		layoutData.horizontalAlignment = GridData.FILL;
+		this.controllerCombo = new Combo(this.keyMapControllerComp, SWT.READ_ONLY);
 		controllerCombo.setLayoutData(layoutData);
 		this.controllerCombo.addModifyListener(new ModifyListener() {
 			@Override
@@ -1410,10 +1387,10 @@ public final class Property implements IProperty, SelectionListener {
 			}
 		});
 		final GridData layoutData2 = new GridData();
-		(layoutData2).horizontalAlignment = 2;
-		layoutData2.verticalAlignment = 2;
+		(layoutData2).horizontalAlignment = GridData.CENTER;
+		layoutData2.verticalAlignment = GridData.CENTER;
 		Button keymapRefreshBtn;
-		keymapRefreshBtn = new Button(this.keyMapControllerComp, 8388616);
+		keymapRefreshBtn = new Button(this.keyMapControllerComp, SWT.FLAT | SWT.PUSH);
 		keymapRefreshBtn.setText(UILocale.get("OPTION_KEYMAP_REFRESH", "Refresh"));
 		keymapRefreshBtn.setLayoutData(layoutData2);
 		keymapRefreshBtn.addSelectionListener(new SelectionAdapter() {
@@ -1423,36 +1400,36 @@ public final class Property implements IProperty, SelectionListener {
 			}
 		});
 		Button keymapClearBtn;
-		keymapClearBtn = new Button(this.keyMapControllerComp, 8388616);
+		keymapClearBtn = new Button(this.keyMapControllerComp, SWT.FLAT | SWT.PUSH);
 		keymapClearBtn.setText(UILocale.get("OPTION_KEYMAP_CLEAR", "Clear"));
 		GridData layoutData3 = new GridData();
-		layoutData3.horizontalAlignment = 2;
-		layoutData3.verticalAlignment = 2;
+		layoutData3.horizontalAlignment = GridData.CENTER;
+		layoutData3.verticalAlignment = GridData.CENTER;
 		keymapClearBtn.setLayoutData(layoutData3);
 		keymapClearBtn.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				aText627.setText("");
-				aText754.setText("");
-				aText757.setText("");
-				aText760.setText("");
-				aText763.setText("");
-				aText766.setText("");
-				aText768.setText("");
-				aText770.setText("");
-				aText772.setText("");
-				aText774.setText("");
-				aText629.setText("");
-				aText631.setText("");
-				aText739.setText("");
-				aText742.setText("");
-				aText745.setText("");
-				aText748.setText("");
-				aText751.setText("");
-				aText731.setText("");
-				aText735.setText("");
+				num0Binding.setText("");
+				num1Binding.setText("");
+				num2Binding.setText("");
+				num3Binding.setText("");
+				num4Binding.setText("");
+				num5Binding.setText("");
+				num6Binding.setText("");
+				num7Binding.setText("");
+				num8Binding.setText("");
+				num9Binding.setText("");
+				starBinding.setText("");
+				poundBinding.setText("");
+				leftBinding.setText("");
+				rightBinding.setText("");
+				upBinding.setText("");
+				downBinding.setText("");
+				fireBinding.setText("");
+				leftSoftKeyBinding.setText("");
+				rightSoftKeyBinding.setText("");
 				if (controllerCombo.getText().equals("Keyboard")) {
-					for (int i = 0; i < Property.aStringArray661.length; i++) {
-						Property.aStringArray661[i] = "";
+					for (int i = 0; i < Property.keyboardBindings.length; i++) {
+						Property.keyboardBindings[i] = "";
 						KeyMapping.mapDeviceKey(i, "");
 					}
 				} else {
@@ -1462,11 +1439,11 @@ public final class Property implements IProperty, SelectionListener {
 				}
 			}
 		});
-		Button keymapResetBtn = new Button(this.keyMapControllerComp, 8388616);
+		Button keymapResetBtn = new Button(this.keyMapControllerComp, SWT.FLAT | SWT.PUSH);
 		keymapResetBtn.setText(UILocale.get("OPTION_KEYMAP_RESET", "Reset"));
 		GridData layoutData4 = new GridData();
-		layoutData4.horizontalAlignment = 2;
-		layoutData4.verticalAlignment = 2;
+		layoutData4.horizontalAlignment = GridData.CENTER;
+		layoutData4.verticalAlignment = GridData.CENTER;
 		keymapResetBtn.setLayoutData(layoutData4);
 		keymapResetBtn.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -1490,8 +1467,8 @@ public final class Property implements IProperty, SelectionListener {
 					KeyMapping.mapDeviceKey(16, "13");
 					KeyMapping.mapDeviceKey(17, "10");
 					KeyMapping.mapDeviceKey(18, "11");
-					for (int i = 0; i < Property.aStringArray661.length; i++) {
-						Property.aStringArray661[i] = KeyMapping.get(i);
+					for (int i = 0; i < Property.keyboardBindings.length; i++) {
+						Property.keyboardBindings[i] = KeyMapping.get(i);
 					}
 				} else {
 					int i = controllerCombo.getSelectionIndex() - 1;
@@ -1524,86 +1501,86 @@ public final class Property implements IProperty, SelectionListener {
 	private void populateControllerSelector() {
 		this.controllerCombo.removeAll();
 		this.controllerCombo.add("Keyboard");
-		for (int method740 = Controllers.getControllersCount(), i = 0; i < method740; ++i) {
+		for (int controllerCount = Controllers.getControllersCount(), i = 0; i < controllerCount; ++i) {
 			this.controllerCombo.add(Controllers.getController(i).getName());
 		}
 		this.controllerCombo.setText("Keyboard");
 	}
 
 	private void cacheKeyboardBindings() {
-		Property.aStringArray661[0] = this.aText627.getText().trim();
-		Property.aStringArray661[1] = this.aText754.getText().trim();
-		Property.aStringArray661[2] = this.aText757.getText().trim();
-		Property.aStringArray661[3] = this.aText760.getText().trim();
-		Property.aStringArray661[4] = this.aText763.getText().trim();
-		Property.aStringArray661[5] = this.aText766.getText().trim();
-		Property.aStringArray661[6] = this.aText768.getText().trim();
-		Property.aStringArray661[7] = this.aText770.getText().trim();
-		Property.aStringArray661[8] = this.aText772.getText().trim();
-		Property.aStringArray661[9] = this.aText774.getText().trim();
-		Property.aStringArray661[10] = this.aText629.getText().trim();
-		Property.aStringArray661[11] = this.aText631.getText().trim();
-		Property.aStringArray661[14] = this.aText739.getText().trim();
-		Property.aStringArray661[15] = this.aText742.getText().trim();
-		Property.aStringArray661[12] = this.aText745.getText().trim();
-		Property.aStringArray661[13] = this.aText748.getText().trim();
-		Property.aStringArray661[16] = this.aText751.getText().trim();
-		Property.aStringArray661[17] = this.aText731.getText().trim();
-		Property.aStringArray661[18] = this.aText735.getText().trim();
+		Property.keyboardBindings[0] = this.num0Binding.getText().trim();
+		Property.keyboardBindings[1] = this.num1Binding.getText().trim();
+		Property.keyboardBindings[2] = this.num2Binding.getText().trim();
+		Property.keyboardBindings[3] = this.num3Binding.getText().trim();
+		Property.keyboardBindings[4] = this.num4Binding.getText().trim();
+		Property.keyboardBindings[5] = this.num5Binding.getText().trim();
+		Property.keyboardBindings[6] = this.num6Binding.getText().trim();
+		Property.keyboardBindings[7] = this.num7Binding.getText().trim();
+		Property.keyboardBindings[8] = this.num8Binding.getText().trim();
+		Property.keyboardBindings[9] = this.num9Binding.getText().trim();
+		Property.keyboardBindings[10] = this.starBinding.getText().trim();
+		Property.keyboardBindings[11] = this.poundBinding.getText().trim();
+		Property.keyboardBindings[14] = this.leftBinding.getText().trim();
+		Property.keyboardBindings[15] = this.rightBinding.getText().trim();
+		Property.keyboardBindings[12] = this.upBinding.getText().trim();
+		Property.keyboardBindings[13] = this.downBinding.getText().trim();
+		Property.keyboardBindings[16] = this.fireBinding.getText().trim();
+		Property.keyboardBindings[17] = this.leftSoftKeyBinding.getText().trim();
+		Property.keyboardBindings[18] = this.rightSoftKeyBinding.getText().trim();
 	}
 
 	private void refreshKeyBindingFields() {
 		final int selectionIndex;
-		if ((selectionIndex = this.controllerCombo.getSelectionIndex()) < 0 || this.aText627 == null || this.aText627.isDisposed()) {
+		if ((selectionIndex = this.controllerCombo.getSelectionIndex()) < 0 || this.num0Binding == null || this.num0Binding.isDisposed()) {
 			return;
 		}
 		Text text;
-		String method744;
+		String rightSoftKeyValue;
 		if (selectionIndex == 0) {
-			this.aText627.setText(Property.aStringArray661[0]);
-			this.aText754.setText(Property.aStringArray661[1]);
-			this.aText757.setText(Property.aStringArray661[2]);
-			this.aText760.setText(Property.aStringArray661[3]);
-			this.aText763.setText(Property.aStringArray661[4]);
-			this.aText766.setText(Property.aStringArray661[5]);
-			this.aText768.setText(Property.aStringArray661[6]);
-			this.aText770.setText(Property.aStringArray661[7]);
-			this.aText772.setText(Property.aStringArray661[8]);
-			this.aText774.setText(Property.aStringArray661[9]);
-			this.aText629.setText(Property.aStringArray661[10]);
-			this.aText631.setText(Property.aStringArray661[11]);
-			this.aText739.setText(Property.aStringArray661[14]);
-			this.aText742.setText(Property.aStringArray661[15]);
-			this.aText745.setText(Property.aStringArray661[12]);
-			this.aText748.setText(Property.aStringArray661[13]);
-			this.aText751.setText(Property.aStringArray661[16]);
-			this.aText731.setText(Property.aStringArray661[17]);
-			text = this.aText735;
-			method744 = Property.aStringArray661[18];
+			this.num0Binding.setText(Property.keyboardBindings[0]);
+			this.num1Binding.setText(Property.keyboardBindings[1]);
+			this.num2Binding.setText(Property.keyboardBindings[2]);
+			this.num3Binding.setText(Property.keyboardBindings[3]);
+			this.num4Binding.setText(Property.keyboardBindings[4]);
+			this.num5Binding.setText(Property.keyboardBindings[5]);
+			this.num6Binding.setText(Property.keyboardBindings[6]);
+			this.num7Binding.setText(Property.keyboardBindings[7]);
+			this.num8Binding.setText(Property.keyboardBindings[8]);
+			this.num9Binding.setText(Property.keyboardBindings[9]);
+			this.starBinding.setText(Property.keyboardBindings[10]);
+			this.poundBinding.setText(Property.keyboardBindings[11]);
+			this.leftBinding.setText(Property.keyboardBindings[14]);
+			this.rightBinding.setText(Property.keyboardBindings[15]);
+			this.upBinding.setText(Property.keyboardBindings[12]);
+			this.downBinding.setText(Property.keyboardBindings[13]);
+			this.fireBinding.setText(Property.keyboardBindings[16]);
+			this.leftSoftKeyBinding.setText(Property.keyboardBindings[17]);
+			text = this.rightSoftKeyBinding;
+			rightSoftKeyValue = Property.keyboardBindings[18];
 		} else {
 			final int n = selectionIndex - 1;
-			this.aText627.setText(Controllers.getBind(n, 0));
-			this.aText754.setText(Controllers.getBind(n, 1));
-			this.aText757.setText(Controllers.getBind(n, 2));
-			this.aText760.setText(Controllers.getBind(n, 3));
-			this.aText763.setText(Controllers.getBind(n, 4));
-			this.aText766.setText(Controllers.getBind(n, 5));
-			this.aText768.setText(Controllers.getBind(n, 6));
-			this.aText770.setText(Controllers.getBind(n, 7));
-			this.aText772.setText(Controllers.getBind(n, 8));
-			this.aText774.setText(Controllers.getBind(n, 9));
-			this.aText629.setText(Controllers.getBind(n, 10));
-			this.aText631.setText(Controllers.getBind(n, 11));
-			this.aText739.setText(Controllers.getBind(n, 14));
-			this.aText742.setText(Controllers.getBind(n, 15));
-			this.aText745.setText(Controllers.getBind(n, 12));
-			this.aText748.setText(Controllers.getBind(n, 13));
-			this.aText751.setText(Controllers.getBind(n, 16));
-			this.aText731.setText(Controllers.getBind(n, 17));
-			text = this.aText735;
-			method744 = Controllers.getBind(n, 18);
+			this.num0Binding.setText(Controllers.getBind(n, 0));
+			this.num1Binding.setText(Controllers.getBind(n, 1));
+			this.num2Binding.setText(Controllers.getBind(n, 2));
+			this.num3Binding.setText(Controllers.getBind(n, 3));
+			this.num4Binding.setText(Controllers.getBind(n, 4));
+			this.num5Binding.setText(Controllers.getBind(n, 5));
+			this.num6Binding.setText(Controllers.getBind(n, 6));
+			this.num7Binding.setText(Controllers.getBind(n, 7));
+			this.num8Binding.setText(Controllers.getBind(n, 8));
+			this.num9Binding.setText(Controllers.getBind(n, 9));
+			this.starBinding.setText(Controllers.getBind(n, 10));
+			this.poundBinding.setText(Controllers.getBind(n, 11));
+			this.leftBinding.setText(Controllers.getBind(n, 14));
+			this.rightBinding.setText(Controllers.getBind(n, 15));
+			this.upBinding.setText(Controllers.getBind(n, 12));
+			this.downBinding.setText(Controllers.getBind(n, 13));
+			this.fireBinding.setText(Controllers.getBind(n, 16));
+			this.leftSoftKeyBinding.setText(Controllers.getBind(n, 17));
+			text = this.rightSoftKeyBinding;
+			rightSoftKeyValue = Controllers.getBind(n, 18);
 		}
-		text.setText(method744);
+		text.setText(rightSoftKeyValue);
 	}
 
 	public boolean updateController() {
@@ -1619,9 +1596,9 @@ public final class Property implements IProperty, SelectionListener {
 				if ((selectionIndex = getControllerCombo(this.aClass38_1497).getSelectionIndex()) == 0) {
 					return;
 				}
-				final String method749;
+				final String controllerInput;
 				String string;
-				if (!(string = (method749 = Controllers.method749())).equalsIgnoreCase("LEFT")
+				if (!(string = (controllerInput = Controllers.method749())).equalsIgnoreCase("LEFT")
 						&& !string.equalsIgnoreCase("RIGHT")
 						&& !string.equalsIgnoreCase("UP")
 						&& !string.equalsIgnoreCase("DOWN")
@@ -1631,64 +1608,64 @@ public final class Property implements IProperty, SelectionListener {
 				--selectionIndex;
 				Text text;
 				if (getDigit0KeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 0, method749);
+					Controllers.bind(selectionIndex, 0, controllerInput);
 					text = getDigit0KeyField(this.aClass38_1497);
 				} else if (getDigit1KeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 1, method749);
+					Controllers.bind(selectionIndex, 1, controllerInput);
 					text = getDigit1KeyField(this.aClass38_1497);
 				} else if (getDigit2KeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 2, method749);
+					Controllers.bind(selectionIndex, 2, controllerInput);
 					text = getDigit2KeyField(this.aClass38_1497);
 				} else if (getDigit3KeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 3, method749);
+					Controllers.bind(selectionIndex, 3, controllerInput);
 					text = getDigit3KeyField(this.aClass38_1497);
 				} else if (getDigit4KeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 4, method749);
+					Controllers.bind(selectionIndex, 4, controllerInput);
 					text = getDigit4KeyField(this.aClass38_1497);
 				} else if (getDigit5KeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 5, method749);
+					Controllers.bind(selectionIndex, 5, controllerInput);
 					text = getDigit5KeyField(this.aClass38_1497);
 				} else if (getDigit6KeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 6, method749);
+					Controllers.bind(selectionIndex, 6, controllerInput);
 					text = getDigit6KeyField(this.aClass38_1497);
 				} else if (getDigit7KeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 7, method749);
+					Controllers.bind(selectionIndex, 7, controllerInput);
 					text = getDigit7KeyField(this.aClass38_1497);
 				} else if (getDigit8KeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 8, method749);
+					Controllers.bind(selectionIndex, 8, controllerInput);
 					text = getDigit8KeyField(this.aClass38_1497);
 				} else if (getDigit9KeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 9, method749);
+					Controllers.bind(selectionIndex, 9, controllerInput);
 					text = getDigit9KeyField(this.aClass38_1497);
 				} else if (getStarKeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 10, method749);
+					Controllers.bind(selectionIndex, 10, controllerInput);
 					text = getStarKeyField(this.aClass38_1497);
 				} else if (getPoundKeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 11, method749);
+					Controllers.bind(selectionIndex, 11, controllerInput);
 					text = getPoundKeyField(this.aClass38_1497);
 				} else if (getLeftDirectionKeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 14, method749);
+					Controllers.bind(selectionIndex, 14, controllerInput);
 					text = getLeftDirectionKeyField(this.aClass38_1497);
 				} else if (getRightDirectionKeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 15, method749);
+					Controllers.bind(selectionIndex, 15, controllerInput);
 					text = getRightDirectionKeyField(this.aClass38_1497);
 				} else if (getUpDirectionKeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 12, method749);
+					Controllers.bind(selectionIndex, 12, controllerInput);
 					text = getUpDirectionKeyField(this.aClass38_1497);
 				} else if (getDownDirectionKeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 13, method749);
+					Controllers.bind(selectionIndex, 13, controllerInput);
 					text = getDownDirectionKeyField(this.aClass38_1497);
 				} else if (getCenterKeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 16, method749);
+					Controllers.bind(selectionIndex, 16, controllerInput);
 					text = getCenterKeyField(this.aClass38_1497);
 				} else if (getLeftSoftKeyField(this.aClass38_1497).isFocusControl()) {
-					Controllers.bind(selectionIndex, 17, method749);
+					Controllers.bind(selectionIndex, 17, controllerInput);
 					text = getLeftSoftKeyField(this.aClass38_1497);
 				} else {
 					if (!getRightSoftKeyField(this.aClass38_1497).isFocusControl()) {
 						return;
 					}
-					Controllers.bind(selectionIndex, 18, method749);
+					Controllers.bind(selectionIndex, 18, controllerInput);
 					text = getRightSoftKeyField(this.aClass38_1497);
 				}
 				text.setText(string);
@@ -1699,7 +1676,7 @@ public final class Property implements IProperty, SelectionListener {
 
 	private void setupSystemComp() {
 		this.systemScrollComp = new ScrolledComposite(this.tabFolder, SWT.V_SCROLL);
-		this.systemComp = new Composite(this.systemScrollComp, 0);
+		this.systemComp = new Composite(this.systemScrollComp, SWT.NONE);
 		systemComp.setLayout(new GridLayout());
 		this.initSystemComp();
 		systemScrollComp.setContent(systemComp);
@@ -1707,14 +1684,14 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void setupDisableApiComp() {
-		disableApiComp = new Composite(tabFolder, 0);
+		disableApiComp = new Composite(tabFolder, SWT.NONE);
 		disableApiComp.setLayout(new GridLayout());
 
 		GridData d = new GridData();
-		d.horizontalAlignment = 4;
+		d.horizontalAlignment = GridData.FILL;
 		d.grabExcessHorizontalSpace = true;
 		d.grabExcessVerticalSpace = true;
-		d.verticalAlignment = 4;
+		d.verticalAlignment = GridData.FILL;
 		d.heightHint = 240;
 
 		disableApiTable = new Table(disableApiComp, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL);
@@ -1738,14 +1715,14 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void setupPropsComp() {
-		propsComp = new Composite(tabFolder, 0);
+		propsComp = new Composite(tabFolder, SWT.NONE);
 		propsComp.setLayout(new GridLayout());
 
 		GridData d = new GridData();
-		d.horizontalAlignment = 4;
+		d.horizontalAlignment = GridData.FILL;
 		d.grabExcessHorizontalSpace = true;
 		d.grabExcessVerticalSpace = true;
-		d.verticalAlignment = 4;
+		d.verticalAlignment = GridData.FILL;
 
 		propsText = new Text(propsComp, SWT.MULTI | SWT.BORDER);
 		propsText.setLayoutData(d);
@@ -1759,14 +1736,14 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private void setupMediaComp() {
-		this.mediaComp = new Composite(this.tabFolder, 0);
+		this.mediaComp = new Composite(this.tabFolder, SWT.NONE);
 		mediaComp.setLayout(new GridLayout());
 
 		final GridData fill = new GridData();
-		fill.horizontalAlignment = 4;
+		fill.horizontalAlignment = GridData.FILL;
 		fill.grabExcessHorizontalSpace = true;
 		fill.grabExcessVerticalSpace = true;
-		fill.verticalAlignment = 4;
+		fill.verticalAlignment = GridData.FILL;
 
 		final GridData fillHor = new GridData();
 		fillHor.horizontalAlignment = GridData.FILL;
@@ -1801,12 +1778,12 @@ public final class Property implements IProperty, SelectionListener {
 		fillHor7.grabExcessHorizontalSpace = true;
 		fillHor7.horizontalSpan = 2;
 
-		Group mediaGroup = new Group(this.mediaComp, 0);
+		Group mediaGroup = new Group(this.mediaComp, SWT.NONE);
 		mediaGroup.setText(UILocale.get("OPTION_TAB_MEDIA", "Media"));
 		mediaGroup.setLayout(new GridLayout(2, false));
 		mediaGroup.setLayoutData(fill);
 
-		Label label = new Label(mediaGroup, 32);
+		Label label = new Label(mediaGroup, SWT.SHADOW_NONE);
 		label.setText("MIDI Soundfont Path:");
 		label.setLayoutData(fillHor7);
 
@@ -1821,7 +1798,7 @@ public final class Property implements IProperty, SelectionListener {
 		sfPathBtn.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog fileDialog = new FileDialog(setsShell, SWT.OPEN);
+				FileDialog fileDialog = new FileDialog(settingsShell, SWT.OPEN);
 				fileDialog.setFilterExtensions(new String[] { "*.sf2;*.dls", "*.*" });
 				String selection = fileDialog.open();
 				if (selection != null) {
@@ -1852,7 +1829,7 @@ public final class Property implements IProperty, SelectionListener {
 		vlcCheck.setLayoutData(fillHor4);
 		vlcCheck.setSelection(Settings.enableVlc);
 
-		label = new Label(mediaGroup, 32);
+		label = new Label(mediaGroup, SWT.SHADOW_NONE);
 		label.setText(String.format(
 			"%s (%s):",
 			UILocale.get("OPTION_MEDIA_VLC_DIR", "VLC Path"),
@@ -1871,7 +1848,7 @@ public final class Property implements IProperty, SelectionListener {
 		vlcDirBtn.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog fileDialog = new FileDialog(setsShell, SWT.OPEN);
+				FileDialog fileDialog = new FileDialog(settingsShell, SWT.OPEN);
 				fileDialog.setFilterExtensions(new String[] { "vlc;vlc.exe;libvlc.dll;libvlc.so;libvlc.dylib"});
 				String selection = fileDialog.open();
 				if (selection != null) {
@@ -1946,7 +1923,7 @@ public final class Property implements IProperty, SelectionListener {
 		comboLayoutData.horizontalAlignment = GridData.FILL;
 		comboLayoutData.grabExcessHorizontalSpace = true;
 
-		ottCombo = new Combo(comp, 12);
+		ottCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		ottCombo.setLayoutData(comboLayoutData);
 		ottCombo.setFont(f);
 		String[] items = new String[] {
@@ -1979,10 +1956,10 @@ public final class Property implements IProperty, SelectionListener {
 		comboData.grabExcessHorizontalSpace = true;
 
 		final GridData groupData = new GridData();
-		groupData.horizontalAlignment = 4;
+		groupData.horizontalAlignment = GridData.FILL;
 		groupData.grabExcessHorizontalSpace = true;
 		groupData.grabExcessVerticalSpace = true;
-		groupData.verticalAlignment = 1;
+		groupData.verticalAlignment = GridData.BEGINNING;
 
 		securityCheck = new Button(securityContent, SWT.CHECK);
 		securityCheck.setText(UILocale.get("OPTION_SECURITY_ENABLE", "Enable security"));
@@ -1999,7 +1976,7 @@ public final class Property implements IProperty, SelectionListener {
 			final GridData data = new GridData();
 			data.horizontalAlignment = SWT.FILL;
 
-			CLabel label = new CLabel(permGroup, 0);
+			CLabel label = new CLabel(permGroup, SWT.NONE);
 			label.setText(s[0]);
 			label.setLayoutData(data);
 
@@ -2024,10 +2001,10 @@ public final class Property implements IProperty, SelectionListener {
 	private void initSystemComp() {
 
 		final GridData layoutData = new GridData();
-		(layoutData).horizontalAlignment = 4;
+		(layoutData).horizontalAlignment = GridData.FILL;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.grabExcessVerticalSpace = true;
-		layoutData.verticalAlignment = 4;
+		layoutData.verticalAlignment = GridData.FILL;
 		
 		Group updateComp = new Group(systemComp, SWT.NONE);
 		updateComp.setText("Updates");
@@ -2046,7 +2023,7 @@ public final class Property implements IProperty, SelectionListener {
 		comboLayoutData2.horizontalAlignment = GridData.FILL;
 		comboLayoutData2.grabExcessHorizontalSpace = true;
 
-		updateBranchCombo = new Combo(updateComp, 12);
+		updateBranchCombo = new Combo(updateComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		updateBranchCombo.setLayoutData(comboLayoutData2);
 		updateBranchCombo.setFont(f);
 		updateBranchCombo.add("stable");
@@ -2054,7 +2031,7 @@ public final class Property implements IProperty, SelectionListener {
 
 		updateBranchCombo.setText(Settings.updateBranch);
 
-		autoUpdatesBtn = new Button(updateComp, 32);
+		autoUpdatesBtn = new Button(updateComp, SWT.CHECK);
 		autoUpdatesBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		autoUpdatesBtn.setText(UILocale.get("OPTION_SYSTEM_AUTO_UPDATES", "Automatically check for updates"));
 		autoUpdatesBtn.setSelection(Settings.autoUpdate == 2);
@@ -2077,12 +2054,12 @@ public final class Property implements IProperty, SelectionListener {
 		this.vibrationCheck.setSelection(Settings.enableVibration);
 		vibrationCheck.setToolTipText("Shakes the window during vibration");
 		
-		this.aButton752 = new Button(grpUi, 32);
-		aButton752.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		aButton752.setText(UILocale.get("OPTION_SYSTEM_INFO_COLOR", "Info View: Show color in (R,G,B)"));
-		this.aButton752.setSelection(Settings.infoColorHex);
+		this.infoColorHexCheck = new Button(grpUi, SWT.CHECK);
+		infoColorHexCheck.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		infoColorHexCheck.setText(UILocale.get("OPTION_SYSTEM_INFO_COLOR", "Info View: Show color in (R,G,B)"));
+		this.infoColorHexCheck.setSelection(Settings.infoColorHex);
 
-		showAppSettingsBtn = new Button(grpUi, 32);
+		showAppSettingsBtn = new Button(grpUi, SWT.CHECK);
 		showAppSettingsBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		showAppSettingsBtn.setText("Show application settings on first start");
 		showAppSettingsBtn.setSelection(Settings.showAppSettingsOnStart);
@@ -2092,52 +2069,52 @@ public final class Property implements IProperty, SelectionListener {
 		grpDebug.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		grpDebug.setLayout(new GridLayout(1, false));
 		
-		this.aButton746 = new Button(grpDebug, 32);
-		aButton746.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton746.setText(UILocale.get("OPTION_SYSTEM_XRAY_BG", "X-Ray View: OverLap images"));
-		this.aButton746.setSelection(Settings.xrayOverlapScreen);
+		this.xrayOverlapCheck = new Button(grpDebug, SWT.CHECK);
+		xrayOverlapCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		xrayOverlapCheck.setText(UILocale.get("OPTION_SYSTEM_XRAY_BG", "X-Ray View: OverLap images"));
+		this.xrayOverlapCheck.setSelection(Settings.xrayOverlapScreen);
 		
-		this.aButton749 = new Button(grpDebug, 32);
-		aButton749.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton749.setText(UILocale.get("OPTION_SYSTEM_XRAY_CLIP", "X-Ray View: Show image clipping region"));
-		this.aButton749.setSelection(Settings.xrayShowClipBorder);
+		this.xrayClipCheck = new Button(grpDebug, SWT.CHECK);
+		xrayClipCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		xrayClipCheck.setText(UILocale.get("OPTION_SYSTEM_XRAY_CLIP", "X-Ray View: Show image clipping region"));
+		this.xrayClipCheck.setSelection(Settings.xrayShowClipBorder);
 		
-		this.aButton703 = new Button(grpDebug, 32);
-		aButton703.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton703.setText(UILocale.get("OPTION_SYSTEM_RELEASED_IMG", "Memory View: Record released images"));
-		this.aButton703.setSelection(Settings.recordReleasedImg);
+		this.recordReleasedImagesCheck = new Button(grpDebug, SWT.CHECK);
+		recordReleasedImagesCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		recordReleasedImagesCheck.setText(UILocale.get("OPTION_SYSTEM_RELEASED_IMG", "Memory View: Record released images"));
+		this.recordReleasedImagesCheck.setSelection(Settings.recordReleasedImg);
 
-		storeCreatedImagesBtn = new Button(grpDebug, 32);
+		storeCreatedImagesBtn = new Button(grpDebug, SWT.CHECK);
 		storeCreatedImagesBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		storeCreatedImagesBtn.setText("Memory View: Record created images");
 		storeCreatedImagesBtn.setSelection(Settings.storeCreatedImages);
 
-		countImagesSize = new Button(grpDebug, 32);
+		countImagesSize = new Button(grpDebug, SWT.CHECK);
 		countImagesSize.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		countImagesSize.setText("Memory View: Count images in objects total size");
 		countImagesSize.setSelection(Settings.countImagesInObjectsSize);
 		
-		this.aButton714 = new Button(grpDebug, 32);
-		aButton714.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton714.setText(UILocale.get("OPTION_SYSTEM_TRACK_NEW", "Track \"new/new[]...\" operations"));
-		this.aButton714.setSelection(Settings.enableNewTrack);
+		this.trackAllocationsCheck = new Button(grpDebug, SWT.CHECK);
+		trackAllocationsCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		trackAllocationsCheck.setText(UILocale.get("OPTION_SYSTEM_TRACK_NEW", "Track \"new/new[]...\" operations"));
+		this.trackAllocationsCheck.setSelection(Settings.enableNewTrack);
 		
-		this.aButton719 = new Button(grpDebug, 32);
-		aButton719.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		aButton719.setText(UILocale.get("OPTION_SYSTEM_TRACK_METHOD", "Track method calls"));
-		this.aButton719.setSelection(Settings.enableMethodTrack);
+		this.trackMethodCallsCheck = new Button(grpDebug, SWT.CHECK);
+		trackMethodCallsCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		trackMethodCallsCheck.setText(UILocale.get("OPTION_SYSTEM_TRACK_METHOD", "Track method calls"));
+		this.trackMethodCallsCheck.setSelection(Settings.enableMethodTrack);
 
 		grpMisc = new Group(systemComp, SWT.NONE);
 		grpMisc.setText("Misc");
 		grpMisc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		grpMisc.setLayout(new GridLayout(1, false));
 		
-		antiAliasBtn = new Button(grpMisc, 32);
+		antiAliasBtn = new Button(grpMisc, SWT.CHECK);
 		antiAliasBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		antiAliasBtn.setText(UILocale.get("OPTION_SYSTEM_AWT_ANTIALIASING", "AWT Smooth drawing"));
 		antiAliasBtn.setSelection(Settings.awtAntiAliasing);
 
-		passMinimizeBtn = new Button(grpMisc, 32);
+		passMinimizeBtn = new Button(grpMisc, SWT.CHECK);
 		passMinimizeBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		passMinimizeBtn.setText("Pass window minimized state to MIDlet");
 		passMinimizeBtn.setSelection(Settings.hideDisplayableOnMinimize);
@@ -2146,32 +2123,32 @@ public final class Property implements IProperty, SelectionListener {
 	private void setupSysFontComp() {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalSpan = 2;
-		layoutData.horizontalAlignment = 4;
-		layoutData.verticalAlignment = 2;
+		layoutData.horizontalAlignment = GridData.FILL;
+		layoutData.verticalAlignment = GridData.CENTER;
 		layoutData.grabExcessVerticalSpace = true;
 		layoutData.grabExcessHorizontalSpace = true;
 		final GridData layoutData2 = new GridData();
-		(layoutData2).horizontalAlignment = 4;
-		layoutData2.verticalAlignment = 2;
+		(layoutData2).horizontalAlignment = GridData.FILL;
+		layoutData2.verticalAlignment = GridData.CENTER;
 		final GridData layoutData5 = new GridData();
-		(layoutData5).horizontalAlignment = 4;
-		layoutData5.verticalAlignment = 2;
+		(layoutData5).horizontalAlignment = GridData.FILL;
+		layoutData5.verticalAlignment = GridData.CENTER;
 		final GridData layoutData3 = new GridData();
-		(layoutData3).horizontalAlignment = 1;
-		layoutData3.verticalAlignment = 2;
+		(layoutData3).horizontalAlignment = GridData.BEGINNING;
+		layoutData3.verticalAlignment = GridData.CENTER;
 		final GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
 		this.fontScrollComp = new ScrolledComposite(this.tabFolder, SWT.V_SCROLL);
 		this.fontComp = new Composite(fontScrollComp, SWT.NONE);
 		fontComp.setLayout(layout);
-		CLabel aCLabel638 = new CLabel(this.fontComp, 0);
-		(aCLabel638).setText(UILocale.get("OPTION_FONT_DEFAULT_FONT", "Default Font:"));
-		aCLabel638.setLayoutData(layoutData2);
+		CLabel defaultFontLabel = new CLabel(this.fontComp, SWT.NONE);
+		(defaultFontLabel).setText(UILocale.get("OPTION_FONT_DEFAULT_FONT", "Default Font:"));
+		defaultFontLabel.setLayoutData(layoutData2);
 		this.setupDefaultFontChoice();
 
-		CLabel aCLabel = new CLabel(this.fontComp, 0);
-		(aCLabel).setText("Monospace Font:");
-		aCLabel.setLayoutData(layoutData5);
+		CLabel monospaceFontLabel = new CLabel(this.fontComp, SWT.NONE);
+		(monospaceFontLabel).setText("Monospace Font:");
+		monospaceFontLabel.setLayoutData(layoutData5);
 		this.setupMonoFontChoice();
 		
 		lastChangedFont = 0;
@@ -2185,49 +2162,49 @@ public final class Property implements IProperty, SelectionListener {
 		gd.verticalAlignment = GridData.FILL;
 		fontPreviewGroup.setLayoutData(gd);
 
-		CLabel aCLabel640 = new CLabel(fontPreviewGroup, 0);
-		(aCLabel640).setText(UILocale.get("OPTION_FONT_LARGE_SIZE", "Large Size:"));
-		aCLabel640.setLayoutData(layoutData3);
-		this.aSpinner670 = new Spinner(fontPreviewGroup, 2048);
-		aSpinner670.setMinimum(1);
-		this.aSpinner670.setSelection(this.fontLargeSize);
-		this.aSpinner670.addModifyListener(new ModifyListener() {
+		CLabel largeFontLabel = new CLabel(fontPreviewGroup, SWT.NONE);
+		(largeFontLabel).setText(UILocale.get("OPTION_FONT_LARGE_SIZE", "Large Size:"));
+		largeFontLabel.setLayoutData(layoutData3);
+		this.largeFontSpinner = new Spinner(fontPreviewGroup, SWT.BORDER);
+		largeFontSpinner.setMinimum(1);
+		this.largeFontSpinner.setSelection(this.fontLargeSize);
+		this.largeFontSpinner.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent modifyEvent) {
 				refreshFontPreviews(1);
 			}
 		});
 		this.createLargeFontPreview(fontPreviewGroup);
-		CLabel aCLabel642 = new CLabel(fontPreviewGroup, 0);
-		(aCLabel642).setText(UILocale.get("OPTION_FONT_MIDDLE_SIZE", "Medium Size:"));
-		this.aSpinner679 = new Spinner(fontPreviewGroup, 2048);
-		aSpinner679.setMinimum(1);
-		this.aSpinner679.setSelection(this.fontMediumSize);
-		this.aSpinner679.addModifyListener(new ModifyListener() {
+		CLabel mediumFontLabel = new CLabel(fontPreviewGroup, SWT.NONE);
+		(mediumFontLabel).setText(UILocale.get("OPTION_FONT_MIDDLE_SIZE", "Medium Size:"));
+		this.mediumFontSpinner = new Spinner(fontPreviewGroup, SWT.BORDER);
+		mediumFontSpinner.setMinimum(1);
+		this.mediumFontSpinner.setSelection(this.fontMediumSize);
+		this.mediumFontSpinner.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent modifyEvent) {
 				refreshFontPreviews(2);
 			}
 		});
 		this.createMediumFontPreview(fontPreviewGroup);
-		CLabel aCLabel644 = new CLabel(fontPreviewGroup, 0);
-		(aCLabel644).setText(UILocale.get("OPTION_FONT_SMALL_SIZE", "Small Size:"));
-		this.aSpinner690 = new Spinner(fontPreviewGroup, 2048);
-		aSpinner690.setMinimum(1);
-		this.aSpinner690.setSelection(this.fontSmallSize);
-		this.aSpinner690.addModifyListener(new ModifyListener() {
+		CLabel smallFontLabel = new CLabel(fontPreviewGroup, SWT.NONE);
+		(smallFontLabel).setText(UILocale.get("OPTION_FONT_SMALL_SIZE", "Small Size:"));
+		this.smallFontSpinner = new Spinner(fontPreviewGroup, SWT.BORDER);
+		smallFontSpinner.setMinimum(1);
+		this.smallFontSpinner.setSelection(this.fontSmallSize);
+		this.smallFontSpinner.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent modifyEvent) {
 				refreshFontPreviews(4);
 			}
 		});
 		this.createSmallFontPreview(fontPreviewGroup);
-		CLabel aCLabel645 = new CLabel(fontPreviewGroup, 0);
-		(aCLabel645).setText(UILocale.get("OPTION_FONT_TEST_TEXT", "Test Text:"));
-		this.aText633 = new Text(fontPreviewGroup, 2048);
-		aText633.setText(UILocale.get("OPTION_FONT_TEST_TEXT_TXT", "This is an Example."));
-		this.aText633.setLayoutData(layoutData);
-		this.aText633.addModifyListener(new ModifyListener() {
+		CLabel fontPreviewTextLabel = new CLabel(fontPreviewGroup, SWT.NONE);
+		(fontPreviewTextLabel).setText(UILocale.get("OPTION_FONT_TEST_TEXT", "Test Text:"));
+		this.fontPreviewText = new Text(fontPreviewGroup, SWT.BORDER);
+		fontPreviewText.setText(UILocale.get("OPTION_FONT_TEST_TEXT_TXT", "This is an Example."));
+		this.fontPreviewText.setLayoutData(layoutData);
+		this.fontPreviewText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
 				refreshFontPreviews(7);
 			}
@@ -2236,7 +2213,7 @@ public final class Property implements IProperty, SelectionListener {
 
 		final GridData layoutData4 = new GridData();
 		(layoutData4).horizontalSpan = 3;
-		antiAliasTextBtn = new Button(fontComp, 32);
+		antiAliasTextBtn = new Button(fontComp, SWT.CHECK);
 		antiAliasTextBtn.setText(UILocale.get("OPTION_SYSTEM_TEXT_ANTIALIASING", "Text Antialiasing"));
 		antiAliasTextBtn.setSelection(Settings.textAntiAliasing);
 		antiAliasTextBtn.setLayoutData(layoutData4);
@@ -2248,10 +2225,10 @@ public final class Property implements IProperty, SelectionListener {
 	private void setupDefaultFontChoice() {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalSpan = 2;
-		layoutData.verticalAlignment = 2;
+		layoutData.verticalAlignment = GridData.CENTER;
 		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.horizontalAlignment = 4;
-		this.defaultFontCombo = new Combo(this.fontComp, 8);
+		layoutData.horizontalAlignment = GridData.FILL;
+		this.defaultFontCombo = new Combo(this.fontComp, SWT.READ_ONLY);
 		defaultFontCombo.setLayoutData(layoutData);
 		this.defaultFontCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
@@ -2275,24 +2252,24 @@ public final class Property implements IProperty, SelectionListener {
 			}
 		}
 		Collections.sort(list);
-		String aString682 = (String) list.get(0);
+		String fontName = (String) list.get(0);
 		for (Comparable comparable : list) {
 			this.defaultFontCombo.add((String) comparable);
 			if (this.defaultFont.equalsIgnoreCase((String) comparable)) {
-				aString682 = (String) comparable;
+				fontName = (String) comparable;
 			}
 		}
-		this.defaultFont = aString682;
+		this.defaultFont = fontName;
 		this.defaultFontCombo.setText(this.defaultFont);
 	}
 
 	private void setupMonoFontChoice() {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalSpan = 2;
-		layoutData.verticalAlignment = 2;
+		layoutData.verticalAlignment = GridData.CENTER;
 		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.horizontalAlignment = 4;
-		this.monoFontCombo = new Combo(this.fontComp, 8);
+		layoutData.horizontalAlignment = GridData.FILL;
+		this.monoFontCombo = new Combo(this.fontComp, SWT.READ_ONLY);
 		monoFontCombo.setLayoutData(layoutData);
 		this.monoFontCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent modifyEvent) {
@@ -2314,35 +2291,35 @@ public final class Property implements IProperty, SelectionListener {
 			}
 		}
 		Collections.sort(list);
-		String aString682 = (String) list.get(0);
+		String fontName = (String) list.get(0);
 		for (Comparable comparable : list) {
 			this.monoFontCombo.add((String) comparable);
 			if (this.monospaceFont.equalsIgnoreCase((String) comparable)) {
-				aString682 = (String) comparable;
+				fontName = (String) comparable;
 			}
 		}
-		this.monospaceFont = aString682;
+		this.monospaceFont = fontName;
 		this.monoFontCombo.setText(this.monospaceFont);
 	}
 
 	private void createLargeFontPreview(Composite parent) {
 		final GridData layoutData = new GridData();
-		(layoutData).horizontalAlignment = 4;
+		(layoutData).horizontalAlignment = GridData.FILL;
 		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.verticalAlignment = 2;
-		this.aCanvas663 = new Canvas(parent, 264192);
-		aCanvas663.setLayoutData(layoutData);
-		this.aCanvas663.addPaintListener(new PaintListener() {
+		layoutData.verticalAlignment = GridData.CENTER;
+		this.largeFontCanvas = new Canvas(parent, SWT.NO_BACKGROUND | SWT.BORDER);
+		largeFontCanvas.setLayoutData(layoutData);
+		this.largeFontCanvas.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
-				if (anIImage671 == null) {
+				if (largeFontPreview == null) {
 					refreshFontPreviews(1);
 				}
 				if (Settings.g2d == 0) {
-					((ImageSWT) anIImage671).method12(paintEvent.gc, 0, 0);
+					((ImageSWT) largeFontPreview).method12(paintEvent.gc, 0, 0);
 					return;
 				}
 				if (Settings.g2d == 1) {
-					((ImageAWT) anIImage671).copyToScreen(paintEvent.gc);
+					((ImageAWT) largeFontPreview).copyToScreen(paintEvent.gc);
 				}
 			}
 		});
@@ -2350,169 +2327,145 @@ public final class Property implements IProperty, SelectionListener {
 
 	private void createMediumFontPreview(Composite parent) {
 		final GridData layoutData = new GridData();
-		(layoutData).horizontalAlignment = 4;
+		(layoutData).horizontalAlignment = GridData.FILL;
 		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.verticalAlignment = 2;
-		this.aCanvas680 = new Canvas(parent, 264192);
-		aCanvas680.setLayoutData(layoutData);
-		this.aCanvas680.addPaintListener(new PaintListener() {
+		layoutData.verticalAlignment = GridData.CENTER;
+		this.mediumFontCanvas = new Canvas(parent, SWT.NO_BACKGROUND | SWT.BORDER);
+		mediumFontCanvas.setLayoutData(layoutData);
+		this.mediumFontCanvas.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
-				if (anIImage674 == null) {
+				if (mediumFontPreview == null) {
 					refreshFontPreviews(2);
 				}
-				anIImage674.copyToScreen(paintEvent.gc);
+				mediumFontPreview.copyToScreen(paintEvent.gc);
 			}
 		});
 	}
 
 	private void createSmallFontPreview(Composite parent) {
 		final GridData layoutData = new GridData();
-		(layoutData).horizontalAlignment = 4;
+		(layoutData).horizontalAlignment = GridData.FILL;
 		layoutData.grabExcessHorizontalSpace = true;
-		layoutData.verticalAlignment = 2;
-		this.aCanvas691 = new Canvas(parent, 264192);
-		aCanvas691.setLayoutData(layoutData);
-		this.aCanvas691.addPaintListener(new PaintListener() {
+		layoutData.verticalAlignment = GridData.CENTER;
+		this.smallFontCanvas = new Canvas(parent, SWT.NO_BACKGROUND | SWT.BORDER);
+		smallFontCanvas.setLayoutData(layoutData);
+		this.smallFontCanvas.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent paintEvent) {
-				if (anIImage693 == null) {
+				if (smallFontPreview == null) {
 					refreshFontPreviews(4);
 				}
 				if (Settings.g2d == 0) {
-					((ImageSWT) anIImage693).copyToScreen(paintEvent.gc);
+					((ImageSWT) smallFontPreview).copyToScreen(paintEvent.gc);
 					return;
 				}
 				if (Settings.g2d == 1) {
-					((ImageAWT) anIImage693).copyToScreen(paintEvent.gc);
+					((ImageAWT) smallFontPreview).copyToScreen(paintEvent.gc);
 				}
 			}
 		});
 	}
 
 	private void refreshFontPreviews(final int n) {
-		if (!this.setsShell.isVisible()) {
+		if (!this.settingsShell.isVisible()) {
 			return;
 		}
 		String fontName = lastChangedFont == 1 ? monoFontCombo.getText() : defaultFontCombo.getText();
 		IFont font = null;
 		if ((n & 0x1) != 0x0) {
-			Label_0080:
-			{
-				IFont font2;
-				if (Settings.g2d == 0) {
-					font2 = new FontSWT(fontName, this.aSpinner670.getSelection(), 0);
-				} else {
-					if (Settings.g2d != 1) {
-						break Label_0080;
-					}
-					font2 = new FontAWT(fontName, this.aSpinner670.getSelection(), 0, false);
-				}
-				font = font2;
+			if (Settings.g2d == 0) {
+				font = new FontSWT(fontName, this.largeFontSpinner.getSelection(), 0);
+			} else if (Settings.g2d == 1) {
+				font = new FontAWT(fontName, this.largeFontSpinner.getSelection(), 0, false);
 			}
-			final int x = this.aCanvas663.getSize().x;
-			final int y = this.aCanvas663.getSize().y;
-			this.anIImage671 = Emulator.getEmulator().newImage(x, y, false, 0);
+			final int x = this.largeFontCanvas.getSize().x;
+			final int y = this.largeFontCanvas.getSize().y;
+			this.largeFontPreview = Emulator.getEmulator().newImage(x, y, false, 0);
 			final IGraphics2D graphics;
-			(graphics = this.anIImage671.createGraphics()).setColor(65280, false);
+			(graphics = this.largeFontPreview.createGraphics()).setColor(65280, false);
 			graphics.setFont(font);
-			graphics.drawString(this.aText633.getText(), 1, y >> 1);
-			this.aCanvas663.redraw();
+			graphics.drawString(this.fontPreviewText.getText(), 1, y >> 1);
+			this.largeFontCanvas.redraw();
 		}
 		if ((n & 0x2) != 0x0) {
-			Label_0242:
-			{
-				IFont font3;
-				if (Settings.g2d == 0) {
-					font3 = new FontSWT(fontName, this.aSpinner679.getSelection(), 0);
-				} else {
-					if (Settings.g2d != 1) {
-						break Label_0242;
-					}
-					font3 = new FontAWT(fontName, this.aSpinner679.getSelection(), 0, false);
-				}
-				font = font3;
+			if (Settings.g2d == 0) {
+				font = new FontSWT(fontName, this.mediumFontSpinner.getSelection(), 0);
+			} else if (Settings.g2d == 1) {
+				font = new FontAWT(fontName, this.mediumFontSpinner.getSelection(), 0, false);
 			}
-			final int x2 = this.aCanvas680.getSize().x;
-			final int y2 = this.aCanvas680.getSize().y;
-			this.anIImage674 = Emulator.getEmulator().newImage(x2, y2, false, 0);
+			final int x2 = this.mediumFontCanvas.getSize().x;
+			final int y2 = this.mediumFontCanvas.getSize().y;
+			this.mediumFontPreview = Emulator.getEmulator().newImage(x2, y2, false, 0);
 			final IGraphics2D graphics2;
-			(graphics2 = this.anIImage674.createGraphics()).setColor(65280, false);
+			(graphics2 = this.mediumFontPreview.createGraphics()).setColor(65280, false);
 			graphics2.setFont(font);
-			graphics2.drawString(this.aText633.getText(), 1, y2 >> 1);
-			this.aCanvas680.redraw();
+			graphics2.drawString(this.fontPreviewText.getText(), 1, y2 >> 1);
+			this.mediumFontCanvas.redraw();
 		}
 		if ((n & 0x4) != 0x0) {
-			Label_0404:
-			{
-				IFont font4;
-				if (Settings.g2d == 0) {
-					font4 = new FontSWT(fontName, this.aSpinner690.getSelection(), 0);
-				} else {
-					if (Settings.g2d != 1) {
-						break Label_0404;
-					}
-					font4 = new FontAWT(fontName, this.aSpinner690.getSelection(), 0, false);
-				}
-				font = font4;
+			if (Settings.g2d == 0) {
+				font = new FontSWT(fontName, this.smallFontSpinner.getSelection(), 0);
+			} else if (Settings.g2d == 1) {
+				font = new FontAWT(fontName, this.smallFontSpinner.getSelection(), 0, false);
 			}
-			final int x3 = this.aCanvas691.getSize().x;
-			final int y3 = this.aCanvas691.getSize().y;
-			this.anIImage693 = Emulator.getEmulator().newImage(x3, y3, false, 0);
+			final int x3 = this.smallFontCanvas.getSize().x;
+			final int y3 = this.smallFontCanvas.getSize().y;
+			this.smallFontPreview = Emulator.getEmulator().newImage(x3, y3, false, 0);
 			final IGraphics2D graphics3;
-			(graphics3 = this.anIImage693.createGraphics()).setColor(65280, false);
+			(graphics3 = this.smallFontPreview.createGraphics()).setColor(65280, false);
 			graphics3.setFont(font);
-			graphics3.drawString(this.aText633.getText(), 1, y3 >> 1);
-			this.aCanvas691.redraw();
+			graphics3.drawString(this.fontPreviewText.getText(), 1, y3 >> 1);
+			this.smallFontCanvas.redraw();
 		}
 	}
 
 	private void setupRecordsComp() {
 		final GridData layoutData = new GridData();
-		(layoutData).horizontalAlignment = 2;
-		layoutData.verticalAlignment = 2;
+		(layoutData).horizontalAlignment = GridData.CENTER;
+		layoutData.verticalAlignment = GridData.CENTER;
 		final GridData layoutData2 = new GridData();
 		(layoutData2).horizontalSpan = 3;
-		layoutData2.verticalAlignment = 2;
-		layoutData2.horizontalAlignment = 4;
+		layoutData2.verticalAlignment = GridData.CENTER;
+		layoutData2.horizontalAlignment = GridData.FILL;
 		final GridData layoutData3 = new GridData();
 		(layoutData3).horizontalSpan = 3;
-		layoutData3.verticalAlignment = 4;
+		layoutData3.verticalAlignment = GridData.FILL;
 		layoutData3.grabExcessHorizontalSpace = true;
 		layoutData3.grabExcessVerticalSpace = true;
 		layoutData3.heightHint = 160;
-		layoutData3.horizontalAlignment = 4;
+		layoutData3.horizontalAlignment = GridData.FILL;
 		final GridData layoutData4 = new GridData();
-		(layoutData4).horizontalAlignment = 4;
+		(layoutData4).horizontalAlignment = GridData.FILL;
 		layoutData4.grabExcessHorizontalSpace = true;
-		layoutData4.verticalAlignment = 2;
+		layoutData4.verticalAlignment = GridData.CENTER;
 		final GridData layoutData5 = new GridData();
-		(layoutData5).horizontalAlignment = 4;
-		layoutData5.verticalAlignment = 2;
+		(layoutData5).horizontalAlignment = GridData.FILL;
+		layoutData5.verticalAlignment = GridData.CENTER;
 		final GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
-		this.recordsComp = new Composite(this.tabFolder, 0);
+		this.recordsComp = new Composite(this.tabFolder, SWT.NONE);
 		recordsComp.setLayout(layout);
-		CLabel aCLabel683 = new CLabel(this.recordsComp, 0);
-		(aCLabel683).setText(UILocale.get("OPTION_RECORDS_RMS_FOLDER", "RMS Folder:"));
-		aCLabel683.setLayoutData(layoutData5);
-		this.aText662 = new Text(this.recordsComp, 2048);
-		aText662.setEditable(true);
-		this.aText662.setEnabled(true);
-		this.aText662.setLayoutData(layoutData4);
-		this.aText662.setText(this.rmsFolder);
-		Button aButton666;
-		aButton666 = new Button(this.recordsComp, 8388616);
-		aButton666.setText("...");
-		aButton666.addSelectionListener(new SelectionAdapter() {
+		CLabel rmsFolderLabel = new CLabel(this.recordsComp, SWT.NONE);
+		(rmsFolderLabel).setText(UILocale.get("OPTION_RECORDS_RMS_FOLDER", "RMS Folder:"));
+		rmsFolderLabel.setLayoutData(layoutData5);
+		this.rmsFolderText = new Text(this.recordsComp, SWT.BORDER);
+		rmsFolderText.setEditable(true);
+		this.rmsFolderText.setEnabled(true);
+		this.rmsFolderText.setLayoutData(layoutData4);
+		this.rmsFolderText.setText(this.rmsFolder);
+		Button browseRmsButton;
+		browseRmsButton = new Button(this.recordsComp, SWT.FLAT | SWT.PUSH);
+		browseRmsButton.setText("...");
+		browseRmsButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				Emulator.getEmulator().getScreen();
 				EmulatorScreen.pauseStep();
 				final DirectoryDialog directoryDialog;
-				(directoryDialog = new DirectoryDialog(setsShell)).setText(UILocale.get("OPTION_RECORDS_OPEN_DIRECTORY", "Select a directory for rms"));
+				(directoryDialog = new DirectoryDialog(settingsShell)).setText(UILocale.get("OPTION_RECORDS_OPEN_DIRECTORY", "Select a directory for rms"));
 				directoryDialog.setMessage(UILocale.get("OPTION_RECORDS_CHOOSE_DIR", "Choose a directory"));
 				directoryDialog.setFilterPath(System.getProperty("user.dir"));
 				final String open;
 				if ((open = directoryDialog.open()) != null) {
-					aText662.setText(open);
+					rmsFolderText.setText(open);
 					refreshRmsTree();
 				}
 				((EmulatorScreen) Emulator.getEmulator().getScreen()).resumeStep();
@@ -2521,41 +2474,41 @@ public final class Property implements IProperty, SelectionListener {
 
 		Button clearRecordsBtn;
 		if (Emulator.midletClassName != null) {
-			CLabel aCLabel647 = new CLabel(this.recordsComp, 0);
-			(aCLabel647).setText(UILocale.get("OPTION_RECORDS_RMS_TEXT", "All Records in current midlet:"));
-			aCLabel647.setLayoutData(layoutData2);
-			this.aTable665 = new Table(this.recordsComp, 2080);
-			aTable665.setHeaderVisible(false);
-			this.aTable665.setLayoutData(layoutData3);
-			this.aTable665.setLinesVisible(true);
-			Button aButton761 = new Button(this.recordsComp, 8388608);
-			(aButton761).setText(UILocale.get("OPTION_RECORDS_SELECT_ALL", "Select All"));
-			aButton761.addSelectionListener(new SelectionAdapter() {
+			CLabel recordsLabel = new CLabel(this.recordsComp, SWT.NONE);
+			(recordsLabel).setText(UILocale.get("OPTION_RECORDS_RMS_TEXT", "All Records in current midlet:"));
+			recordsLabel.setLayoutData(layoutData2);
+			this.legacyRecordsTable = new Table(this.recordsComp, SWT.CHECK | SWT.BORDER);
+			legacyRecordsTable.setHeaderVisible(false);
+			this.legacyRecordsTable.setLayoutData(layoutData3);
+			this.legacyRecordsTable.setLinesVisible(true);
+			Button selectAllRecordsButton = new Button(this.recordsComp, SWT.FLAT);
+			(selectAllRecordsButton).setText(UILocale.get("OPTION_RECORDS_SELECT_ALL", "Select All"));
+			selectAllRecordsButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent selectionEvent) {
-					for (int i = 0; i < aTable665.getItemCount(); ++i) {
-						aTable665.getItem(i).setChecked(true);
+					for (int i = 0; i < legacyRecordsTable.getItemCount(); ++i) {
+						legacyRecordsTable.getItem(i).setChecked(true);
 					}
 				}
 			});
-			clearRecordsBtn = new Button(this.recordsComp, 8388608);
+			clearRecordsBtn = new Button(this.recordsComp, SWT.FLAT);
 			clearRecordsBtn.setText(UILocale.get("OPTION_RECORDS_CLEAR_RECORD", "Clear Selected Records"));
 			clearRecordsBtn.setLayoutData(layoutData);
 			clearRecordsBtn.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent selectionEvent) {
 					// TODO: rms delete
 					final String string = resolveRmsDirectory() + ".";
-					for (int i = 0; i < aTable665.getItemCount(); ++i) {
+					for (int i = 0; i < legacyRecordsTable.getItemCount(); ++i) {
 						final File file;
-						if (aTable665.getItem(i).getChecked()) {
+						if (legacyRecordsTable.getItem(i).getChecked()) {
 							try {
-								RecordStore.deleteRecordStore(aTable665.getItem(i).getText().trim());
+								RecordStore.deleteRecordStore(legacyRecordsTable.getItem(i).getText().trim());
 							} catch (Exception ignored) {}
 						}
 					}
 					refreshRmsTree();
 				}
 			});
-			new TableColumn(this.aTable665, 0).setWidth(200);
+			new TableColumn(this.legacyRecordsTable, SWT.NONE).setWidth(200);
 			this.refreshRmsTree();
 		} else {
 			rmsTree = new Tree(recordsComp, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
@@ -2609,7 +2562,7 @@ public final class Property implements IProperty, SelectionListener {
 			}
 
 
-			clearRecordsBtn = new Button(this.recordsComp, 8388608);
+			clearRecordsBtn = new Button(this.recordsComp, SWT.FLAT);
 			clearRecordsBtn.setText(UILocale.get("OPTION_RECORDS_CLEAR_RECORD", "Clear Selected Records"));
 			clearRecordsBtn.setLayoutData(layoutData);
 			clearRecordsBtn.addSelectionListener(new SelectionListener() {
@@ -2649,28 +2602,22 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private String resolveRmsDirectory() {
-		String s = null;
-		Label_0083:
-		{
-			StringBuffer sb;
-			String substring;
-			if ((s = this.aText662.getText().trim()).startsWith(".")) {
-				sb = new StringBuffer().append(Emulator.getUserPath());
-				substring = s.substring(1);
-			} else {
-				if (!s.startsWith("/") && !s.startsWith("\\")) {
-					break Label_0083;
-				}
-				sb = new StringBuffer().append(Emulator.getUserPath());
-				substring = s;
-			}
-			s = sb.append(substring).toString();
-		}
+		String s = resolveUserRelativePath(this.rmsFolderText.getText().trim());
 		final File file;
 		if (!(file = new File(s)).exists() || !file.isDirectory()) {
 			file.mkdirs();
 		}
 		return s + "/";
+	}
+
+	private static String resolveUserRelativePath(String path) {
+		if (path.startsWith(".")) {
+			return Emulator.getUserPath() + path.substring(1);
+		}
+		if (path.startsWith("/") || path.startsWith("\\")) {
+			return Emulator.getUserPath() + path;
+		}
+		return path;
 	}
 
 	private void refreshRmsTree() {
@@ -2691,18 +2638,18 @@ public final class Property implements IProperty, SelectionListener {
 			}
 			return;
 		}
-		aTable665.removeAll();
+		legacyRecordsTable.removeAll();
 		String[] rms = RecordStore.listRecordStores();
 		if (rms == null) return;
 		for (String s : rms) {
-			TableItem ti = new TableItem(this.aTable665, 0);
+			TableItem ti = new TableItem(this.legacyRecordsTable, SWT.NONE);
 			ti.setText(0, s);
 			ti.setChecked(false);
 		}
 	}
 
 	private void setupNetworkComp() {
-		this.networkComp = new Composite(this.tabFolder, 0);
+		this.networkComp = new Composite(this.tabFolder, SWT.NONE);
 		networkComp.setLayout(new GridLayout());
 		this.setupNetworkTabContent();
 	}
@@ -2710,95 +2657,95 @@ public final class Property implements IProperty, SelectionListener {
 	private void setupNetworkTabContent() {
 		final GridData layoutData = new GridData();
 		(layoutData).horizontalSpan = 2;
-		layoutData.verticalAlignment = 2;
-		layoutData.horizontalAlignment = 2;
+		layoutData.verticalAlignment = GridData.CENTER;
+		layoutData.horizontalAlignment = GridData.CENTER;
 		final GridData layoutData2 = new GridData();
-		(layoutData2).horizontalAlignment = 4;
+		(layoutData2).horizontalAlignment = GridData.FILL;
 		layoutData2.grabExcessHorizontalSpace = true;
-		layoutData2.verticalAlignment = 2;
+		layoutData2.verticalAlignment = GridData.CENTER;
 		final GridData layoutData3 = new GridData();
-		(layoutData3).horizontalAlignment = 3;
-		layoutData3.verticalAlignment = 2;
+		(layoutData3).horizontalAlignment = GridData.END;
+		layoutData3.verticalAlignment = GridData.CENTER;
 		final GridData layoutData4 = new GridData();
-		(layoutData4).horizontalAlignment = 4;
+		(layoutData4).horizontalAlignment = GridData.FILL;
 		layoutData4.grabExcessHorizontalSpace = true;
-		layoutData4.verticalAlignment = 2;
+		layoutData4.verticalAlignment = GridData.CENTER;
 		final GridData layoutData5 = new GridData();
-		(layoutData5).horizontalAlignment = 3;
-		layoutData5.verticalAlignment = 2;
+		(layoutData5).horizontalAlignment = GridData.END;
+		layoutData5.verticalAlignment = GridData.CENTER;
 		final GridData layoutData6 = new GridData();
-		(layoutData6).horizontalAlignment = 3;
-		layoutData6.verticalAlignment = 2;
+		(layoutData6).horizontalAlignment = GridData.END;
+		layoutData6.verticalAlignment = GridData.CENTER;
 		final GridData gridData = new GridData();
-		(gridData).horizontalAlignment = 4;
+		(gridData).horizontalAlignment = GridData.FILL;
 		gridData.widthHint = 40;
 		gridData.grabExcessHorizontalSpace = true;
-		gridData.verticalAlignment = 2;
+		gridData.verticalAlignment = GridData.CENTER;
 		final GridData gridData3 = new GridData();
-		(gridData3).horizontalAlignment = 4;
+		(gridData3).horizontalAlignment = GridData.FILL;
 		gridData3.widthHint = 40;
 		gridData3.grabExcessHorizontalSpace = true;
-		gridData3.verticalAlignment = 2;
+		gridData3.verticalAlignment = GridData.CENTER;
 		final GridData layoutData7 = new GridData();
-		(layoutData7).horizontalAlignment = 4;
+		(layoutData7).horizontalAlignment = GridData.FILL;
 		layoutData7.widthHint = 50;
 		layoutData7.grabExcessHorizontalSpace = true;
-		layoutData7.verticalAlignment = 2;
+		layoutData7.verticalAlignment = GridData.CENTER;
 		final GridLayout layout = new GridLayout();
 		layout.numColumns = 4;
 		final GridData layoutData8 = new GridData();
-		(layoutData8).horizontalAlignment = 4;
+		(layoutData8).horizontalAlignment = GridData.FILL;
 		layoutData8.grabExcessHorizontalSpace = true;
 //		layoutData8.grabExcessVerticalSpace = true;
-		layoutData8.verticalAlignment = 1;
-		this.networkProxyGroup = new Group(this.networkComp, 0);
+		layoutData8.verticalAlignment = GridData.BEGINNING;
+		this.networkProxyGroup = new Group(this.networkComp, SWT.NONE);
 		networkProxyGroup.setText(UILocale.get("OPTION_NETWORK_PROXY", "Proxy"));
 		this.networkProxyGroup.setLayout(layout);
 		this.networkProxyGroup.setLayoutData(layoutData8);
-		CLabel aCLabel648;
-		aCLabel648 = new CLabel(this.networkProxyGroup, 0);
-		aCLabel648.setText(UILocale.get("OPTION_NETWORK_PROXY_TYPE", "ProxyType:"));
+		CLabel proxyTypeLabel;
+		proxyTypeLabel = new CLabel(this.networkProxyGroup, SWT.NONE);
+		proxyTypeLabel.setText(UILocale.get("OPTION_NETWORK_PROXY_TYPE", "ProxyType:"));
 		this.setupProxyCombo();
-		CLabel aCLabel651;
-		aCLabel651 = new CLabel(this.networkProxyGroup, 0);
-		aCLabel651.setText("");
-		CLabel aCLabel649;
-		aCLabel649 = new CLabel(this.networkProxyGroup, 0);
-		aCLabel649.setText(UILocale.get("OPTION_NETWORK_HOST", "Host:"));
-		aCLabel649.setLayoutData(layoutData6);
-		this.aText635 = new Text(this.networkProxyGroup, 2048);
-		aText635.setLayoutData(layoutData7);
-		this.aText635.setText(Settings.proxyHost);
-		CLabel aCLabel650;
-		aCLabel650 = new CLabel(this.networkProxyGroup, 0);
-		aCLabel650.setText(UILocale.get("OPTION_NETWORK_PORT", "Port:"));
-		this.aText637 = new Text(this.networkProxyGroup, 2048);
-		aText637.setText(Settings.proxyPort);
-		this.aText637.setLayoutData(gridData);
-		CLabel aCLabel652;
-		aCLabel652 = new CLabel(this.networkProxyGroup, 0);
-		aCLabel652.setText(UILocale.get("OPTION_NETWORK_USERNAME", "Username:"));
-		aCLabel652.setLayoutData(layoutData5);
-		this.aText639 = new Text(this.networkProxyGroup, 2048);
-		aText639.setLayoutData(layoutData4);
-		this.aText639.setText(Settings.proxyUser);
-		CLabel aCLabel653;
-		aCLabel653 = new CLabel(this.networkProxyGroup, 0);
-		aCLabel653.setText(UILocale.get("OPTION_NETWORK_PASSWORD", "Password:"));
-		this.aText641 = new Text(this.networkProxyGroup, 4196352);
-		aText641.setText(Settings.proxyPass);
-		this.aText641.setLayoutData(gridData3);
-		CLabel aCLabel654;
-		aCLabel654 = new CLabel(this.networkProxyGroup, 0);
-		aCLabel654.setText(UILocale.get("OPTION_NETWORK_DOMAIN", "Domain:"));
-		aCLabel654.setLayoutData(layoutData3);
-		this.aText643 = new Text(this.networkProxyGroup, 2048);
-		aText643.setLayoutData(layoutData2);
-		this.aText643.setText(Settings.proxyDomain);
-		this.aButton764 = new Button(this.networkProxyGroup, 8388608);
-		aButton764.setText(UILocale.get("OPTION_NETWORK_CONNECT", "Connect"));
-		this.aButton764.setLayoutData(layoutData);
-		this.aButton764.addSelectionListener(new SelectionAdapter() {
+		CLabel proxySpacerLabel;
+		proxySpacerLabel = new CLabel(this.networkProxyGroup, SWT.NONE);
+		proxySpacerLabel.setText("");
+		CLabel proxyHostLabel;
+		proxyHostLabel = new CLabel(this.networkProxyGroup, SWT.NONE);
+		proxyHostLabel.setText(UILocale.get("OPTION_NETWORK_HOST", "Host:"));
+		proxyHostLabel.setLayoutData(layoutData6);
+		this.proxyHostText = new Text(this.networkProxyGroup, SWT.BORDER);
+		proxyHostText.setLayoutData(layoutData7);
+		this.proxyHostText.setText(Settings.proxyHost);
+		CLabel proxyPortLabel;
+		proxyPortLabel = new CLabel(this.networkProxyGroup, SWT.NONE);
+		proxyPortLabel.setText(UILocale.get("OPTION_NETWORK_PORT", "Port:"));
+		this.proxyPortText = new Text(this.networkProxyGroup, SWT.BORDER);
+		proxyPortText.setText(Settings.proxyPort);
+		this.proxyPortText.setLayoutData(gridData);
+		CLabel proxyUserLabel;
+		proxyUserLabel = new CLabel(this.networkProxyGroup, SWT.NONE);
+		proxyUserLabel.setText(UILocale.get("OPTION_NETWORK_USERNAME", "Username:"));
+		proxyUserLabel.setLayoutData(layoutData5);
+		this.proxyUserText = new Text(this.networkProxyGroup, SWT.BORDER);
+		proxyUserText.setLayoutData(layoutData4);
+		this.proxyUserText.setText(Settings.proxyUser);
+		CLabel proxyPasswordLabel;
+		proxyPasswordLabel = new CLabel(this.networkProxyGroup, SWT.NONE);
+		proxyPasswordLabel.setText(UILocale.get("OPTION_NETWORK_PASSWORD", "Password:"));
+		this.proxyPasswordText = new Text(this.networkProxyGroup, SWT.PASSWORD | SWT.BORDER);
+		proxyPasswordText.setText(Settings.proxyPass);
+		this.proxyPasswordText.setLayoutData(gridData3);
+		CLabel proxyDomainLabel;
+		proxyDomainLabel = new CLabel(this.networkProxyGroup, SWT.NONE);
+		proxyDomainLabel.setText(UILocale.get("OPTION_NETWORK_DOMAIN", "Domain:"));
+		proxyDomainLabel.setLayoutData(layoutData3);
+		this.proxyDomainText = new Text(this.networkProxyGroup, SWT.BORDER);
+		proxyDomainText.setLayoutData(layoutData2);
+		this.proxyDomainText.setText(Settings.proxyDomain);
+		this.proxyConnectButton = new Button(this.networkProxyGroup, SWT.FLAT);
+		proxyConnectButton.setText(UILocale.get("OPTION_NETWORK_CONNECT", "Connect"));
+		this.proxyConnectButton.setLayoutData(layoutData);
+		this.proxyConnectButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				testProxyConnection();
 			}
@@ -2825,7 +2772,7 @@ public final class Property implements IProperty, SelectionListener {
 		new Label(networkProxyGroup, SWT.NONE);
 
 		final GridData gridData2 = new GridData();
-		(gridData2).horizontalAlignment = 4;
+		(gridData2).horizontalAlignment = GridData.FILL;
 		gridData2.grabExcessHorizontalSpace = true;
 		gridData2.verticalAlignment = GridData.BEGINNING;
 		
@@ -2837,11 +2784,11 @@ public final class Property implements IProperty, SelectionListener {
 
 	private void setupProxyCombo() {
 		final GridData layoutData = new GridData();
-		(layoutData).horizontalAlignment = 4;
+		(layoutData).horizontalAlignment = GridData.FILL;
 		layoutData.grabExcessHorizontalSpace = true;
 		layoutData.horizontalSpan = 2;
-		layoutData.verticalAlignment = 2;
-		this.proxyTypeCombo = new Combo(this.networkProxyGroup, 8);
+		layoutData.verticalAlignment = GridData.CENTER;
+		this.proxyTypeCombo = new Combo(this.networkProxyGroup, SWT.READ_ONLY);
 		proxyTypeCombo.setLayoutData(layoutData);
 		this.proxyTypeCombo.add("None Proxy");
 		this.proxyTypeCombo.add("HTTP Proxy");
@@ -2859,14 +2806,14 @@ public final class Property implements IProperty, SelectionListener {
 	private void testProxyConnection() {
 		Emulator.getEmulator().getScreen();
 		EmulatorScreen.pauseStep();
-		if (this.aText635.getText().trim().length() < 1) {
+		if (this.proxyHostText.getText().trim().length() < 1) {
 			final MessageBox messageBox;
-			(messageBox = new MessageBox(this.setsShell)).setText(UILocale.get("OPTION_NETWORK_PROXY_TEST", "Proxy Test"));
+			(messageBox = new MessageBox(this.settingsShell)).setText(UILocale.get("OPTION_NETWORK_PROXY_TEST", "Proxy Test"));
 			messageBox.setMessage(UILocale.get("OPTION_NETWORK_PROXY_EMPTY", "Empty proxy host!"));
 			messageBox.open();
 		} else {
 			final MessageBox messageBox2;
-			(messageBox2 = new MessageBox(this.setsShell)).setText(UILocale.get("OPTION_NETWORK_PROXY_TEST", "Proxy Test"));
+			(messageBox2 = new MessageBox(this.settingsShell)).setText(UILocale.get("OPTION_NETWORK_PROXY_TEST", "Proxy Test"));
 			messageBox2.setMessage(UILocale.get("OPTION_NETWORK_PROXY_UNIMP", "Proxy test is underimplemented!"));
 			messageBox2.open();
 		}
@@ -2893,127 +2840,127 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	Shell getShell() {
-		return setsShell;
+		return settingsShell;
 	}
 
-	static Combo getControllerCombo(final Property class38) {
-		return class38.controllerCombo;
+	static Combo getControllerCombo(final Property property) {
+		return property.controllerCombo;
 	}
 
-	static Text getLeftSoftKeyField(final Property class38) {
-		return class38.aText731;
+	static Text getLeftSoftKeyField(final Property property) {
+		return property.leftSoftKeyBinding;
 	}
 
 	static String[] getKeyboardBindings() {
-		return Property.aStringArray661;
+		return Property.keyboardBindings;
 	}
 
-	static Text getRightSoftKeyField(final Property class38) {
-		return class38.aText735;
+	static Text getRightSoftKeyField(final Property property) {
+		return property.rightSoftKeyBinding;
 	}
 
-	static Text getDigit1KeyField(final Property class38) {
-		return class38.aText754;
+	static Text getDigit1KeyField(final Property property) {
+		return property.num1Binding;
 	}
 
-	static Text getDigit2KeyField(final Property class38) {
-		return class38.aText757;
+	static Text getDigit2KeyField(final Property property) {
+		return property.num2Binding;
 	}
 
-	static Text getDigit3KeyField(final Property class38) {
-		return class38.aText760;
+	static Text getDigit3KeyField(final Property property) {
+		return property.num3Binding;
 	}
 
-	static Text getDigit4KeyField(final Property class38) {
-		return class38.aText763;
+	static Text getDigit4KeyField(final Property property) {
+		return property.num4Binding;
 	}
 
-	static Text getDigit5KeyField(final Property class38) {
-		return class38.aText766;
+	static Text getDigit5KeyField(final Property property) {
+		return property.num5Binding;
 	}
 
-	static Text getDigit6KeyField(final Property class38) {
-		return class38.aText768;
+	static Text getDigit6KeyField(final Property property) {
+		return property.num6Binding;
 	}
 
-	static Text getDigit7KeyField(final Property class38) {
-		return class38.aText770;
+	static Text getDigit7KeyField(final Property property) {
+		return property.num7Binding;
 	}
 
-	static Text getDigit8KeyField(final Property class38) {
-		return class38.aText772;
+	static Text getDigit8KeyField(final Property property) {
+		return property.num8Binding;
 	}
 
-	static Text getDigit9KeyField(final Property class38) {
-		return class38.aText774;
+	static Text getDigit9KeyField(final Property property) {
+		return property.num9Binding;
 	}
 
-	static Text getDigit0KeyField(final Property class38) {
-		return class38.aText627;
+	static Text getDigit0KeyField(final Property property) {
+		return property.num0Binding;
 	}
 
-	static Text getStarKeyField(final Property class38) {
-		return class38.aText629;
+	static Text getStarKeyField(final Property property) {
+		return property.starBinding;
 	}
 
-	static Text getPoundKeyField(final Property class38) {
-		return class38.aText631;
+	static Text getPoundKeyField(final Property property) {
+		return property.poundBinding;
 	}
 
-	static Text getLeftDirectionKeyField(final Property class38) {
-		return class38.aText739;
+	static Text getLeftDirectionKeyField(final Property property) {
+		return property.leftBinding;
 	}
 
-	static Text getRightDirectionKeyField(final Property class38) {
-		return class38.aText742;
+	static Text getRightDirectionKeyField(final Property property) {
+		return property.rightBinding;
 	}
 
-	static Text getUpDirectionKeyField(final Property class38) {
-		return class38.aText745;
+	static Text getUpDirectionKeyField(final Property property) {
+		return property.upBinding;
 	}
 
-	static Text getDownDirectionKeyField(final Property class38) {
-		return class38.aText748;
+	static Text getDownDirectionKeyField(final Property property) {
+		return property.downBinding;
 	}
 
-	static Text getCenterKeyField(final Property class38) {
-		return class38.aText751;
+	static Text getCenterKeyField(final Property property) {
+		return property.fireBinding;
 	}
 
-	static Combo getProxyTypeCombo(final Property class38) {
-		return class38.proxyTypeCombo;
+	static Combo getProxyTypeCombo(final Property property) {
+		return property.proxyTypeCombo;
 	}
 
-	static Text getProxyHostField(final Property class38) {
-		return class38.aText635;
+	static Text getProxyHostField(final Property property) {
+		return property.proxyHostText;
 	}
 
-	static Text getProxyPortField(final Property class38) {
-		return class38.aText637;
+	static Text getProxyPortField(final Property property) {
+		return property.proxyPortText;
 	}
 
-	static Text getProxyUsernameField(final Property class38) {
-		return class38.aText639;
+	static Text getProxyUsernameField(final Property property) {
+		return property.proxyUserText;
 	}
 
-	static Text getProxyPasswordField(final Property class38) {
-		return class38.aText641;
+	static Text getProxyPasswordField(final Property property) {
+		return property.proxyPasswordText;
 	}
 
-	static Text getProxyDomainField(final Property class38) {
-		return class38.aText643;
+	static Text getProxyDomainField(final Property property) {
+		return property.proxyDomainText;
 	}
 
-	static Button getProxyConnectButton(final Property class38) {
-		return class38.aButton764;
+	static Button getProxyConnectButton(final Property property) {
+		return property.proxyConnectButton;
 	}
 
-	static void clearAppliedProxyProperties(final Property class38) {
+	static void clearAppliedProxyProperties(final Property property) {
 		removeProxyProperties();
 	}
 
 	static {
-		Property.aStringArray661 = new String[19];
+		Property.keyboardBindings = new String[19];
 	}
 
 	public void widgetSelected(SelectionEvent e) {
@@ -3028,17 +2975,17 @@ public final class Property implements IProperty, SelectionListener {
 	}
 
 	private final class MyAuthenticator extends Authenticator {
-		private final String aString780;
-		private final String aString781;
+		private final String username;
+		private final String password;
 
-		MyAuthenticator(final Property class38, final String aString780, final String aString781) {
+		MyAuthenticator(final Property property, final String username, final String password) {
 			super();
-			this.aString780 = aString780;
-			this.aString781 = aString781;
+			this.username = username;
+			this.password = password;
 		}
 
 		public PasswordAuthentication getPasswordAuthentication() {
-			return new PasswordAuthentication(this.aString780, this.aString781.toCharArray());
+			return new PasswordAuthentication(this.username, this.password.toCharArray());
 		}
 	}
 
