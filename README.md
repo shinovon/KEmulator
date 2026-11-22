@@ -78,8 +78,6 @@ Graphics card:
 - [vlcj](https://github.com/caprica/vlcj) 4.7.3
 - [JInput](https://github.com/jinput/jinput) 2.0.5
 - [jutils](https://github.com/jinput/jutils) 1.0.0
-- [webcam-capture](https://github.com/sarxos/webcam-capture) 0.3.12
-- [BrigJ](https://github.com/nativelibs4java/BridJ) 0.7.0
 - [lwjgl3-swt](https://github.com/LWJGLX/lwjgl3-swt)
 - org.apache.tools.zip
 - [opencore-amr](https://sourceforge.net/projects/opencore-amr) 0.1.6

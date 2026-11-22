@@ -21,7 +21,7 @@ class VideoControlImpl implements VideoControl {
 	public int getDisplayWidth() {
 		return player.width;
 	}
-	
+
 	public int getDisplayHeight() {
 		return player.height;
 	}
