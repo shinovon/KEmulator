@@ -76,7 +76,7 @@ public class Graphics
 		impl = null;
 	}
 
-	public IGraphics2D getImpl() {
+	public IGraphics2D _getImpl() {
 		if (AppSettings.xrayView && xrayGraphics != null) {
 			return this.xrayGraphics;
 		}

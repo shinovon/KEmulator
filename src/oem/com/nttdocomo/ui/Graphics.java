@@ -251,7 +251,7 @@ public class Graphics {
 			arrayOfInt3[(i << 1)] = array[i];
 			arrayOfInt3[((i << 1) + 1)] = array2[i];
 		}
-		this.impl.getImpl().drawPolyline(arrayOfInt3);
+		this.impl._getImpl().drawPolyline(arrayOfInt3);
 	}
 
 	public void drawPolyline(final int[] array, final int[] array2, final int n, final int n2) {
@@ -271,7 +271,7 @@ public class Graphics {
 			arrayOfInt3[(i << 1)] = array[i];
 			arrayOfInt3[((i << 1) + 1)] = array2[i];
 		}
-		this.impl.getImpl().fillPolygon(arrayOfInt3);
+		this.impl._getImpl().fillPolygon(arrayOfInt3);
 	}
 
 	public void fillPolygon(final int[] array, final int[] array2, final int n, final int n2) {
@@ -330,7 +330,7 @@ public class Graphics {
 	}
 
 	public void drawScaledImage(final Image image, final int n, final int n2, final int n3, final int n4, final int n5, final int n6, final int n7, final int n8) {
-		this.impl._drawRegion(((ImageImpl) image).getImpl()._getImpl(), n5, n6, n7, n8, n3, n4, this.impl.getImpl().getTransform().newTransform(n3, n4, this.getMidp2Transformation(), n, n2, 0));
+		this.impl._drawRegion(((ImageImpl) image).getImpl()._getImpl(), n5, n6, n7, n8, n3, n4, this.impl._getImpl().getTransform().newTransform(n3, n4, this.getMidp2Transformation(), n, n2, 0));
 	}
 
 	public void drawArc(final int n, final int n2, final int n3, final int n4, final int n5, final int n6) {

@@ -67,6 +67,8 @@ class VideoControlImpl implements VideoControl {
 		} catch (Exception ignored) {}
 		if (player.sourceHeight == 0)
 			player.sourceHeight = player.bufferHeight;
+		if (player.sourceHeight == 0)
+			return 480;
 		return player.sourceHeight;
 	}
 
@@ -83,12 +85,15 @@ class VideoControlImpl implements VideoControl {
 		} catch (Exception ignored) {}
 		if (player.sourceWidth == 0)
 			player.sourceWidth = player.bufferWidth;
+		if (player.sourceWidth == 0)
+			return 640;
 		return player.sourceWidth;
 	}
 
 	public byte[] getSnapshot(String p0) throws MediaException {
 		if (player.released || player.mediaPlayer == null)
 			throw new IllegalStateException();
+		// TODO parse parameters
 		if (player.img != null) {
 			return VLCPlayerImpl.imgToBytes(player.img);
 		}
@@ -106,8 +111,8 @@ class VideoControlImpl implements VideoControl {
 
 
 	public Object initDisplayMode(int p0, Object p1) {
+		player.isItem = p0 != USE_DIRECT_VIDEO;
 		if (p0 == 0) {
-			player.isItem = true;
 			return player.getItem();
 		}
 		player.canvas = p1;

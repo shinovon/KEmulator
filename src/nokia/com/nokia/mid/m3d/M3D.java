@@ -680,7 +680,7 @@ public class M3D
 						zbuffer[x+(y*width)] = depth;	
 						if(boundTexture)
 						{ 
-							gc.getImpl().setColor(texture.map(x,y), true);
+							gc._getImpl().setColor(texture.map(x,y), true);
 						}
 						gc.drawLine(x,y,x,y);
 					}

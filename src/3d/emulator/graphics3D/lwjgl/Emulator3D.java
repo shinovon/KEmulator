@@ -393,7 +393,7 @@ public final class Emulator3D implements IGraphics3D {
 						}
 
 						Image frameImage = new Image(null, swtBufferImage);
-						((Graphics2DSWT) (target.getImpl())).gc().drawImage(
+						((Graphics2DSWT) (target._getImpl())).gc().drawImage(
 								frameImage,
 								0, 0, width, height,
 								x, y, width, height
@@ -416,7 +416,7 @@ public final class Emulator3D implements IGraphics3D {
 							ib.get(data, writePos, width);
 						}
 
-						((Graphics2DAWT) (target.getImpl())).g().drawImage(
+						((Graphics2DAWT) (target._getImpl())).g().drawImage(
 								awtBufferImage,
 								x, y, x + width, y + height,
 								0, 0, width, height,

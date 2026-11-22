@@ -31,7 +31,7 @@ public abstract class GameCanvas extends Canvas {
 	}
 
 	public void paint(final Graphics graphics) {
-		graphics.getImpl().drawImage(Emulator.getEmulator().getScreen().getBackBufferImage(), 0, 0);
+		graphics._getImpl().drawImage(Emulator.getEmulator().getScreen().getBackBufferImage(), 0, 0);
 	}
 
 	public void flushGraphics(final int x, final int y, final int w, final int h) {

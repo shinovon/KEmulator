@@ -11,7 +11,6 @@ import emulator.UILocale;
 import emulator.debug.MediaUtils;
 import emulator.debug.Memory;
 import emulator.debug.PlayerActionType;
-import emulator.media.capture.CapturePlayerImpl;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.vlc.VLCPlayerImpl;
 import org.eclipse.swt.SWT;
@@ -229,8 +228,6 @@ public class MediaView extends SelectionAdapter implements DisposeListener, Sele
 			return getImplementation(((Sound) player).m_player);
 		if (player instanceof ToneImpl || player instanceof MIDITonePlayer || player instanceof MIDIImpl)
 			return "JVM MIDI";
-		if (player instanceof CapturePlayerImpl)
-			return "Capture";
 		if (player instanceof PlayerImpl)
 			return ((PlayerImpl) player).getReadableImplementationType();
 		if (player instanceof VLCPlayerImpl)

@@ -24,7 +24,7 @@ final class a
 
 	public a(Graphics paramGraphics) {
 		this.gc = paramGraphics;
-		this.impl = paramGraphics.getImpl();
+		this.impl = paramGraphics._getImpl();
 	}
 
 	private static int a(int paramInt) {
@@ -319,9 +319,9 @@ final class a
 		Image transimage = Image.createImage(out_width, out_height, 0);
 		Graphics gc = transimage.getGraphics();
 		if (Settings.g2d == 0) {
-			gc.getImpl().setTransform(new TransformSWT(af));
+			gc._getImpl().setTransform(new TransformSWT(af));
 		} else {
-			gc.getImpl().setTransform(new TransformAWT(af));
+			gc._getImpl().setTransform(new TransformAWT(af));
 		}
 		gc.drawImage(image, 0, 0, 0);
 		return transimage;

@@ -2,6 +2,7 @@ package javax.microedition.media;
 
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.Utils;
 import emulator.custom.ResourceManager;
 import emulator.media.capture.CapturePlayerImpl;
 import emulator.media.tone.MIDITonePlayer;
@@ -81,7 +82,8 @@ public class Manager {
 			return new MIDIImpl();
 		}
 		if (s.startsWith("capture://image") || s.startsWith("capture://video") || s.startsWith("capture://devcam0") || s.startsWith("capture://devcam1")) {
-			return new CapturePlayerImpl();
+			requireLibVlc();
+			return new VLCPlayerImpl(s);
 		}
 		String contentType = null;
 		try {
@@ -359,8 +361,6 @@ public class Manager {
 	public static String[] getSupportedProtocols(final String type) {
 		Vector<String> kem = new Vector<String>();
 		kem.add("device://tone");
-		kem.add("capture://video");
-		kem.add("capture://image");
 		kem.add("file");
 		kem.add("http");
 		kem.add("https");
@@ -369,6 +369,9 @@ public class Manager {
 		vlc.add("rtp");
 		Vector<String> fullList = new Vector<String>(kem);
 		if (Settings.enableVlc && _isLibVlcSupported()) {
+			kem.add("capture");
+			kem.add("capture://video");
+			kem.add("capture://image");
 			fullList.addAll(vlc);
 		}
 		return fullList.toArray(new String[0]);
@@ -510,8 +513,6 @@ public class Manager {
 
 					@Override
 					public boolean supported() {
-						// TODO
-//						return !Emulator.isX64() || RuntimeUtil.isWindows();
 						return true;
 					}
 
@@ -520,6 +521,10 @@ public class Manager {
 						List<String> directories = new ArrayList<String>();
 						try {
 							directories.add(new File(Settings.vlcDir).getCanonicalPath());
+							if (Utils.win) {
+								directories.add("C:\\Program Files\\VideoLAN\\VLC");
+								directories.add("C:\\Program Files (x86)\\VideoLAN\\VLC");
+							}
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -528,7 +533,10 @@ public class Manager {
 
 					@Override
 					protected boolean setPluginPath(String pluginPath) {
-						return LibC.INSTANCE._putenv(String.format("%s=%s", PLUGIN_ENV_NAME, pluginPath)) == 0;
+						if (Utils.win) {
+							return LibC.INSTANCE._putenv(String.format("%s=%s", PLUGIN_ENV_NAME, pluginPath)) == 0;
+						}
+						return LibC.INSTANCE.setenv(PLUGIN_ENV_NAME, pluginPath, 1) == 0;
 					}
 
 				};

@@ -512,7 +512,7 @@ public class OpglGraphics {
 				var10 -= var8;
 			}
 			Image var12 = new Image((Device) null, swtImageBuffer);
-			((Graphics2DSWT) graphics.getImpl()).gc().drawImage(var12, 0, 0);
+			((Graphics2DSWT) graphics._getImpl()).gc().drawImage(var12, 0, 0);
 			var12.dispose();
 		} else {
 			int[] var1 = ((DataBufferInt) awtImageBuffer.getRaster().getDataBuffer()).getData();
@@ -525,7 +525,7 @@ public class OpglGraphics {
 				var4 -= var3;
 			}
 
-			((Graphics2DAWT) graphics.getImpl()).g().drawImage(awtImageBuffer, 0, 0, (ImageObserver) null);
+			((Graphics2DAWT) graphics._getImpl()).g().drawImage(awtImageBuffer, 0, 0, (ImageObserver) null);
 		}
 		releaseEglContext();
 		graphics = null;
