@@ -306,17 +306,17 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		if (!visible || img == null || !playing) return;
 		try {
 			g.setColor(0);
-			g.fillRect(x, y, width, height);
+			g.fillRect(x, y, w, h);
 			int[] size = new int[2];
-			renderImage = AWTImageUtils.resizeProportional(renderImage, img, width, height, size);
+			renderImage = AWTImageUtils.resizeProportional(renderImage, img, w, h, size);
 			if (renderImage == null) return;
 
 			int iw = size[0];
 			int ih = size[1];
-			if (renderImage.getWidth() < width)
-				x = (width - ih) / 2;
-			if (renderImage.getHeight() < height)
-				y = (height - ih) / 2;
+			if (renderImage.getWidth() < w)
+				x = (w - ih) / 2;
+			if (renderImage.getHeight() < h)
+				y = (h - ih) / 2;
 			((Graphics2DAWT) g._getImpl()).g().drawImage(renderImage, x, y, iw, ih, null);
 		} catch (Exception e) {
 			e.printStackTrace();
