@@ -9,7 +9,6 @@ import emulator.Settings;
 import emulator.Utils;
 import emulator.graphics2D.awt.AWTImageUtils;
 import emulator.graphics2D.awt.Graphics2DAWT;
-import emulator.graphics2D.awt.ImageAWT;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.media.MediaRef;
 import uk.co.caprica.vlcj.media.TrackType;
@@ -33,7 +32,6 @@ import javax.microedition.amms.control.camera.CameraControl;
 import javax.microedition.amms.control.camera.FlashControl;
 import javax.microedition.amms.control.camera.FocusControl;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
 import javax.microedition.media.*;
 import javax.microedition.media.control.*;
 import javax.microedition.media.protocol.DataSource;
@@ -92,13 +90,16 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	private FlashControl flashControl;
 	private CameraControl cameraControl;
 
+	private RecordControl recordControl;
+
 	long stopTime = StopTimeControl.RESET;
 	private boolean stoppedAtTime;
 	private final Object vlcLock = new Object();
 
 	private BufferedImage renderImage;
 	private VLCPlayerItem item;
-	private boolean capture;
+	private boolean captureVideo;
+	private boolean captureAudio;
 
 	private VLCPlayerImpl() {
 		this.listeners = new Vector();
@@ -116,124 +117,173 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 	public VLCPlayerImpl(String url) throws IOException {
 		this();
 		if (url.startsWith("capture://")) {
-			capture = true;
-			focusControl = new FocusControl() {
+			if (url.startsWith("capture://audio")) {
+				// TODO
+				captureAudio = true;
+				recordControl = new RecordControl() {
 
-				public int setFocus(int paramInt) throws MediaException {
-					return 0;
+					public void commit() {
+
+					}
+
+					public String getContentType() {
+						return "";
+					}
+
+					public void reset() {
+
+					}
+
+					public void setRecordLocation(String p0) {
+
+					}
+
+					public int setRecordSizeLimit(int p0) {
+						return 0;
+					}
+
+					public void setRecordStream(OutputStream p0) {
+
+					}
+
+					public void startRecord() {
+
+					}
+
+					public void stopRecord() {
+
+					}
+				};
+
+				controls = new Control[] { recordControl };
+
+				if (Utils.win) {
+					url = "dshow://";
+				} else if (Utils.macos) {
+					url = "avaudiocapture://";
+				} else {
+					url = "pulse://";
 				}
-
-				public int getFocus() {
-					return 0;
-				}
-
-				public int getMinFocus() {
-					return 0;
-				}
-
-				public int getFocusSteps() {
-					return 0;
-				}
-
-				public boolean isManualFocusSupported() {
-					return false;
-				}
-
-				public boolean isAutoFocusSupported() {
-					return false;
-				}
-
-				public boolean isMacroSupported() {
-					return false;
-				}
-
-				public void setMacro(boolean paramBoolean) throws MediaException {
-
-				}
-
-				public boolean getMacro() {
-					return false;
-				}
-			};
-
-			flashControl = new FlashControl() {
-
-				public int[] getSupportedModes() {
-					return new int[] { OFF, AUTO };
-				}
-
-				public void setMode(int paramInt) {
-
-				}
-
-				public int getMode() {
-					return OFF;
-				}
-
-				public boolean isFlashReady() {
-					return false;
-				}
-			};
-
-			cameraControl = new CameraControl() {
-
-				public int getCameraRotation() {
-					return ROTATE_NONE;
-				}
-
-				public void enableShutterFeedback(boolean paramBoolean) throws MediaException {
-
-				}
-
-				public boolean isShutterFeedbackEnabled() {
-					return false;
-				}
-
-				public String[] getSupportedExposureModes() {
-					return new String[0];
-				}
-
-				public void setExposureMode(String paramString) {
-
-				}
-
-				public String getExposureMode() {
-					return "";
-				}
-
-				public int[] getSupportedVideoResolutions() {
-					return new int[0];
-				}
-
-				public int[] getSupportedStillResolutions() {
-					return new int[0];
-				}
-
-				public void setVideoResolution(int paramInt) {
-
-				}
-
-				public void setStillResolution(int paramInt) {
-
-				}
-
-				public int getVideoResolution() {
-					return 0;
-				}
-
-				public int getStillResolution() {
-					return 0;
-				}
-			};
-
-			controls = new Control[] {videoControl, focusControl, cameraControl};
-
-			if (Utils.win) {
-				url = "dshow://";
-			} else if (Utils.macos) {
-				url = "avcapture://";
 			} else {
-				url = "v4l2:///dev/video0";
+				captureVideo = true;
+				focusControl = new FocusControl() {
+
+					public int setFocus(int paramInt) throws MediaException {
+						return 0;
+					}
+
+					public int getFocus() {
+						return 0;
+					}
+
+					public int getMinFocus() {
+						return 0;
+					}
+
+					public int getFocusSteps() {
+						return 0;
+					}
+
+					public boolean isManualFocusSupported() {
+						return false;
+					}
+
+					public boolean isAutoFocusSupported() {
+						return false;
+					}
+
+					public boolean isMacroSupported() {
+						return false;
+					}
+
+					public void setMacro(boolean paramBoolean) throws MediaException {
+
+					}
+
+					public boolean getMacro() {
+						return false;
+					}
+				};
+
+				flashControl = new FlashControl() {
+
+					public int[] getSupportedModes() {
+						return new int[] { OFF, AUTO };
+					}
+
+					public void setMode(int paramInt) {
+
+					}
+
+					public int getMode() {
+						return OFF;
+					}
+
+					public boolean isFlashReady() {
+						return false;
+					}
+				};
+
+				cameraControl = new CameraControl() {
+
+					public int getCameraRotation() {
+						return ROTATE_NONE;
+					}
+
+					public void enableShutterFeedback(boolean paramBoolean) throws MediaException {
+
+					}
+
+					public boolean isShutterFeedbackEnabled() {
+						return false;
+					}
+
+					public String[] getSupportedExposureModes() {
+						return new String[0];
+					}
+
+					public void setExposureMode(String paramString) {
+
+					}
+
+					public String getExposureMode() {
+						return "";
+					}
+
+					public int[] getSupportedVideoResolutions() {
+						return new int[0];
+					}
+
+					public int[] getSupportedStillResolutions() {
+						return new int[0];
+					}
+
+					public void setVideoResolution(int paramInt) {
+
+					}
+
+					public void setStillResolution(int paramInt) {
+
+					}
+
+					public int getVideoResolution() {
+						return 0;
+					}
+
+					public int getStillResolution() {
+						return 0;
+					}
+				};
+
+				controls = new Control[] { videoControl, focusControl, flashControl, cameraControl };
+
+				if (Utils.win) {
+					url = "dshow://";
+				} else if (Utils.macos) {
+					url = "avcapture://";
+				} else {
+					url = "v4l2:///dev/video0";
+				}
 			}
 		} else if (url.startsWith("file:///root/")) {
 			url = "file:///" + (Emulator.getUserPath() + "/file/root/" + url.substring("file:///root/".length())).replace(" ", "%20");
@@ -323,32 +373,17 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		}
 	}
 
-	static byte[] imgToBytes(BufferedImage img) {
-		try {
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			ImageOutputStream ios = ImageIO.createImageOutputStream(os);
-			Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
-			ImageWriter writer = iter.next();
-			ImageWriteParam iwp = writer.getDefaultWriteParam();
-			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-			iwp.setCompressionQuality(0.5f);
-			writer.setOutput(ios);
-			writer.write(null, new IIOImage(img, null, null), iwp);
-			writer.dispose();
-			byte[] bytes = os.toByteArray();
-			os.close();
-			return bytes;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	public Control getControl(String s) {
+		if (captureAudio) {
+			if (s.contains("RecordControl")) {
+				return recordControl;
+			}
+ 			return null;
+		}
 		if (s.contains("GUIControl") || s.contains("VideoControl")) {
 			return videoControl;
 		}
-		if (capture) {
+		if (captureVideo) {
 			if (s.contains("FocusControl")) {
 				return focusControl;
 			}
@@ -460,12 +495,16 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 		if (!prepared) {
 			synchronized (vlcLock) {
 				load();
-				if (capture
+				if (captureAudio
+						|| mediaUrl.startsWith("pulse:")
+						|| mediaUrl.startsWith("avaudiocapture:")) {
+					Permission.checkPermission("media.capture.audeo");
+				} else if (captureVideo
 						|| mediaUrl.startsWith("v4l2:")
 						|| mediaUrl.startsWith("ddraw:")
 						|| mediaUrl.startsWith("dshow:")
 						|| mediaUrl.startsWith("avcapture:")) {
-					Permission.checkPermission("media.camera");
+					Permission.checkPermission("media.capture.video");
 				}
 				try {
 					if (mediaCallback != null) {
@@ -475,7 +514,17 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 						}
 					} else {
 						boolean res;
-						if (capture && Utils.win) {
+						if (captureAudio) {
+							// TODO
+							if (Utils.win) {
+								res = mediaPlayer.media().prepare(mediaUrl,
+										":dshow-vdev=none",
+										":live-caching=300");
+							} else {
+								res = mediaPlayer.media().prepare(mediaUrl,
+										":live-caching=300");
+							}
+						} else if (captureVideo && Utils.win) {
 							res = mediaPlayer.media().prepare(mediaUrl,
 									":dshow-adev=none",
 									":clock-jitter=0",
@@ -885,7 +934,7 @@ public class VLCPlayerImpl implements Player, MediaPlayerEventListener {
 
 	@Override
 	public void snapshotTaken(MediaPlayer arg0, String arg1) {
-		notifyListeners("vlc.snapshotTaken", arg1);
+//		notifyListeners("vlc.snapshotTaken", arg1);
 	}
 
 	@Override

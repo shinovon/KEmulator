@@ -3,12 +3,20 @@ Copyright (c) 2024 Arman Jussupgaliyev
 */
 package emulator.media.vlc;
 
+import emulator.graphics2D.awt.AWTImageUtils;
+
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import javax.microedition.media.MediaException;
 import javax.microedition.media.PlayerListener;
 import javax.microedition.media.control.VideoControl;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 
 class VideoControlImpl implements VideoControl {
 
@@ -90,16 +98,67 @@ class VideoControlImpl implements VideoControl {
 		return player.sourceWidth;
 	}
 
-	public byte[] getSnapshot(String p0) throws MediaException {
+	public byte[] getSnapshot(String params) throws MediaException {
 		if (player.released || player.mediaPlayer == null)
 			throw new IllegalStateException();
-		// TODO parse parameters
-		if (player.img != null) {
-			return VLCPlayerImpl.imgToBytes(player.img);
+
+		if (params == null) {
+			params = "encoding=jpeg";
 		}
+
+		String[] paramsArr = params.split("&");
+
+		String format = "JPEG";
+		int width = 0, height = 0;
+
+		for (String param : paramsArr) {
+			String value = null;
+			int i = param.indexOf('=') ;
+			if (i != -1) {
+				value = param.substring(i + 1);
+			}
+			if (value == null) continue;
+			if (param.startsWith("encoding=")) {
+				String f = value.toLowerCase();
+				if (f.contains("jpeg")) {
+					format = "JPEG";
+				} else if (f.contains("png")) {
+					format = "PNG";
+				} else if (f.contains("gif")) {
+					format = "GIF";
+				}
+				continue;
+			}
+			if (param.startsWith("width=")) {
+				try {
+					width = Integer.parseInt(value);
+				} catch (NumberFormatException ignored) {}
+				continue;
+			}
+			if (param.startsWith("height=")) {
+				try {
+					height = Integer.parseInt(value);
+				} catch (NumberFormatException ignored) {}
+			}
+		}
+
+		BufferedImage image = player.img;
+		if (image == null) {
+			image = player.mediaPlayer.snapshots().get();
+		}
+
+		if (width != 0 || height != 0) {
+			if (width == 0) {
+				width = (int) (((float) image.getWidth() * height) / image.getHeight());
+			} else if (height == 0) {
+				height = (int) (((float) image.getHeight() * width) / image.getWidth());
+			}
+			image = AWTImageUtils.resizeProportional(image, width, height);
+		}
+
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			ImageIO.write(player.mediaPlayer.snapshots().get(), "JPEG", os);
+			ImageIO.write(image, format, os);
 			byte[] bytes = os.toByteArray();
 			os.close();
 			return bytes;
@@ -108,7 +167,6 @@ class VideoControlImpl implements VideoControl {
 			throw new MediaException(e);
 		}
 	}
-
 
 	public Object initDisplayMode(int p0, Object p1) {
 		player.isItem = p0 != USE_DIRECT_VIDEO;

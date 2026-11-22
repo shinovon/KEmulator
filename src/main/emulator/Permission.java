@@ -41,7 +41,8 @@ public class Permission {
 				s.equals("connector.open.ssl") ||
 				s.equals("location")) {
 			return allowed;
-		} else if (s.equals("media.camera") ||
+		} else if (s.equals("media.capture.video") ||
+				s.equals("media.capture.audio") ||
 				s.equals("platformrequest")) {
 			return ask_always_until_no;
 		}
@@ -157,8 +158,10 @@ public class Permission {
 			return "Allow the application to open socket connections?";
 		} else if (x.equals("connector.open.serversocket")) {
 			return "Allow the application to open server socket connections?";
-		} else if (x.equals("media.camera")) {
+		} else if (x.equals("media.capture.video")) {
 			return UILocale.get("PERMISSION_CAMERA", "Allow the application to use camera?");
+		} else if (x.equals("media.capture.audio")) {
+			return UILocale.get("PERMISSION_AUDIO", "Allow the application to use microphone?");
 		}
 		return "Allow the application to use '" + x + "'?";
 	}

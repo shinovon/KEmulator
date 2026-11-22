@@ -147,28 +147,19 @@ public class CustomMethod {
 					} catch (Exception ignored) {
 					}
 				}
-			} else if (res == null
-					&& (prop.equals("supports.video.capture")
-					|| prop.equals("supports.photo.capture")
-					|| prop.equals("supports.mediacapabilities")
-					|| prop.equals("camera.orientations")
-					|| prop.equals("camera.resolutions"))) {
-				if (System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
-					try {
-						// TODO
-//							System.setProperty("supports.video.capture", "true");
-//							System.setProperty("supports.photo.capture", "true");
-//							System.setProperty("supports.mediacapabilities", "camera");
-//							System.setProperty("camera.orientations", "devcam0:inwards");
-//							System.setProperty("camera.resolutions", "devcam0:" + d.width + "x" + d.height);
-//
-//							res = System.getProperty(prop);
-					} catch (Throwable ignored) {
-					}
+			} else if (System.getProperty("kemulator.disablecamera") == null && !Settings.disableCamera) {
+				if ("supports.video.capture".equals(prop)) {
+					// actually no, only snapshots are supported
+					res = "true";
+				} else if ("camera.orientations".equals(prop)) {
+					res = "devcam0:inwards";
+				} else if ("camera.resolutions".equals(prop)) {
+					res = "devcam0:640x480";
+				} else if ("video.snapshot.encodings".equals(prop)) {
+					res = "encoding=jpeg encoding=png encoding=gif encoding=image/jpeg encoding=image/png encoding=image/gif";
 				}
-				if (prop.equals("supports.video.capture") || prop.equals("supports.photo.capture")) {
-					res = "false";
-				}
+			} else if ("supports.video.capture".equals(prop)) {
+				res = "false";
 			} else if (Settings.hideEmulation &&
 					(prop.startsWith("os.") || prop.startsWith("java.") || prop.startsWith("sun.")
 							|| prop.startsWith("org.pigler.") || prop.startsWith("ru.nnproject."))) {
