@@ -139,7 +139,7 @@ public class AppSettings {
 		motorolaSoftKeyFix = false;
 		keyPressOnRepeat = false;
 		synchronizeKeyEvents = false;
-		preloadResources = false;
+		preloadResources = true;
 
 		patchYield = false;
 		ignoreGc = true;
