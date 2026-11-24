@@ -1,5 +1,7 @@
 package emulator.bluetooth;
 
+import emulator.Emulator;
+
 import javax.bluetooth.L2CAPConnection;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -185,7 +187,7 @@ public class BTL2CAPConnection implements L2CAPConnection {
             readerThread.interrupt();
         }
 
-        System.out.println("[BT] L2CAP connection closed: " + url
+        Emulator.getEmulator().getLogStream().println("[BT] L2CAP connection closed: " + url
                 + " (sent " + sentPackets + " packet(s)/" + sentBytes + " byte(s), received "
                 + receivedPacketCount + " packet(s)/" + receivedBytes + " byte(s))");
     }
@@ -234,7 +236,7 @@ public class BTL2CAPConnection implements L2CAPConnection {
         synchronized (receiveLock) {
             if (inputFailure == null) {
                 inputFailure = failure;
-                System.out.println("[BT] L2CAP input failed for " + url + ": " + failure.getMessage());
+                Emulator.getEmulator().getLogStream().println("[BT] L2CAP input failed for " + url + ": " + failure.getMessage());
             }
             receiveLock.notifyAll();
         }

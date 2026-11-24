@@ -1,5 +1,7 @@
 package emulator.bluetooth.obex;
 
+import emulator.Emulator;
+
 import javax.obex.*;
 import java.io.*;
 import java.net.Socket;
@@ -131,7 +133,7 @@ public class ClientSessionImpl implements ClientSession {
             try { in.close(); } catch (IOException ignored) {}
             try { out.close(); } catch (IOException ignored) {}
             socket.close();
-            System.out.println("[BT] OBEX ClientSession closed: " + url);
+            Emulator.getEmulator().getLogStream().println("[BT] OBEX ClientSession closed: " + url);
         }
     }
 

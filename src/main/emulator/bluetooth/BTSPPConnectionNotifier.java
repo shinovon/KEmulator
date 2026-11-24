@@ -1,5 +1,7 @@
 package emulator.bluetooth;
 
+import emulator.Emulator;
+
 import javax.microedition.io.Connection;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.io.StreamConnectionNotifier;
@@ -28,9 +30,9 @@ public class BTSPPConnectionNotifier implements StreamConnectionNotifier {
     @Override
     public StreamConnection acceptAndOpen() throws IOException {
         if (closed) throw new IOException("Notifier closed");
-        System.out.println("[BT] BTSPP notifier waiting for connection: " + url + " on port " + serverSocket.getLocalPort());
+        Emulator.getEmulator().getLogStream().println("[BT] BTSPP notifier waiting for connection: " + url + " on port " + serverSocket.getLocalPort());
         Socket client = serverSocket.accept();
-        System.out.println("[BT] BTSPP client connected from " + client.getInetAddress() + ":" + client.getPort());
+        Emulator.getEmulator().getLogStream().println("[BT] BTSPP client connected from " + client.getInetAddress() + ":" + client.getPort());
         return new BTSPPConnection(client, url);
     }
 
@@ -44,7 +46,7 @@ public class BTSPPConnectionNotifier implements StreamConnectionNotifier {
             backend.unregisterService(this);
         }
         serverSocket.close();
-        System.out.println("[BT] BTSPP notifier closed: " + url);
+        Emulator.getEmulator().getLogStream().println("[BT] BTSPP notifier closed: " + url);
     }
 
     public String getUrl() {

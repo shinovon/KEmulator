@@ -1,5 +1,7 @@
 package emulator.bluetooth;
 
+import emulator.Emulator;
+
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.DiscoveryListener;
 import java.io.IOException;
@@ -72,7 +74,7 @@ public class DiscoveryManager implements Runnable {
             socket.setLoopbackMode(false);
         } catch (IOException e) {
             // Directed and limited broadcasts remain available as a fallback.
-            System.out.println("[BT] Could not configure multicast options: " + e.getMessage());
+            Emulator.getEmulator().getLogStream().println("[BT] Could not configure multicast options: " + e.getMessage());
         }
         socket.bind(new InetSocketAddress(discoveryPort));
         loadManualPeers();
@@ -82,14 +84,14 @@ public class DiscoveryManager implements Runnable {
             multicastJoined = true;
         } catch (IOException e) {
             multicastJoined = false;
-            System.out.println("[BT] Multicast not available, using broadcast only: " + e.getMessage());
+            Emulator.getEmulator().getLogStream().println("[BT] Multicast not available, using broadcast only: " + e.getMessage());
         }
 
         running = true;
         thread = new Thread(this, "KEm-BT-Discovery");
         thread.setDaemon(true);
         thread.start();
-        System.out.println("[BT] Discovery started on port " + discoveryPort);
+        Emulator.getEmulator().getLogStream().println("[BT] Discovery started on port " + discoveryPort);
     }
 
     public synchronized void stop() {
@@ -242,7 +244,7 @@ public class DiscoveryManager implements Runnable {
                 continue;
             }
             if (address.equalsIgnoreCase(stack.getLocalAddress())) {
-                System.out.println("[BT] Ignoring local address in " + BluetoothConstants.PROP_MANUAL_PEERS);
+                Emulator.getEmulator().getLogStream().println("[BT] Ignoring local address in " + BluetoothConstants.PROP_MANUAL_PEERS);
                 continue;
             }
 
@@ -260,12 +262,12 @@ public class DiscoveryManager implements Runnable {
 
             addOrUpdatePeer(address, address, host, sdpPort, 0);
             preknownPeerAddresses.add(address);
-            System.out.println("[BT] Configured preknown peer " + address + " at " + host + ":" + sdpPort);
+            Emulator.getEmulator().getLogStream().println("[BT] Configured preknown peer " + address + " at " + host + ":" + sdpPort);
         }
     }
 
     private void logInvalidManualPeer(String entry) {
-        System.out.println("[BT] Ignoring invalid " + BluetoothConstants.PROP_MANUAL_PEERS +
+        Emulator.getEmulator().getLogStream().println("[BT] Ignoring invalid " + BluetoothConstants.PROP_MANUAL_PEERS +
                 " entry '" + entry + "' (expected BT_ADDRESS@host:sdpPort)");
     }
 
@@ -279,7 +281,7 @@ public class DiscoveryManager implements Runnable {
         if (previousIp != null && !previousIp.equals(peer.getIpAddress())
                 && BluetoothUtils.isLoopbackAddress(ip) && !BluetoothUtils.isLoopbackAddress(previousIp)
                 && ignoredLoopbackClaims.add(btAddr.toUpperCase() + '@' + ip)) {
-            System.out.println("[BT] Ignoring loopback claim from " + ip + " for peer " + btAddr
+            Emulator.getEmulator().getLogStream().println("[BT] Ignoring loopback claim from " + ip + " for peer " + btAddr
                     + ", keeping reachable address " + previousIp);
         }
         return peer;
@@ -322,7 +324,7 @@ public class DiscoveryManager implements Runnable {
         } else {
             BluetoothPeer peer = new BluetoothPeer(btAddr, friendlyName, ip, sdpPort, devClass);
             cache.put(key, peer);
-            System.out.println("[BT] Discovered peer: " + peer);
+            Emulator.getEmulator().getLogStream().println("[BT] Discovered peer: " + peer);
             return peer;
         }
     }
@@ -435,7 +437,7 @@ public class DiscoveryManager implements Runnable {
             replySocket.bind(new InetSocketAddress(0));
             replySocket.setSoTimeout(INQUIRY_RECEIVE_TIMEOUT_MS);
 
-            System.out.println("[BT] Starting inquiry...");
+            Emulator.getEmulator().getLogStream().println("[BT] Starting inquiry...");
             long start = System.currentTimeMillis();
             long nextRequestAt = start;
             while (inquiryRunning &&
@@ -463,7 +465,7 @@ public class DiscoveryManager implements Runnable {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("[BT] Inquiry completed, found " + cachedPeers.size() + " peers");
+                Emulator.getEmulator().getLogStream().println("[BT] Inquiry completed, found " + cachedPeers.size() + " peers");
             }
         } catch (IOException e) {
             if (inquiryRunning) {
@@ -473,7 +475,7 @@ public class DiscoveryManager implements Runnable {
                 } catch (Exception callbackError) {
                     callbackError.printStackTrace();
                 }
-                System.out.println("[BT] Inquiry failed: " + e.getMessage());
+                Emulator.getEmulator().getLogStream().println("[BT] Inquiry failed: " + e);
             }
         } finally {
             inquiryRunning = false;
@@ -496,7 +498,7 @@ public class DiscoveryManager implements Runnable {
             }
         }
         inquiryListener = null;
-        System.out.println("[BT] Inquiry cancelled");
+        Emulator.getEmulator().getLogStream().println("[BT] Inquiry cancelled");
         return true;
     }
 

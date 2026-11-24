@@ -1,6 +1,7 @@
 package emulator.bluetooth;
 
 import emulator.AppSettings;
+import emulator.Emulator;
 import emulator.Settings;
 
 /**
@@ -25,7 +26,7 @@ final class BluetoothConfiguration {
         int port = getPort(BluetoothConstants.PROP_DISCOVERY_PORT, ENV_DISCOVERY_PORT,
                 BluetoothConstants.DEFAULT_DISCOVERY_PORT, false);
         if (port != BluetoothConstants.DEFAULT_DISCOVERY_PORT) {
-            System.out.println("[BT] WARNING: custom discovery port " + port +
+            Emulator.getEmulator().getLogStream().println("[BT] WARNING: custom discovery port " + port +
                     " is active. Automatic discovery will not work with peers using a " +
                     "different port; every participating emulator must use " +
                     BluetoothConstants.PROP_DISCOVERY_PORT + "=" + port + ".");
@@ -60,7 +61,7 @@ final class BluetoothConfiguration {
             }
         } catch (NumberFormatException ignored) {}
 
-        System.out.println("[BT] Invalid " + property + " value '" + value +
+        Emulator.getEmulator().getLogStream().println("[BT] Invalid " + property + " value '" + value +
                 "'; using " + defaultValue + ".");
         return defaultValue;
     }

@@ -1,5 +1,7 @@
 package emulator.bluetooth;
 
+import emulator.Emulator;
+
 import javax.bluetooth.*;
 import javax.microedition.io.Connection;
 import java.io.IOException;
@@ -69,7 +71,7 @@ public class BluetoothStack implements BluetoothBackend {
             throw e;
         }
 
-        System.out.println("[BT] Stack initialized: addr=" + localAddress + " name=" + friendlyName +
+        Emulator.getEmulator().getLogStream().println("[BT] Stack initialized: addr=" + localAddress + " name=" + friendlyName +
                 " ip=" + BluetoothUtils.getLocalIpString() + " sdpPort=" + sdpServer.getPort());
 
         // Keep direct BluetoothStack users safe too; public facades normally
@@ -322,7 +324,7 @@ public class BluetoothStack implements BluetoothBackend {
         serviceRegistry.register(service);
         notifierRecordMap.put((Connection) notifier, record);
 
-        System.out.println("[BT] Service registered: " + protocol + " uuid=" + uuidOrPsm + " name=" + serviceName + " port=" + serverSocket.getLocalPort());
+        Emulator.getEmulator().getLogStream().println("[BT] Service registered: " + protocol + " uuid=" + uuidOrPsm + " name=" + serviceName + " port=" + serverSocket.getLocalPort());
 
         return record;
     }
@@ -412,11 +414,11 @@ public class BluetoothStack implements BluetoothBackend {
             // peer that was discovered on the LAN this means the cached address
             // was replaced by a loopback announcement, and the connection would
             // go back to this same machine.
-            System.out.println("[BT] Warning: peer " + hostname + " resolved to loopback address " + ip
+            Emulator.getEmulator().getLogStream().println("[BT] Warning: peer " + hostname + " resolved to loopback address " + ip
                     + " (service port " + serviceTcpPort + ")");
         }
 
-        System.out.println("[BT] Opening client connection to " + ip + ":" + serviceTcpPort + " for " + url);
+        Emulator.getEmulator().getLogStream().println("[BT] Opening client connection to " + ip + ":" + serviceTcpPort + " for " + url);
 
         // Open TCP socket.  Use a bounded connect so an offline LAN peer does
         // not indefinitely block the MIDlet's connection attempt.
@@ -477,7 +479,7 @@ public class BluetoothStack implements BluetoothBackend {
         // Bind directly to port zero so the OS reserves the selected service
         // port atomically (rather than probing first and introducing TOCTOU).
         ServerSocket ss = new ServerSocket(0);
-        System.out.println("[BT] Opening server notifier: " + url + " -> TCP port " + ss.getLocalPort());
+        Emulator.getEmulator().getLogStream().println("[BT] Opening server notifier: " + url + " -> TCP port " + ss.getLocalPort());
 
         if (protocol.equals("btspp")) {
             BTSPPConnectionNotifier notifier = new BTSPPConnectionNotifier(ss, url, channel, serviceName);

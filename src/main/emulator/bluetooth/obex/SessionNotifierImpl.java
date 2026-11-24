@@ -1,5 +1,7 @@
 package emulator.bluetooth.obex;
 
+import emulator.Emulator;
+
 import javax.microedition.io.Connection;
 import javax.obex.*;
 import java.io.*;
@@ -34,9 +36,9 @@ public class SessionNotifierImpl implements SessionNotifier {
     public Connection acceptAndOpen(ServerRequestHandler handler, Authenticator auth) throws IOException {
         if (closed) throw new IOException("Notifier closed");
         if (handler == null) throw new NullPointerException("handler");
-        System.out.println("[BT] OBEX notifier waiting: " + url + " port " + serverSocket.getLocalPort());
+        Emulator.getEmulator().getLogStream().println("[BT] OBEX notifier waiting: " + url + " port " + serverSocket.getLocalPort());
         Socket client = serverSocket.accept();
-        System.out.println("[BT] OBEX client connected: " + client.getInetAddress());
+        Emulator.getEmulator().getLogStream().println("[BT] OBEX client connected: " + client.getInetAddress());
 
         Thread thread = new Thread(() -> handleObexSession(client, handler, auth),
                 "KEm-BT-OBEX-" + client.getPort());
@@ -131,7 +133,7 @@ public class SessionNotifierImpl implements SessionNotifier {
             backend.unregisterService(this);
         }
         serverSocket.close();
-        System.out.println("[BT] OBEX notifier closed: " + url);
+        Emulator.getEmulator().getLogStream().println("[BT] OBEX notifier closed: " + url);
     }
 
     /**

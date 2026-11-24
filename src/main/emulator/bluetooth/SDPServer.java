@@ -1,5 +1,7 @@
 package emulator.bluetooth;
 
+import emulator.Emulator;
+
 import javax.bluetooth.ServiceRecordImpl;
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -53,7 +55,7 @@ public class SDPServer implements Runnable {
         thread = new Thread(this, "KEm-BT-SDP-Server");
         thread.setDaemon(true);
         thread.start();
-        System.out.println("[BT] SDP Server started on port " + serverSocket.getLocalPort() + " IP " + BluetoothUtils.getLocalIpString());
+        Emulator.getEmulator().getLogStream().println("[BT] SDP Server started on port " + serverSocket.getLocalPort() + " IP " + BluetoothUtils.getLocalIpString());
     }
 
     public synchronized void stop() {
@@ -137,7 +139,7 @@ public class SDPServer implements Runnable {
             }
 
             int serviceCount = Math.min(services.size(), MAX_SERVICE_RECORDS);
-            System.out.println("[BT] SDP request from " + s.getInetAddress().getHostAddress() +
+            Emulator.getEmulator().getLogStream().println("[BT] SDP request from " + s.getInetAddress().getHostAddress() +
                     ": " + request + " -> " + serviceCount + " service(s)");
             out.writeInt(serviceCount);
             for (int serviceIndex = 0; serviceIndex < serviceCount; serviceIndex++) {

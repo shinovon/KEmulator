@@ -40,9 +40,9 @@ public class BTL2CAPConnectionNotifier implements L2CAPConnectionNotifier {
     @Override
     public L2CAPConnection acceptAndOpen() throws IOException {
         if (closed) throw new IOException("Notifier closed");
-        System.out.println("[BT] L2CAP notifier waiting: " + url + " port " + serverSocket.getLocalPort());
+        Emulator.getEmulator().getLogStream().println("[BT] L2CAP notifier waiting: " + url + " port " + serverSocket.getLocalPort());
         Socket client = serverSocket.accept();
-        System.out.println("[BT] L2CAP client connected: " + client.getInetAddress());
+        Emulator.getEmulator().getLogStream().println("[BT] L2CAP client connected: " + client.getInetAddress());
         return new BTL2CAPConnection(client, receiveMTU, transmitMTU, url);
     }
 
@@ -55,6 +55,6 @@ public class BTL2CAPConnectionNotifier implements L2CAPConnectionNotifier {
             backend.unregisterService(this);
         }
         serverSocket.close();
-        System.out.println("[BT] L2CAP notifier closed: " + url);
+        Emulator.getEmulator().getLogStream().println("[BT] L2CAP notifier closed: " + url);
     }
 }

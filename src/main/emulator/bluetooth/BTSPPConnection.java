@@ -1,5 +1,7 @@
 package emulator.bluetooth;
 
+import emulator.Emulator;
+
 import javax.microedition.io.StreamConnection;
 import java.io.*;
 
@@ -59,7 +61,7 @@ public class BTSPPConnection implements StreamConnection {
             outputStream.close();
         } catch (IOException ignored) {}
         socket.close();
-        System.out.println("[BT] BTSPP connection closed: " + url);
+        Emulator.getEmulator().getLogStream().println("[BT] BTSPP connection closed: " + url);
     }
 
     /**
