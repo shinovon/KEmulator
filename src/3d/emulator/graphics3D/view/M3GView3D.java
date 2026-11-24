@@ -555,6 +555,8 @@ public final class M3GView3D implements PaintListener, Runnable {
 				lightsTransforms.add(new Transform(transform));
 			} else if (child instanceof Group) {
 				this.collectLights(world, (Group) child);
+			} else if (child instanceof SkinnedMesh) {
+				this.collectLights(world, ((SkinnedMesh) child).getSkeleton());
 			}
 		}
 
@@ -593,6 +595,7 @@ public final class M3GView3D implements PaintListener, Runnable {
 		GL11.glFrontFace(pm.getWinding() == PolygonMode.WINDING_CW ? GL_CW : GL_CCW);
 		GL11.glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, pm.isTwoSidedLightingEnabled() ? 1.0F : 0.0F);
 		GL11.glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, pm.isLocalCameraLightingEnabled() ? 1.0F : 0.0F);
+		GL11.glLightModelfv(GL_LIGHT_MODEL_AMBIENT, memoryBuffers.getFloatBuffer(new float[] {0, 0, 0, 1}));
 
 		boolean persCorrect = pm.isPerspectiveCorrectionEnabled();
 		if (AppSettings.m3gForcePerspectiveCorrection) persCorrect = true;
@@ -949,6 +952,8 @@ public final class M3GView3D implements PaintListener, Runnable {
 		for (int i = 0; i < Emulator3D.MaxLights; ++i) {
 			GL11.glDisable(GL_LIGHT0 + i);
 		}
+
+		GL11.glLightModelfv(GL_LIGHT_MODEL_AMBIENT, memoryBuffers.getFloatBuffer(new float[] {0, 0, 0, 1}));
 
 		if (!useGL11() && capabilities.GL_ARB_color_buffer_float) {
 			ARBColorBufferFloat.glClampColorARB(
