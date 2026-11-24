@@ -78,9 +78,9 @@ public class Connector {
 			if (s.startsWith("resource:")) {
 				res = new ResourceConnectionImpl(s);
 			}
-			if (s.startsWith("scratchpad:")) {
-				res = ScratchPadConnection.open(s);
-			}
+//			if (s.startsWith("scratchpad:")) {
+//				res = ScratchPadConnection.open(s);
+//			}
 			if (s.startsWith("file://") && !Settings.protectedPackages.contains("javax.microedition.io.file")) {
 				Permission.checkPermission("connector.open.file");
 				res = new FileConnectionImpl(s);
@@ -104,10 +104,10 @@ public class Connector {
 			}
 			if (s.startsWith("http://")) {
 				Permission.checkPermission("connector.open.http");
-				if (Emulator.doja) {
-					res = new com.nttdocomo.io.maker.HttpConnectionImpl(s, n);
-					break res;
-				}
+//				if (Emulator.doja) {
+//					res = new com.nttdocomo.io.maker.HttpConnectionImpl(s, n);
+//					break res;
+//				}
 				res = checkVserv(s) ? new VServConnectionWrapper(s) : new HttpConnectionImpl(s);
 				break res;
 			}

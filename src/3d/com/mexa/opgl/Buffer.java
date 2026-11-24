@@ -16,9 +16,7 @@
 
 package com.mexa.opgl;
 
-import com.nttdocomo.ui.ogl.DirectBuffer;
-
-public abstract class Buffer implements DirectBuffer {
+public abstract class Buffer {
 	final java.nio.Buffer buffer;
 	int offset;
 	int length;

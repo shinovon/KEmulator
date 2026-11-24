@@ -1,6 +1,5 @@
 package emulator;
 
-import com.nttdocomo.ui.maker.IApplicationMIDlet;
 import emulator.custom.CustomClassLoader;
 import emulator.custom.CustomMethod;
 import emulator.custom.ResourceManager;
@@ -715,8 +714,11 @@ public class Emulator implements Runnable {
 			if (AppSettings.preloadResources) ResourceManager.preloadResources();
 
 			if (doja) {
-				Emulator.eventQueue = new EventQueue();
-				midlet = new IApplicationMIDlet(Emulator.midletClassName.trim());
+//				Emulator.eventQueue = new EventQueue();
+//				midlet = new IApplicationMIDlet(Emulator.midletClassName.trim());
+				Emulator.emulatorimpl.getScreen().showMessage("DoJa profile support was removed");
+				System.exit(1);
+				return;
 			} else {
 				getEmulator().getLogStream().stdout("Launch MIDlet class: " + Emulator.midletClassName);
 				try {
