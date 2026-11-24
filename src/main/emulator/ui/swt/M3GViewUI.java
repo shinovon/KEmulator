@@ -211,15 +211,17 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 			currentNode = (Node) memory.m3gObjects.get(0);
 		}
 
-		if (lightingMode != 0 && currentNode instanceof World) {
-			World world = (World) currentNode;
-			currentBackground = world.getBackground();
-			m3gview.collectWorldLights(world);
-		} else if (currentNode != null) {
-			Light viewerLight = new Light();
-			viewerLight.setMode(Light.AMBIENT);
-			M3GView3D.resetLights();
-			M3GView3D.addLight(viewerLight, null);
+		if (currentNode != null) {
+			if (lightingMode == 0 && currentNode instanceof World) {
+				World world = (World) currentNode;
+				currentBackground = world.getBackground();
+				m3gview.collectWorldLights(world);
+			} else {
+				Light viewerLight = new Light();
+				viewerLight.setMode(Light.AMBIENT);
+				M3GView3D.resetLights();
+				M3GView3D.addLight(viewerLight, null);
+			}
 		}
 		this.canvasClientArea = this.canvas.getClientArea();
 	}

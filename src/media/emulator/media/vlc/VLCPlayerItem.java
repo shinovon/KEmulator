@@ -1,7 +1,5 @@
 package emulator.media.vlc;
 
-import emulator.media.capture.CapturePlayerImpl;
-
 import javax.microedition.lcdui.CustomItem;
 import javax.microedition.lcdui.Graphics;
 
