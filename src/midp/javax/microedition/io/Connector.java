@@ -6,8 +6,11 @@ import emulator.Connections;
 import emulator.Emulator;
 import emulator.Permission;
 import emulator.Settings;
+import emulator.bluetooth.BluetoothBackend;
+import emulator.bluetooth.BluetoothBackendProvider;
 import emulator.sensor.Sensor;
 
+import javax.bluetooth.BluetoothStateException;
 import javax.microedition.io.file.FileConnectionImpl;
 import javax.microedition.sensor.SensorConnection;
 import javax.microedition.sensor.SensorInfo;
@@ -140,13 +143,14 @@ public class Connector {
 			}
 			if (!Settings.protectedPackages.contains("javax.bluetooth")) {
 				if (s.startsWith("btspp://") || s.startsWith("btl2cap://") || s.startsWith("btgoep://")) {
+					Permission.checkPermission("connector.open.bt");
 					try {
-						emulator.bluetooth.BluetoothBackend backend =
-								emulator.bluetooth.BluetoothBackendProvider.getInstance();
+						BluetoothBackend backend =
+								BluetoothBackendProvider.getInstance();
 						res = s.contains("://localhost:") ? backend.openServerNotifier(s) : backend.openClientConnection(s);
 						break res;
-					} catch (javax.bluetooth.BluetoothStateException bse) {
-						throw new IOException("Bluetooth not available: " + bse.getMessage());
+					} catch (BluetoothStateException bse) {
+						throw new IOException("Bluetooth not available: " + bse);
 					}
 				}
 			}

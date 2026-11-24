@@ -39,6 +39,7 @@ public class Permission {
 				s.equals("connector.open.datagram") ||
 				s.equals("connector.open.datagramreceive") ||
 				s.equals("connector.open.ssl") ||
+				s.equals("connector.open.bt") ||
 				s.equals("location")) {
 			return allowed;
 		} else if (s.equals("media.capture.video") ||
@@ -158,6 +159,8 @@ public class Permission {
 			return "Allow the application to open socket connections?";
 		} else if (x.equals("connector.open.serversocket")) {
 			return "Allow the application to open server socket connections?";
+		} else if (x.equals("connector.open.bt")) {
+			return "Allow the application to open Bluetooth connections?";
 		} else if (x.equals("media.capture.video")) {
 			return UILocale.get("PERMISSION_CAMERA", "Allow the application to use camera?");
 		} else if (x.equals("media.capture.audio")) {

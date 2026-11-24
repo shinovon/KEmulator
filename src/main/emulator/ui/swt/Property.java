@@ -111,6 +111,7 @@ public final class Property implements IProperty, SelectionListener {
 			{"Send Datagram", "connector.open.datagram"},
 			{"Receive Datagram", "connector.open.datagramreceive"},
 			{"SSL Socket", "connector.open.ssl"},
+			{"Bluetooth", "connector.open.bt"},
 			{"Camera", "media.capture.video"},
 			{"Microphone", "media.capture.audio"},
 			{"Location", "location"},
