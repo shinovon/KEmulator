@@ -42,6 +42,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 	private boolean glInitialized;
 	boolean renderPending;
 	private enum CameraMode { ORBIT, PAN, DOLLY, ZOOM }
+	private int lightingMode;
 
 	private CameraMode cameraMode = CameraMode.ORBIT;
 	private int parallelProjEnabled;
@@ -210,7 +211,7 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 			currentNode = (Node) memory.m3gObjects.get(0);
 		}
 
-		if (currentNode instanceof World) {
+		if (lightingMode != 0 && currentNode instanceof World) {
 			World world = (World) currentNode;
 			currentBackground = world.getBackground();
 			m3gview.collectWorldLights(world);
@@ -343,7 +344,17 @@ public final class M3GViewUI implements MouseMoveListener, DisposeListener, KeyL
 		(menuItem3 = new MenuItem(this.menu, SWT.CASCADE)).setText(UILocale.get("M3G_VIEW_LIGHT", "Light"));
 		this.lightMenu = new Menu(menuItem3);
 		(this.sceneLightItem = new MenuItem(this.lightMenu, SWT.RADIO)).setText(UILocale.get("M3G_VIEW_LIGHT_SCENE", "Scene Graphics"));
+		sceneLightItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				lightingMode = 0;
+			}
+		});
 		(this.viewLightItem = new MenuItem(this.lightMenu, SWT.RADIO)).setText(UILocale.get("M3G_VIEW_LIGHT_VIEW", "Viewer Light"));
+		viewLightItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				lightingMode = 1;
+			}
+		});
 		menuItem3.setMenu(this.lightMenu);
 		this.cameraMenu = new Menu(menuItem2);
 
