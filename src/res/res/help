@@ -4,6 +4,8 @@ Rewritten video capture using VLC instead of webcam-capture
 Added resourceStreamDecompressedBytes in Profiler
 Fixed lighting mode selection in M3G View
 Fixed ambient light in M3G View
+Added http tracing
+Added hotkeys binding
 Removed DoJa support
 
 $v2.22.1 [2026.11.20]
