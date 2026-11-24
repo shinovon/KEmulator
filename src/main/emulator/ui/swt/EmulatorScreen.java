@@ -987,7 +987,7 @@ public final class EmulatorScreen implements
 		this.xrayViewMenuItem.addSelectionListener(this);
 		Accelerators.menuItem(xrayViewMenuItem, "X-Ray View");
 
-		if (!Emulator.isX64()) {
+		if (!Emulator.isMultiplatform()) {
 			(this.alwaysOnTopMenuItem = new MenuItem(this.menuView, 32)).setText(UILocale.get("MENU_VIEW_TOP", "Always On Top"));
 			this.alwaysOnTopMenuItem.addSelectionListener(this);
 			this.alwaysOnTopMenuItem.setSelection(Settings.alwaysOnTop);
@@ -1274,7 +1274,7 @@ public final class EmulatorScreen implements
 		swerve3dMenuItem = new MenuItem(menuM3GEngine, SWT.RADIO);
 		swerve3dMenuItem.setText("Swerve");
 		swerve3dMenuItem.setSelection(Settings.g3d == 0);
-		swerve3dMenuItem.setEnabled(!Emulator.isX64());
+		swerve3dMenuItem.setEnabled(!Emulator.isMultiplatform());
 		swerve3dMenuItem.addSelectionListener(this);
 
 		final MenuItem engineM3DGroup;
@@ -1289,7 +1289,7 @@ public final class EmulatorScreen implements
 		dllM3DMenuItem = new MenuItem(this.menuM3DEngine, SWT.RADIO);
 		dllM3DMenuItem.setText("Software (DLL)");
 		dllM3DMenuItem.setSelection(Settings.micro3d == 0);
-		dllM3DMenuItem.setEnabled(!Emulator.isX64());
+		dllM3DMenuItem.setEnabled(!Emulator.isMultiplatform());
 		dllM3DMenuItem.addSelectionListener(this);
 
 		softM3DMenuItem = new MenuItem(this.menuM3DEngine, SWT.RADIO);

@@ -315,7 +315,7 @@ public abstract class IdeaSetup implements DisposeListener, SelectionListener {
 			}
 
 			if (this instanceof IdeaSetupWindows) {
-				Path jdkLocs = Emulator.isX64() ? Paths.get("C:\\Program Files\\Java") : Paths.get("C:\\Program Files (x86)\\Java");
+				Path jdkLocs = Emulator.isMultiplatform() ? Paths.get("C:\\Program Files\\Java") : Paths.get("C:\\Program Files (x86)\\Java");
 				for (File f : jdkLocs.toFile().listFiles()) {
 					String path = f.getAbsolutePath();
 					if (!path.toLowerCase().contains("jdk"))

@@ -4,7 +4,6 @@ Copyright (c) 2025 Fyodor Ryzhov
 package emulator.ui.swt.devutils.idea;
 
 import emulator.Emulator;
-import emulator.Settings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -49,7 +48,7 @@ public class JdkTablePatcher {
 		Vector<String> libs = new Vector<>();
 		libs.add("KEmulator.jar");
 		libs.addAll(Arrays.asList(Emulator.platform.getLwjglLibraryNames()));
-		if (Emulator.platform.isX64()) libs.add(Emulator.platform.getSwtLibraryName());
+		if (Emulator.platform.isMultiplatform()) libs.add(Emulator.platform.getSwtLibraryName());
 		return libs;
 	}
 

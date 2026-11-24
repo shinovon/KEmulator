@@ -132,7 +132,7 @@ public class Updater {
 		cmd.add(Emulator.revision);
 
 		cmd.add("-type");
-		cmd.add(Emulator.getPlatform().isX64() ? "x64" : "win32");
+		cmd.add(Emulator.getPlatform().isMultiplatform() ? "x64" : "win32");
 
 		cmd.add("-branch");
 		cmd.add(Settings.updateBranch);

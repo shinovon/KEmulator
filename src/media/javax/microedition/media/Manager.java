@@ -253,7 +253,7 @@ public class Manager {
 		kemAudio.add("audio/x-amr");
 		kemAudio.add("audio/mpeg");
 		kemAudio.add("audio/mp3");
-		if (!Emulator.isX64()) {
+		if (!Emulator.isMultiplatform()) {
 			kemAudio.add("audio/xmmf");
 			kemAudio.add("audio/x-smaf");
 		}
@@ -542,7 +542,7 @@ public class Manager {
 				list.add(win);
 			}
 			list.add(new WindowsNativeDiscoveryStrategy());
-			if (Emulator.isX64()) {
+			if (Emulator.isMultiplatform()) {
 				list.add(new OsxNativeDiscoveryStrategy());
 				list.add(new LinuxNativeDiscoveryStrategy());
 			}

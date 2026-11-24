@@ -203,7 +203,7 @@ public class PlayerImpl implements Player, Runnable, LineListener, MetaEventList
 		byte[] data = ResourceManager.getBytes(inputStream);
 		if (Settings.enableMediaDump) this.data = data;
 
-		if (!Emulator.isX64() && Settings.maMidi) {
+		if (!Emulator.isMultiplatform() && Settings.maMidi) {
 			ma: {
 				try {
 					if (!MMFPlayer.initialize(true)) throw new Exception();

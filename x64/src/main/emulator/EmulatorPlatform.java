@@ -6,7 +6,7 @@ import java.io.File;
 
 public class EmulatorPlatform implements IEmulatorPlatform {
 
-	public boolean isX64() {
+	public boolean isMultiplatform() {
 		return true;
 	}
 

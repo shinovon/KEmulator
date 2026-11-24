@@ -3,11 +3,10 @@ Copyright (c) 2024 Arman Jussupgaliyev
 */
 package emulator;
 
-import emulator.debug.MemoryViewImage;
 import emulator.graphics3D.IGraphics3D;
 
 public interface IEmulatorPlatform {
-	boolean isX64();
+	boolean isMultiplatform();
 
 	String getName();
 

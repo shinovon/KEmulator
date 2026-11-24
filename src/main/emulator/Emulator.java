@@ -561,7 +561,7 @@ public class Emulator implements Runnable {
 		System.setProperty("microedition.amms.version", "1.0");
 		System.setProperty("streamable.contents", "audio/mpeg");
 		System.setProperty("org.pigler.api.version", "1.4-kemulator");
-		if (platform.isX64()) System.setProperty("kemulator.x64", "true");
+		if (platform.isMultiplatform()) System.setProperty("kemulator.x64", "true");
 		System.setProperty("ru.nnproject.symbiangl", "0.2-kemulator");
 	}
 
@@ -587,7 +587,7 @@ public class Emulator implements Runnable {
 		} catch (Exception ignored) {
 		}
 		String arch = System.getProperty("os.arch");
-		if (!platform.isX64() && (!arch.contains("86") || !Utils.win)) {
+		if (!platform.isMultiplatform() && (!arch.contains("86") || !Utils.win)) {
 			JOptionPane.showMessageDialog(new JPanel(), "Can't run this version of KEmulator nnmod on this architecture (" + arch + "). Try multi-platform version instead.");
 			System.exit(1);
 			return;
@@ -633,7 +633,7 @@ public class Emulator implements Runnable {
 				Emulator.emulatorimpl = new SWTFrontend();
 			parseLaunchArgs(args);
 			// Force m3g engine to LWJGL in x64 build
-			if (platform.isX64()) Settings.g3d = 1;
+			if (platform.isMultiplatform()) Settings.g3d = 1;
 
 			platform.load3D();
 			Controllers.refresh(true);
@@ -1194,8 +1194,8 @@ public class Emulator implements Runnable {
 		return x;
 	}
 
-	public static boolean isX64() {
-		return platform.isX64();
+	public static boolean isMultiplatform() {
+		return platform.isMultiplatform();
 	}
 
 	public static IEmulatorPlatform getPlatform() {

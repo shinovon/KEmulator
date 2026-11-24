@@ -340,7 +340,7 @@ public final class Property implements IProperty, SelectionListener {
 //			Settings.g2d = (properties.getProperty("2D_Graphics_Engine", "AWT").equalsIgnoreCase("SWT") ? 0 : 1);
 			Settings.g3d = (properties.getProperty("3D_Graphics_Engine", "LWJ").equalsIgnoreCase("SWERVE") ? 0 : 1);
 			{
-				String s = properties.getProperty("Micro3D_Engine", Emulator.isX64() ? "GL" : "DLL");
+				String s = properties.getProperty("Micro3D_Engine", Emulator.isMultiplatform() ? "GL" : "DLL");
 				Settings.micro3d = s.equalsIgnoreCase("DLL") ? 0 : s.equalsIgnoreCase("SW") ? 2 : 1;
 			}
 
@@ -1860,7 +1860,7 @@ public final class Property implements IProperty, SelectionListener {
 		globalMidiCheck.setLayoutData(fillHor5);
 		globalMidiCheck.setSelection(Settings.oneMidiAtTime);
 
-		if (!Emulator.isX64()) {
+		if (!Emulator.isMultiplatform()) {
 			maMidiCheck = new Button(mediaGroup, SWT.CHECK);
 			maMidiCheck.setText("Use MA-3/5 emulator for MIDI playback (experimental)");
 			maMidiCheck.setLayoutData(fillHor5);

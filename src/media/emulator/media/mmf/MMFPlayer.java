@@ -12,7 +12,7 @@ public class MMFPlayer {
 		if (MMFPlayer.initialized) {
 			return true;
 		}
-		if (Emulator.isX64()) {
+		if (Emulator.isMultiplatform()) {
 			return false;
 		}
 		try {
