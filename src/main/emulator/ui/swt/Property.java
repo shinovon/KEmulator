@@ -240,6 +240,10 @@ public final class Property implements IProperty, SelectionListener {
 	private Button countImagesSize;
 	private Button traceHttpConnectionCheck;
 
+	private ScrolledComposite hotkeysComp;
+	private Composite hotkeysContent;
+	private Button hotkeysResetBtn;
+
 	public Property() {
 		super();
 		this.loadProperties();
@@ -262,6 +266,8 @@ public final class Property implements IProperty, SelectionListener {
 		fontScrollComp.setExpandVertical(true);
 		securityComp.setMinHeight(securityContent.computeSize(-1, -1).y);
 		securityComp.setExpandVertical(true);
+		hotkeysComp.setMinHeight(hotkeysContent.computeSize(-1, -1).y);
+		hotkeysComp.setExpandVertical(true);
 
 		this.settingsShell.setLocation(parent.getLocation().x + (parent.getSize().x - this.settingsShell.getSize().x >> 1), parent.getLocation().y + (parent.getSize().y - this.settingsShell.getSize().y >> 1));
 		this.settingsShell.open();
@@ -371,6 +377,8 @@ public final class Property implements IProperty, SelectionListener {
 					// permissions
 				} else if (((String) k).startsWith("Security.")) {
 					Permission.permissions.put(((String) k).substring("Security.".length()), Permission.fromString(properties.getProperty((String) k)));
+				} else if (((String) k).startsWith("Accelerators.")) {
+					Accelerators.set(((String) k).substring("Accelerators.".length()), properties.getProperty((String) k));
 				}
 			}
 
@@ -750,6 +758,10 @@ public final class Property implements IProperty, SelectionListener {
 
 			properties.setProperty("PresetsPath", Settings.deviceFile);
 
+			for (String k: Accelerators.accelerators.keySet()) {
+				properties.setProperty("Accelerators." + k, String.valueOf(Accelerators.accelerators.get(k)));
+			}
+
 			properties.store(fileOutputStream, "KEmulator properties");
 			fileOutputStream.close();
 		} catch (Exception e) {
@@ -976,6 +988,7 @@ public final class Property implements IProperty, SelectionListener {
 		this.tabFolder.setUnselectedCloseVisible(false);
 		this.tabFolder.setUnselectedImageVisible(false);
 		this.tabFolder.setLayoutData(layoutData);
+
 		this.setupKeyMapComp();
 		this.setupSystemComp();
 		setupDisableApiComp();
@@ -985,33 +998,47 @@ public final class Property implements IProperty, SelectionListener {
 		this.setupNetworkComp();
 		this.setupMediaComp();
 		setupSecurityComp();
+		setupHotkeysComp();
+
 		final CTabItem keymapTab = new CTabItem(this.tabFolder, SWT.NONE);
 		keymapTab.setText(UILocale.get("OPTION_TAB_KEYMAP", "KeyMap"));
 		keymapTab.setControl(this.keyMapTabComp);
+
 		final CTabItem sysFontTab = new CTabItem(this.tabFolder, SWT.NONE);
 		sysFontTab.setText(UILocale.get("OPTION_TAB_FONT", "Font"));
 		sysFontTab.setControl(this.fontScrollComp);
+
 		final CTabItem systemTab = new CTabItem(this.tabFolder, SWT.NONE);
 		systemTab.setText(UILocale.get("OPTION_TAB_SYSTEM", "System"));
 		systemTab.setControl(this.systemScrollComp);
+
 		final CTabItem disableApiTab = new CTabItem(this.tabFolder, SWT.NONE);
 		disableApiTab.setText(UILocale.get("OPTION_TAB_DISABLE_API", "Disable APIs"));
 		disableApiTab.setControl(this.disableApiComp);
+
 		final CTabItem rmsTab = new CTabItem(this.tabFolder, SWT.NONE);
 		rmsTab.setText(UILocale.get("OPTION_TAB_RECORDS", "Records"));
 		rmsTab.setControl(this.recordsComp);
+
 		final CTabItem networkTab = new CTabItem(this.tabFolder, SWT.NONE);
 		networkTab.setText(UILocale.get("OPTION_TAB_NETWORK", "Network"));
 		networkTab.setControl(this.networkComp);
+
 		final CTabItem mediaTab = new CTabItem(this.tabFolder, SWT.NONE);
 		mediaTab.setText(UILocale.get("OPTION_TAB_MEDIA", "Media"));
 		mediaTab.setControl(this.mediaComp);
+
 		final CTabItem securityTab = new CTabItem(this.tabFolder, SWT.NONE);
 		securityTab.setText(UILocale.get("OPTION_TAB_SECURITY", "Security"));
 		securityTab.setControl(this.securityComp);
+
 		final CTabItem propsTab = new CTabItem(this.tabFolder, SWT.NONE);
 		propsTab.setText(UILocale.get("OPTION_TAB_SYSTEM_PROPERTIES", "Properties"));
 		propsTab.setControl(this.propsComp);
+
+		final CTabItem hotkeysTab = new CTabItem(this.tabFolder, SWT.NONE);
+		hotkeysTab.setText("Hotkeys");
+		hotkeysTab.setControl(this.hotkeysComp);
 	}
 
 	private void setupKeyMapComp() {
@@ -1953,7 +1980,6 @@ public final class Property implements IProperty, SelectionListener {
 	
 	private void setupSecurityComp() {
 		securityComp = new ScrolledComposite(tabFolder, SWT.V_SCROLL);
-
 		securityContent = new Composite(securityComp, SWT.NONE);
 
 		final GridLayout layout = new GridLayout();
@@ -2012,6 +2038,127 @@ public final class Property implements IProperty, SelectionListener {
 
 		securityComp.setContent(securityContent);
 		securityComp.setExpandHorizontal(true);
+	}
+	
+	private void setupHotkeysComp() {
+		hotkeysComp = new ScrolledComposite(tabFolder, SWT.V_SCROLL);
+		hotkeysContent = new Composite(hotkeysComp, SWT.NONE);
+
+		final GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		layout.marginWidth = 5;
+
+		hotkeysContent.setLayout(new GridLayout());
+
+		final GridData labelGridData = new GridData();
+		labelGridData.horizontalAlignment = SWT.FILL;
+		labelGridData.grabExcessHorizontalSpace = true;
+		labelGridData.horizontalSpan = 2;
+
+		final GridData groupData = new GridData();
+		groupData.horizontalAlignment = GridData.FILL;
+		groupData.grabExcessHorizontalSpace = true;
+		groupData.grabExcessVerticalSpace = true;
+		groupData.verticalAlignment = GridData.BEGINNING;
+
+//		hotkeysResetBtn = new Button(hotkeysContent, SWT.PUSH);
+//		hotkeysResetBtn.setText("Reset");
+//		hotkeysResetBtn.setLayoutData(labelGridData);
+
+		Group group = new Group(hotkeysContent, SWT.NONE);
+		group.setText("Hotkeys");
+		group.setLayout(layout);
+		group.setLayoutData(groupData);
+
+		VerifyListener verify = new VerifyListener() {
+			public void verifyText(VerifyEvent verifyEvent) {
+				verifyEvent.doit = verifyEvent.start == 0 && verifyEvent.text != null;
+			}
+		};
+
+		for (String s: Accelerators.accelerators.keySet()) {
+			final GridData data = new GridData();
+			data.horizontalAlignment = SWT.FILL;
+
+			CLabel label = new CLabel(group, SWT.NONE);
+			label.setText(s);
+			label.setLayoutData(data);
+
+			final GridData textLayoutData = new GridData();
+			textLayoutData.grabExcessHorizontalSpace = true;
+			textLayoutData.horizontalAlignment = GridData.FILL;
+			textLayoutData.verticalAlignment = GridData.CENTER;
+
+			Text text = new Text(group, SWT.BORDER);
+			text.setText(Accelerators.get(s));
+			text.setEditable(true);
+			text.setLayoutData(textLayoutData);
+			text.addKeyListener(new KeyAdapter() {
+				public void keyPressed(KeyEvent e) {
+					e.doit = false;
+
+					if (e.keyCode == SWT.BS) {
+						Accelerators.set(s, "0");
+						text.setText(Accelerators.get(s));
+						return;
+					}
+
+					int key = 0;
+					if (e.keyCode >= 'a' && e.keyCode <= 'z') {
+						key = Character.toUpperCase(e.keyCode);
+					} else if (e.keyCode >= ' ' && e.keyCode <= ']') {
+						key = e.keyCode;
+					} else {
+						switch (e.keyCode) {
+						case SWT.ARROW_UP:
+						case SWT.ARROW_DOWN:
+						case SWT.ARROW_LEFT:
+						case SWT.ARROW_RIGHT:
+						case SWT.PAGE_UP:
+						case SWT.PAGE_DOWN:
+						case SWT.HOME:
+						case SWT.END:
+						case SWT.INSERT:
+						case SWT.F1:
+						case SWT.F2:
+						case SWT.F3:
+						case SWT.F4:
+						case SWT.F5:
+						case SWT.F6:
+						case SWT.F7:
+						case SWT.F8:
+						case SWT.F9:
+						case SWT.F10:
+						case SWT.F11:
+						case SWT.F12:
+							key = e.keyCode;
+						}
+					}
+
+					if (key == 0) return;
+
+					if ((e.stateMask & SWT.CONTROL) != 0) {
+						key |= SWT.CONTROL;
+					}
+					if ((e.stateMask & SWT.ALT) != 0) {
+						key |= SWT.ALT;
+					}
+					if ((e.stateMask & SWT.SHIFT) != 0) {
+						key |= SWT.SHIFT;
+					}
+					if ((e.stateMask & SWT.COMMAND) != 0) {
+						key |= SWT.COMMAND;
+					}
+
+					Accelerators.set(s, Integer.toString(key));
+					text.setText(Accelerators.get(s));
+				}
+			});
+			text.addVerifyListener(verify);
+		}
+
+		hotkeysComp.setContent(hotkeysContent);
+		hotkeysComp.setExpandHorizontal(true);
 	}
 
 	private void initSystemComp() {
