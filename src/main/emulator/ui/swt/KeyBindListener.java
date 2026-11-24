@@ -24,6 +24,7 @@ final class KeyBindListener extends KeyAdapter {
 			int controller = ((Property) Emulator.getEmulator().getProperty()).controllerCombo.getSelectionIndex();
 			if (controller == 0) {
 				Property.getKeyboardBindings()[i] = "";
+				KeyMapping.mapDeviceKey(i, "");
 			} else {
 				Controllers.bind(controller - 1, i, "");
 			}
