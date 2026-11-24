@@ -24,7 +24,6 @@ Cross-platform J2ME emulator, based on decompiled KEmulator 1.0.3
 - Customizable MIDI soundfont
 - Fixed network connection issues
 - Mascot Capsule and SoftBank MEXA support
-- Limited DoJa profile support
 - Implemented NokiaUI 1.4
 - Support of obscure OEM APIs
 - Support of UEI integration with IDEs (Eclipse with MTJ, NetBeans, etc)
@@ -45,6 +44,10 @@ Operating system:
 
 Graphics card:
 - OpenGL 1.3 support
+
+### Limitations of multi-platform build (win32 only features)
+- No SMAF support
+- No Swerve M3G engine
 
 ## Building in IntelliJ IDEA
 
