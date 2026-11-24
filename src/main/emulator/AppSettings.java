@@ -209,6 +209,12 @@ public class AppSettings {
 								screenWidth = w;
 								screenHeight = h;
 							}
+
+							if (emulator.getAppProperty("MIDxlet-ScreenSize") == null
+								&& !applyPreset(w + "x" + h + " (COMMON - full screen)", false)) {
+								applyPreset(w + "x" + h + " (Nokia - full screen)", false);
+							}
+
 							break detectScreen;
 						}
 					}
