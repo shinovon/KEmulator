@@ -17,10 +17,7 @@ public class Profiler {
 	public static int gcCallCount;
 	public static int currentTimeMillisCallCount;
 	public static int drawCallCount;
-
-	public Profiler() {
-		super();
-	}
+	public static int resourceStreamDecompressedBytes;
 
 	public static void reset() {
 		Profiler.drawImageCallCount = 0;
@@ -36,5 +33,6 @@ public class Profiler {
 		Profiler.gcCallCount = 0;
 		Profiler.currentTimeMillisCallCount = 0;
 		Profiler.drawCallCount = 0;
+		Profiler.resourceStreamDecompressedBytes = 0;
 	}
 }

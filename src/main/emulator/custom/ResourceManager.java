@@ -2,6 +2,7 @@ package emulator.custom;
 
 import emulator.Emulator;
 import emulator.Settings;
+import emulator.debug.Profiler;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
@@ -71,6 +72,7 @@ public final class ResourceManager {
 						new DataInputStream(zipFile.getInputStream(entry)).readFully(data);
 					}
 				}
+				Profiler.resourceStreamDecompressedBytes += data.length;
 			} else {
 				final File fileFromClassPath;
 				if ((fileFromClassPath = Emulator.getFileFromClassPath(s)) == null || !fileFromClassPath.exists()) {
