@@ -4,6 +4,7 @@ Rewritten video capture using VLC instead of webcam-capture
 Added resourceStreamDecompressedBytes in Profiler
 Fixed lighting mode selection in M3G View
 Fixed ambient light in M3G View
+Removed DoJa support
 
 $v2.22.1 [2026.11.20]
 Added JSR-82 Bluetooth emulation over LAN
