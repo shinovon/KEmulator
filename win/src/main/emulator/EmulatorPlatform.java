@@ -15,7 +15,7 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 	}
 
 	public String getTitleName() {
-		return "KEmnn";
+		return "KEmu";
 	}
 
 	public String getInfoString(String version) {
