@@ -1,6 +1,7 @@
 package javax.microedition.io;
 
 import emulator.AppSettings;
+import emulator.Connections;
 import emulator.Emulator;
 import emulator.Settings;
 
@@ -34,7 +35,6 @@ public final class HttpConnectionImpl implements HttpConnection {
 	public HttpConnectionImpl(String url) throws IOException {
 		super();
 		this.url = url;
-		Emulator.getEmulator().getLogStream().println("Connect to: " + url);
 		this.connection = (HttpURLConnection) new URL(url).openConnection();
 		connection.setInstanceFollowRedirects(false);
 		connection.setDoInput(true);
@@ -110,7 +110,9 @@ public final class HttpConnectionImpl implements HttpConnection {
 				}
 			}
 		} catch (Exception ignored) {}
+		Connections.httpRequest(this);
 		connection.connect();
+		Connections.httpResponse(this);
 		try {
 			headerOffset = connection.getHeaderFieldKey(0) == null && connection.getHeaderFieldKey(1) != null ? 1 : 0;
 		} catch (Exception ignored) {}

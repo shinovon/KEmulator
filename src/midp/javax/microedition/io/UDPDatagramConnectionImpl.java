@@ -14,7 +14,6 @@ class UDPDatagramConnectionImpl implements UDPDatagramConnection {
 
 	UDPDatagramConnectionImpl(String addr) throws IOException {
 		address = addr;
-		Emulator.getEmulator().getLogStream().println("Datagram opened: " + addr);
 		final int n = addr.indexOf("://") + 3;
 		final int n2 = addr.lastIndexOf(":") + 1;
 		if (addr.startsWith("datagram://:")) {

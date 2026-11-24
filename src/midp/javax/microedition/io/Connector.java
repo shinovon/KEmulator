@@ -2,6 +2,7 @@ package javax.microedition.io;
 
 import com.nttdocomo.io.maker.ScratchPadConnection;
 import com.sun.cdc.io.ConnectionBaseInterface;
+import emulator.Connections;
 import emulator.Emulator;
 import emulator.Permission;
 import emulator.Settings;
@@ -32,6 +33,7 @@ public class Connector {
 	}
 
 	public static Connection open(String s, final int n, final boolean b) throws IOException {
+		String origUrl = s;
 		{
 			// nokia
 			int i = s.indexOf(";nokia_netid=");
@@ -65,99 +67,107 @@ public class Connector {
 				s = s.substring(0, i);
 			}
 		}
-		if (s.startsWith("resource:")) {
-			return new ResourceConnectionImpl(s);
-		}
-		if(s.startsWith("vserv:")) {
+		if (s.startsWith("vserv:")) {
 			return new VServConnectionWrapper(s);
 		}
-		if (s.startsWith("scratchpad:")) {
-			return ScratchPadConnection.open(s);
-		}
-		if (s.startsWith("file://") && !Settings.protectedPackages.contains("javax.microedition.io.file")) {
-			Permission.checkPermission("connector.open.file");
-			return new FileConnectionImpl(s);
-		}
-		if (s.startsWith("sms://") && !Settings.protectedPackages.contains("javax.wireless.messaging")) {
-			Permission.checkPermission("connector.open.sms");
-			return new MessageConnectionImpl(s);
-		}
-		if (s.startsWith("sensor:") && !Settings.protectedPackages.contains("javax.microedition.sensor")) {
-			final SensorInfo[] sensors;
-			if ((sensors = SensorManager.findSensors(s)).length > 0) {
-				((Sensor) sensors[0]).open();
-				return (SensorConnection) sensors[0];
+		Connection res = null;
+		res: try {
+			if (s.startsWith("resource:")) {
+				res = new ResourceConnectionImpl(s);
 			}
-			return null;
-		} else {
+			if (s.startsWith("scratchpad:")) {
+				res = ScratchPadConnection.open(s);
+			}
+			if (s.startsWith("file://") && !Settings.protectedPackages.contains("javax.microedition.io.file")) {
+				Permission.checkPermission("connector.open.file");
+				res = new FileConnectionImpl(s);
+			}
+			if (s.startsWith("sms://") && !Settings.protectedPackages.contains("javax.wireless.messaging")) {
+				Permission.checkPermission("connector.open.sms");
+				res = new MessageConnectionImpl(s);
+			}
+			if (s.startsWith("sensor:") && !Settings.protectedPackages.contains("javax.microedition.sensor")) {
+				final SensorInfo[] sensors;
+				if ((sensors = SensorManager.findSensors(s)).length > 0) {
+					((Sensor) sensors[0]).open();
+					res = (SensorConnection) sensors[0];
+					break res;
+				}
+				res = null;
+				break res;
+			}
 			if (Settings.networkNotAvailable) {
-				Emulator.getEmulator().getLogStream().println("MIDlet tried to open: " + s);
-				throw new IOException("Network not available");
+				throw new ConnectionNotFoundException("Network not available");
 			}
 			if (s.startsWith("http://")) {
 				Permission.checkPermission("connector.open.http");
 				if (Emulator.doja) {
-					return new com.nttdocomo.io.maker.HttpConnectionImpl(s, n);
+					res = new com.nttdocomo.io.maker.HttpConnectionImpl(s, n);
+					break res;
 				}
-				return checkVserv(s) ? new VServConnectionWrapper(s) : new HttpConnectionImpl(s);
+				res = checkVserv(s) ? new VServConnectionWrapper(s) : new HttpConnectionImpl(s);
+				break res;
 			}
 			if (s.startsWith("https://")) {
 				Permission.checkPermission("connector.open.http");
-				return checkVserv(s) ? new VServConnectionWrapper(s) : new HttpConnectionImpl(s);
+				res = checkVserv(s) ? new VServConnectionWrapper(s) : new HttpConnectionImpl(s);
+				break res;
 			}
 			if (s.startsWith("socket://:")) {
 				Permission.checkPermission("connector.open.serversocket");
-				return new ServerSocketImpl(s);
+				res = new ServerSocketImpl(s);
+				break res;
 			}
 			if (s.startsWith("socket://")) {
 				Permission.checkPermission("connector.open.socket");
-				return new SocketConnectionImpl(s);
+				res = new SocketConnectionImpl(s);
+				break res;
 			}
 			if (s.startsWith("datagram://:")) {
 				Permission.checkPermission("connector.open.datagramreceive");
-				return new UDPDatagramConnectionImpl(s);
+				res = new UDPDatagramConnectionImpl(s);
+				break res;
 			}
 			if (s.startsWith("datagram://")) {
 				Permission.checkPermission("connector.open.datagram");
-				return new UDPDatagramConnectionImpl(s);
+				res = new UDPDatagramConnectionImpl(s);
+				break res;
 			}
 			if (s.startsWith("ssl://")) {
 				Permission.checkPermission("connector.open.ssl");
-				return new SecureConnectionImpl(s);
+				res = new SecureConnectionImpl(s);
+				break res;
 			}
-			// Bluetooth emulation over LAN
 			if (!Settings.protectedPackages.contains("javax.bluetooth")) {
 				if (s.startsWith("btspp://") || s.startsWith("btl2cap://") || s.startsWith("btgoep://")) {
 					try {
 						emulator.bluetooth.BluetoothBackend backend =
 								emulator.bluetooth.BluetoothBackendProvider.getInstance();
-						if (s.contains("://localhost:")) {
-							return backend.openServerNotifier(s);
-						} else {
-							return backend.openClientConnection(s);
-						}
+						res = s.contains("://localhost:") ? backend.openServerNotifier(s) : backend.openClientConnection(s);
+						break res;
 					} catch (javax.bluetooth.BluetoothStateException bse) {
 						throw new IOException("Bluetooth not available: " + bse.getMessage());
 					}
 				}
 			}
-			Connection openPrim = null;
-			String protocol = "";
+			String protocol;
 			if (s.indexOf(':') != -1) {
 				protocol = s.substring(0, s.indexOf(':'));
 			} else {
 				throw new ConnectionNotFoundException("unknown protocol: " + s);
 			}
 			try {
-				openPrim = ((ConnectionBaseInterface) Class.forName("com.sun.cdc.io.j2me." + protocol + ".Protocol").newInstance()).openPrim(s.substring(s.indexOf(':') + 1), n, b);
+				res = ((ConnectionBaseInterface) Class.forName("com.sun.cdc.io.j2me." + protocol + ".Protocol").newInstance()).openPrim(s.substring(s.indexOf(':') + 1), n, b);
 			} catch (Exception ex) {
 				if (ex instanceof IOException) {
 					throw (IOException) ex;
 				}
 				throw new ConnectionNotFoundException("unknown protocol: " + s, ex);
 			}
-			return openPrim;
+		} finally {
+			Connections.open(origUrl, res);
 		}
+		return res;
 	}
 
 	private static boolean checkVserv(String s) {

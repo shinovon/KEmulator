@@ -13,7 +13,6 @@ class SocketConnectionImpl implements SocketConnection
 	
 	SocketConnectionImpl(final String s) throws IOException {
 		super();
-		Emulator.getEmulator().getLogStream().println("Socket opened: " + s);
 		final int n = s.indexOf("://") + 3;
 		final int n2 = s.lastIndexOf(":") + 1;
 		socket = new Socket(s.substring(n, n2 - 1), Integer.parseInt(s.substring(n2)));

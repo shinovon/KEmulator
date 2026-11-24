@@ -11,7 +11,6 @@ final class VServConnectionWrapper implements HttpConnection {
 
 	public VServConnectionWrapper(String url) {
 		this.url = url;
-		Emulator.getEmulator().getLogStream().println("vServ connection wrapped: " + url);
 	}
 
 	public final String getURL() {

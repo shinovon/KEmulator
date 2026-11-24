@@ -15,7 +15,6 @@ public class FileConnectionImpl implements FileConnection {
 	private String aString442;
 
 	public FileConnectionImpl(String url) throws IOException {
-		Emulator.getEmulator().getLogStream().println("File opened: " + url);
 		if (url.length() > 300) {
 			throw new IOException("Path too long");
 		}
