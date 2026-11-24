@@ -110,9 +110,9 @@ public final class HttpConnectionImpl implements HttpConnection {
 				}
 			}
 		} catch (Exception ignored) {}
-		Connections.httpRequest(this);
+		Connections.httpRequest(this, connection.getRequestProperties());
 		connection.connect();
-		Connections.httpResponse(this);
+		Connections.httpResponse(this, connection.getHeaderFields());
 		try {
 			headerOffset = connection.getHeaderFieldKey(0) == null && connection.getHeaderFieldKey(1) != null ? 1 : 0;
 		} catch (Exception ignored) {}

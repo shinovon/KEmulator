@@ -238,6 +238,7 @@ public final class Property implements IProperty, SelectionListener {
 	private Button maMidiCheck;
 	private Button passMinimizeBtn;
 	private Button countImagesSize;
+	private Button traceHttpConnectionCheck;
 
 	public Property() {
 		super();
@@ -407,9 +408,10 @@ public final class Property implements IProperty, SelectionListener {
 			Settings.infoColorHex = Boolean.parseBoolean(properties.getProperty("InfoColorHex", "false"));
 			Settings.recordReleasedImg = Boolean.parseBoolean(properties.getProperty("RecordReleasedImg", "false"));
 			Settings.autoGenJad = Boolean.parseBoolean(properties.getProperty("AutoGenJad", "false"));
-			Settings.enableNewTrack = Boolean.parseBoolean(properties.getProperty("EnableNewTrack", "false"));
-			Settings.enableMethodTrack = Boolean.parseBoolean(properties.getProperty("EnableMethodTrack", "false"));
-			Settings.threadMethodTrack = Boolean.parseBoolean(properties.getProperty("ShowMethodTrack", "false"));
+			Settings.traceNew = Boolean.parseBoolean(properties.getProperty("EnableNewTrack", "false"));
+			Settings.traceCalls = Boolean.parseBoolean(properties.getProperty("EnableMethodTrack", "false"));
+			Settings.traceHttp = Boolean.parseBoolean(properties.getProperty("TraceHttp", "false"));
+			Settings.enableTrace = Boolean.parseBoolean(properties.getProperty("ShowMethodTrack", "false"));
 			Settings.updateBranch = properties.getProperty("UpdateBranch", Emulator.debugBuild ? "dev" : "stable");
 			Settings.autoUpdate = Integer.parseInt(properties.getProperty("AutoUpdate", "0"));
 			Settings.altLessSpeedShortcuts = Boolean.parseBoolean(properties.getProperty("AltLessSpeedShortcuts", "false"));
@@ -503,8 +505,8 @@ public final class Property implements IProperty, SelectionListener {
 			EmulatorScreen.locX = Integer.MIN_VALUE;
 			EmulatorScreen.locY = Integer.MIN_VALUE;
 			Settings.autoGenJad = false;
-			Settings.enableNewTrack = false;
-			Settings.enableMethodTrack = false;
+			Settings.traceNew = false;
+			Settings.traceCalls = false;
 			this.fontSmallSize = 12;
 			this.fontMediumSize = 14;
 			this.fontLargeSize = 16;
@@ -663,9 +665,10 @@ public final class Property implements IProperty, SelectionListener {
 			properties.setProperty("InfoColorHex", String.valueOf(Settings.infoColorHex));
 			properties.setProperty("RecordReleasedImg", String.valueOf(Settings.recordReleasedImg));
 			properties.setProperty("AutoGenJad", String.valueOf(Settings.autoGenJad));
-			properties.setProperty("EnableNewTrack", String.valueOf(Settings.enableNewTrack));
-			properties.setProperty("EnableMethodTrack", String.valueOf(Settings.enableMethodTrack));
-			properties.setProperty("ShowMethodTrack", String.valueOf(Settings.threadMethodTrack));
+			properties.setProperty("EnableNewTrack", String.valueOf(Settings.traceNew));
+			properties.setProperty("EnableMethodTrack", String.valueOf(Settings.traceCalls));
+			properties.setProperty("TraceHttp", String.valueOf(Settings.traceHttp));
+			properties.setProperty("ShowMethodTrack", String.valueOf(Settings.enableTrace));
 			properties.setProperty("UpdateBranch", Settings.updateBranch);
 			properties.setProperty("AutoUpdate", String.valueOf(Settings.autoUpdate));
 			if (properties.getProperty("AltLessSpeedShortcuts") == null) //overwrite only if not in the file, can be changed only externaly
@@ -793,8 +796,9 @@ public final class Property implements IProperty, SelectionListener {
 		Settings.xrayShowClipBorder = this.xrayClipCheck.getSelection();
 		Settings.infoColorHex = this.infoColorHexCheck.getSelection();
 		Settings.recordReleasedImg = this.recordReleasedImagesCheck.getSelection();
-		Settings.enableNewTrack = this.trackAllocationsCheck.getSelection();
-		Settings.enableMethodTrack = this.trackMethodCallsCheck.getSelection();
+		Settings.traceNew = this.trackAllocationsCheck.getSelection();
+		Settings.traceCalls = this.trackMethodCallsCheck.getSelection();
+		Settings.traceHttp = this.traceHttpConnectionCheck.getSelection();
 		Settings.proxyType = this.proxyTypeCombo.getSelectionIndex();
 		Settings.proxyHost = this.proxyHostText.getText().trim();
 		Settings.proxyPort = this.proxyPortText.getText().trim();
@@ -2108,13 +2112,18 @@ public final class Property implements IProperty, SelectionListener {
 		
 		this.trackAllocationsCheck = new Button(grpDebug, SWT.CHECK);
 		trackAllocationsCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		trackAllocationsCheck.setText(UILocale.get("OPTION_SYSTEM_TRACK_NEW", "Track \"new/new[]...\" operations"));
-		this.trackAllocationsCheck.setSelection(Settings.enableNewTrack);
+		trackAllocationsCheck.setText(UILocale.get("OPTION_SYSTEM_TRACK_NEW", "Trace \"new/new[]...\" operations"));
+		this.trackAllocationsCheck.setSelection(Settings.traceNew);
 		
 		this.trackMethodCallsCheck = new Button(grpDebug, SWT.CHECK);
 		trackMethodCallsCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		trackMethodCallsCheck.setText(UILocale.get("OPTION_SYSTEM_TRACK_METHOD", "Track method calls"));
-		this.trackMethodCallsCheck.setSelection(Settings.enableMethodTrack);
+		trackMethodCallsCheck.setText(UILocale.get("OPTION_SYSTEM_TRACK_METHOD", "Trace method calls"));
+		this.trackMethodCallsCheck.setSelection(Settings.traceCalls);
+
+		traceHttpConnectionCheck = new Button(grpDebug, SWT.CHECK);
+		traceHttpConnectionCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		traceHttpConnectionCheck.setText("Trace HTTP connections");
+		traceHttpConnectionCheck.setSelection(Settings.traceHttp);
 
 		grpMisc = new Group(systemComp, SWT.NONE);
 		grpMisc.setText("Misc");

@@ -52,9 +52,10 @@ public final class Settings {
 	public static boolean recordReleasedImg;
 	public static boolean xrayOverlapScreen;
 	public static boolean xrayShowClipBorder;
-	public static boolean enableMethodTrack;
-	public static boolean enableNewTrack;
-	public static boolean threadMethodTrack;
+	public static boolean traceCalls;
+	public static boolean traceNew;
+	public static boolean traceHttp;
+	public static boolean enableTrace;
 	public static boolean storeCreatedImages = true;
 	public static boolean countImagesInObjectsSize = true;
 

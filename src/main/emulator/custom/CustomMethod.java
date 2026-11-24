@@ -10,7 +10,6 @@ import emulator.graphics3D.lwjgl.Emulator3D;
 import emulator.ui.swt.EmulatorScreen;
 
 import javax.microedition.media.Manager;
-import java.awt.*;
 import java.io.*;
 import java.util.Hashtable;
 
@@ -208,7 +207,7 @@ public class CustomMethod {
 	}
 
 	public static void showTrackInfo(final String s) {
-		if (Settings.threadMethodTrack) {
+		if (Settings.enableTrace) {
 			System.out.print(s);
 			if (trackWriter != null) {
 				try {

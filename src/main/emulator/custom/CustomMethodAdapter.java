@@ -1,6 +1,5 @@
 package emulator.custom;
 
-import emulator.AppSettings;
 import emulator.Emulator;
 import emulator.Settings;
 import org.objectweb.asm.Label;
@@ -248,7 +247,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 		this.className = className;
 		this.methodName = s;
 		this.methodDesc = methodDescriptor;
-		if (Settings.enableNewTrack || Settings.enableMethodTrack) {
+		if (Settings.traceNew || Settings.traceCalls) {
 			this.methodName = className + "." + s;
 			this.allocationTraceMessage = "";
 			this.sourceLine = 0;
@@ -264,7 +263,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 	}
 
 	public final void visitLineNumber(final int lineNumber, final Label label) {
-		if (Settings.enableNewTrack) {
+		if (Settings.traceNew) {
 			this.sourceLine = lineNumber;
 		}
 		super.visitLineNumber(lineNumber, label);
@@ -280,7 +279,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 
 	public final void visitMultiANewArrayInsn(final String s, final int n) {
 //		System.out.println("visitMulti " + s);
-		if (Settings.enableNewTrack) {
+		if (Settings.traceNew) {
 			this.emitAllocationTrace("new " + emulator.debug.ClassTypes.method870(s));
 		}
 		if (s.contains("com/docomostar/")) {
@@ -293,7 +292,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 	public final void visitTypeInsn(final int n, final String s) {
 		Label_0078:
 		{
-			if (Settings.enableNewTrack) {
+			if (Settings.traceNew) {
 				CustomMethodAdapter f = null;
 				StringBuffer sb = null;
 				String s2 = null;
@@ -353,7 +352,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 		}
 		Label_0116:
 		{
-			if (Settings.enableNewTrack && n == 188) {
+			if (Settings.traceNew && n == 188) {
 				CustomMethodAdapter f = null;
 				String s = null;
 				switch (n2) {
@@ -415,7 +414,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 	}
 
 	public final void visitCode() {
-		if (Settings.enableMethodTrack) {
+		if (Settings.traceCalls) {
 			this.requireExtraStack(1);
 			super.visitLdcInsn((this.methodName + this.methodDesc));
 			super.visitMethodInsn(184, "emulator/custom/CustomMethod", "beginMethod", "(Ljava/lang/String;)V");
@@ -423,7 +422,7 @@ public final class CustomMethodAdapter extends MethodVisitor implements Opcodes 
 	}
 
 	public final void visitInsn(final int n) {
-		if (Settings.enableMethodTrack) {
+		if (Settings.traceCalls) {
 			switch (n) {
 				case 172:
 				case 173:

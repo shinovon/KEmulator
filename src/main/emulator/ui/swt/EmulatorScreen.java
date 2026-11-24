@@ -1177,8 +1177,8 @@ public final class EmulatorScreen implements
 		this.captureToClipboardMenuItem.setAccelerator(SWT.ALT | 'C');
 		this.captureToClipboardMenuItem.addSelectionListener(this);
 		new MenuItem(this.menuTool, 2);
-		(this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText(UILocale.get("MENU_TOOL_SHOW_TRACK_INFO", "Show Track Info") + "\tCtrl+F3");
-		this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack);
+		(this.showTrackInfoMenuItem = new MenuItem(this.menuTool, 32)).setText("Enable Trace" + "\tCtrl+F3");
+		this.showTrackInfoMenuItem.setSelection(Settings.enableTrace);
 		this.showTrackInfoMenuItem.addSelectionListener(this);
 		this.showTrackInfoMenuItem.setAccelerator(SWT.CONTROL | SWT.F3);
 
@@ -1369,7 +1369,7 @@ public final class EmulatorScreen implements
 					return;
 				}
 				if (menuItem == this.showTrackInfoMenuItem) {
-					this.showTrackInfoMenuItem.setSelection(Settings.threadMethodTrack = !Settings.threadMethodTrack);
+					this.showTrackInfoMenuItem.setSelection(Settings.enableTrace = !Settings.enableTrace);
 					return;
 				}
 				if (menuItem == this.zoomInMenuItem) {

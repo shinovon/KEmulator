@@ -292,7 +292,7 @@ public final class Methods implements Runnable, DisposeListener {
 				((EmulatorScreen) Emulator.getEmulator().getScreen()).resumeStep();
 			}
 		});
-		if (!Settings.enableMethodTrack)
+		if (!Settings.traceCalls)
 			new Label(this.tablePanel, 8388608).setText("To track calls, enable it in System settings");
 		(this.methodsTable = new Table(this.tablePanel, 67584)).setHeaderVisible(true);
 		this.methodsTable.setLayoutData(layoutData);
