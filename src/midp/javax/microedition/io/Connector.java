@@ -1,6 +1,5 @@
 package javax.microedition.io;
 
-import com.nttdocomo.io.maker.ScratchPadConnection;
 import com.sun.cdc.io.ConnectionBaseInterface;
 import emulator.Connections;
 import emulator.Emulator;
