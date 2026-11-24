@@ -1,6 +1,6 @@
 $v2.xx.x [2026.xx.xx]
 Enabled preload resources by default
-Video capture rewritten on VLC instead of webcam-capture library
+Rewritten video capture using VLC instead of webcam-capture
 Added resourceStreamDecompressedBytes in Profiler
 Fixed lighting mode selection in M3G View
 Fixed ambient light in M3G View

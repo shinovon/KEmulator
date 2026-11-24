@@ -1,6 +1,7 @@
+/*
+Copyright (c) 2024-2026 Arman Jussupgaliyev
+*/
 package javax.microedition.io;
-
-import emulator.Emulator;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

@@ -35,6 +35,7 @@ import javax.microedition.lcdui.Screen;
 import javax.swing.*;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -846,14 +847,27 @@ public final class EmulatorScreen implements
 		shell.setMinimumSize(120, 50); // windows uses 120px as hard limit for width
 		shell.setLayout(layout);
 		try {
+			// windows dpi fix
 			if (f == null) {
 				FontData fd = shell.getFont().getFontData()[0];
-				fd.height = (fd.height / -fd.data.lfHeight) * 12;
+
+				Field heightField = FontData.class.getField("height");
+				heightField.setAccessible(true);
+				int height = heightField.getInt(fd);
+
+				Field dataField = FontData.class.getField("data");
+				dataField.setAccessible(true);
+				Object data = dataField.get(fd);
+				Field lfHeightField = data.getClass().getField("lfHeight");
+				lfHeightField.setAccessible(true);
+				int lfHeight = lfHeightField.getInt(data);
+
+				heightField.set(fd, (height / -lfHeight) * 12);
+
 				f = new Font(shell.getDisplay(), fd);
 			}
 			shell.setFont(f);
-		} catch (Error ignored) {
-		}
+		} catch (Throwable ignored) {}
 		initCanvas();
 		(this.leftSoftLabel = new CLabel(this.shell, 0)).setText("\t");
 		this.leftSoftLabel.addMouseListener(new MouseAdapter() {

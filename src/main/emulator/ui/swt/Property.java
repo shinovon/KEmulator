@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.*;
 import javax.microedition.rms.RecordStore;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.nio.file.Files;
@@ -856,19 +857,28 @@ public final class Property implements IProperty, SelectionListener {
 		this.settingsShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		settingsShell.setText(UILocale.get("OPTION_FRAME_TITLE", "Options & Properties"));
 		this.settingsShell.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/res/icon")));
-		// 1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI
-		//settingsShell.setFont(settingsShell.getFont().getFontData()[0]);
 		try {
+			// windows dpi fix
 			if (f == null) {
-				FontData fd = settingsShell.getFont().getFontData()[0];
-				fd.height = (fd.height / -fd.data.lfHeight) * 12;
+				FontData fd = shell.getFont().getFontData()[0];
+
+				Field heightField = FontData.class.getField("height");
+				heightField.setAccessible(true);
+				int height = heightField.getInt(fd);
+
+				Field dataField = FontData.class.getField("data");
+				dataField.setAccessible(true);
+				Object data = dataField.get(fd);
+				Field lfHeightField = data.getClass().getField("lfHeight");
+				lfHeightField.setAccessible(true);
+				int lfHeight = lfHeightField.getInt(data);
+
+				heightField.set(fd, (height / -lfHeight) * 12);
+
 				f = new Font(shell.getDisplay(), fd);
 			}
-
-			settingsShell.setFont(f);
-		} catch (Error ignored) {
-
-		}
+			shell.setFont(f);
+		} catch (Throwable ignored) {}
 		final GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		this.settingsShell.setLayout(layout);
