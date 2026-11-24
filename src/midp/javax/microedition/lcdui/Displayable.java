@@ -3,7 +3,6 @@ package javax.microedition.lcdui;
 import emulator.*;
 import emulator.debug.Profiler;
 import emulator.lcdui.LCDUIUtils;
-import emulator.media.capture.CapturePlayerImpl;
 import emulator.media.vlc.VLCPlayerImpl;
 import emulator.ui.CommandsMenuPosition;
 import emulator.ui.IScreen;

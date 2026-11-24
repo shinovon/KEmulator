@@ -4,7 +4,6 @@ import emulator.Emulator;
 import emulator.Settings;
 import emulator.Utils;
 import emulator.custom.ResourceManager;
-import emulator.media.capture.CapturePlayerImpl;
 import emulator.media.tone.MIDITonePlayer;
 import emulator.media.tone.ToneManager;
 import emulator.media.vlc.VLCPlayerImpl;
