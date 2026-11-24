@@ -31,6 +31,9 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 		loadLWJGLNatives();
 	}
 
+	public void loadLibrary(String name) {
+	}
+
 	public boolean supportsMascotCapsule() {
 		return true;
 	}

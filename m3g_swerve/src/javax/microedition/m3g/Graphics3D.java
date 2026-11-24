@@ -1,7 +1,7 @@
 package javax.microedition.m3g;
 
+import emulator.Emulator;
 import emulator.debug.Memory;
-import emulator.i;
 
 import javax.microedition.lcdui.Graphics;
 import java.util.Hashtable;
@@ -272,7 +272,7 @@ public class Graphics3D {
     }
 
     static {
-        i.a("jsr184client");
+        Emulator.getPlatform().loadLibrary("jsr184client");
         Engine.cacheFID(Graphics3D.class, 1);
     }
 

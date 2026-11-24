@@ -1,6 +1,6 @@
 package javax.microedition.m3g;
 
-import emulator.i;
+import emulator.Emulator;
 
 public class Transform {
     int swerveHandle;
@@ -30,7 +30,7 @@ public class Transform {
     }
 
     static {
-        i.a("jsr184client");
+        Emulator.getPlatform().loadLibrary("jsr184client");
         Engine.cacheFID(Transform.class, 4);
     }
 

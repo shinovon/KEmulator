@@ -25,6 +25,15 @@ public class EmulatorPlatform implements IEmulatorPlatform {
 	public void loadLibraries() {
 	}
 
+	public void loadLibrary(String name) {
+		try {
+			System.load(Emulator.getAbsolutePath() + "/" + name + ".dll");
+		} catch (UnsatisfiedLinkError e) {
+			e.printStackTrace();
+			System.loadLibrary(name);
+		}
+	}
+
 	public boolean supportsMascotCapsule() {
 		return true;
 	}

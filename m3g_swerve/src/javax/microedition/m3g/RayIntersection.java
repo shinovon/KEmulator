@@ -1,6 +1,6 @@
 package javax.microedition.m3g;
 
-import emulator.i;
+import emulator.Emulator;
 
 public class RayIntersection {
     int swerveHandle;
@@ -42,7 +42,7 @@ public class RayIntersection {
     public native void getRay(final float[] p0);
 
     static {
-        i.a("jsr184client");
+        Emulator.getPlatform().loadLibrary("jsr184client");
         Engine.cacheFID(RayIntersection.class, 3);
     }
 }

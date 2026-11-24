@@ -27,4 +27,6 @@ public interface IEmulatorPlatform {
 	String getSwtLibraryName();
 
 	String[] getLwjglLibraryNames();
+
+	void loadLibrary(String name);
 }

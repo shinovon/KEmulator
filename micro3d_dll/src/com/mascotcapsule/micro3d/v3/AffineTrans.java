@@ -16,6 +16,8 @@
  */
 package com.mascotcapsule.micro3d.v3;
 
+import emulator.Emulator;
+
 public class AffineTrans {
     public int m00;
     public int m01;
@@ -248,7 +250,7 @@ public class AffineTrans {
     }
 
     static {
-        System.loadLibrary("java_micro3d_v3_32");
+        Emulator.getPlatform().loadLibrary("java_micro3d_v3_32");
         nInitClass();
     }
 

@@ -16,6 +16,8 @@
  */
 package com.mascotcapsule.micro3d.v3;
 
+import emulator.Emulator;
+
 public class Light {
     private int mAmbIntensity;
     private int mDirIntensity;
@@ -88,7 +90,7 @@ public class Light {
     }
 
     static {
-        System.loadLibrary("java_micro3d_v3_32");
+        Emulator.getPlatform().loadLibrary("java_micro3d_v3_32");
         nInitClass();
     }
 

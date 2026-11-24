@@ -1,6 +1,6 @@
 package javax.microedition.m3g;
 
-import emulator.i;
+import emulator.Emulator;
 
 public abstract class Object3D {
     int swerveHandle;
@@ -89,7 +89,7 @@ public abstract class Object3D {
     }
 
     static {
-        i.a("jsr184client");
+        Emulator.getPlatform().loadLibrary("jsr184client");
         Engine.cacheFID(Object3D.class, 0);
     }
 

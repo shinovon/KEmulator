@@ -1,6 +1,6 @@
 package javax.microedition.m3g;
 
-import emulator.i;
+import emulator.Emulator;
 
 import javax.microedition.lcdui.Image;
 import java.io.IOException;
@@ -375,7 +375,7 @@ public class Loader {
     }
 
     static {
-        i.a("jsr184client");
+        Emulator.getPlatform().loadLibrary("jsr184client");
         Engine.cacheFID(Loader.class, 2);
         Loader.pngIdentifier = new byte[]{-119, 80, 78, 71, 13, 10, 26, 10};
         Loader.m3gIdentifierLength = 12;

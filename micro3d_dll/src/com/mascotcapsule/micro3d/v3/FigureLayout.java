@@ -16,6 +16,8 @@
  */
 package com.mascotcapsule.micro3d.v3;
 
+import emulator.Emulator;
+
 public class FigureLayout {
     private AffineTrans mAffine;
     private AffineTrans[] mAffineArray;
@@ -155,7 +157,7 @@ public class FigureLayout {
     }
 
     static {
-        System.loadLibrary("java_micro3d_v3_32");
+        Emulator.getPlatform().loadLibrary("java_micro3d_v3_32");
         nInitClass();
     }
 

@@ -16,6 +16,8 @@
  */
 package com.mascotcapsule.micro3d.v3;
 
+import emulator.Emulator;
+
 public class Effect3D {
     public static final int NORMAL_SHADING = 0;
     public static final int TOON_SHADING = 1;
@@ -150,7 +152,7 @@ public class Effect3D {
     }
 
     static {
-        System.loadLibrary("java_micro3d_v3_32");
+        Emulator.getPlatform().loadLibrary("java_micro3d_v3_32");
         nInitClass();
     }
 

@@ -162,7 +162,7 @@ public class Texture {
     }
 
     static {
-        System.loadLibrary("java_micro3d_v3_32");
+        Emulator.getPlatform().loadLibrary("java_micro3d_v3_32");
         nInitClass();
     }
 
