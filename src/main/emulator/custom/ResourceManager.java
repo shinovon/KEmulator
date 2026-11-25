@@ -20,6 +20,8 @@ public final class ResourceManager {
 	private static HashMap<String, byte[]> resourcesTable;
 
 	public static void preloadResources() {
+		if (Emulator.midletJar == null) return;
+
 		resourcesTable = new HashMap<>();
 		synchronized (Emulator.jarFileLock) {
 			ZipFile zipFile = Emulator.midletJar;
