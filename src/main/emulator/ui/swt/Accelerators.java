@@ -116,6 +116,10 @@ public class Accelerators {
 			sb.append("Shift+");
 		}
 
+		if ((a & SWT.COMMAND) != 0) {
+			sb.append("Command+");
+		}
+
 		int key = a & SWT.KEY_MASK;
 
 		switch (key) {
