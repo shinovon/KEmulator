@@ -30,7 +30,7 @@ public class Accelerators {
 		set("Restart", ALT | 'R');
 		set("Exit", 0);
 
-		set("Set Screen Size", 0);
+		set("Set Screen Size...", 0);
 		set("Reset Window Size", 0);
 
 		set("Speed Up", Settings.altLessSpeedShortcuts ? '>' : (ALT | '>'));

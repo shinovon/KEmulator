@@ -2066,7 +2066,7 @@ public final class Property implements IProperty, SelectionListener {
 //		hotkeysResetBtn.setLayoutData(labelGridData);
 
 		Group group = new Group(hotkeysContent, SWT.NONE);
-		group.setText("Hotkeys");
+		group.setText("Menus");
 		group.setLayout(layout);
 		group.setLayoutData(groupData);
 

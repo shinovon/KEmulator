@@ -1049,7 +1049,7 @@ public final class EmulatorScreen implements
 		Accelerators.menuItem(sensorMenuItem, "Sensor Simulator");
 
 		devUtilsMenuItem = new MenuItem(this.menuView, 8);
-		devUtilsMenuItem.setText("IntelliJ IDEA support");
+		devUtilsMenuItem.setText("IntelliJ IDEA Support");
 		devUtilsMenuItem.addSelectionListener(this);
 
 		(this.logMenuItem = new MenuItem(this.menuView, 8)).setText(UILocale.get("MENU_VIEW_LOG", "Log"));
@@ -1151,7 +1151,7 @@ public final class EmulatorScreen implements
 
 		changeResMenuItem = new MenuItem(menuResize, 8);
 		changeResMenuItem.addSelectionListener(this);
-		Accelerators.menuItem(changeResMenuItem, "Set Screen Size");
+		Accelerators.menuItem(changeResMenuItem, "Set Screen Size...");
 
 		resetSizeMenuItem = new MenuItem(menuResize, SWT.PUSH);
 		resetSizeMenuItem.addSelectionListener(this);
