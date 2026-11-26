@@ -20,15 +20,16 @@ public final class InfosBox {
 		Display display = parent.getDisplay();
 		visible = true;
 		parent.forceActive();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-		visible = false;
+//		while (!shell.isDisposed()) {
+//			if (!display.readAndDispatch()) {
+//				display.sleep();
+//			}
+//		}
+//		visible = false;
 	}
 
 	public void dispose() {
+		visible = false;
 		if (this.shell != null && !this.shell.isDisposed()) {
 			this.shell.dispose();
 		}

@@ -471,12 +471,12 @@ public final class Watcher extends SelectionAdapter implements Runnable, Dispose
 		display.asyncExec(this);
 		Watcher.activeWatchers.addElement(this);
 		Display display = SWTFrontend.getDisplay();
-		while (!this.shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-		visible = false;
+//		while (!this.shell.isDisposed()) {
+//			if (!display.readAndDispatch()) {
+//				display.sleep();
+//			}
+//		}
+//		visible = false;
 	}
 
 	private void setInitialRect(Shell parent) {

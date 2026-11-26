@@ -124,12 +124,12 @@ public final class Log implements ILogStream, ControlListener, DisposeListener, 
 		this.logShell.addControlListener(this);
 		this.logShell.addDisposeListener(this);
 		parent.setFocus();
-		while (!this.logShell.isDisposed()) {
-			if (!current.readAndDispatch()) {
-				current.sleep();
-			}
-		}
-		this.logOpen = false;
+//		while (!this.logShell.isDisposed()) {
+//			if (!current.readAndDispatch()) {
+//				current.sleep();
+//			}
+//		}
+//		this.logOpen = false;
 	}
 
 	public final void dispose() {

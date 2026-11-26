@@ -2838,7 +2838,7 @@ public final class EmulatorScreen implements
 	}
 
 	public String showIMEIDialog() {
-		InputDialog imeiDialog[] = new InputDialog[1];
+		InputDialog[] imeiDialog = new InputDialog[1];
 		shell.getDisplay().syncExec(() -> {
 			imeiDialog[0] = new InputDialog(shell);
 			imeiDialog[0].setMessage("Application asks for IMEI");
