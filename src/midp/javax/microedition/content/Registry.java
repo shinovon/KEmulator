@@ -4,8 +4,7 @@ import java.io.IOException;
 
 public class Registry {
 	public static Registry getRegistry(String paramString) {
-		Registry localRegistry = null;
-		return localRegistry;
+		return new Registry();
 	}
 
 	public static ContentHandlerServer getServer(String paramString)
@@ -65,28 +64,25 @@ public class Registry {
 		return localContentHandler;
 	}
 
-	public ContentHandler[] findHandler(Invocation paramInvocation)
+	public ContentHandler[] findHandler(Invocation invocation)
 			throws IOException, ContentHandlerException, SecurityException {
-		ContentHandler[] arrayOfContentHandler = null;
-		return arrayOfContentHandler;
+		return new ContentHandler[] {};
 	}
 
 	public boolean invoke(Invocation paramInvocation1, Invocation paramInvocation2)
 			throws IllegalArgumentException, IOException, ContentHandlerException, SecurityException {
-		boolean bool = true;
-		return bool;
+		return false;
 	}
 
 	public boolean invoke(Invocation paramInvocation)
 			throws IllegalArgumentException, IOException, ContentHandlerException, SecurityException {
-		boolean bool = true;
-		return bool;
+		return false;
 	}
 
 	public boolean reinvoke(Invocation paramInvocation)
 			throws IllegalArgumentException, IOException, ContentHandlerException, SecurityException {
-		boolean bool = true;
-		return bool;
+
+		return false;
 	}
 
 	public Invocation getResponse(boolean paramBoolean) {
@@ -105,6 +101,6 @@ public class Registry {
 		return str;
 	}
 
-	private Registry(int paramInt) {
+	private Registry() {
 	}
 }

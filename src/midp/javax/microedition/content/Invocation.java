@@ -13,19 +13,33 @@ public final class Invocation {
 	public static final int OK = 5;
 	public static final int WAITING = 3;
 
+	String url;
+	String id;
+	boolean responseRequired;
+	String action;
+	String type;
+
 	public Invocation() {
 	}
 
-	public Invocation(String paramString) {
+	public Invocation(String url) {
+		this(url, null, null, true, null);
 	}
 
-	public Invocation(String paramString1, String paramString2) {
+	public Invocation(String url, String type) {
+		this(url, type, null, true, null);
 	}
 
-	public Invocation(String paramString1, String paramString2, String paramString3) {
+	public Invocation(String url, String type, String id) {
+		this(url, type, id, true, null);
 	}
 
-	public Invocation(String paramString1, String paramString2, String paramString3, boolean paramBoolean, String paramString4) {
+	public Invocation(String url, String type, String id, boolean responseRequired, String action) {
+		this.url = url;
+		this.type = type;
+		this.id = id;
+		this.responseRequired = responseRequired;
+		this.action = action;
 	}
 
 	public String findType()
@@ -35,8 +49,7 @@ public final class Invocation {
 	}
 
 	public String getAction() {
-		String str = null;
-		return str;
+		return action;
 	}
 
 	public String[] getArgs() {
@@ -50,8 +63,7 @@ public final class Invocation {
 	}
 
 	public String getID() {
-		String str = null;
-		return str;
+		return id;
 	}
 
 	public String getInvokingAppName() {
@@ -75,8 +87,7 @@ public final class Invocation {
 	}
 
 	public boolean getResponseRequired() {
-		boolean bool = true;
-		return bool;
+		return responseRequired;
 	}
 
 	public int getStatus() {
@@ -85,13 +96,11 @@ public final class Invocation {
 	}
 
 	public String getType() {
-		String str = null;
-		return str;
+		return type;
 	}
 
 	public String getURL() {
-		String str = null;
-		return str;
+		return url;
 	}
 
 	public Connection open(boolean paramBoolean)
@@ -101,6 +110,7 @@ public final class Invocation {
 	}
 
 	public void setAction(String paramString) {
+		action = paramString;
 	}
 
 	public void setArgs(String[] paramArrayOfString) {
@@ -113,14 +123,18 @@ public final class Invocation {
 	}
 
 	public void setID(String paramString) {
+		id = paramString;
 	}
 
 	public void setResponseRequired(boolean paramBoolean) {
+
 	}
 
 	public void setType(String paramString) {
+		type = paramString;
 	}
 
 	public void setURL(String paramString) {
+		url = paramString;
 	}
 }
