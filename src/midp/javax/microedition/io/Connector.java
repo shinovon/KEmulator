@@ -76,17 +76,21 @@ public class Connector {
 		res: try {
 			if (s.startsWith("resource:")) {
 				res = new ResourceConnectionImpl(s);
+				break res;
 			}
 //			if (s.startsWith("scratchpad:")) {
 //				res = ScratchPadConnection.open(s);
+//				break res;
 //			}
 			if (s.startsWith("file://") && !Settings.protectedPackages.contains("javax.microedition.io.file")) {
 				Permission.checkPermission("connector.open.file");
 				res = new FileConnectionImpl(s);
+				break res;
 			}
 			if (s.startsWith("sms://") && !Settings.protectedPackages.contains("javax.wireless.messaging")) {
 				Permission.checkPermission("connector.open.sms");
 				res = new MessageConnectionImpl(s);
+				break res;
 			}
 			if (s.startsWith("sensor:") && !Settings.protectedPackages.contains("javax.microedition.sensor")) {
 				final SensorInfo[] sensors;
